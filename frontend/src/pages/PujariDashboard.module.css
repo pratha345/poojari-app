@@ -1,0 +1,112 @@
+/* PujariDashboard.module.css */
+.main { background: var(--cream); min-height: 80vh; padding: 40px 0 72px; }
+
+.profileBanner {
+  background: linear-gradient(135deg, var(--secondary), #5a1a00);
+  border-radius: var(--radius-lg); padding: 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 24px; margin-bottom: 24px; flex-wrap: wrap;
+  box-shadow: 0 8px 32px rgba(139,37,0,0.3);
+}
+.profileLeft { display: flex; align-items: center; gap: 20px; }
+.avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--primary); border: 3px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: var(--white);
+  overflow: hidden; flex-shrink: 0;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profileName { font-family: var(--font-display); font-size: 1.5rem; color: var(--white); margin-bottom: 6px; }
+.profileMeta { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 10px; }
+
+.profileStats { display: flex; gap: 24px; }
+.stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.stat span { font-size: 22px; font-weight: 700; color: var(--gold-light); font-family: var(--font-display); }
+.stat small { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+.pendingAlert {
+  background: rgba(245,127,23,0.12); border: 1.5px solid var(--warning);
+  border-radius: var(--radius-md); padding: 14px 20px;
+  font-size: 14px; color: var(--warning); margin-bottom: 24px;
+}
+
+.tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 28px; }
+.tab {
+  padding: 12px 28px; background: none; border: none;
+  font-size: 14px; font-family: var(--font-body); font-weight: 500;
+  color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; transition: all var(--transition);
+}
+.tab:hover { color: var(--primary); }
+.tabActive { color: var(--primary) !important; border-bottom-color: var(--primary) !important; font-weight: 700; }
+
+.filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.filterBtn {
+  padding: 7px 18px; border-radius: 30px; border: 1.5px solid var(--border);
+  background: var(--white); font-size: 13px; font-family: var(--font-body);
+  color: var(--text-muted); cursor: pointer; transition: all var(--transition);
+}
+.filterBtn:hover { border-color: var(--primary); color: var(--primary); }
+.filterActive { background: var(--primary) !important; color: var(--white) !important; border-color: var(--primary) !important; }
+
+.bookingList { display: flex; flex-direction: column; gap: 16px; }
+.bookingCard {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); padding: 20px 24px;
+  transition: all var(--transition);
+}
+.bookingCard:hover { border-color: var(--primary); box-shadow: 0 8px 24px var(--shadow); }
+.bookingHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.bookingCode { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+.poojaName { font-family: var(--font-display); font-size: 1.1rem; color: var(--secondary); margin-bottom: 10px; }
+.bookingMeta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.bookingAddress { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+.bookingFooter { display: flex; align-items: center; justify-content: space-between; }
+.bookingAmt { font-size: 18px; font-weight: 700; color: var(--primary); font-family: var(--font-display); }
+.respondBtns { display: flex; gap: 10px; }
+
+.empty { text-align: center; padding: 60px; color: var(--text-muted); font-size: 15px; }
+.empty span { display: block; font-size: 48px; margin-bottom: 12px; }
+
+/* Availability */
+.availSection { background: var(--white); border-radius: var(--radius-lg); padding: 32px; border: 1.5px solid var(--border); }
+.availHeader { margin-bottom: 24px; }
+.availHeader h2 { font-family: var(--font-display); color: var(--secondary); margin-bottom: 8px; }
+.availHeader p { font-size: 14px; color: var(--text-muted); }
+
+.calGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 420px; }
+.calHeader { text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted); padding: 6px 0; }
+.calDay {
+  aspect-ratio: 1; border-radius: 8px; border: none;
+  cursor: pointer; font-size: 13px; font-family: var(--font-body);
+  font-weight: 600; transition: all var(--transition);
+}
+.calAvail { background: rgba(46,125,50,0.15); color: var(--success); }
+.calAvail:hover { background: var(--success); color: var(--white); transform: scale(1.1); }
+.calUnavail { background: rgba(198,40,40,0.1); color: var(--danger); }
+.calUnavail:hover { background: var(--danger); color: var(--white); transform: scale(1.1); }
+
+.calLegend { display: flex; align-items: center; gap: 16px; margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+.legendAvail, .legendUnavail { display: inline-block; width: 16px; height: 16px; border-radius: 4px; }
+.legendAvail { background: rgba(46,125,50,0.2); }
+.legendUnavail { background: rgba(198,40,40,0.2); }
+
+/* Profile details */
+.profileDetails {}
+.detailCard {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 32px; max-width: 600px;
+}
+.detailCard h3 { font-family: var(--font-display); color: var(--secondary); margin-bottom: 20px; }
+.detailRow {
+  display: flex; gap: 16px; padding: 12px 0;
+  border-bottom: 1px solid var(--border); font-size: 14px;
+}
+.detailRow span { color: var(--text-muted); width: 100px; flex-shrink: 0; }
+.detailRow strong, .detailRow p { color: var(--text); }
+
+@media (max-width: 640px) {
+  .profileBanner { flex-direction: column; }
+  .profileStats { justify-content: center; }
+}

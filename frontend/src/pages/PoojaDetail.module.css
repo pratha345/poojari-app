@@ -1,0 +1,143 @@
+/* PoojaDetail.module.css */
+.main { background: var(--cream); padding-bottom: 72px; min-height: 80vh; }
+
+.breadcrumb {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+.breadcrumb > div {
+  display: flex; gap: 8px; align-items: center;
+  font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--primary); }
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 40px;
+  padding-top: 36px;
+}
+
+/* LEFT */
+.details {}
+.imageWrap {
+  position: relative; border-radius: var(--radius-lg);
+  overflow: hidden; height: 380px; margin-bottom: 28px;
+}
+.imageWrap img { width: 100%; height: 100%; object-fit: cover; }
+.featuredBadge {
+  position: absolute; top: 16px; left: 16px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--brown); padding: 6px 14px;
+  border-radius: 20px; font-size: 12px; font-weight: 700;
+}
+
+.info {}
+.category {
+  font-size: 11px; color: var(--primary); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.title {
+  font-family: var(--font-display); font-size: 2rem;
+  color: var(--secondary); margin: 8px 0 4px; line-height: 1.3;
+}
+.titleEn { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+.metaRow { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.metaBadge {
+  background: var(--cream-dark); border: 1px solid var(--border);
+  padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--text-muted);
+}
+.desc {
+  font-size: 15px; line-height: 1.9; color: var(--text);
+  border-left: 4px solid var(--primary); padding-left: 16px;
+  margin-bottom: 28px; background: var(--cream-dark);
+  padding: 16px 20px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
+.tab {
+  padding: 12px 24px; font-size: 14px; font-family: var(--font-body);
+  font-weight: 500; color: var(--text-muted); background: none;
+  border: none; cursor: pointer; border-bottom: 3px solid transparent;
+  margin-bottom: -2px; transition: all var(--transition);
+}
+.tab:hover { color: var(--primary); }
+.tabActive { color: var(--primary) !important; border-bottom-color: var(--primary) !important; font-weight: 700; }
+
+.tabContent { animation: fadeIn 0.3s ease; }
+.tabTitle { font-family: var(--font-display); font-size: 1.1rem; color: var(--secondary); margin-bottom: 16px; }
+.tabEmpty { font-size: 14px; color: var(--text-muted); font-style: italic; padding: 20px 0; }
+
+/* Samagri */
+.samagriList { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.samagriItem {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--white); border: 1px solid var(--border);
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  font-size: 14px; transition: all var(--transition);
+}
+.samagriItem:hover { border-color: var(--primary); background: var(--cream); }
+.samagriDot { font-size: 14px; flex-shrink: 0; }
+.samagriName { flex: 1; color: var(--text); }
+.samagriQty { font-size: 12px; color: var(--text-muted); font-style: italic; white-space: nowrap; }
+
+/* Steps */
+.stepList { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.stepItem {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--white); border: 1px solid var(--border);
+  padding: 14px 16px; border-radius: var(--radius-sm);
+  font-size: 14px; line-height: 1.7; transition: all var(--transition);
+}
+.stepItem:hover { border-color: var(--primary); box-shadow: 0 4px 12px var(--shadow); }
+.stepNum {
+  background: var(--primary); color: var(--white);
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+
+/* Reviews */
+.reviewItem {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 16px;
+  margin-bottom: 12px;
+}
+.reviewHeader { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.reviewHeader strong { font-size: 14px; color: var(--text); }
+.reviewItem p { font-size: 13px; color: var(--text-muted); line-height: 1.7; font-style: italic; }
+
+/* RIGHT: Booking Panel */
+.bookPanel { display: flex; flex-direction: column; gap: 20px; }
+.bookCard {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px;
+  box-shadow: 0 8px 32px var(--shadow);
+  position: sticky; top: 130px;
+}
+.bookPrice {
+  font-family: var(--font-display); font-size: 2.2rem;
+  color: var(--primary); margin-bottom: 2px;
+}
+.bookPriceSub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+.bookFeatures { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.bookFeature { font-size: 14px; color: var(--text); display: flex; gap: 8px; }
+.bookBtn { width: 100%; margin-bottom: 12px; font-size: 16px; }
+.waBtn { width: 100%; margin-bottom: 16px; }
+.bookNote { font-size: 12px; color: var(--text-muted); text-align: center; }
+
+.whyBox {
+  background: var(--cream-dark); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 20px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.whyBox h3 { font-size: 14px; color: var(--secondary); margin-bottom: 4px; }
+.whyBox div { font-size: 13px; color: var(--text-muted); }
+
+@media (max-width: 960px) {
+  .layout { grid-template-columns: 1fr; }
+  .bookCard { position: static; }
+  .samagriList { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,273 @@
+// src/pages/PujariDashboard.jsx
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import { pujariAPI } from '../api/index.js';
+import styles from './PujariDashboard.module.css';
+
+const STATUS_LABELS = {
+  pending:     { label: 'नवीन',      color: 'warning' },
+  confirmed:   { label: 'मंजूर',     color: 'success' },
+  completed:   { label: 'पूर्ण',     color: 'info'    },
+  cancelled:   { label: 'रद्द',      color: 'danger'  },
+  in_progress: { label: 'सुरू आहे',  color: 'warning' },
+};
+
+export default function PujariDashboard() {
+  const [profile,  setProfile]  = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [tab,      setTab]      = useState('bookings');
+  const [filter,   setFilter]   = useState('pending');
+  const [loading,  setLoading]  = useState(true);
+
+  useEffect(() => {
+    pujariAPI.getMyProfile()
+      .then(r => setProfile(r.data.data))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    const params = filter !== 'all' ? { status: filter } : {};
+    pujariAPI.getMyBookings(params)
+      .then(r => setBookings(r.data.data || []))
+      .catch(() => setBookings([]))
+      .finally(() => setLoading(false));
+  }, [filter]);
+
+  const handleRespond = async (id, action, reason = '') => {
+    try {
+      await pujariAPI.respondBooking(id, { action, reason });
+      toast.success(action === 'confirm' ? 'बुकिंग स्वीकारली! 🙏' : 'बुकिंग नाकारली.');
+      setBookings(bs => bs.filter(b => b.id !== id));
+    } catch { toast.error('प्रतिसाद देताना त्रुटी झाली.'); }
+  };
+
+  const statusIcon = (status) => ({
+    approved: '✅', pending: '⏳', rejected: '❌'
+  })[status] || '🔄';
+
+  return (
+    <div>
+      <Header />
+      <main className={styles.main}>
+        <div className="container">
+          {/* Profile Header */}
+          {profile && (
+            <div className={styles.profileBanner}>
+              <div className={styles.profileLeft}>
+                <div className={styles.avatar}>
+                  {profile.photo_url
+                    ? <img src={profile.photo_url} alt={profile.full_name}/>
+                    : <span>{profile.full_name?.[0]}</span>
+                  }
+                </div>
+                <div>
+                  <h1 className={styles.profileName}>{profile.full_name}</h1>
+                  <p className={styles.profileMeta}>
+                    📍 {profile.city}, {profile.district} &nbsp;•&nbsp;
+                    ⭐ {profile.avg_rating || '0'} ({profile.total_reviews || 0} अभिप्राय) &nbsp;•&nbsp;
+                    🪔 {profile.total_bookings || 0} बुकिंग्ज
+                  </p>
+                  <span className={`badge badge-${profile.status === 'approved' ? 'success' : profile.status === 'pending' ? 'warning' : 'danger'}`}>
+                    {statusIcon(profile.status)}&nbsp;
+                    {profile.status === 'approved' ? 'मंजूर' : profile.status === 'pending' ? 'मंजुरीसाठी प्रतीक्षा' : 'नाकारले'}
+                  </span>
+                </div>
+              </div>
+              <div className={styles.profileStats}>
+                <div className={styles.stat}><span>{profile.experience_yrs || 0}</span><small>वर्षे अनुभव</small></div>
+                <div className={styles.stat}><span>{profile.total_bookings || 0}</span><small>एकूण बुकिंग</small></div>
+                <div className={styles.stat}><span>{profile.avg_rating || '—'}</span><small>सरासरी रेटिंग</small></div>
+              </div>
+            </div>
+          )}
+
+          {profile?.status !== 'approved' && (
+            <div className={styles.pendingAlert}>
+              ⏳ आपली नोंदणी मंजुरीसाठी प्रतीक्षेत आहे. मंजुरीनंतर बुकिंग मिळण्यास सुरुवात होईल.
+            </div>
+          )}
+
+          {/* Tabs */}
+          <div className={styles.tabs}>
+            {[
+              { key: 'bookings',     label: '📋 बुकिंग्ज'     },
+              { key: 'availability', label: '🗓️ उपलब्धता'    },
+              { key: 'profile',      label: '👤 प्रोफाईल'      },
+            ].map(t => (
+              <button
+                key={t.key}
+                className={`${styles.tab} ${tab === t.key ? styles.tabActive : ''}`}
+                onClick={() => setTab(t.key)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* BOOKINGS TAB */}
+          {tab === 'bookings' && (
+            <div>
+              <div className={styles.filters}>
+                {[
+                  { key: 'pending',   label: '⏳ नवीन'    },
+                  { key: 'confirmed', label: '✅ मंजूर'   },
+                  { key: 'completed', label: '🪔 पूर्ण'   },
+                  { key: 'all',       label: 'सर्व'        },
+                ].map(f => (
+                  <button
+                    key={f.key}
+                    className={`${styles.filterBtn} ${filter === f.key ? styles.filterActive : ''}`}
+                    onClick={() => setFilter(f.key)}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {loading ? (
+                <div className="page-loader"><div className="spinner"/></div>
+              ) : bookings.length === 0 ? (
+                <div className={styles.empty}>
+                  <span>📭</span>
+                  <p>{filter === 'pending' ? 'कोणतीही नवीन बुकिंग नाही.' : 'कोणतीही बुकिंग सापडली नाही.'}</p>
+                </div>
+              ) : (
+                <div className={styles.bookingList}>
+                  {bookings.map(b => {
+                    const st = STATUS_LABELS[b.status] || { label: b.status, color: 'info' };
+                    return (
+                      <div key={b.id} className={styles.bookingCard}>
+                        <div className={styles.bookingHeader}>
+                          <span className={`badge badge-${st.color}`}>{st.label}</span>
+                          <span className={styles.bookingCode}>#{b.booking_code}</span>
+                        </div>
+                        <h3 className={styles.poojaName}>{b.pooja_name}</h3>
+                        <div className={styles.bookingMeta}>
+                          <span>👤 {b.user_name}</span>
+                          <span>📞 {b.user_phone}</span>
+                          <span>📅 {new Date(b.booking_date).toLocaleDateString('mr-IN')}</span>
+                          <span>🕐 {b.booking_time?.slice(0,5)}</span>
+                        </div>
+                        <div className={styles.bookingAddress}>
+                          📍 {b.address}
+                        </div>
+                        <div className={styles.bookingFooter}>
+                          <span className={styles.bookingAmt}>
+                            ₹{Number(b.total_amount).toLocaleString('mr-IN')}
+                          </span>
+                          {b.status === 'pending' && (
+                            <div className={styles.respondBtns}>
+                              <button
+                                className="btn btn-primary btn-sm"
+                                onClick={() => handleRespond(b.id, 'confirm')}
+                              >✅ स्वीकारा</button>
+                              <button
+                                className="btn btn-secondary btn-sm"
+                                onClick={() => handleRespond(b.id, 'cancel', 'उपलब्ध नाही')}
+                              >❌ नाकारा</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* AVAILABILITY TAB */}
+          {tab === 'availability' && (
+            <AvailabilityManager />
+          )}
+
+          {/* PROFILE TAB */}
+          {tab === 'profile' && profile && (
+            <div className={styles.profileDetails}>
+              <div className={styles.detailCard}>
+                <h3>माझी माहिती</h3>
+                <div className={styles.detailRow}><span>नाव:</span><strong>{profile.full_name}</strong></div>
+                <div className={styles.detailRow}><span>अनुभव:</span><strong>{profile.experience_yrs} वर्षे</strong></div>
+                <div className={styles.detailRow}><span>शहर:</span><strong>{profile.city}, {profile.district}</strong></div>
+                <div className={styles.detailRow}><span>भाषा:</span><strong>{JSON.parse(profile.languages || '[]').join(', ')}</strong></div>
+                <div className={styles.detailRow}><span>विशेषज्ञता:</span><strong>{profile.specialization_names || '—'}</strong></div>
+                {profile.bio && <div className={styles.detailRow}><span>परिचय:</span><p>{profile.bio}</p></div>}
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+// AvailabilityManager sub-component
+function AvailabilityManager() {
+  const [dates,   setDates]   = useState({});
+  const [saving,  setSaving]  = useState(false);
+
+  const today = new Date();
+  const next30 = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i + 1);
+    return d.toISOString().split('T')[0];
+  });
+
+  const toggle = (date) => {
+    setDates(ds => ({ ...ds, [date]: !ds[date] }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const dateArr = next30.map(d => ({
+        date: d,
+        is_available: dates[d] !== false,
+      }));
+      await pujariAPI.setAvailability(dateArr);
+      toast.success('उपलब्धता जतन केली! 🗓️');
+    } catch { toast.error('जतन करताना त्रुटी झाली.'); }
+    finally { setSaving(false); }
+  };
+
+  const weekDays = ['रवि','सोम','मंगळ','बुध','गुरु','शुक्र','शनि'];
+
+  return (
+    <div className={styles.availSection}>
+      <div className={styles.availHeader}>
+        <h2>🗓️ उपलब्धता कॅलेंडर</h2>
+        <p>हिरव्या तारखांवर आपण उपलब्ध आहात. लाल म्हणजे अनुपलब्ध.</p>
+      </div>
+      <div className={styles.calGrid}>
+        {weekDays.map(d => <div key={d} className={styles.calHeader}>{d}</div>)}
+        {/* Offset */}
+        {Array.from({ length: new Date(next30[0]).getDay() }).map((_, i) => <div key={`off-${i}`}/>)}
+        {next30.map(date => {
+          const available = dates[date] !== false;
+          const d = new Date(date);
+          return (
+            <button
+              key={date}
+              className={`${styles.calDay} ${available ? styles.calAvail : styles.calUnavail}`}
+              onClick={() => toggle(date)}
+              title={date}
+            >
+              {d.getDate()}
+            </button>
+          );
+        })}
+      </div>
+      <div className={styles.calLegend}>
+        <span className={styles.legendAvail}/>उपलब्ध
+        <span className={styles.legendUnavail}/>अनुपलब्ध
+      </div>
+      <button className="btn btn-primary" onClick={handleSave} disabled={saving} style={{marginTop:'20px'}}>
+        {saving ? '⏳ जतन होत आहे...' : '💾 उपलब्धता जतन करा'}
+      </button>
+    </div>
+  );
+}

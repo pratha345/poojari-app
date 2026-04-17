@@ -1,0 +1,97 @@
+/* PoojaList.module.css */
+.main { padding-bottom: 72px; min-height: 80vh; background: var(--cream); }
+.breadcrumb {
+  background:    var(--white);
+  border-bottom: 1px solid var(--border);
+  padding:       12px 0;
+}
+.breadcrumb > div {
+  display:     flex;
+  gap:         8px;
+  align-items: center;
+  font-size:   13px;
+  color:       var(--text-muted);
+}
+.breadcrumb a { color: var(--primary); }
+.breadcrumb span { color: var(--text-muted); }
+
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 32px;
+  padding-top: 32px;
+}
+
+.sidebar {
+  background:    var(--white);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding:       20px;
+  height:        fit-content;
+  position:      sticky;
+  top:           120px;
+}
+.sideTitle {
+  font-family:   var(--font-display);
+  font-size:     16px;
+  color:         var(--secondary);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+}
+.catList { list-style: none; }
+.catItem {
+  display:       block;
+  padding:       10px 12px;
+  border-radius: var(--radius-sm);
+  font-size:     14px;
+  color:         var(--text);
+  transition:    all var(--transition);
+  margin-bottom: 4px;
+}
+.catItem:hover { background: var(--cream); color: var(--primary); }
+.catActive { background: var(--primary) !important; color: var(--white) !important; font-weight: 600; }
+
+.contentHeader {
+  display:       flex;
+  align-items:   center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.pageTitle { font-size: 1.5rem; font-family: var(--font-display); color: var(--secondary); }
+.count { font-size: 13px; color: var(--text-muted); }
+
+.poojaGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.loadGrid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.skeletonCard { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); }
+.skeletonImg  { height: 200px; }
+
+.empty {
+  text-align:      center;
+  padding:         80px 40px;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             16px;
+  color:           var(--text-muted);
+}
+.empty span  { font-size: 64px; }
+.empty h3    { font-size: 1.2rem; color: var(--text); }
+
+.pagination { display: flex; gap: 8px; justify-content: center; margin-top: 40px; }
+.pageBtn {
+  width:         36px; height: 36px; border-radius: 50%;
+  border:        1.5px solid var(--border); background: var(--white);
+  cursor:        pointer; font-size: 14px; transition: all var(--transition);
+}
+.pageBtn:hover { border-color: var(--primary); color: var(--primary); }
+.pageActive { background: var(--primary) !important; color: var(--white) !important; border-color: var(--primary) !important; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .poojaGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .poojaGrid { grid-template-columns: 1fr; }
+}
