@@ -1,0 +1,341 @@
+/* ═══════════════════════════════════════════════════════════════
+   ClockTimePicker.module.css — SVG clock dial, Hindu brown/orange theme
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Modal overlay ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: overlayIn 0.18s ease;
+  backdrop-filter: blur(6px);
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Picker panel ── */
+.picker {
+  background: linear-gradient(160deg, #1e0a00 0%, #2a1200 100%);
+  border: 2px solid #7a3200;
+  border-radius: 24px;
+  padding: 26px 24px 20px;
+  width: 320px;
+  max-width: 94vw;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.85),
+    0 0   48px rgba(160, 60, 0, 0.25),
+    inset 0 1px 0 rgba(255, 160, 60, 0.12);
+  animation: pickerIn 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+}
+
+@keyframes pickerIn {
+  from { transform: translateY(48px) scale(0.92); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HEADER — big time display + AM/PM
+══════════════════════════════════════════════════════════════ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.timeDisplay {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.timeUnit {
+  background: #3a1800;
+  border: 2px solid #5a2800;
+  border-radius: 14px;
+  color: #ffd080;
+  font-size: 2.6rem;
+  font-weight: 700;
+  font-family: var(--font-display, Georgia, serif);
+  padding: 6px 14px;
+  min-width: 76px;
+  text-align: center;
+  cursor: pointer;
+  line-height: 1.1;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
+}
+
+.timeUnit:hover {
+  background: #5a2800;
+  border-color: #c25000;
+  transform: scale(1.04);
+}
+
+.unitActive {
+  background: linear-gradient(135deg, #c25000, #8b3a00) !important;
+  border-color: #e07000 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 20px rgba(194, 80, 0, 0.55);
+}
+
+.colon {
+  color: #ffd080;
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 2px 8px;
+  opacity: 0.7;
+}
+
+/* AM/PM */
+.ampmGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ampmBtn {
+  background: #2a1200;
+  border: 1.5px solid #5a3010;
+  border-radius: 10px;
+  color: #aa6030;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 7px 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.18s;
+}
+
+.ampmBtn:hover {
+  border-color: #c25000;
+  color: #ffd080;
+  background: #3a1a00;
+}
+
+.ampmActive {
+  background: linear-gradient(135deg, #c25000, #7a2e00) !important;
+  border-color: #e07000 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 10px rgba(194, 80, 0, 0.5);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STEP INDICATOR  (तास → मिनिटे)
+══════════════════════════════════════════════════════════════ */
+.stepLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4a2800;
+  border: 1.5px solid #7a4000;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.stepDotActive {
+  background: #c25000 !important;
+  border-color: #e07000 !important;
+  box-shadow: 0 0 8px rgba(194, 80, 0, 0.7);
+}
+
+.stepText {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7a5030;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.stepTextActive {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffa040;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.stepArrow {
+  color: #5a3010;
+  font-size: 0.7rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SVG DIAL
+══════════════════════════════════════════════════════════════ */
+.dial {
+  display: block;
+  width: 100%;
+  max-width: 272px;
+  margin: 0 auto 4px;
+  cursor: crosshair;
+  touch-action: none; /* prevent page scroll while dragging */
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+}
+
+/* ── SVG elements (applied via className prop on SVG elements) ── */
+
+.faceRing {
+  fill: none;
+  stroke: rgba(180, 80, 0, 0.18);
+  stroke-width: 8;
+}
+
+.face {
+  fill: #1e0c00;
+  stroke: #5a2800;
+  stroke-width: 1.5;
+}
+
+.tickMin {
+  stroke: #3a2010;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.tickMaj {
+  stroke: #6a3818;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.handTrack {
+  stroke: rgba(194, 80, 0, 0.12);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.hand {
+  stroke: #c25000;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: none; /* instant feedback during drag */
+}
+
+.handTip {
+  fill: #c25000;
+}
+
+.pivot {
+  fill: #e07000;
+}
+
+.selGlow {
+  fill: rgba(194, 80, 0, 0.2);
+}
+
+.selBg {
+  fill: #c25000;
+}
+
+.num {
+  fill: #cc8040;
+  font-size: 16px;
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 600;
+  pointer-events: none;
+  transition: fill 0.15s, font-size 0.15s;
+}
+
+.numSel {
+  fill: #ffffff !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+}
+
+/* Ripple on drag */
+.ripple {
+  fill: rgba(255, 130, 30, 0.22);
+  animation: rippleOut 0.35s ease-out;
+}
+
+@keyframes rippleOut {
+  from { r: 14; opacity: 0.5; }
+  to   { r: 26; opacity: 0;   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════════════ */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #3a1800;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1.5px solid #4a2800;
+  border-radius: 12px;
+  color: #aa6030;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.cancelBtn:hover {
+  border-color: #c25000;
+  color: #ffd080;
+  background: #3a1800;
+}
+
+.okBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #c25000 0%, #8b3a00 100%);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 11px 26px;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  box-shadow: 0 4px 18px rgba(194, 80, 0, 0.5);
+  transition: all 0.18s;
+}
+
+.okBtn:hover {
+  background: linear-gradient(135deg, #d46000, #a04800);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(194, 80, 0, 0.65);
+}
+
+.okBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(194, 80, 0, 0.4);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 360px) {
+  .picker    { padding: 20px 16px 16px; }
+  .timeUnit  { font-size: 2.1rem; min-width: 62px; padding: 6px 10px; }
+  .colon     { font-size: 2rem; }
+}

@@ -304,3 +304,10 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .btn-lg { padding: 14px 28px; font-size: 15px; }
   .section-heading h2 { font-size: 1.5rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Tailwind CSS utilities — added last so they can supplement
+   existing styles without overriding the design system above.
+   (preflight and container are disabled in tailwind.config.cjs)
+═══════════════════════════════════════════════════════════════ */
+@tailwind utilities;

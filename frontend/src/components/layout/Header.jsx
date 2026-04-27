@@ -23,6 +23,7 @@ export default function Header() {
   const navLinks = [
     { to: '/',               label: 'मुख्यपृष्ठ'   },
     { to: '/pooja',          label: 'पूजा बुक करा'  },
+    { to: '/panchang',       label: '🕉️ पंचांग'     },
     { to: '/pujari-nondni',  label: 'पुजारी व्हा'   },
     { to: '/contact',        label: 'संपर्क'         },
     { to: '/about',          label: 'आमच्याबद्दल'   },

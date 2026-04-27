@@ -1,0 +1,951 @@
+/* src/styles/Panchang.module.css — हिंदू पंचांग + कुंडली */
+
+/* ═══════════════════════════════════════════════════════════════
+   CSS CUSTOM PROPERTIES  (light + dark overrides)
+═══════════════════════════════════════════════════════════════ */
+.page {
+  --pg-bg:         var(--cream);
+  --pg-bg2:        var(--cream-dark);
+  --pg-card:       #ffffff;
+  --pg-border:     var(--border);
+  --pg-text:       var(--text);
+  --pg-muted:      var(--text-muted);
+  --pg-title:      var(--secondary);
+  --pg-shadow:     var(--shadow);
+  --pg-input-bg:   var(--cream);
+
+  /* Kundali */
+  --kd-bg:         #fff;
+  --kd-border:     var(--secondary);
+  --kd-cell:       #fffbf4;
+  --kd-corner:     #fff8ec;
+  --kd-text:       var(--brown);
+  --kd-num:        var(--text-muted);
+  --kd-center:     #fff3e0;
+  --kd-center-txt: var(--secondary);
+
+  min-height: 100vh;
+  background: var(--pg-bg);
+  color: var(--pg-text);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── Dark mode overrides ───────────────────────────────────── */
+.dark {
+  --pg-bg:        #0f0f1a;
+  --pg-bg2:       #1a1a2e;
+  --pg-card:      #1e1e30;
+  --pg-border:    #2e2e4e;
+  --pg-text:      #e8e0d0;
+  --pg-muted:     #9090b0;
+  --pg-title:     #f5c06e;
+  --pg-shadow:    rgba(0,0,0,0.4);
+  --pg-input-bg:  #16162a;
+
+  --kd-bg:        #1a1a2e;
+  --kd-border:    #f5c06e;
+  --kd-cell:      #1e1e30;
+  --kd-corner:    #16162a;
+  --kd-text:      #e8e0d0;
+  --kd-num:       #8080a0;
+  --kd-center:    #2a1e10;
+  --kd-center-txt:#f5c06e;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════════════ */
+.hero {
+  background: linear-gradient(135deg, #5a1500 0%, var(--secondary) 50%, #8b3a00 100%);
+  padding: 44px 0 36px;
+}
+.heroInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.heroLeft {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.heroOm {
+  font-size: 54px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 12px rgba(255,180,80,0.6));
+  animation: floatOm 3s ease-in-out infinite;
+}
+@keyframes floatOm {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+}
+.heroSub {
+  color: #ffd080;
+  font-size: 0.92rem;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+/* Dark mode toggle */
+.darkToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: 30px;
+  color: #fff;
+  font-size: 0.88rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+}
+.darkToggle:hover { background: rgba(255,255,255,0.25); transform: scale(1.04); }
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTROLS
+═══════════════════════════════════════════════════════════════ */
+.controls {
+  background: var(--pg-card);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin: 28px 0 22px;
+  box-shadow: 0 4px 24px var(--pg-shadow);
+  transition: background 0.3s, border-color 0.3s;
+}
+.controlRow {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.controlGroup {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ctrlLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--pg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.dateInput {
+  padding: 11px 14px;
+  border: 1.5px solid var(--pg-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  color: var(--pg-text);
+  background: var(--pg-input-bg);
+  outline: none;
+  transition: border-color 0.2s, background 0.3s;
+}
+.dateInput:focus { border-color: var(--primary); background: var(--pg-card); }
+.dateMR {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.locRow { display: flex; gap: 8px; align-items: center; }
+.locInput {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1.5px solid var(--pg-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--pg-text);
+  background: var(--pg-input-bg);
+  outline: none;
+  transition: border-color 0.2s, background 0.3s;
+}
+.locInput:focus { border-color: var(--primary); background: var(--pg-card); }
+
+.gpsBtn {
+  flex-shrink: 0;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.gpsBtn:hover  { background: var(--primary-dark); transform: scale(1.08); }
+.gpsBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Clock picker trigger button */
+.timePickerBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--pg-border);
+  border-radius: var(--radius-md);
+  background: var(--pg-input-bg);
+  color: var(--pg-text);
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.timePickerBtn:hover {
+  border-color: var(--primary);
+  background: var(--pg-card);
+  transform: translateY(-1px);
+}
+.timePickerIcon  { font-size: 1.1rem; flex-shrink: 0; }
+.timePickerVal   { flex: 1; font-weight: 700; color: var(--primary-dark); }
+.dark .timePickerVal { color: var(--gold); }
+.timePickerChevron {
+  font-size: 0.6rem;
+  color: var(--pg-muted);
+  flex-shrink: 0;
+}
+
+.timeSub {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.timeNote {
+  color: var(--pg-muted);
+  font-weight: 400;
+}
+
+/* Auto-refresh indicator */
+.autoRefreshInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pg-border);
+  font-size: 0.78rem;
+  color: var(--pg-muted);
+}
+.autoRefreshDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success, #4caf50);
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+.autoRefreshDotLoading {
+  background: var(--primary);
+  animation: pulse 0.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* City pills */
+.cityRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--pg-border);
+}
+.cityRowLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.cityPill {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--pg-border);
+  background: var(--pg-bg);
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  color: var(--pg-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cityPill:hover { border-color: var(--primary); color: var(--primary); }
+.cityPillActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ERROR
+═══════════════════════════════════════════════════════════════ */
+.errorBox {
+  background: rgba(198,40,40,0.08);
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  color: var(--danger);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SKELETON
+═══════════════════════════════════════════════════════════════ */
+.skeletonWrap { margin: 8px 0 32px; }
+.skeletonBanner {
+  height: 80px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--pg-bg2) 25%, var(--pg-card) 50%, var(--pg-bg2) 75%);
+  background-size: 300% 100%;
+  animation: shimmer 1.4s infinite;
+  margin-bottom: 16px;
+}
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.skeletonCard {
+  height: 80px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--pg-bg2) 25%, var(--pg-card) 50%, var(--pg-bg2) 75%);
+  background-size: 300% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULTS  (fade-in on key change)
+═══════════════════════════════════════════════════════════════ */
+.results {
+  animation: fadeSlide 0.45s ease-out;
+  padding-bottom: 48px;
+}
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Soft fade when refreshing (time/date change without full reload) */
+.resultsRefreshing { opacity: 0.7; transition: opacity 0.25s; }
+
+/* ── Date banner ── */
+.dateBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 22px 28px;
+  background: linear-gradient(135deg, var(--secondary), #7a1e00);
+  border-radius: var(--radius-lg);
+  margin-bottom: 22px;
+  box-shadow: 0 6px 28px rgba(139,37,0,0.28);
+}
+.dark .dateBanner {
+  background: linear-gradient(135deg, #2a0f00, #4a1800);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.5);
+}
+.dateBannerLeft { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.bannerDate {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: 700;
+}
+.bannerVar {
+  padding: 4px 14px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  color: #ffd080;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.dateBannerRight { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.tagPaksha {
+  padding: 5px 16px;
+  background: var(--gold);
+  color: var(--brown);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.tagMaas, .tagCity {
+  padding: 5px 14px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.83rem;
+}
+.tagTime {
+  padding: 5px 14px;
+  background: rgba(255,220,80,0.25);
+  border: 1px solid rgba(255,220,80,0.5);
+  color: #ffe060;
+  border-radius: 20px;
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+
+/* ── Festival band ── */
+.festivalBand {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 22px;
+  background: linear-gradient(135deg, #fffde7, #fff8e1);
+  border: 1.5px solid #ffe082;
+  border-radius: var(--radius-lg);
+  margin-bottom: 22px;
+}
+.dark .festivalBand {
+  background: linear-gradient(135deg, #2a2000, #1e1800);
+  border-color: #5a4a00;
+}
+.festivalBandTitle {
+  font-weight: 700;
+  color: var(--secondary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.festivalPills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.pillSpecial  { background: #fff3e0; color: #e65100; border: 1.5px solid #ffb74d; }
+.pillVrat     { background: #f3e5f5; color: #7b1fa2; border: 1.5px solid #ba68c8; }
+.pillFestival { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #81c784; }
+.pillInfo     { background: #e3f2fd; color: #1565c0; border: 1.5px solid #64b5f6; }
+.dark .pillSpecial  { background: #3a1500; color: #ffb74d; border-color: #4a2000; }
+.dark .pillVrat     { background: #2a1030; color: #ce93d8; border-color: #3a1545; }
+.dark .pillFestival { background: #0e2410; color: #81c784; border-color: #1a3a1e; }
+.dark .pillInfo     { background: #0e1c2e; color: #64b5f6; border-color: #1a2a40; }
+
+/* ── Section wrapper ── */
+.section {
+  background: var(--pg-card);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 16px var(--pg-shadow);
+  transition: background 0.3s, border-color 0.3s;
+}
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--pg-title);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--pg-border);
+}
+.sectionIcon { font-size: 1.1rem; }
+.sectionBadge {
+  margin-left: auto;
+  padding: 3px 12px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PANCHANG CARDS  (8 cards)
+═══════════════════════════════════════════════════════════════ */
+.panchangGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.pCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--pg-bg);
+  border: 1.5px solid var(--pg-border);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.pCard::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.pCard:hover { transform: translateY(-3px); box-shadow: 0 8px 24px var(--pg-shadow); }
+.pCard:hover::after { background: var(--primary); }
+.pCardAccent { background: linear-gradient(135deg, #fff8f0, #ffeedd); }
+.dark .pCardAccent { background: linear-gradient(135deg, #2a1500, #1e1000); }
+
+.pCardTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pCardIcon { font-size: 1.2rem; }
+.pCardLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--pg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.pCardValue {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--pg-title);
+  line-height: 1.3;
+}
+.pCardSub {
+  font-size: 0.72rem;
+  color: var(--pg-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUN ROW
+═══════════════════════════════════════════════════════════════ */
+.sunRow {
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(135deg, #fffbf0, #fff6e0);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid #f0d090;
+}
+.dark .sunRow {
+  background: linear-gradient(135deg, #1e1500, #16100a);
+  border-color: #3a2a00;
+}
+.sunBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px;
+  gap: 6px;
+}
+.sunSep {
+  width: 1px;
+  background: #f0d090;
+  margin: 20px 0;
+}
+.dark .sunSep { background: #3a2a00; }
+.sunEmoji  { font-size: 2.4rem; }
+.sunName {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pg-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.sunTime {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+.dark .sunTime { color: var(--gold); }
+
+/* ═══════════════════════════════════════════════════════════════
+   MUHURTA GRID
+═══════════════════════════════════════════════════════════════ */
+.muhurtaGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.muhurtaBlock {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid;
+  transition: transform 0.2s;
+}
+.muhurtaBlock:hover { transform: translateY(-2px); }
+.muhurtaGood {
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  border-color: #81c784;
+  color: #2e7d32;
+}
+.muhurtaBad {
+  background: linear-gradient(135deg, #fce4ec, #fff3f5);
+  border-color: #ef9a9a;
+  color: #c62828;
+}
+.dark .muhurtaGood { background: linear-gradient(135deg, #0e2410, #0a1c0c); border-color: #2e5030; color: #81c784; }
+.dark .muhurtaBad  { background: linear-gradient(135deg, #2c0a0a, #200808); border-color: #5a1e1e; color: #ef9a9a; }
+
+.muhurtaTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.muhurtaIcon { font-size: 1.2rem; }
+.muhurtaLabel { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.muhurtaTime {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.muhurtaNote {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--pg-muted);
+  padding: 10px 14px;
+  background: var(--pg-bg);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--primary-light);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHUBH MUHURAT BANNER
+═══════════════════════════════════════════════════════════════ */
+.shubhBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 22px 26px;
+  background: linear-gradient(135deg, #fffde7, #fff8c4);
+  border: 2px solid var(--gold);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px var(--shadow-gold);
+  animation: pulseGold 2.5s ease-in-out infinite;
+}
+.dark .shubhBanner {
+  background: linear-gradient(135deg, #2a2200, #1e1a00);
+  border-color: #8a7000;
+  box-shadow: 0 4px 20px rgba(180,140,0,0.2);
+}
+@keyframes pulseGold {
+  0%,100% { box-shadow: 0 4px 20px rgba(212,175,55,0.3); }
+  50%      { box-shadow: 0 4px 30px rgba(212,175,55,0.6); }
+}
+.shubhBannerIcon { font-size: 2.2rem; flex-shrink: 0; }
+.shubhBannerBody { display: flex; flex-direction: column; gap: 4px; }
+.shubhBannerTitle {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+.dark .shubhBannerTitle { color: var(--gold); }
+.shubhBannerText { font-size: 0.95rem; color: var(--pg-text); margin: 0; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════════════════════
+   KUNDALI CHART
+═══════════════════════════════════════════════════════════════ */
+.kundaliDesc {
+  font-size: 0.88rem;
+  color: var(--pg-muted);
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+.sunText  { color: #e65100; font-weight: 700; }
+.moonText { color: #1565c0; font-weight: 700; }
+.dark .sunText  { color: #ffb74d; }
+.dark .moonText { color: #64b5f6; }
+
+.kundaliWrap {
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* 4×4 CSS Grid — center cell spans col 2-3, row 2-3 */
+.kundaliGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows:    repeat(4, 1fr);
+  aspect-ratio: 1;
+  border: 2.5px solid var(--kd-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--kd-bg);
+  box-shadow: 0 8px 40px var(--pg-shadow);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+/* ── Individual house cell ── */
+.house {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 4px;
+  background: var(--kd-cell);
+  border: 1px solid var(--kd-border);
+  position: relative;
+  transition: background 0.25s;
+  cursor: default;
+  text-align: center;
+}
+.house:hover { background: color-mix(in srgb, var(--primary-light) 12%, var(--kd-cell)); }
+.houseCorner { background: var(--kd-corner); }
+
+/* Planet highlight states */
+.houseSun {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2) !important;
+  border-color: #e65100 !important;
+  border-width: 2px !important;
+}
+.houseMoon {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
+  border-color: #1565c0 !important;
+  border-width: 2px !important;
+}
+.houseBoth {
+  background: linear-gradient(135deg, #fff3e0, #e3f2fd) !important;
+  border-color: #7b1fa2 !important;
+  border-width: 2px !important;
+}
+.dark .houseSun  { background: linear-gradient(135deg, #3a1500, #2a0e00) !important; border-color: #ff8c00 !important; }
+.dark .houseMoon { background: linear-gradient(135deg, #0a1e3a, #050f1e) !important; border-color: #4488cc !important; }
+.dark .houseBoth { background: linear-gradient(135deg, #2a1030, #1a0820) !important; border-color: #9c27b0 !important; }
+
+.houseNum {
+  position: absolute;
+  top: 4px; left: 6px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--kd-num);
+  line-height: 1;
+}
+.houseBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.houseSymbol {
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--kd-text);
+  opacity: 0.7;
+}
+.houseRashi {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--kd-text);
+  line-height: 1.2;
+}
+.housePlanets {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+}
+.planetSun  {
+  font-size: 1rem;
+  color: #e65100;
+  text-shadow: 0 1px 4px rgba(230,81,0,0.5);
+}
+.planetMoon {
+  font-size: 1rem;
+  color: #1565c0;
+  text-shadow: 0 1px 4px rgba(21,101,192,0.5);
+}
+.planetLagna {
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: #2e7d32;
+  text-shadow: 0 1px 4px rgba(46,125,50,0.5);
+}
+.dark .planetSun   { color: #ffb74d; }
+.dark .planetMoon  { color: #64b5f6; }
+.dark .planetLagna { color: #81c784; }
+
+/* Lagna house highlight */
+.houseLagna {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9) !important;
+  border-color: #2e7d32 !important;
+  border-width: 2px !important;
+}
+.dark .houseLagna { background: linear-gradient(135deg, #0a2010, #061408) !important; border-color: #2e7d32 !important; }
+
+/* ── Center cell (spans 2×2) ── */
+.houseCenter {
+  grid-column: 2 / 4;
+  grid-row:    2 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--kd-center);
+  border: 1px solid var(--kd-border);
+  position: relative;
+  overflow: hidden;
+}
+/* Decorative corner lines for the North Indian "diamond" feel */
+.houseCenter::before,
+.houseCenter::after {
+  content: '';
+  position: absolute;
+  width: 141%; /* √2 × 100% */
+  height: 1px;
+  background: var(--kd-border);
+  opacity: 0.4;
+  top: 50%; left: -20%;
+}
+.houseCenter::before { transform: rotate(45deg); }
+.houseCenter::after  { transform: rotate(-45deg); }
+
+.centerOm {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 8px rgba(139,37,0,0.3));
+  position: relative; z-index: 1;
+}
+.centerTitle {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--kd-center-txt);
+  position: relative; z-index: 1;
+}
+.centerLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  position: relative; z-index: 1;
+}
+.legendSun  { font-size: 0.7rem; color: #e65100; font-weight: 600; }
+.legendMoon { font-size: 0.7rem; color: #1565c0; font-weight: 600; }
+.dark .legendSun  { color: #ffb74d; }
+.dark .legendMoon { color: #64b5f6; }
+
+/* ── Below-chart legend ── */
+.kundaliLegend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px 20px;
+  background: var(--pg-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--pg-border);
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--pg-text);
+}
+.legendDotSun, .legendDotMoon, .legendDotBoth {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legendDotSun   { background: #e65100; }
+.legendDotMoon  { background: #1565c0; }
+.legendDotBoth  { background: linear-gradient(135deg, #e65100, #1565c0); }
+.legendDotLagna { background: #2e7d32; }
+
+.legendLagna { font-size: 0.7rem; color: #2e7d32; font-weight: 600; }
+.dark .legendLagna { color: #81c784; }
+
+/* Lagna text highlight in kundali description */
+.lagnaText { color: #2e7d32; font-weight: 700; }
+.dark .lagnaText { color: #81c784; }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .panchangGrid  { grid-template-columns: repeat(4, 1fr); }
+  .muhurtaGrid   { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .heroTitle { font-size: 1.9rem; }
+  .heroOm    { font-size: 40px; }
+  .heroInner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .darkToggle { align-self: flex-end; }
+
+  .controlRow { flex-direction: column; }
+  .controlGroup { min-width: unset; }
+
+  .dateBanner { flex-direction: column; align-items: flex-start; padding: 16px 18px; }
+  .bannerDate { font-size: 1.25rem; }
+
+  .panchangGrid { grid-template-columns: repeat(2, 1fr); }
+  .muhurtaGrid  { grid-template-columns: repeat(2, 1fr); }
+
+  .sunRow { flex-direction: column; }
+  .sunSep { width: 60px; height: 1px; align-self: center; }
+
+  .kundaliWrap { max-width: 100%; }
+  .houseRashi  { font-size: 0.7rem; }
+  .houseSymbol { font-size: 1rem; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 28px 0 22px; }
+  .controls { padding: 16px 14px; }
+  .section  { padding: 18px 14px; }
+  .shubhBanner { padding: 16px 14px; gap: 12px; }
+
+  .panchangGrid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .muhurtaGrid  { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .houseRashi  { font-size: 0.6rem; }
+  .houseSymbol { font-size: 0.85rem; }
+  .centerOm    { font-size: 1.4rem; }
+  .centerTitle { font-size: 0.75rem; }
+  .planetSun, .planetMoon { font-size: 0.8rem; }
+
+  .kundaliLegend { flex-direction: column; align-items: flex-start; gap: 8px; }
+}

@@ -26,9 +26,11 @@ export default function AdminDashboard() {
   ] : [];
 
   const quickLinks = [
-    { to: '/admin/pujaris',  label: '🧑‍🦳 पुजारी व्यवस्थापन', desc: 'नोंदणी मंजुरी, प्रोफाईल पहा' },
-    { to: '/admin/bookings', label: '📋 बुकिंग व्यवस्थापन',   desc: 'सर्व बुकिंग्ज, पुजारी नियुक्त करा' },
-    { to: '/admin/poojas',   label: '🪔 पूजा व्यवस्थापन',     desc: 'पूजा जोडा, संपादित करा' },
+    { to: '/admin/pujaris',        label: '🧑‍🦳 पुजारी व्यवस्थापन', desc: 'नोंदणी मंजुरी, प्रोफाईल पहा' },
+    { to: '/admin/bookings',       label: '📋 बुकिंग व्यवस्थापन',   desc: 'सर्व बुकिंग्ज, पुजारी नियुक्त करा' },
+    { to: '/admin/poojas',         label: '🪔 पूजा व्यवस्थापन',     desc: 'पूजा जोडा, संपादित करा' },
+    { to: '/admin/kundali-milan',  label: '🔯 कुंडली मिलान',         desc: 'अष्ट कूट गुण मिलान, कुंडली जुळणी' },
+    { to: '/admin/home',           label: '🏠 होमपेज संपादक',         desc: 'हिरो, स्लाइडर, मजकूर बदला' },
   ];
 
   return (

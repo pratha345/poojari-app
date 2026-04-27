@@ -18,6 +18,9 @@ import AdminDashboard  from './pages/admin/AdminDashboard';
 import ManagePujaris   from './pages/admin/ManagePujaris';
 import ManageBookings  from './pages/admin/ManageBookings';
 import ManagePoojas    from './pages/admin/ManagePoojas';
+import Panchang        from './pages/Panchang';
+import KundaliMilan    from './pages/admin/KundaliMilan';
+import AdminHome       from './pages/admin/AdminHome';
 
 // Route guards
 const PrivateRoute = ({ children }) => {
@@ -52,6 +55,7 @@ export default function App() {
           <Route path="/vidhi/:slug"       element={<PoojaDetail />} />
           <Route path="/contact"           element={<Contact />} />
           <Route path="/about"             element={<About />} />
+          <Route path="/panchang"          element={<Panchang />} />
           <Route path="/login"             element={<Login />} />
           <Route path="/register"          element={<Register />} />
 
@@ -64,10 +68,12 @@ export default function App() {
           <Route path="/pujari-dashboard"  element={<PujariRoute><PujariDashboard /></PujariRoute>} />
 
           {/* Admin */}
-          <Route path="/admin"             element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-          <Route path="/admin/pujaris"     element={<AdminRoute><ManagePujaris /></AdminRoute>} />
-          <Route path="/admin/bookings"    element={<AdminRoute><ManageBookings /></AdminRoute>} />
-          <Route path="/admin/poojas"      element={<AdminRoute><ManagePoojas /></AdminRoute>} />
+          <Route path="/admin"                  element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/pujaris"          element={<AdminRoute><ManagePujaris /></AdminRoute>} />
+          <Route path="/admin/bookings"         element={<AdminRoute><ManageBookings /></AdminRoute>} />
+          <Route path="/admin/poojas"           element={<AdminRoute><ManagePoojas /></AdminRoute>} />
+          <Route path="/admin/kundali-milan"    element={<AdminRoute><KundaliMilan /></AdminRoute>} />
+          <Route path="/admin/home"             element={<AdminRoute><AdminHome /></AdminRoute>} />
 
           <Route path="*"                  element={<Navigate to="/" replace />} />
         </Routes>

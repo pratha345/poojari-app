@@ -118,6 +118,45 @@
   border-bottom: 2px solid var(--border);
 }
 
+/* Card */
+.card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 28px 32px;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+/* Form elements */
+.formGroup { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 13px; font-weight: 700; color: var(--secondary); }
+.input {
+  padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 14px;
+  font-family: var(--font-body); color: var(--text);
+  background: var(--white); transition: border-color var(--transition);
+  width: 100%;
+}
+.input:focus { outline: none; border-color: var(--primary); }
+
+/* Buttons */
+.btn {
+  padding: 10px 28px; border-radius: var(--radius-sm);
+  background: var(--primary); color: var(--white);
+  border: none; cursor: pointer; font-size: 14px;
+  font-weight: 700; font-family: var(--font-body);
+  transition: background var(--transition), transform var(--transition);
+}
+.btn:hover:not(:disabled) { background: var(--primary-dark, #c06818); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+.btnSecondary {
+  padding: 9px 20px; border-radius: var(--radius-sm);
+  background: var(--white); color: var(--primary);
+  border: 1.5px solid var(--primary); cursor: pointer;
+  font-size: 13px; font-weight: 700; font-family: var(--font-body);
+  transition: all var(--transition);
+}
+.btnSecondary:hover { background: var(--primary); color: var(--white); }
+
 /* Responsive */
 @media (max-width: 1024px) {
   .statsGrid { grid-template-columns: repeat(3, 1fr); }

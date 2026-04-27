@@ -60,3 +60,27 @@ export const adminAPI = {
 export const contactAPI = {
   send: (data) => api.post('/contact', data),
 };
+
+// src/api/panchang.api.js
+export const panchangAPI = {
+  get: (params) => api.get('/panchang', { params }),
+};
+
+// src/api/kundali.api.js  (Admin only — JWT must have role=admin)
+export const kundaliAPI = {
+  match:  (data)   => api.post('/kundali/match', data),
+  save:   (data)   => api.post('/kundali/save',  data),
+  list:   (params) => api.get('/kundali',         { params }),
+  get:    (id)     => api.get(`/kundali/${id}`),
+  delete: (id)     => api.delete(`/kundali/${id}`),
+};
+
+// src/api/home.api.js
+const MULTIPART = { headers: { 'Content-Type': 'multipart/form-data' } };
+export const homeAPI = {
+  get:           ()       => api.get('/home'),
+  upsert:        (data)   => api.post('/home', data, MULTIPART),
+  addSlider:     (data)   => api.post('/home/slider', data, MULTIPART),
+  deleteSlider:  (id)     => api.delete(`/home/slider/${id}`),
+  toggleSlider:  (id)     => api.patch(`/home/slider/${id}/toggle`),
+};

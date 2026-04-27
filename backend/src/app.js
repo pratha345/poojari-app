@@ -28,6 +28,9 @@ app.use('/api/pujari',   require('./routes/pujari.routes'));
 app.use('/api/bookings', require('./routes/booking.routes'));
 app.use('/api/admin',    require('./routes/admin.routes'));
 app.use('/api/contact',  require('./routes/contact.routes'));
+app.use('/api/panchang', require('./routes/panchang.routes'));
+app.use('/api/kundali',  require('./routes/kundali.routes'));
+app.use('/api/home',     require('./routes/home.routes'));
 
 // ── Health Check ──────────────────────────────────────────────
 app.get('/api/health', (req, res) => {

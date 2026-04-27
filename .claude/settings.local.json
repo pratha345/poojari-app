@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(node -e \"require\\('./backend/src/services/panchangService'\\)\")",
+      "Read(//f/pojjari_v2_with_images/**)",
+      "Bash(sort -u grep -oP '^\\\\.\\\\K\\\\w+' \"F:/pojjari_v2_with_images/pojjari_updated/frontend/src/pages/Home.module.css\")",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(cmd /c \"netstat -ano\")"
+    ]
+  }
+}
