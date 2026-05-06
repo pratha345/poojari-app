@@ -4,8 +4,44 @@ import { Link } from 'react-router-dom';
 import Header    from '../components/layout/Header';
 import Footer    from '../components/layout/Footer';
 import PoojaCard from '../components/common/PoojaCard';
+import SEOHead   from '../components/SEOHead';
 import { poojaAPI, homeAPI } from '../api/index.js';
 import s from './Home.module.css';
+
+const HOME_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': 'https://pojjari.com/#webpage',
+      'url': 'https://pojjari.com/',
+      'name': 'पूजारी - घरी पूजा, मनासारखी',
+      'description': 'महाराष्ट्रातील सर्वोत्तम ऑनलाईन पूजा बुकिंग सेवा',
+      'inLanguage': 'mr',
+      'isPartOf': { '@id': 'https://pojjari.com/#website' },
+    },
+    {
+      '@type': 'FAQPage',
+      'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': 'ऑनलाईन पूजा बुकिंग कसे करावे?',
+          'acceptedAnswer': { '@type': 'Answer', 'text': 'पूजारी वेबसाईटवर जाऊन इच्छित पूजा निवडा, तारीख व वेळ निश्चित करा, आणि सुरक्षित ऑनलाईन पेमेंट करा. पुजारी घरी येऊन संपूर्ण विधी करतात.' }
+        },
+        {
+          '@type': 'Question',
+          'name': 'पुजारी घरी येतात का?',
+          'acceptedAnswer': { '@type': 'Answer', 'text': 'होय, आमचे सर्व पुजारी सामग्रीसह घरी येतात. महाराष्ट्रातील सर्व जिल्ह्यांमध्ये सेवा उपलब्ध आहे.' }
+        },
+        {
+          '@type': 'Question',
+          'name': 'कोणत्या पूजा बुक करता येतात?',
+          'acceptedAnswer': { '@type': 'Answer', 'text': 'सत्यनारायण पूजा, गृहप्रवेश, दशक्रिया विधी, रुद्राभिषेक, नवग्रह हवन, लक्ष्मी पूजन, गणपती स्थापना व इतर सर्व पूजा बुक करता येतात.' }
+        }
+      ]
+    }
+  ]
+};
 
 // ─────────────────────────────────────────────────────────────────
 // STATIC FALLBACK DATA (shown if API is unavailable)
@@ -190,6 +226,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FDF6EC]">
+      <SEOHead
+        title="घरी पूजा, मनासारखी | ऑनलाईन पूजा बुकिंग महाराष्ट्र"
+        description="पूजारी - महाराष्ट्रातील सर्वोत्तम ऑनलाईन पूजा बुकिंग सेवा. अनुभवी पुजारी घरी बोलवा. सत्यनारायण, गृहप्रवेश, दशक्रिया, हवन, उत्सव पूजा बुक करा."
+        keywords="online puja booking, pujari near me, घरबसल्या पूजा, पुजारी सेवा, book pandit online, पूजा बुकिंग महाराष्ट्र, satyanarayan puja booking, पुणे पुजारी, मुंबई पुजारी, ऑनलाईन पूजा"
+        canonical="/"
+        schema={HOME_SCHEMA}
+      />
       <Header />
       <main>
 
@@ -202,20 +245,20 @@ export default function Home() {
           <div className="pointer-events-none absolute -bottom-36 -left-36 h-[400px] w-[400px] rounded-full bg-crimson-700/5 blur-2xl" />
 
           <div className="container relative z-10">
-            <div className="grid min-h-[90vh] grid-cols-1 items-center gap-10 py-16 lg:grid-cols-2">
+            {/* Mobile: 1-col text only; lg: 2-col with image */}
+            <div className="grid grid-cols-1 items-center gap-8 py-12 lg:min-h-[84vh] lg:grid-cols-2 lg:gap-10 lg:py-16">
 
               {/* LEFT: dynamic text */}
-              <div className="flex flex-col gap-7">
+              <div className="flex flex-col gap-5 sm:gap-7">
 
-                <div className="inline-flex w-fit items-center gap-2 rounded-full border border-saffron-500/25 bg-white/75 px-5 py-2.5 shadow-sm backdrop-blur-sm">
+                <div className="inline-flex w-fit items-center gap-2 rounded-full border border-saffron-500/25 bg-white/75 px-4 py-2 shadow-sm backdrop-blur-sm sm:px-5 sm:py-2.5">
                   <span>🙏</span>
                   <span className="font-devanagari text-sm font-semibold text-saffron-600">
                     {content.subtitle}
                   </span>
                 </div>
 
-                <h1 className="font-display text-[2.6rem] font-bold leading-[1.22] text-maroon-700 sm:text-5xl lg:text-[3.2rem]">
-                  {/* Split title to highlight "विश्वासार्ह" */}
+                <h1 className="font-display text-3xl font-bold leading-[1.22] text-maroon-700 sm:text-4xl lg:text-[3rem] xl:text-[3.2rem]">
                   {content.title.split('विश्वासार्ह').map((part, i, arr) => (
                     <span key={i}>
                       {part}
@@ -224,89 +267,90 @@ export default function Home() {
                   ))}
                 </h1>
 
-                <p className="max-w-[500px] font-devanagari text-lg leading-[1.85] text-maroon-700/65">
+                <p className="max-w-[500px] font-devanagari text-base leading-[1.85] text-maroon-700/65 sm:text-lg">
                   {content.description}
                 </p>
 
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                   <Link to="/pooja"
-                    className="inline-flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-8 py-4 font-devanagari text-base font-bold text-white shadow-saffron transition-all duration-200 hover:-translate-y-1 hover:from-saffron-600 hover:to-saffron-700 hover:shadow-saffron-xl">
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-6 py-3.5 font-devanagari text-sm font-bold text-white shadow-saffron transition-all duration-200 hover:-translate-y-1 hover:from-saffron-600 hover:to-saffron-700 hover:shadow-saffron-xl sm:w-auto sm:gap-2.5 sm:px-8 sm:py-4 sm:text-base">
                     🪔 {content.button_text_1}
                   </Link>
                   <Link to="/about"
-                    className="inline-flex items-center gap-2.5 rounded-2xl border-2 border-saffron-500/55 bg-white/75 px-8 py-4 font-devanagari text-base font-bold text-saffron-600 backdrop-blur-sm transition-all duration-200 hover:border-saffron-500 hover:bg-white">
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-saffron-500/55 bg-white/75 px-6 py-3.5 font-devanagari text-sm font-bold text-saffron-600 backdrop-blur-sm transition-all duration-200 hover:border-saffron-500 hover:bg-white sm:w-auto sm:px-8 sm:py-4 sm:text-base">
                     {content.button_text_2}
                   </Link>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-5">
                   {['✅ विश्वासू पुजारी', '⚡ तत्काळ बुकिंग', '🔒 सुरक्षित पेमेंट'].map(t => (
-                    <span key={t} className="font-devanagari text-sm font-semibold text-maroon-700/55">{t}</span>
+                    <span key={t} className="font-devanagari text-xs font-semibold text-maroon-700/55 sm:text-sm">{t}</span>
                   ))}
                 </div>
               </div>
 
-              {/* RIGHT: image / slider */}
-              <div className="flex items-center justify-center">
-                <div className="relative flex h-[450px] w-[450px] items-center justify-center sm:h-[490px] sm:w-[490px]">
+              {/* RIGHT: image / slider — hidden on mobile, scales up on md/lg */}
+              <div className="hidden md:flex items-center justify-center">
+                <div className="relative flex h-[340px] w-[340px] items-center justify-center lg:h-[440px] lg:w-[440px] xl:h-[480px] xl:w-[480px]">
 
                   <div className={`absolute inset-0 rounded-full ${s.mandalaRing}`} />
-                  <div className={`absolute h-[370px] w-[370px] rounded-full ${s.mandalaRingInner}`} />
-                  <div className={`absolute h-[360px] w-[360px] rounded-full ${s.imageGlow}`} />
-                  <div className="absolute h-[314px] w-[314px] rounded-full border border-saffron-500/15" />
+                  <div className={`absolute h-[278px] w-[278px] rounded-full lg:h-[360px] lg:w-[360px] xl:h-[394px] xl:w-[394px] ${s.mandalaRingInner}`} />
+                  <div className={`absolute h-[270px] w-[270px] rounded-full lg:h-[350px] lg:w-[350px] xl:h-[383px] xl:w-[383px] ${s.imageGlow}`} />
+                  <div className="absolute h-[235px] w-[235px] rounded-full lg:h-[305px] lg:w-[305px] xl:h-[334px] xl:w-[334px] border border-saffron-500/15" />
 
                   {/* Image frame */}
-                  <div className="relative z-10 h-[284px] w-[262px] overflow-hidden rounded-[50%]">
+                  <div className="relative z-10 h-[214px] w-[196px] overflow-hidden rounded-[50%] lg:h-[276px] lg:w-[254px] xl:h-[302px] xl:w-[278px]">
                     {hasSlider ? (
                       <HeroSlider sliders={sliders} />
                     ) : !imgBroken ? (
                       <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[50%] border-[5px] border-white/60 bg-gradient-to-b from-amber-50 to-orange-100/60 shadow-[0_20px_60px_rgba(139,37,0,0.22)]">
                         <img
                           src={heroSrc}
-                          alt="श्री गणेश"
+                          alt="श्री गणेश — पूजारी पूजा बुकिंग सेवा"
                           className="h-full w-full object-cover object-top"
+                          fetchpriority="high"
                           onError={() => setImgBroken(true)}
                         />
                       </div>
                     ) : (
                       <div className="flex h-full w-full items-center justify-center rounded-[50%] border-[5px] border-white/60 bg-gradient-to-b from-amber-50 to-orange-100/60">
                         <div className="flex flex-col items-center gap-3 text-center">
-                          <span className={`font-display text-[5.5rem] leading-none ${s.omFallback}`}>ॐ</span>
-                          <span className="font-display text-sm font-bold text-saffron-700">श्री गणेशाय नमः</span>
+                          <span className={`font-display text-[4.5rem] leading-none lg:text-[5.5rem] ${s.omFallback}`}>ॐ</span>
+                          <span className="font-display text-xs font-bold text-saffron-700 lg:text-sm">श्री गणेशाय नमः</span>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Floating cards */}
-                  <div className={`${s.floatCard} absolute -right-4 top-[10%] z-20 flex min-w-[148px] items-center gap-3 rounded-2xl border border-amber-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}>
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 text-xl">⭐</div>
+                  {/* Floating cards — only on lg+ to prevent overflow */}
+                  <div className={`${s.floatCard} absolute -right-2 top-[10%] z-20 hidden lg:flex min-w-[140px] items-center gap-3 rounded-2xl border border-amber-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}>
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 text-lg">⭐</div>
                     <div>
                       <p className="font-display text-sm font-bold leading-tight text-maroon-700">4.8 रेटिंग</p>
                       <p className="font-devanagari text-xs text-maroon-700/50">५०० + ग्राहक</p>
                     </div>
                   </div>
 
-                  <div className={`${s.floatCard} absolute -left-8 top-[38%] z-20 flex min-w-[152px] items-center gap-3 rounded-2xl border border-orange-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}
+                  <div className={`${s.floatCard} absolute -left-6 top-[38%] z-20 hidden lg:flex min-w-[144px] items-center gap-3 rounded-2xl border border-orange-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}
                     style={{ animationDelay: '1.5s' }}>
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-orange-50 text-xl">🙏</div>
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-orange-50 text-lg">🙏</div>
                     <div>
                       <p className="font-display text-sm font-bold leading-tight text-maroon-700">500+ पुजारी</p>
                       <p className="font-devanagari text-xs text-maroon-700/50">अनुभवी व विश्वासू</p>
                     </div>
                   </div>
 
-                  <div className={`${s.floatCard} absolute -right-6 bottom-[10%] z-20 flex min-w-[156px] items-center gap-3 rounded-2xl border border-red-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}
+                  <div className={`${s.floatCard} absolute -right-4 bottom-[10%] z-20 hidden lg:flex min-w-[148px] items-center gap-3 rounded-2xl border border-red-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}
                     style={{ animationDelay: '3s' }}>
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-red-50 text-xl">📍</div>
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-red-50 text-lg">📍</div>
                     <div>
                       <p className="font-display text-sm font-bold leading-tight text-maroon-700">महाराष्ट्र सेवा</p>
                       <p className="font-devanagari text-xs text-maroon-700/50">सर्व जिल्ह्यांत</p>
                     </div>
                   </div>
 
-                  <span className="absolute right-[22%] top-[7%] h-3 w-3 rounded-full bg-gold-500 shadow-[0_0_12px_rgba(255,193,7,0.75)]" />
-                  <span className="absolute bottom-[7%] left-[20%] h-2.5 w-2.5 rounded-full bg-saffron-400 shadow-[0_0_10px_rgba(255,122,0,0.65)]" />
+                  <span className="absolute right-[22%] top-[7%] h-2.5 w-2.5 rounded-full bg-gold-500 shadow-[0_0_12px_rgba(255,193,7,0.75)]" />
+                  <span className="absolute bottom-[7%] left-[20%] h-2 w-2 rounded-full bg-saffron-400 shadow-[0_0_10px_rgba(255,122,0,0.65)]" />
                 </div>
               </div>
             </div>
@@ -463,9 +507,9 @@ export default function Home() {
                 ))}
               </div>
             )}
-            <div className="mt-12 text-center">
+            <div className="mt-12 flex justify-center">
               <Link to="/pooja"
-                className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-10 py-4 font-devanagari text-base font-bold text-white shadow-saffron transition-all duration-200 hover:-translate-y-0.5 hover:shadow-saffron-xl">
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-10 py-4 font-devanagari text-base font-bold text-white shadow-saffron transition-all duration-200 hover:-translate-y-0.5 hover:shadow-saffron-xl sm:w-auto">
                 सर्व पूजा पहा →
               </Link>
             </div>

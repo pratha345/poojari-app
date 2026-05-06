@@ -1,6 +1,5 @@
 // src/context/AuthContext.jsx
-import { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../api/index.js';
+import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -9,7 +8,6 @@ export const AuthProvider = ({ children }) => {
     try { return JSON.parse(localStorage.getItem('pojjari_user')); }
     catch { return null; }
   });
-  const [loading, setLoading] = useState(false);
 
   const login = (token, userData) => {
     localStorage.setItem('pojjari_token', token);
@@ -20,15 +18,20 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('pojjari_token');
     localStorage.removeItem('pojjari_user');
+    localStorage.removeItem('pojjari_theme');
     setUser(null);
   };
 
   const isAuthenticated = !!user;
-  const isAdmin  = user?.role === 'admin';
-  const isPujari = user?.role === 'pujari';
+  const isSuperAdmin    = user?.role === 'super_admin';
+  const isAdmin         = user?.role === 'admin' || isSuperAdmin;
+  const isPujari        = user?.role === 'pujari';
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, isAdmin, isPujari, loading }}>
+    <AuthContext.Provider value={{
+      user, login, logout,
+      isAuthenticated, isSuperAdmin, isAdmin, isPujari,
+    }}>
       {children}
     </AuthContext.Provider>
   );

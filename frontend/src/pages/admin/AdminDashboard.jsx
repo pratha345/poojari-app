@@ -1,81 +1,130 @@
 // src/pages/admin/AdminDashboard.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
-import { adminAPI } from '../../api/index.js';
-import styles from './Admin.module.css';
+import { useAuth } from '../../context/AuthContext';
+import { adminAPI, superadminAPI } from '../../api/index.js';
+import AdminLayout from './AdminLayout';
+import s from './AdminDashboard.module.css';
+
+function StatCard({ icon, label, value, color }) {
+  return (
+    <div className={s.statCard} style={{ borderTopColor: color }}>
+      <span className={s.statIcon}>{icon}</span>
+      <div className={s.statInfo}>
+        <span className={s.statValue}>{value ?? '—'}</span>
+        <span className={s.statLabel}>{label}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
-  const [stats,   setStats]   = useState(null);
+  const { isSuperAdmin } = useAuth();
+  const [stats, setStats]     = useState(null);
+  const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    adminAPI.getStats()
-      .then(r => setStats(r.data.data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    (async () => {
+      try {
+        if (isSuperAdmin) {
+          const [sRes, tRes] = await Promise.all([
+            superadminAPI.getStats(),
+            superadminAPI.getTenants(),
+          ]);
+          setStats(sRes.data.data || sRes.data);
+          setTenants((tRes.data.data || tRes.data).slice(0, 5));
+        } else {
+          const res = await adminAPI.getStats();
+          setStats(res.data.data || res.data);
+        }
+      } catch { /* silent */ }
+      finally { setLoading(false); }
+    })();
+  }, [isSuperAdmin]);
 
-  const statCards = stats ? [
-    { icon: '👤', label: 'एकूण वापरकर्ते',     val: stats.users,            color: '#1565C0' },
-    { icon: '🧑‍🦳', label: 'मंजूर पुजारी',    val: stats.pujaris,          color: '#2E7D32' },
-    { icon: '⏳', label: 'प्रलंबित नोंदणी',     val: stats.pending_pujaris,  color: '#F57F17' },
-    { icon: '📋', label: 'एकूण बुकिंग्ज',       val: stats.bookings,         color: '#6A1B9A' },
-    { icon: '💰', label: 'एकूण महसूल (₹)',      val: Number(stats.revenue||0).toLocaleString('mr-IN'), color: '#E07B2A' },
-  ] : [];
-
-  const quickLinks = [
-    { to: '/admin/pujaris',        label: '🧑‍🦳 पुजारी व्यवस्थापन', desc: 'नोंदणी मंजुरी, प्रोफाईल पहा' },
-    { to: '/admin/bookings',       label: '📋 बुकिंग व्यवस्थापन',   desc: 'सर्व बुकिंग्ज, पुजारी नियुक्त करा' },
-    { to: '/admin/poojas',         label: '🪔 पूजा व्यवस्थापन',     desc: 'पूजा जोडा, संपादित करा' },
-    { to: '/admin/kundali-milan',  label: '🔯 कुंडली मिलान',         desc: 'अष्ट कूट गुण मिलान, कुंडली जुळणी' },
-    { to: '/admin/home',           label: '🏠 होमपेज संपादक',         desc: 'हिरो, स्लाइडर, मजकूर बदला' },
-  ];
+  if (loading) return <AdminLayout><div className="page-loader"><div className="spinner" /></div></AdminLayout>;
 
   return (
-    <div>
-      <Header />
-      <main className={styles.main}>
-        <div className="container">
-          <div className={styles.pageHeader}>
-            <h1 className={styles.pageTitle}>⚙️ प्रशासन पॅनेल</h1>
-            <span className={styles.adminBadge}>Admin</span>
-          </div>
+    <AdminLayout>
+      <div className={s.wrap}>
+        <h1 className={s.heading}>
+          {isSuperAdmin ? '🌐 Platform Dashboard' : '📊 Dashboard'}
+        </h1>
 
-          {loading ? (
-            <div className="page-loader"><div className="spinner"/></div>
+        <div className={s.statsGrid}>
+          {isSuperAdmin ? (
+            <>
+              <StatCard icon="🏢" label="Tenants"  value={stats?.tenants}  color="#E07B2A" />
+              <StatCard icon="👥" label="Users"    value={stats?.users}    color="#1565C0" />
+              <StatCard icon="👨‍⚕️" label="Pujaris" value={stats?.pujaris}  color="#2E7D32" />
+              <StatCard icon="📅" label="Bookings" value={stats?.bookings} color="#7B2D8B" />
+              <StatCard icon="💰" label="Revenue"  value={`₹${Number(stats?.revenue || 0).toLocaleString('en-IN')}`} color="#D4AF37" />
+            </>
           ) : (
             <>
-              {/* Stats */}
-              <div className={styles.statsGrid}>
-                {statCards.map(s => (
-                  <div key={s.label} className={styles.statCard} style={{ borderTopColor: s.color }}>
-                    <span className={styles.statIcon}>{s.icon}</span>
-                    <div className={styles.statVal} style={{ color: s.color }}>{s.val}</div>
-                    <div className={styles.statLabel}>{s.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Quick Links */}
-              <div className={styles.quickLinks}>
-                <h2 className={styles.sectionTitle}>द्रुत लिंक</h2>
-                <div className="grid-3">
-                  {quickLinks.map(l => (
-                    <Link key={l.to} to={l.to} className={styles.quickCard}>
-                      <span className={styles.quickLabel}>{l.label}</span>
-                      <span className={styles.quickDesc}>{l.desc}</span>
-                      <span className={styles.quickArrow}>→</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
+              <StatCard icon="👥" label="Users"             value={stats?.users}           color="#1565C0" />
+              <StatCard icon="👨‍⚕️" label="Pujaris"         value={stats?.pujaris}         color="#2E7D32" />
+              <StatCard icon="⏳" label="Pending Pujaris"   value={stats?.pending_pujaris} color="#F57F17" />
+              <StatCard icon="📅" label="Bookings"          value={stats?.bookings}        color="#7B2D8B" />
+              <StatCard icon="💰" label="Revenue"           value={`₹${Number(stats?.revenue || 0).toLocaleString('en-IN')}`} color="#D4AF37" />
             </>
           )}
         </div>
-      </main>
-      <Footer />
-    </div>
+
+        {isSuperAdmin && tenants.length > 0 && (
+          <div className={s.section}>
+            <div className={s.sectionHeader}>
+              <h2 className={s.sectionTitle}>🏢 Recent Tenants</h2>
+              <Link to="/superadmin/tenants" className={s.seeAll}>View All →</Link>
+            </div>
+            <div className={s.tableWrap}>
+              <table className={s.table}>
+                <thead>
+                  <tr>
+                    <th>Name</th><th>Slug</th><th>Plan</th>
+                    <th>Users</th><th>Bookings</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tenants.map(t => (
+                    <tr key={t.id}>
+                      <td><strong>{t.name}</strong></td>
+                      <td><code>{t.slug}</code></td>
+                      <td>
+                        <span className={`badge badge-${t.plan === 'premium' ? 'success' : t.plan === 'basic' ? 'warning' : 'default'}`}>
+                          {t.plan}
+                        </span>
+                      </td>
+                      <td>{t.user_count}</td>
+                      <td>{t.booking_count}</td>
+                      <td>
+                        {t.is_active
+                          ? <span className="badge badge-success">Active</span>
+                          : <span className="badge badge-danger">Inactive</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {!isSuperAdmin && (
+          <div className={s.quickLinks}>
+            <Link to="/admin/pujaris/pending" className={s.quickCard}>
+              <span>⏳</span><span>Pujari Requests</span>
+              {stats?.pending_pujaris > 0 && <span className={s.badge}>{stats.pending_pujaris}</span>}
+            </Link>
+            <Link to="/admin/bookings"      className={s.quickCard}><span>📅</span><span>Manage Bookings</span></Link>
+            <Link to="/admin/poojas"        className={s.quickCard}><span>🪔</span><span>Manage Poojas</span></Link>
+            <Link to="/admin/theme"         className={s.quickCard}><span>🎨</span><span>Theme Settings</span></Link>
+            <Link to="/admin/home"          className={s.quickCard}><span>🏠</span><span>Homepage Content</span></Link>
+            <Link to="/admin/kundali-milan" className={s.quickCard}><span>🔯</span><span>Kundali Milan</span></Link>
+          </div>
+        )}
+      </div>
+    </AdminLayout>
   );
 }

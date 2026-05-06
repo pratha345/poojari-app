@@ -1,109 +1,176 @@
 /* Booking.module.css */
-.main { background: var(--cream); padding: 40px 0 72px; min-height: 80vh; }
+.main { background: var(--cream); padding: 32px 0 60px; min-height: 80vh; }
 
+/* ── Progress bar ─────────────────────────────────────────────── */
 .progress {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0; margin-bottom: 40px; flex-wrap: wrap;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             0;
+  margin-bottom:   36px;
+  flex-wrap:       wrap;
+  row-gap:         8px;
 }
 .progressStep {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 13px; color: var(--text-muted);
+  display:    flex;
+  align-items: center;
+  gap:        8px;
+  font-size:  13px;
+  color:      var(--text-muted);
 }
 .progressDot {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--border); color: var(--text-muted);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 13px; transition: all var(--transition);
+  width:           30px;
+  height:          30px;
+  border-radius:   50%;
+  background:      var(--border);
+  color:           var(--text-muted);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-weight:     700;
+  font-size:       12px;
+  transition:      all var(--transition);
+  flex-shrink:     0;
 }
-.progressLine {
-  width: 60px; height: 2px; background: var(--border);
-  margin: 0 10px; transition: background var(--transition);
-}
+.progressLine { width: 56px; height: 2px; background: var(--border); margin: 0 8px; transition: background var(--transition); }
 .current .progressDot { background: var(--primary); color: var(--white); }
-.current { color: var(--primary); font-weight: 600; }
-.done .progressDot { background: var(--success); color: var(--white); }
-.done .progressLine { background: var(--success); }
+.current              { color: var(--primary); font-weight: 600; }
+.done .progressDot    { background: var(--success); color: var(--white); }
+.done .progressLine   { background: var(--success); }
 
+/* ── Layout ───────────────────────────────────────────────────── */
 .layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 32px;
-  align-items: start;
+  display:               grid;
+  grid-template-columns: 1fr 320px;
+  gap:                   28px;
+  align-items:           start;
 }
 
 .formSection {}
 .card {
-  background: var(--white); border-radius: var(--radius-lg);
-  border: 1.5px solid var(--border); padding: 36px;
-  box-shadow: 0 4px 20px var(--shadow);
+  background:    var(--white);
+  border-radius: var(--radius-lg);
+  border:        1.5px solid var(--border);
+  padding:       28px 32px;
+  box-shadow:    0 4px 20px var(--shadow);
 }
 .cardTitle {
-  font-family: var(--font-display); font-size: 1.4rem;
-  color: var(--secondary); margin-bottom: 28px;
-  padding-bottom: 16px; border-bottom: 2px solid var(--border);
+  font-family:    var(--font-display);
+  font-size:      1.3rem;
+  color:          var(--secondary);
+  margin-bottom:  24px;
+  padding-bottom: 14px;
+  border-bottom:  2px solid var(--border);
 }
 
-/* Confirm */
-.confirmList { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
-.confirmItem {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  padding: 12px 16px; background: var(--cream); border-radius: var(--radius-sm);
-  gap: 16px;
+/* Form grid on laptop: 2-col for some fields */
+.formGrid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   0 20px;
 }
-.confirmItem span { font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
+.formGridFull { grid-column: 1 / -1; }
+
+/* Confirm panel */
+.confirmList  { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.confirmItem  {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     flex-start;
+  padding:         10px 14px;
+  background:      var(--cream);
+  border-radius:   var(--radius-sm);
+  gap:             14px;
+}
+.confirmItem span   { font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
 .confirmItem strong { font-size: 14px; color: var(--text); text-align: right; }
-.totalRow { background: rgba(224,123,42,0.1); border: 1.5px solid var(--primary); }
-.totalAmt { font-size: 20px !important; color: var(--primary) !important; font-family: var(--font-display); }
+.totalRow   { background: rgba(224,123,42,0.1); border: 1.5px solid var(--primary); }
+.totalAmt   { font-size: 18px !important; color: var(--primary) !important; font-family: var(--font-display); }
 
-.actionRow { display: flex; gap: 16px; justify-content: flex-end; flex-wrap: wrap; }
-.payNote { font-size: 12px; color: var(--text-muted); margin-top: 14px; font-style: italic; }
+.actionRow  { display: flex; gap: 14px; justify-content: flex-end; flex-wrap: wrap; }
+.payNote    { font-size: 12px; color: var(--text-muted); margin-top: 12px; font-style: italic; }
 
-/* Success */
-.successCard { text-align: center; padding: 60px 36px; }
-.successIcon { font-size: 72px; animation: float 2s ease-in-out infinite; margin-bottom: 16px; }
-.successCard h2 { font-family: var(--font-display); font-size: 1.8rem; color: var(--secondary); margin-bottom: 12px; }
-.successCard p { color: var(--text-muted); font-size: 15px; }
+/* Success state */
+.successCard   { text-align: center; padding: 48px 28px; }
+.successIcon   { font-size: 64px; animation: float 2s ease-in-out infinite; margin-bottom: 14px; }
+.successCard h2 { font-family: var(--font-display); font-size: 1.6rem; color: var(--secondary); margin-bottom: 10px; }
+.successCard p  { color: var(--text-muted); font-size: 15px; }
 .bookingCode {
-  font-family: monospace; font-size: 28px; font-weight: 700;
-  color: var(--primary); background: var(--cream-dark);
-  border: 2px dashed var(--primary); border-radius: var(--radius-md);
-  padding: 14px 28px; margin: 16px auto;
-  display: inline-block; letter-spacing: 3px;
+  font-family:  monospace;
+  font-size:    24px;
+  font-weight:  700;
+  color:        var(--primary);
+  background:   var(--cream-dark);
+  border:       2px dashed var(--primary);
+  border-radius: var(--radius-md);
+  padding:      12px 24px;
+  margin:       14px auto;
+  display:      inline-block;
+  letter-spacing: 3px;
+  word-break:   break-all;
 }
 .successNote {
-  background: var(--cream-dark); border-radius: var(--radius-md);
-  padding: 16px 20px; margin: 20px 0;
-  font-size: 14px; line-height: 1.7;
+  background:    var(--cream-dark);
+  border-radius: var(--radius-md);
+  padding:       14px 18px;
+  margin:        18px 0;
+  font-size:     14px;
+  line-height:   1.7;
 }
-.successActions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+.successActions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
 
-/* Summary */
+/* Summary card */
 .summaryCard {
-  background: var(--white); border-radius: var(--radius-lg);
-  border: 1.5px solid var(--border); overflow: hidden;
-  box-shadow: 0 4px 20px var(--shadow); position: sticky; top: 130px;
+  background:    var(--white);
+  border-radius: var(--radius-lg);
+  border:        1.5px solid var(--border);
+  overflow:      hidden;
+  box-shadow:    0 4px 20px var(--shadow);
+  position:      sticky;
+  top:           120px;
 }
-.summaryImg { width: 100%; height: 200px; object-fit: cover; }
-.summaryBody { padding: 20px; }
-.summaryCat { font-size: 11px; color: var(--primary); font-weight: 700; text-transform: uppercase; }
-.summaryTitle { font-family: var(--font-display); font-size: 1.1rem; color: var(--secondary); margin: 6px 0; }
-.summaryMeta { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
-.summaryPrice { font-size: 24px; font-weight: 700; color: var(--primary); font-family: var(--font-display); }
+.summaryImg       { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+.summaryBody      { padding: 18px; }
+.summaryCat       { font-size: 11px; color: var(--primary); font-weight: 700; text-transform: uppercase; }
+.summaryTitle     { font-family: var(--font-display); font-size: 1.05rem; color: var(--secondary); margin: 5px 0; }
+.summaryMeta      { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+.summaryPrice     { font-size: 22px; font-weight: 700; color: var(--primary); font-family: var(--font-display); }
 .summaryGuarantee {
-  padding: 14px 20px; background: rgba(46,125,50,0.08);
-  border-top: 1px solid var(--border);
-  display: flex; flex-direction: column; gap: 4px;
+  padding:        12px 18px;
+  background:     rgba(46,125,50,0.08);
+  border-top:     1px solid var(--border);
+  display:        flex;
+  flex-direction: column;
+  gap:            3px;
 }
 .summaryGuarantee strong { font-size: 13px; color: var(--success); }
-.summaryGuarantee span { font-size: 12px; color: var(--text-muted); }
+.summaryGuarantee span   { font-size: 12px; color: var(--text-muted); }
 
-@media (max-width: 860px) {
-  .layout { grid-template-columns: 1fr; }
-  .summaryCard { position: static; }
-  .progress { gap: 8px; }
-  .progressLine { width: 30px; }
+/* ── Laptop (1024px) ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .layout { grid-template-columns: 1fr 280px; gap: 20px; }
 }
-@media (max-width: 480px) {
+
+/* ── Tablet (768px) ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .layout       { grid-template-columns: 1fr; }
+  .summaryCard  { position: static; order: -1; }
+  .formGrid     { grid-template-columns: 1fr; }
+  .progress     { gap: 4px; }
+  .progressLine { width: 28px; }
+  .main         { padding: 20px 0 48px; }
+}
+
+/* ── Mobile (640px) ───────────────────────────────────────────── */
+@media (max-width: 640px) {
   .card { padding: 24px 20px; }
-  .actionRow { flex-direction: column-reverse; }
+}
+
+/* ── Mobile (480px) ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .card        { padding: 20px 16px; }
+  .actionRow   { flex-direction: column-reverse; }
+  .bookingCode { font-size: 18px; padding: 10px 16px; }
+  .successCard { padding: 36px 16px; }
+  .progress    { flex-wrap: wrap; justify-content: center; }
 }

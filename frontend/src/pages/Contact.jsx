@@ -3,8 +3,17 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import SEOHead from '../components/SEOHead';
 import { contactAPI } from '../api/index.js';
 import styles from './Contact.module.css';
+
+const CONTACT_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  'name': 'संपर्क करा | Contact Pojjari',
+  'description': 'पूजारी सेवेशी संपर्क करा. पूजा बुकिंग, पुजारी नोंदणी किंवा कोणत्याही प्रश्नासाठी आम्हाला संदेश पाठवा.',
+  'url': 'https://pojjari.com/contact',
+};
 
 export default function Contact() {
   const [form,    setForm]    = useState({ name:'', email:'', phone:'', subject:'', message:'' });
@@ -26,6 +35,13 @@ export default function Contact() {
 
   return (
     <div>
+      <SEOHead
+        title="संपर्क करा - पूजारी पूजा बुकिंग"
+        description="पूजारी सेवेशी संपर्क करा. पूजा बुकिंग, पुजारी नोंदणी किंवा कोणत्याही प्रश्नासाठी आम्हाला संदेश पाठवा. महाराष्ट्रातील सर्व जिल्ह्यांमध्ये सेवा."
+        keywords="contact pojjari, पूजारी संपर्क, पूजा बुकिंग enquiry, पुजारी नोंदणी"
+        canonical="/contact"
+        schema={CONTACT_SCHEMA}
+      />
       <Header />
       <main className={styles.main}>
         <div className={styles.hero}>

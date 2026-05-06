@@ -7,6 +7,7 @@ USE pojjari_db;
 
 CREATE TABLE IF NOT EXISTS kundali_matches (
   id               INT PRIMARY KEY AUTO_INCREMENT,
+  tenant_id        INT DEFAULT 1,
 
   -- Bride (वधू)
   bride_name       VARCHAR(100) NOT NULL,

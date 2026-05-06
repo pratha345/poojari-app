@@ -61,6 +61,19 @@
 .processCard li { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.6; }
 
 @media (max-width: 960px) {
-  .layout { grid-template-columns: 1fr; }
+  .layout   { grid-template-columns: 1fr; }
   .benefits { position: static; }
+}
+
+@media (max-width: 768px) {
+  .main    { padding: 32px 0 56px; }
+  .hero h1 { font-size: 1.7rem; }
+  .section { padding: 22px 18px; }
+}
+
+@media (max-width: 480px) {
+  .main        { padding: 24px 0 48px; }
+  .hero h1     { font-size: 1.5rem; }
+  .photoSection { flex-direction: column; align-items: flex-start; }
+  .section     { padding: 18px 14px; }
 }

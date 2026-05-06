@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Private / authenticated pages
+Disallow: /admin/
+Disallow: /superadmin/
+Disallow: /my-bookings
+Disallow: /pujari-dashboard
+Disallow: /pujari-nondni
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /api/
+
+# Allow public content
+Allow: /pooja
+Allow: /vidhi/
+Allow: /panchang
+Allow: /about
+Allow: /contact
+
+# Sitemaps
+Sitemap: https://pojjari.com/sitemap.xml

@@ -2,7 +2,23 @@
 import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import SEOHead from '../components/SEOHead';
 import styles from './About.module.css';
+
+const ABOUT_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  'name': 'पूजारी बद्दल | About Pojjari',
+  'description': 'पूजारी — महाराष्ट्रातील सर्वोत्तम पूजा बुकिंग सेवा. आमची टीम, मूल्ये आणि मिशन.',
+  'url': 'https://pojjari.com/about',
+  'breadcrumb': {
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': 'https://pojjari.com/' },
+      { '@type': 'ListItem', 'position': 2, 'name': 'आमच्याबद्दल', 'item': 'https://pojjari.com/about' },
+    ],
+  },
+};
 
 const TEAM = [
   { name: 'राहुल जोशी',    role: 'संस्थापक & CEO',       emoji: '👨‍💼' },
@@ -19,6 +35,13 @@ const VALUES = [
 export default function About() {
   return (
     <div>
+      <SEOHead
+        title="आमच्याबद्दल - पूजारी पूजा बुकिंग सेवा"
+        description="पूजारी — महाराष्ट्रातील सर्वोत्तम ऑनलाईन पूजा बुकिंग सेवा. अनुभवी पुजारी, विश्वासार्ह सेवा, परवडणाऱ्या किंमती. आमच्या मिशन व टीमबद्दल जाणून घ्या."
+        keywords="पूजारी बद्दल, about pojjari, पूजा बुकिंग सेवा महाराष्ट्र, अनुभवी पुजारी"
+        canonical="/about"
+        schema={ABOUT_SCHEMA}
+      />
       <Header />
       <main>
         {/* Hero */}
@@ -99,8 +122,8 @@ export default function About() {
             <h2>आजच पूजा बुक करा</h2>
             <p>महाराष्ट्रातील विश्वासू पुजारी सेवेचा अनुभव घ्या</p>
             <div className={styles.ctaBtns}>
-              <Link to="/pooja"          className="btn btn-gold btn-lg">🪔 पूजा बुक करा</Link>
-              <Link to="/pujari-nondni"  className="btn btn-secondary btn-lg">🧑‍🦳 पुजारी व्हा</Link>
+              <Link to="/pooja"         className="btn btn-gold btn-lg btn-block-sm">🪔 पूजा बुक करा</Link>
+              <Link to="/pujari-nondni" className="btn btn-secondary btn-lg btn-block-sm">🧑‍🦳 पुजारी व्हा</Link>
             </div>
           </div>
         </section>

@@ -1,0 +1,70 @@
+/* HallMap.module.css */
+.wrapper {
+  border-radius: var(--radius-md);
+  overflow:      hidden;
+  border:        1px solid var(--border);
+}
+
+.placeholder,
+.loading {
+  height:          360px;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             14px;
+  background:      var(--cream);
+  border:          1px solid var(--border);
+  border-radius:   var(--radius-md);
+  color:           var(--text-muted);
+  text-align:      center;
+  padding:         24px;
+}
+.placeholder span { font-size: 48px; }
+.placeholder p    { font-size: 14px; max-width: 320px; line-height: 1.5; }
+.loading p        { font-size: 14px; }
+
+.noCoords {
+  background: #fff8e1;
+  border:     1px solid #ffe082;
+  color:      #7a5800;
+  font-size:  13px;
+  padding:    10px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+
+/* Info window content */
+.infoWin {
+  font-family: var(--font-display);
+  min-width:   160px;
+  max-width:   220px;
+}
+.infoName {
+  display:       block;
+  font-size:     14px;
+  margin-bottom: 6px;
+  color:         #333;
+}
+.infoWin p {
+  font-size:     12.5px;
+  color:         #555;
+  margin:        3px 0;
+}
+.infoActions {
+  display:    flex;
+  gap:        6px;
+  margin-top: 10px;
+  flex-wrap:  wrap;
+}
+.infoCall,
+.infoWa {
+  padding:         5px 10px;
+  border-radius:   4px;
+  font-size:       12px;
+  font-weight:     600;
+  text-decoration: none;
+  white-space:     nowrap;
+}
+.infoCall { background: var(--primary); color: #fff; }
+.infoWa   { background: #25D366;        color: #fff; }

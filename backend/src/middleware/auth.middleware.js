@@ -14,7 +14,7 @@ const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const [rows] = await pool.query(
-      'SELECT id, name, phone, email, role, is_active FROM users WHERE id = ?',
+      'SELECT id, name, phone, email, role, tenant_id, is_active FROM users WHERE id = ?',
       [decoded.id]
     );
     if (!rows.length || !rows[0].is_active) {
@@ -28,11 +28,21 @@ const authenticate = async (req, res, next) => {
 };
 
 // ── Role Guard ────────────────────────────────────────────────
+// super_admin always passes any role check
 const authorize = (...roles) => (req, res, next) => {
+  if (req.user.role === 'super_admin') return next();
   if (!roles.includes(req.user.role)) {
     return error(res, 'परवानगी नाही.', 403);
   }
   next();
 };
 
-module.exports = { authenticate, authorize };
+// ── Super Admin Only ──────────────────────────────────────────
+const superAdminOnly = (req, res, next) => {
+  if (req.user?.role !== 'super_admin') {
+    return error(res, 'केवळ सुपर-ॲडमिनला परवानगी आहे.', 403);
+  }
+  next();
+};
+
+module.exports = { authenticate, authorize, superAdminOnly };

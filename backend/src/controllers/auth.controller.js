@@ -4,37 +4,46 @@ const jwt     = require('jsonwebtoken');
 const pool    = require('../config/db');
 const { success, error } = require('../utils/response.util');
 
-// ── Generate OTP ──────────────────────────────────────────────
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 const signToken = (user) =>
   jwt.sign(
-    { id: user.id, role: user.role },
+    { id: user.id, role: user.role, tenant_id: user.tenant_id || null },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
 
+const safeUser = (u) => ({
+  id: u.id, name: u.name, phone: u.phone,
+  email: u.email, role: u.role, tenant_id: u.tenant_id || null,
+});
+
 // ── Register ──────────────────────────────────────────────────
+const HTML_TAG_RE = /<[^>]*>/;
+
 exports.register = async (req, res) => {
   try {
-    const { name, phone, email, password } = req.body;
+    const { name, phone, email, password, tenant_id } = req.body;
     if (!name || !phone || !password)
       return error(res, 'नाव, फोन आणि पासवर्ड आवश्यक आहे.', 400);
+    if (HTML_TAG_RE.test(String(name)))
+      return error(res, 'नाव अवैध आहे. HTML टॅग वापरू नका.', 400);
 
-    const [exists] = await pool.query(
-      'SELECT id FROM users WHERE phone = ?', [phone]
-    );
+    const [exists] = await pool.query('SELECT id FROM users WHERE phone = ?', [phone]);
     if (exists.length)
       return error(res, 'हा फोन नंबर आधीच नोंदणीकृत आहे.', 400);
 
+    // Resolve which tenant this user belongs to
+    const tid = tenant_id || req.tenantId || 1;
+
     const hashed = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      'INSERT INTO users (name, phone, email, password, is_verified) VALUES (?,?,?,?,?)',
-      [name, phone, email || null, hashed, true]
+      'INSERT INTO users (tenant_id, name, phone, email, password, is_verified) VALUES (?,?,?,?,?,?)',
+      [tid, name, phone, email || null, hashed, true]
     );
-    const newUser = { id: result.insertId, name, phone, role: 'user' };
+    const newUser = { id: result.insertId, name, phone, role: 'user', tenant_id: tid };
     const token = signToken(newUser);
-    return success(res, { token, user: newUser }, 'नोंदणी यशस्वी झाली! 🙏', 201);
+    return success(res, { token, user: safeUser(newUser) }, 'नोंदणी यशस्वी झाली! 🙏', 201);
   } catch (err) {
     console.error(err);
     return error(res, 'नोंदणी करताना त्रुटी झाली.');
@@ -60,35 +69,29 @@ exports.login = async (req, res) => {
       return error(res, 'फोन नंबर किंवा पासवर्ड चुकीचा आहे.', 401);
 
     const token = signToken(user);
-    return success(res, {
-      token,
-      user: { id: user.id, name: user.name, phone: user.phone, email: user.email, role: user.role }
-    }, 'लॉगिन यशस्वी! 🙏');
+    return success(res, { token, user: safeUser(user) }, 'लॉगिन यशस्वी! 🙏');
   } catch (err) {
     return error(res, 'लॉगिन करताना त्रुटी झाली.');
   }
 };
 
-// ── Send OTP (SMS service placeholder) ───────────────────────
+// ── Send OTP ──────────────────────────────────────────────────
 exports.sendOtp = async (req, res) => {
   try {
     const { phone } = req.body;
     if (!phone) return error(res, 'फोन नंबर आवश्यक आहे.', 400);
 
-    const otp = generateOTP();
-    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otp    = generateOTP();
+    const expiry = new Date(Date.now() + 10 * 60 * 1000);
+    const tid    = req.tenantId || 1;
 
-    // Upsert user with OTP
     await pool.query(
-      `INSERT INTO users (name, phone, otp_code, otp_expiry, is_verified)
-       VALUES (?, ?, ?, ?, FALSE)
+      `INSERT INTO users (tenant_id, name, phone, otp_code, otp_expiry, is_verified)
+       VALUES (?, ?, ?, ?, ?, FALSE)
        ON DUPLICATE KEY UPDATE otp_code=?, otp_expiry=?`,
-      ['वापरकर्ता', phone, otp, expiry, otp, expiry]
+      [tid, 'वापरकर्ता', phone, otp, expiry, otp, expiry]
     );
-
-    // TODO: Send SMS via MSG91 / Fast2SMS
     console.log(`OTP for ${phone}: ${otp}`);
-
     return success(res, { phone }, 'OTP पाठवला आहे.');
   } catch (err) {
     return error(res, 'OTP पाठवताना त्रुटी झाली.');
@@ -100,13 +103,14 @@ exports.verifyOtp = async (req, res) => {
   try {
     const { phone, otp, name } = req.body;
     if (!phone || !otp) return error(res, 'फोन आणि OTP आवश्यक आहे.', 400);
+    if (name && HTML_TAG_RE.test(String(name)))
+      return error(res, 'नाव अवैध आहे. HTML टॅग वापरू नका.', 400);
 
     const [rows] = await pool.query(
       'SELECT * FROM users WHERE phone = ? AND otp_code = ? AND otp_expiry > NOW()',
       [phone, otp]
     );
-    if (!rows.length)
-      return error(res, 'OTP चुकीचा किंवा कालबाह्य झाला आहे.', 400);
+    if (!rows.length) return error(res, 'OTP चुकीचा किंवा कालबाह्य झाला आहे.', 400);
 
     const user = rows[0];
     await pool.query(
@@ -115,12 +119,53 @@ exports.verifyOtp = async (req, res) => {
     );
 
     const token = signToken(user);
-    return success(res, {
-      token,
-      user: { id: user.id, name: name || user.name, phone: user.phone, role: user.role }
-    }, 'OTP पडताळणी यशस्वी! 🙏');
+    return success(res, { token, user: safeUser({ ...user, name: name || user.name }) }, 'OTP पडताळणी यशस्वी! 🙏');
   } catch (err) {
     return error(res, 'OTP पडताळताना त्रुटी झाली.');
+  }
+};
+
+// ── Forgot Password — verify phone exists ─────────────────────
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) return error(res, 'फोन नंबर आवश्यक आहे.', 400);
+
+    const [rows] = await pool.query(
+      'SELECT id FROM users WHERE phone = ? AND is_active = TRUE', [phone]
+    );
+    if (!rows.length) return error(res, 'हा फोन नंबर नोंदणीकृत नाही.', 404);
+
+    return success(res, { phone, verified: true }, 'फोन नंबर सापडला. नवीन पासवर्ड सेट करा.');
+  } catch (err) {
+    return error(res, 'त्रुटी झाली.');
+  }
+};
+
+// ── Reset Password (no OTP) ───────────────────────────────────
+exports.resetPassword = async (req, res) => {
+  try {
+    const { phone, new_password } = req.body;
+    if (!phone || !new_password)
+      return error(res, 'फोन आणि नवीन पासवर्ड आवश्यक आहे.', 400);
+
+    if (new_password.length < 6)
+      return error(res, 'पासवर्ड किमान 6 अक्षरांचा असावा.', 400);
+
+    const [rows] = await pool.query(
+      'SELECT id FROM users WHERE phone = ? AND is_active = TRUE', [phone]
+    );
+    if (!rows.length) return error(res, 'वापरकर्ता सापडला नाही.', 404);
+
+    const hashed = await bcrypt.hash(new_password, 10);
+    await pool.query(
+      'UPDATE users SET password = ? WHERE phone = ?',
+      [hashed, phone]
+    );
+
+    return success(res, {}, 'पासवर्ड यशस्वीरित्या बदलला! आता लॉगिन करा. 🎉');
+  } catch (err) {
+    return error(res, 'पासवर्ड रीसेट करताना त्रुटी झाली.');
   }
 };
 
@@ -128,7 +173,7 @@ exports.verifyOtp = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      'SELECT id, name, phone, email, role, created_at FROM users WHERE id = ?',
+      'SELECT id, name, phone, email, role, tenant_id, created_at FROM users WHERE id = ?',
       [req.user.id]
     );
     return success(res, rows[0]);

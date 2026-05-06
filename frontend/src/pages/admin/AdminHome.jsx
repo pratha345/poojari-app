@@ -2,9 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
 import { homeAPI } from '../../api/index.js';
+import AdminLayout from './AdminLayout';
 import styles from './Admin.module.css';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
@@ -150,17 +149,14 @@ export default function AdminHome() {
   }
 
   if (loading) return (
-    <div><Header /><main className={styles.main}><div className="page-loader"><div className="spinner" /></div></main><Footer /></div>
+    <AdminLayout><div className="page-loader"><div className="spinner" /></div></AdminLayout>
   );
 
   const previewImg = heroPreview || imgSrc(heroImage);
 
   return (
-    <div>
-      <Header />
-      <main className={styles.main}>
-        <div className="container">
-
+    <AdminLayout>
+      <div>
           {/* Page Header */}
           <div className={styles.pageHeader}>
             <h1 className={styles.pageTitle}>🏠 होमपेज संपादक</h1>
@@ -406,9 +402,7 @@ export default function AdminHome() {
             )}
           </div>
 
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

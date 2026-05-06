@@ -57,10 +57,11 @@ exports.getMyBookings = async (req, res) => {
 
     const [bookings] = await pool.query(
       `SELECT b.*, p.name_mr AS pooja_name, p.image_url AS pooja_image,
-              pp.full_name AS pujari_name, pp.phone AS pujari_phone
+              pp.full_name AS pujari_name, pu.phone AS pujari_phone
        FROM bookings b
        JOIN poojas p ON b.pooja_id = p.id
        LEFT JOIN pujari_profiles pp ON b.pujari_id = pp.id
+       LEFT JOIN users pu ON pp.user_id = pu.id
        WHERE ${where}
        ORDER BY b.created_at DESC`,
       params
@@ -77,10 +78,11 @@ exports.getBookingByCode = async (req, res) => {
     const { code } = req.params;
     const [rows] = await pool.query(
       `SELECT b.*, p.name_mr AS pooja_name, p.duration_hrs,
-              pp.full_name AS pujari_name, pp.phone AS pujari_phone, pp.photo_url AS pujari_photo
+              pp.full_name AS pujari_name, pu.phone AS pujari_phone, pp.photo_url AS pujari_photo
        FROM bookings b
        JOIN poojas p ON b.pooja_id = p.id
        LEFT JOIN pujari_profiles pp ON b.pujari_id = pp.id
+       LEFT JOIN users pu ON pp.user_id = pu.id
        WHERE b.booking_code = ? AND b.user_id = ?`,
       [code, req.user.id]
     );

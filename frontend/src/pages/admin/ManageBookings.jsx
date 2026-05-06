@@ -1,10 +1,8 @@
 // src/pages/admin/ManageBookings.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
 import { adminAPI } from '../../api/index.js';
+import AdminLayout from './AdminLayout';
 import styles from './Admin.module.css';
 
 const STATUS_LABELS = {
@@ -29,14 +27,9 @@ export default function ManageBookings() {
   }, [filter]);
 
   return (
-    <div>
-      <Header />
-      <main className={styles.main}>
-        <div className="container">
-          <div className={styles.pageHeader}>
-            <Link to="/admin" className={styles.backLink}>← प्रशासन</Link>
-            <h1 className={styles.pageTitle}>📋 बुकिंग व्यवस्थापन</h1>
-          </div>
+    <AdminLayout>
+      <div>
+          <h1 className={styles.pageTitle}>📋 बुकिंग व्यवस्थापन</h1>
 
           <div className={styles.filters}>
             {[
@@ -85,9 +78,7 @@ export default function ManageBookings() {
               </table>
             </div>
           )}
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

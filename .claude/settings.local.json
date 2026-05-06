@@ -8,7 +8,32 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(taskkill /F /IM node.exe)",
-      "Bash(cmd /c \"netstat -ano\")"
+      "Bash(cmd /c \"netstat -ano\")",
+      "Bash(npx playwright *)",
+      "Bash(npm test *)",
+      "Bash(node scripts/test-all.js)",
+      "Bash(netstat -ano)",
+      "Bash(xargs wc *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(node -e \"require\\('@playwright/test'\\)\")",
+      "Bash(echo \"Frontend server starting... PID=$!\")",
+      "Bash(npm start *)",
+      "Bash(echo \"Backend server starting... PID=$!\")",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(curl -s http://localhost:5000/api/health)",
+      "Bash(node scripts/generate-report.js)",
+      "Bash(dir /s /b)",
+      "PowerShell(head *)",
+      "PowerShell(Get-ChildItem -Path \"F:\\\\pojjari_v2_with_images\\\\pojjari_updated\\\\frontend\\\\src\" -Recurse -File | Where-Object {$_.Extension -eq '.jsx' -or $_.Extension -eq '.js'} | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-ChildItem -Path \"F:\\\\pojjari_v2_with_images\\\\pojjari_updated\\\\backend\\\\src\" -Recurse -File | Where-Object {$_.Extension -eq '.js'} | Select-Object -ExpandProperty FullName)",
+      "PowerShell(Get-Process *)",
+      "Bash(node src/app.js)",
+      "Bash(curl -s -X POST \"https://overpass-api.de/api/interpreter\" --data \"data=%5Bout%3Ajson%5D%5Btimeout%3A5%5D%3Bnode%5B%22amenity%22%3D%22event_venue%22%5D%2819.0%2C72.8%2C19.1%2C72.9%29%3Bout%3B\")",
+      "Bash(curl *)",
+      "Bash(grep -n \"samagri_items\\\\|CREATE TABLE \\\\`samagri\" \"c:/Users/Admin/Downloads/pojjari_db \\(3\\).sql\")",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const r=JSON.parse\\(d\\); console.log\\('Groom Rashi:', r.data.groom.rashi, '| Nakshatra:', r.data.groom.nakshatra\\); console.log\\('Bride Rashi:', r.data.bride.rashi, '| Nakshatra:', r.data.bride.nakshatra\\); console.log\\('Total Guns:', r.data.totalGun, '/36'\\);\")",
+      "Bash(Get-ChildItem *)",
+      "Bash(node test_all_features.js)"
     ]
   }
 }

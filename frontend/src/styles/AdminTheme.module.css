@@ -1,0 +1,172 @@
+/* src/styles/AdminTheme.module.css */
+
+.section { margin-bottom: 48px; }
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--secondary);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Mode Selector ─────────────────────────────────────────── */
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.modeCard {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  cursor: pointer;
+  background: var(--white);
+  transition: all var(--transition);
+  text-align: left;
+}
+.modeCard:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.modeCardActive {
+  border-color: var(--primary) !important;
+  background: rgba(224, 123, 42, 0.06) !important;
+  box-shadow: 0 0 0 3px rgba(224, 123, 42, 0.15) !important;
+}
+.modeEmoji { font-size: 28px; display: block; margin-bottom: 8px; }
+.modeLabel { font-size: 15px; font-weight: 700; color: var(--secondary); display: block; }
+.modeLabelMr { font-size: 13px; color: var(--primary); font-weight: 600; display: block; margin-bottom: 6px; }
+.modeDesc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── Theme Grid ────────────────────────────────────────────── */
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.themeCard {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  background: var(--white);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.themeCard:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 24px var(--shadow); }
+.themeCardActive {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(224,123,42,0.2) !important;
+}
+.activeCheck {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+}
+.themeEmoji { font-size: 24px; display: block; margin-bottom: 8px; }
+.themeName { font-size: 13px; font-weight: 700; color: var(--secondary); display: block; }
+.themeNameMr { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 10px; }
+.themeDesc { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 10px; line-height: 1.4; }
+.swatches { display: flex; gap: 4px; }
+.swatch {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+.darkBadge {
+  display: inline-block;
+  font-size: 10px;
+  background: #222;
+  color: #FFD700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  margin-top: 6px;
+}
+
+/* ── Festival Theme Manager ───────────────────────────────── */
+.festivalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* Modal */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px;
+}
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  width: 100%; max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  animation: fadeInUp 0.25s ease;
+}
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--secondary);
+  margin-bottom: 20px;
+}
+.formRow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.formGroup { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.label { font-size: 13px; font-weight: 700; color: var(--secondary); }
+.input, .select {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--white);
+  width: 100%;
+  transition: border-color var(--transition);
+}
+.input:focus, .select:focus { outline: none; border-color: var(--primary); }
+.modalActions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+
+/* Preview card */
+.previewCard {
+  background: var(--cream-dark);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.previewDot {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+.previewInfo { flex: 1; }
+.previewLabel { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.previewTheme { font-size: 15px; font-weight: 700; color: var(--secondary); }
+.previewMode { font-size: 12px; color: var(--primary); }
+.previewFestival { font-size: 12px; color: var(--success); margin-top: 2px; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .themeGrid { grid-template-columns: repeat(3, 1fr); }
+  .modeGrid  { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .themeGrid { grid-template-columns: repeat(2, 1fr); }
+}

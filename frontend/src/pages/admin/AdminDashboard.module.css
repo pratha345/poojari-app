@@ -1,0 +1,83 @@
+/* AdminDashboard.module.css */
+.wrap    { max-width: 1100px; }
+.heading { font-size: 24px; font-weight: 700; color: var(--secondary); margin-bottom: 24px; }
+
+/* Stats */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.statCard {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  border-top: 4px solid var(--primary);
+  box-shadow: 0 2px 12px var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.statIcon  { font-size: 28px; }
+.statInfo  { display: flex; flex-direction: column; }
+.statValue { font-size: 22px; font-weight: 700; color: var(--text); }
+.statLabel { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Section */
+.section       { margin-bottom: 32px; }
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sectionTitle  { font-size: 18px; font-weight: 600; color: var(--secondary); }
+.seeAll        { font-size: 13px; color: var(--primary); font-weight: 500; text-decoration: none; }
+.seeAll:hover  { text-decoration: underline; }
+
+/* Table */
+.tableWrap { background: var(--white); border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 2px 12px var(--shadow); }
+.table     { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th  { background: var(--cream-dark); padding: 12px 16px; text-align: left; font-weight: 600; color: var(--secondary); }
+.table td  { padding: 12px 16px; border-top: 1px solid var(--border); color: var(--text); }
+.table tr:hover td { background: var(--cream); }
+
+/* Quick Links */
+.quickLinks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 8px;
+}
+.quickCard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  position: relative;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+}
+.quickCard span:first-child { font-size: 30px; }
+.quickCard:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px var(--shadow-gold);
+  transform: translateY(-2px);
+}
+.badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: #c62828;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 5px;
+}

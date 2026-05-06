@@ -1,0 +1,83 @@
+.page  { display: flex; flex-direction: column; gap: 20px; }
+
+.header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.title  { font-size: 1.3rem; font-weight: 700; margin: 0; }
+
+.addBtn {
+  background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
+  padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.addBtn:hover { background: #c9621a; }
+
+/* Table */
+.tableWrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); }
+.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.table th { background: var(--primary); color: #fff; padding: 11px 14px; text-align: left; white-space: nowrap; }
+.table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: #fdf6f0; }
+
+.locSet     { color: #388e3c; font-weight: 600; font-size: 12px; }
+.locMissing { color: #e65100; font-weight: 600; font-size: 12px; }
+
+.actions { display: flex; gap: 6px; }
+.editBtn, .delBtn {
+  border: none; border-radius: 5px; padding: 5px 10px; font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: opacity 0.15s;
+}
+.editBtn { background: #1976d2; color: #fff; }
+.delBtn  { background: #d32f2f; color: #fff; }
+.editBtn:hover, .delBtn:hover { opacity: 0.85; }
+.delBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Empty / Loading */
+.loading { display: flex; justify-content: center; padding: 40px; }
+.empty   { text-align: center; padding: 40px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+/* Modal Overlay */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  display: flex; align-items: flex-start; justify-content: center;
+  z-index: 1000; padding: 20px; overflow-y: auto;
+}
+.modal {
+  background: #fff; border-radius: var(--radius-md);
+  width: 100%; max-width: 720px; margin: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+}
+.modalHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+}
+.modalHeader h3 { margin: 0; font-size: 1.1rem; }
+.closeBtn { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
+
+/* Form */
+.form    { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+.row     { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.label   { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: var(--text); }
+.input   {
+  padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13.5px; font-family: inherit; outline: none;
+  transition: border-color 0.2s;
+}
+.input:focus { border-color: var(--primary); }
+
+/* Location section */
+.locationSection { display: flex; flex-direction: column; gap: 10px; }
+.locationHint    { margin: 0; font-size: 13px; color: #555; background: #fff8e1; padding: 8px 12px; border-radius: 6px; border-left: 3px solid #f9ab00; }
+.latLngRow       { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mapPicker       { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
+
+/* Form Footer */
+.formFooter  { display: flex; justify-content: flex-end; gap: 10px; padding-top: 6px; }
+.cancelBtn   { background: #f5f5f5; color: #555; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 18px; font-size: 14px; cursor: pointer; }
+.cancelBtn:hover { background: #ebebeb; }
+.saveBtn     { background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm); padding: 9px 22px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.saveBtn:hover   { background: #c9621a; }
+.saveBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (max-width: 580px) {
+  .row, .latLngRow { grid-template-columns: 1fr; }
+}

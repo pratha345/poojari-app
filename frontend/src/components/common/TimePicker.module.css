@@ -1,0 +1,82 @@
+.root { position: relative; }
+
+/* Trigger */
+.trigger {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 12px; cursor: pointer; background: #fff;
+  transition: border-color 0.2s; font-size: 14px; color: #1a1a2e;
+}
+.trigger:hover { border-color: var(--primary); }
+.clockIcon   { font-size: 16px; }
+.triggerText { flex: 1; }
+
+/* Overlay */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000;
+}
+
+/* Picker panel */
+.picker {
+  background: #1e1e1e; border-radius: 16px;
+  padding: 20px; width: 300px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.pickerTitle {
+  font-family: 'Noto Serif Devanagari', serif;
+  color: #aaa; font-size: 12px; font-weight: 600;
+  text-align: left;
+}
+
+/* Digital display */
+.digital {
+  display: flex; align-items: center; gap: 4px;
+}
+.dNum {
+  font-size: 40px; font-weight: 700;
+  color: #aaa; background: #2e2e2e;
+  border-radius: 8px; padding: 6px 14px;
+  cursor: pointer; transition: color 0.15s;
+  font-family: 'Noto Serif Devanagari', serif;
+  min-width: 72px; text-align: center;
+}
+.dActive { color: #f59e0b; background: #3a2e00; }
+.dColon  { font-size: 36px; color: #aaa; font-weight: 700; padding: 0 4px; }
+.ampmCol { display: flex; flex-direction: column; gap: 4px; margin-left: 10px; }
+.ampmBtn {
+  padding: 6px 14px; border: 1px solid #555;
+  background: transparent; color: #aaa;
+  border-radius: 6px; cursor: pointer; font-size: 13px;
+  font-weight: 600; transition: all 0.15s;
+}
+.ampmActive { background: #3a2e00; color: #f59e0b; border-color: #c8820a; }
+
+/* SVG Clock */
+.clock {
+  width: 100%; max-width: 260px;
+  margin: 0 auto; cursor: pointer;
+  display: block; border-radius: 50%;
+}
+
+/* Footer */
+.footer {
+  display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px;
+}
+.cancelBtn {
+  background: none; border: none;
+  color: #f59e0b; font-size: 14px; font-weight: 700;
+  cursor: pointer; padding: 8px 16px;
+  font-family: 'Noto Serif Devanagari', serif;
+}
+.cancelBtn:hover { color: #fbbf24; }
+.okBtn {
+  background: none; border: none;
+  color: #f59e0b; font-size: 14px; font-weight: 700;
+  cursor: pointer; padding: 8px 16px;
+  font-family: 'Noto Serif Devanagari', serif;
+}
+.okBtn:hover { color: #fbbf24; }

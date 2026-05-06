@@ -3,10 +3,57 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import SEOHead from '../components/SEOHead';
 import { poojaAPI } from '../api/index.js';
 import { useAuth } from '../context/AuthContext';
 import { getImageUrl, POOJA_PLACEHOLDER } from '../utils/index.js';
 import styles from './PoojaDetail.module.css';
+
+function buildPoojaSchema(pooja) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Service',
+        '@id': `https://pojjari.com/vidhi/${pooja.slug}`,
+        'name': pooja.name_mr,
+        'alternateName': pooja.name_en || undefined,
+        'description': pooja.description || pooja.short_desc,
+        'url': `https://pojjari.com/vidhi/${pooja.slug}`,
+        'image': getImageUrl(pooja.image_url),
+        'provider': {
+          '@type': 'LocalBusiness',
+          'name': 'पूजारी',
+          'url': 'https://pojjari.com'
+        },
+        'areaServed': { '@type': 'State', 'name': 'Maharashtra' },
+        'offers': {
+          '@type': 'Offer',
+          'price': pooja.price,
+          'priceCurrency': 'INR',
+          'availability': 'https://schema.org/InStock',
+        },
+        ...(pooja.avg_rating ? {
+          'aggregateRating': {
+            '@type': 'AggregateRating',
+            'ratingValue': pooja.avg_rating,
+            'bestRating': 5,
+            'reviewCount': pooja.review_count || 1,
+          }
+        } : {}),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': 'https://pojjari.com/' },
+          { '@type': 'ListItem', 'position': 2, 'name': 'पूजा',        'item': 'https://pojjari.com/pooja' },
+          ...(pooja.category_name ? [{ '@type': 'ListItem', 'position': 3, 'name': pooja.category_name, 'item': `https://pojjari.com/pooja/${pooja.category_slug}` }] : []),
+          { '@type': 'ListItem', 'position': pooja.category_name ? 4 : 3, 'name': pooja.name_mr, 'item': `https://pojjari.com/vidhi/${pooja.slug}` },
+        ],
+      },
+    ],
+  };
+}
 
 export default function PoojaDetail() {
   const { slug }      = useParams();
@@ -49,6 +96,15 @@ export default function PoojaDetail() {
 
   return (
     <div>
+      <SEOHead
+        title={`${pooja.name_mr}${pooja.name_en ? ` | ${pooja.name_en}` : ''} - ऑनलाईन बुकिंग`}
+        description={`${pooja.name_mr} ऑनलाईन बुक करा. ${pooja.short_desc || pooja.description || ''} महाराष्ट्रातील अनुभवी पुजारी घरी येतात.`.slice(0, 160)}
+        keywords={`${pooja.name_mr}, ${pooja.name_en || ''}, ${pooja.category_name || ''}, पूजा बुकिंग, book puja online, पुजारी सेवा`}
+        canonical={`/vidhi/${pooja.slug}`}
+        ogType="product"
+        ogImage={getImageUrl(pooja.image_url)}
+        schema={buildPoojaSchema(pooja)}
+      />
       <Header />
       <main className={styles.main}>
         {/* Breadcrumb */}

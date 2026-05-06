@@ -3,8 +3,25 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import ClockTimePicker from '../components/common/ClockTimePicker';
+import SEOHead from '../components/SEOHead';
 import { panchangAPI } from '../api/index.js';
 import styles from '../styles/Panchang.module.css';
+
+const PANCHANG_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  'name': 'आजचा पंचांग | Hindu Panchang Today',
+  'description': 'आजचे तिथी, नक्षत्र, योग, करण, राहुकाळ व कुंडली माहिती. पुण्यासह महाराष्ट्रातील सर्व शहरांसाठी दैनंदिन पंचांग.',
+  'url': 'https://pojjari.com/panchang',
+  'inLanguage': 'mr',
+  'breadcrumb': {
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': 'https://pojjari.com/' },
+      { '@type': 'ListItem', 'position': 2, 'name': 'पंचांग',      'item': 'https://pojjari.com/panchang' }
+    ]
+  }
+};
 
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -289,6 +306,13 @@ export default function Panchang() {
   // ── Render ──────────────────────────────────────────────────
   return (
     <div className={`${styles.page} ${dark ? styles.dark : ''}`}>
+      <SEOHead
+        title="आजचा पंचांग | Hindu Panchang Today - तिथी, नक्षत्र, योग"
+        description="आजचे तिथी, नक्षत्र, योग, करण, राहुकाळ व कुंडली माहिती. पुणे, मुंबई, नाशिक, नागपूर सह महाराष्ट्रातील सर्व शहरांसाठी दैनंदिन हिंदू पंचांग."
+        keywords="आजचा पंचांग, tithi today, nakshatra today, panchang 2025, हिंदू पंचांग, आजची तिथी, आजचे नक्षत्र, राहुकाळ, योग करण, कुंडली, hindu calendar marathi"
+        canonical="/panchang"
+        schema={PANCHANG_SCHEMA}
+      />
       <Header />
 
       {/* ═══ HERO ═══════════════════════════════════════════ */}

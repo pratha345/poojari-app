@@ -25,11 +25,11 @@
 }
 
 .imgWrap {
-  display:   block;
-  position:  relative;
-  overflow:  hidden;
-  height:    200px;
-  flex-shrink: 0;
+  display:      block;
+  position:     relative;
+  overflow:     hidden;
+  aspect-ratio: 4 / 3;
+  flex-shrink:  0;
 }
 .imgWrap img {
   width:      100%;

@@ -29,7 +29,14 @@ export default function Login() {
       const { token, user } = res.data.data;
       login(token, user);
       toast.success(`स्वागत आहे, ${user.name}! 🙏`);
-      navigate(from, { replace: true });
+      // Redirect based on role
+      if (user.role === 'super_admin' || user.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (user.role === 'pujari') {
+        navigate('/pujari-dashboard', { replace: true });
+      } else {
+        navigate(from === '/login' ? '/' : from, { replace: true });
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'लॉगिन करताना त्रुटी झाली.');
     } finally { setLoading(false); }
@@ -57,7 +64,13 @@ export default function Login() {
       const { token, user } = res.data.data;
       login(token, user);
       toast.success(`स्वागत आहे! 🙏`);
-      navigate(from, { replace: true });
+      if (user.role === 'super_admin' || user.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (user.role === 'pujari') {
+        navigate('/pujari-dashboard', { replace: true });
+      } else {
+        navigate(from === '/login' ? '/' : from, { replace: true });
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'OTP चुकीचा आहे.');
     } finally { setLoading(false); }
@@ -101,6 +114,11 @@ export default function Login() {
               <button type="submit" className={`btn btn-primary btn-lg ${styles.submitBtn}`} disabled={loading}>
                 {loading ? '⏳ लॉगिन होत आहे...' : '🙏 लॉगिन करा'}
               </button>
+              <div style={{ textAlign: 'right', marginTop: 10 }}>
+                <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 500 }}>
+                  🔑 पासवर्ड विसरलात?
+                </Link>
+              </div>
             </form>
           ) : (
             <form onSubmit={step === 1 ? handleSendOtp : handleVerifyOtp}>

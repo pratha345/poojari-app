@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import SEOHead from '../components/SEOHead';
 import { poojaAPI, bookingAPI } from '../api/index.js';
 import styles from './Booking.module.css';
 
@@ -96,6 +97,12 @@ export default function Booking() {
 
   return (
     <div>
+      <SEOHead
+        title={`${pooja.name_mr} बुक करा - ऑनलाईन बुकिंग`}
+        description={`${pooja.name_mr} ऑनलाईन बुक करा. तारीख, वेळ व स्थान निश्चित करा. महाराष्ट्रातील अनुभवी पुजारी घरी येतात.`}
+        canonical={`/booking/${pooja.slug}`}
+        noindex={true}
+      />
       <Header />
       <main className={styles.main}>
         <div className="container">

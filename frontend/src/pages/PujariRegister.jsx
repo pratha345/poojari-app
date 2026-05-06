@@ -75,7 +75,7 @@ export default function PujariRegister() {
         if (val !== null && val !== '') fd.append(key, val);
       });
       await pujariAPI.register(fd);
-      toast.success('नोंदणी यशस्वी! मंजुरीसाठी प्रतीक्षा करा. 🙏');
+      toast.success('आपली नोंदणी पाठवली आहे. मंजुरीनंतर आपण पुजारी म्हणून दिसाल. 🙏');
       navigate('/pujari-dashboard');
     } catch (err) {
       toast.error(err.response?.data?.message || 'नोंदणी करताना त्रुटी झाली.');

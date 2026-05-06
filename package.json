@@ -1,0 +1,19 @@
+{
+  "name": "pojjari-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "पूजारी — Full-stack pooja booking platform orchestrator",
+  "scripts": {
+    "dev:backend":  "node backend/src/app.js",
+    "dev:frontend": "npx --prefix frontend vite --port 5173",
+    "test:e2e":     "cd e2e && npx playwright test",
+    "test:unit:backend":  "cd backend  && npm test",
+    "test:unit:frontend": "cd frontend && npm test",
+    "test:all":  "node scripts/test-all.js",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../e2e && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "wait-on":      "^7.2.0"
+  }
+}

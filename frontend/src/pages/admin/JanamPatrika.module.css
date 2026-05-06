@@ -1,0 +1,138 @@
+/* JanamPatrika.module.css */
+.page        { display: flex; flex-direction: column; gap: 20px; }
+.pageHeader  { }
+.pageTitle   { font-size: 1.4rem; font-weight: 700; margin: 0; }
+.pageSubtitle{ font-size: 13px; color: var(--text-muted); margin: 4px 0 0; }
+
+/* Tabs */
+.tabs     { display: flex; gap: 8px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+.tab      { padding: 9px 20px; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+.tabActive{ color: var(--primary); border-bottom-color: var(--primary); }
+
+/* Form */
+.form     { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.label    { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; }
+.input    { padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; }
+.input:focus { outline: none; border-color: var(--primary); }
+.formActions { margin-top: 20px; display: flex; gap: 12px; }
+.generateBtn { background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm); padding: 11px 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: var(--font-display); }
+.generateBtn:hover { background: #c9621a; }
+.generateBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Action bar */
+.previewSection { display: flex; flex-direction: column; gap: 16px; }
+.actionBar      { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px; background: #f8f8f8; border-radius: var(--radius-sm); }
+.printBtn   { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 9px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.printBtn:hover { background: #0d47a1; }
+.saveBtn    { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 9px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.saveBtn:hover  { background: #c9621a; }
+.editBtn    { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 9px 16px; font-size: 14px; cursor: pointer; }
+.savedBadge { color: #2e7d32; font-weight: 700; font-size: 14px; }
+
+/* ═══════════════════════════════════════════════════
+   PATRIKA (Printable Section)
+═══════════════════════════════════════════════════ */
+.patrika {
+  background: #fffdf8;
+  border: 2px solid #c8a87a;
+  border-radius: 8px;
+  padding: 28px 32px;
+  font-family: 'Noto Serif Devanagari', 'Mangal', serif;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Header */
+.pHeader    { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #c8a87a; padding-bottom: 16px; }
+.pOm        { font-size: 28px; }
+.pTitle     { font-size: 1.4rem; color: #7b341e; margin: 6px 0 4px; font-weight: 900; }
+.pSubtitle  { font-size: 1.1rem; color: #555; margin: 0; font-weight: 700; }
+.pDecor     { color: #c8a87a; margin: 8px 0; font-size: 13px; }
+
+/* Section */
+.pSection   { margin: 16px 0; }
+.pSectionTitle { font-size: 1rem; font-weight: 800; color: #7b341e; border-bottom: 1px solid #e0c9a0; padding-bottom: 6px; margin-bottom: 10px; }
+
+/* Info table */
+.pInfoTable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.pInfoTable td { padding: 5px 10px; }
+.pLabel     { font-weight: 700; color: #7b341e; width: 100px; white-space: nowrap; }
+.pValue     { color: #1a1a2e; }
+
+/* Panchang table */
+.pPanchTable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.pPanchTable tr { border-bottom: 1px solid #f0e0c0; }
+.pPanchLabel { font-weight: 700; color: #7b341e; padding: 5px 12px 5px 0; width: 120px; }
+.pPanchValue { color: #1a1a2e; padding: 5px 0; }
+
+/* Charts */
+.pCharts    { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 16px 0; }
+
+/* North Indian Kundali Chart */
+.chartWrap  { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.chartTitle { font-size: 12px; font-weight: 700; color: #7b341e; text-align: center; }
+
+.niGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows:    repeat(4, 1fr);
+  width: 100%; max-width: 260px; aspect-ratio: 1;
+  border: 2.5px solid #7b341e;
+}
+.niCell {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 3px 2px; border: 1px solid #c8a87a;
+  background: #fffdf5; text-align: center;
+  position: relative; min-height: 55px;
+}
+.niH1 { background: #fef9c3 !important; border: 2px solid #d97706 !important; }
+.niCenter {
+  grid-column: 2/4; grid-row: 2/4;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff8f0; border: 1px solid #c8a87a;
+  font-size: 1.3rem; color: #7b341e;
+}
+.niHouseNum { font-size: 0.42rem; color: #999; font-weight: 700; line-height: 1.2; align-self: flex-start; padding: 1px 2px; }
+.niSign     { font-size: 0.44rem; color: #7b341e; font-weight: 800; border-bottom: 1px solid #e8d5b5; width: 100%; text-align: center; line-height: 1.3; padding: 0 1px; }
+.niPlanets  { font-size: 0.62rem; color: #1a1a2e; font-weight: 700; line-height: 1.4; word-break: break-all; text-align: center; padding: 1px; }
+
+/* Planet table */
+.pPlanetTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pPlanetTable th { background: #7b341e; color: #fff; padding: 7px 12px; text-align: left; }
+.pPlanetTable td { padding: 5px 12px; border-bottom: 1px solid #f0e0c0; }
+.pPlanetTable tr:last-child td { border-bottom: none; font-weight: 700; background: #fff8f0; }
+
+/* Dasha */
+.pDashaBalance { font-size: 13.5px; margin-bottom: 10px; padding: 8px 12px; background: #fff3cd; border-radius: 4px; border-left: 4px solid #f59e0b; }
+.pDashaTable   { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pDashaTable th { background: #7b341e; color: #fff; padding: 7px 12px; text-align: left; }
+.pDashaTable td { padding: 5px 12px; border-bottom: 1px solid #f0e0c0; }
+.currentDasha td { background: #e8f5e9; font-weight: 700; }
+
+/* Footer */
+.pFooter    { text-align: center; margin-top: 20px; border-top: 2px solid #c8a87a; padding-top: 14px; color: #7b341e; }
+.pFooter p  { margin: 4px 0; font-size: 13px; }
+.pGenDate   { font-size: 11px; color: #aaa; }
+
+/* ═══════════════════════════════════════════════════
+   PRINT STYLES
+═══════════════════════════════════════════════════ */
+@page { size: A4; margin: 15mm; }
+
+@media print {
+  .patrika { border: none; padding: 20px; max-width: 100%; }
+  .actionBar { display: none; }
+  .tabs      { display: none; }
+  .pageHeader{ display: none; }
+  .formActions{ display: none; }
+  .form      { display: none; }
+  .pCharts   { grid-template-columns: 1fr 1fr; }
+  .niGrid    { max-width: 200px; }
+}
+
+@media (max-width: 600px) {
+  .formGrid { grid-template-columns: 1fr; }
+  .pCharts  { grid-template-columns: 1fr; }
+}

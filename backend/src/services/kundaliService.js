@@ -3,79 +3,91 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════
-// ASTRONOMICAL CORE  (standalone — no external deps)
+// ASTRONOMICAL CORE  — astronomy-engine (JPL-level accuracy)
 // ═══════════════════════════════════════════════════════════════
 
-const AYANAMSHA = 23.85; // Lahiri ayanamsha (approx for 2020–2030)
+const Astro = require('astronomy-engine');
 
 function norm360(d) { return ((d % 360) + 360) % 360; }
 
-/** Gregorian date + time (UTC) → Julian Day Number */
-function toJD(year, month, day, hour = 12, min = 0) {
-  let Y = year, M = month;
-  const D = day + (hour + min / 60) / 24;
-  if (M <= 2) { Y--; M += 12; }
-  const A = Math.floor(Y / 100);
-  const B = 2 - A + Math.floor(A / 4);
-  return Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + D + B - 1524.5;
-}
-
-/** Moon's tropical ecliptic longitude (Meeus Ch. 47, ~5' accuracy) */
-function moonLongitude(JD) {
-  const T = (JD - 2451545.0) / 36525.0;
-  const L1 = 218.3164477 + 481267.88123421 * T - 0.0015786 * T * T + T * T * T / 538841;
-  const Ms  = norm360(357.5291092 + 35999.0502909 * T);
-  const Mm  = norm360(134.9633964 + 477198.8675055 * T + 0.0087414 * T * T);
-  const Dv  = norm360(297.8501921 + 445267.1114034 * T - 0.0018819 * T * T);
-  const Fv  = norm360(93.2720950  + 483202.0175233 * T - 0.0036539 * T * T);
-  const [mr, m1r, dr, fr] = [Ms, Mm, Dv, Fv].map(x => x * Math.PI / 180);
-  const dL  = 6.288774 * Math.sin(m1r)
-    + 1.274027 * Math.sin(2 * dr - m1r)
-    + 0.658314 * Math.sin(2 * dr)
-    + 0.213618 * Math.sin(2 * m1r)
-    - 0.185116 * Math.sin(mr)
-    - 0.114332 * Math.sin(2 * fr)
-    + 0.058793 * Math.sin(2 * dr - 2 * m1r)
-    + 0.057066 * Math.sin(2 * dr - mr - m1r)
-    + 0.053322 * Math.sin(2 * dr + m1r)
-    + 0.045758 * Math.sin(2 * dr - mr)
-    - 0.040923 * Math.sin(mr - m1r)
-    - 0.034720 * Math.sin(dr)
-    - 0.030383 * Math.sin(mr + m1r);
-  return norm360(L1 + dL);
+/**
+ * Lahiri Ayanamsha — date-dependent (precession ~50.27"/year)
+ * J2000.0 base = 23.85°
+ */
+function lahiriAyanamsha(utcDate) {
+  const JD = Astro.MakeTime(utcDate).tt + 2451545.0;
+  return 23.85 + (JD - 2451545.0) * 50.27 / (36525.0 * 3600.0);
 }
 
 /**
  * Calculate Moon's sidereal nakshatra (0-26) and rashi (0-11) from birth details.
- * @param {string} dob  - "YYYY-MM-DD"
- * @param {string} tob  - "HH:MM" (local time, 24h) — defaults to "12:00"
+ * Uses astronomy-engine for sub-arcsecond accuracy.
+ * @param {string} dob      - "YYYY-MM-DD"
+ * @param {string} tob      - "HH:MM" (local IST time, 24h) — defaults to "12:00"
  * @param {number} tzOffset - timezone offset in minutes (IST = 330)
  */
+/** Local IST time → UTC Date object */
+function toUtcDate(dob, tob = '12:00', tzOffset = 330) {
+  const [y, mo, d]  = dob.split('-').map(Number);
+  const [h, m]      = (tob || '12:00').split(':').map(Number);
+  const localMins   = h * 60 + m;
+  const utcTotalMin = localMins - tzOffset;
+  const dayOffset   = utcTotalMin < 0 ? -1 : utcTotalMin >= 1440 ? 1 : 0;
+  const utcMins     = ((utcTotalMin % 1440) + 1440) % 1440;
+  return new Date(Date.UTC(y, mo - 1, d + dayOffset, Math.floor(utcMins / 60), utcMins % 60, 0));
+}
+
+/**
+ * Mean Lunar Ascending Node longitude (Rahu) — degrees tropical
+ * Formula: Meeus, Astronomical Algorithms Ch.47
+ */
+function rahuLongitude(astroTime) {
+  const T = (astroTime.tt) / 36525.0; // Julian centuries from J2000.0
+  return norm360(125.0445479 - 1934.1362608 * T + 0.0020754 * T * T + T * T * T / 467441.0);
+}
+
+/**
+ * Calculate all 9 planet + Rahu/Ketu sidereal rashi positions.
+ * Returns array of { name, rashiIdx, symbol }
+ */
+function getAllPlanets(utcDate) {
+  const t        = Astro.MakeTime(utcDate);
+  const ayan     = lahiriAyanamsha(utcDate);
+  const sid      = lon => Math.floor(norm360(lon - ayan) / 30);
+
+  const geoLon   = body => Astro.Ecliptic(Astro.GeoVector(body, t, false)).elon;
+
+  const moon     = Astro.EclipticGeoMoon(t);
+  const rahuTrop = rahuLongitude(t);
+
+  return [
+    { name: 'सूर्य',  sym: '☀',  rashiIdx: sid(geoLon('Sun'))     },
+    { name: 'चंद्र',  sym: '☽',  rashiIdx: sid(moon.lon)           },
+    { name: 'मंगळ',   sym: '♂',  rashiIdx: sid(Astro.EclipticLongitude('Mars',    t)) },
+    { name: 'बुध',    sym: '☿',  rashiIdx: sid(Astro.EclipticLongitude('Mercury', t)) },
+    { name: 'गुरु',   sym: '♃',  rashiIdx: sid(Astro.EclipticLongitude('Jupiter', t)) },
+    { name: 'शुक्र',  sym: '♀',  rashiIdx: sid(Astro.EclipticLongitude('Venus',   t)) },
+    { name: 'शनि',    sym: '♄',  rashiIdx: sid(Astro.EclipticLongitude('Saturn',  t)) },
+    { name: 'राहू',   sym: 'ℛ',  rashiIdx: sid(rahuTrop)            },
+    { name: 'केतू',   sym: 'K',  rashiIdx: sid(norm360(rahuTrop + 180)) },
+  ];
+}
+
 function getNakshatraFromBirth(dob, tob = '12:00', tzOffset = 330) {
-  const [y, mo, d] = dob.split('-').map(Number);
-  const [h, m]     = (tob || '12:00').split(':').map(Number);
+  const utcDate     = toUtcDate(dob, tob, tzOffset);
+  const astroTime   = Astro.MakeTime(utcDate);
 
-  // Convert local time to UTC
-  const localMins  = h * 60 + m;
-  const utcMins    = localMins - tzOffset;
-  const utcH       = Math.floor(((utcMins % 1440) + 1440) % 1440 / 60);
-  const utcM       = ((utcMins % 1440) + 1440) % 60;
-  const dayOffset  = utcMins < 0 ? -1 : utcMins >= 1440 ? 1 : 0;
+  const moonEcl     = Astro.EclipticGeoMoon(astroTime);
+  const ayanamsha   = lahiriAyanamsha(utcDate);
+  const siderealMoon = norm360(moonEcl.lon - ayanamsha);
 
-  const localDate  = new Date(y, mo - 1, d + dayOffset);
-  const JD         = toJD(
-    localDate.getFullYear(),
-    localDate.getMonth() + 1,
-    localDate.getDate(),
-    utcH, utcM
-  );
-
-  const tropicalMoon  = moonLongitude(JD);
-  const siderealMoon  = norm360(tropicalMoon - AYANAMSHA);
-  const nakshatraIdx  = Math.floor(siderealMoon / (360 / 27));
-  const rashiIdx      = Math.floor(siderealMoon / 30);
-
-  return { nakshatraIdx, rashiIdx, siderealMoon };
+  return {
+    nakshatraIdx: Math.floor(siderealMoon / (360 / 27)),
+    rashiIdx:     Math.floor(siderealMoon / 30),
+    siderealMoon,
+    ayanamsha:    +ayanamsha.toFixed(4),
+    planets:      getAllPlanets(utcDate),
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -350,6 +362,7 @@ function matchKundali(brideDetails, groomDetails) {
       rashiIdx:     bride.rashiIdx,
       nakshatra:    NAKSHATRA_NAMES[bride.nakshatraIdx],
       rashi:        RASHI_NAMES[bride.rashiIdx],
+      planets:      bride.planets,
     },
     groom: {
       ...groomDetails,
@@ -357,6 +370,7 @@ function matchKundali(brideDetails, groomDetails) {
       rashiIdx:     groom.rashiIdx,
       nakshatra:    NAKSHATRA_NAMES[groom.nakshatraIdx],
       rashi:        RASHI_NAMES[groom.rashiIdx],
+      planets:      groom.planets,
     },
     ...match,
   };

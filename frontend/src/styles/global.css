@@ -1,6 +1,7 @@
 /* src/styles/global.css — पूजारी Global Styles */
 
-/* ── Google Fonts (loaded in index.html) ─────────────────────── */
+/* ── Theme system ─────────────────────────────────────────────── */
+@import './themes.css';
 
 /* ── CSS Variables ────────────────────────────────────────────── */
 :root {
@@ -44,10 +45,12 @@ body {
   color:       var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  /* Prevent horizontal scroll */
+  overflow-x: hidden;
 }
 
 a { text-decoration: none; color: inherit; }
-img { display: block; max-width: 100%; }
+img { display: block; max-width: 100%; height: auto; }
 button { cursor: pointer; font-family: inherit; border: none; }
 input, textarea, select { font-family: inherit; }
 
@@ -63,12 +66,16 @@ h1, h2, h3, h4, h5 {
   line-height: 1.3;
 }
 
-/* ── Container ────────────────────────────────────────────────── */
+/* ── Container — max-w-7xl, responsive padding ────────────────── */
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
+  width:     100%;
   margin:    0 auto;
-  padding:   0 20px;
+  padding:   0 16px; /* px-4 */
 }
+@media (min-width: 640px)  { .container { padding: 0 24px; } } /* sm: px-6 */
+@media (min-width: 1024px) { .container { padding: 0 32px; } } /* lg: px-8 */
+@media (min-width: 1280px) { .container { padding: 0 48px; } } /* xl: px-12 */
 
 /* ── Buttons ──────────────────────────────────────────────────── */
 .btn {
@@ -83,6 +90,8 @@ h1, h2, h3, h4, h5 {
   letter-spacing:  0.3px;
   transition:      all var(--transition);
   white-space:     nowrap;
+  /* Accessible touch target */
+  min-height:      44px;
 }
 
 .btn-primary {
@@ -113,8 +122,8 @@ h1, h2, h3, h4, h5 {
 }
 .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--shadow-gold); }
 
-.btn-sm { padding: 8px 18px; font-size: 13px; }
-.btn-lg { padding: 16px 36px; font-size: 17px; }
+.btn-sm  { padding: 8px 18px;  font-size: 13px; min-height: 36px; }
+.btn-lg  { padding: 16px 36px; font-size: 17px; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 /* ── Cards ────────────────────────────────────────────────────── */
@@ -134,7 +143,7 @@ h1, h2, h3, h4, h5 {
   margin-bottom: 48px;
 }
 .section-heading h2 {
-  font-size:   2rem;
+  font-size:   clamp(1.5rem, 3vw, 2rem);
   color:       var(--secondary);
   position:    relative;
   display:     inline-block;
@@ -174,10 +183,7 @@ h1, h2, h3, h4, h5 {
 .badge-warning { background: rgba(245,127,23,0.12); color: var(--warning); }
 
 /* ── Decorative OM Background ─────────────────────────────────── */
-.om-bg {
-  position: relative;
-  overflow: hidden;
-}
+.om-bg { position: relative; overflow: hidden; }
 .om-bg::before {
   content:     'ॐ';
   position:    absolute;
@@ -192,10 +198,28 @@ h1, h2, h3, h4, h5 {
   user-select: none;
 }
 
-/* ── Grid ─────────────────────────────────────────────────────── */
+/* ── Grid — responsive ────────────────────────────────────────── */
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+/* Laptop: grid-4 → 3 cols */
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(3, 1fr); }
+}
+/* Tablet: everything collapses one step */
+@media (max-width: 768px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+}
+/* Small tablet / large mobile: grid-2 stacks (better for forms) */
+@media (max-width: 640px) {
+  .grid-2 { grid-template-columns: 1fr; gap: 0; }
+}
+/* Mobile: single column */
+@media (max-width: 480px) {
+  .grid-4, .grid-3 { grid-template-columns: 1fr; gap: 16px; }
+}
 
 /* ── Forms ────────────────────────────────────────────────────── */
 .form-group { margin-bottom: 20px; }
@@ -217,6 +241,8 @@ h1, h2, h3, h4, h5 {
   color:         var(--text);
   transition:    border-color var(--transition);
   outline:       none;
+  /* Prevent iOS zoom on focus */
+  font-size:     max(16px, 15px);
 }
 .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(224,123,42,0.15); }
 .form-control::placeholder { color: #b0906a; }
@@ -280,10 +306,10 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 
 /* Skeleton loader */
 .skeleton {
-  background:           linear-gradient(90deg, #f0e8d8 25%, #f8f0e4 50%, #f0e8d8 75%);
-  background-size:      200px 100%;
-  animation:            shimmer 1.2s infinite;
-  border-radius:        var(--radius-sm);
+  background:      linear-gradient(90deg, #f0e8d8 25%, #f8f0e4 50%, #f0e8d8 75%);
+  background-size: 200px 100%;
+  animation:       shimmer 1.2s infinite;
+  border-radius:   var(--radius-sm);
 }
 
 /* ── Divider ──────────────────────────────────────────────────── */
@@ -293,16 +319,33 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   margin:     32px 0;
 }
 
-/* ── Responsive ───────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+/* ── Reduced-motion accessibility ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+    scroll-behavior:           auto   !important;
+  }
 }
+
+/* ── Section responsive padding ─────────────────────────────── */
+@media (max-width: 1024px) {
+  .section { padding: 64px 0; }
+}
+@media (max-width: 768px) {
+  .section { padding: 52px 0; }
+  .section-heading { margin-bottom: 36px; }
+  .section-heading p  { font-size: 0.95rem; }
+}
+@media (max-width: 480px) {
+  .section { padding: 40px 0; }
+  .btn-lg  { padding: 14px 28px; font-size: 15px; }
+}
+
+/* ── Mobile utility: full-width buttons ─────────────────────── */
 @media (max-width: 640px) {
-  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
-  .section { padding: 48px 0; }
-  .btn-lg { padding: 14px 28px; font-size: 15px; }
-  .section-heading h2 { font-size: 1.5rem; }
+  .btn-block-sm { display: flex; width: 100%; justify-content: center; }
 }
 
 /* ═══════════════════════════════════════════════════════════════

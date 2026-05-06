@@ -1,9 +1,9 @@
 // src/pages/admin/KundaliMilan.jsx — कुंडली मिलान (Admin Only)
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
 import { kundaliAPI } from '../../api/index.js';
+import AdminLayout from '../admin/AdminLayout';
+import DateInput from '../../components/common/DateInput';
+import TimePicker from '../../components/common/TimePicker';
 import styles from '../../styles/KundaliMilan.module.css';
 
 // ═══════════════════════════════════════════════════════════════
@@ -52,25 +52,13 @@ function PersonForm({ label, icon, color, data, onChange }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.fieldLabel}>📅 जन्मतारीख *</label>
-          <input
-            className={styles.input}
-            type="date"
-            value={data.dob}
-            onChange={e => onChange('dob', e.target.value)}
-            max={new Date().toISOString().split('T')[0]}
-            required
-          />
+          <label className={styles.fieldLabel}>📅 जन्मतारीख * (DD/MM/YYYY)</label>
+          <DateInput value={data.dob} onChange={v => onChange('dob', v)} required />
         </div>
 
         <div className={styles.field}>
           <label className={styles.fieldLabel}>🕐 जन्मवेळ <span className={styles.optional}>(ऐच्छिक)</span></label>
-          <input
-            className={styles.input}
-            type="time"
-            value={data.tob}
-            onChange={e => onChange('tob', e.target.value)}
-          />
+          <TimePicker value={data.tob} onChange={v => onChange('tob', v)} />
         </div>
 
         <div className={styles.field}>
@@ -154,47 +142,51 @@ function GunTable({ kootas }) {
   );
 }
 
-/* ── North Indian Kundali grid (single person) ── */
-const KUNDALI_HOUSES = [
-  { num: 12, rashi: 'मीन',    sym: '♓', col: 1, row: 1 },
-  { num:  1, rashi: 'मेष',    sym: '♈', col: 2, row: 1 },
-  { num:  2, rashi: 'वृषभ',   sym: '♉', col: 3, row: 1 },
-  { num:  3, rashi: 'मिथुन',  sym: '♊', col: 4, row: 1 },
-  { num: 11, rashi: 'कुंभ',   sym: '♒', col: 1, row: 2 },
-  { num:  4, rashi: 'कर्क',   sym: '♋', col: 4, row: 2 },
-  { num: 10, rashi: 'मकर',    sym: '♑', col: 1, row: 3 },
-  { num:  5, rashi: 'सिंह',   sym: '♌', col: 4, row: 3 },
-  { num:  9, rashi: 'धनु',    sym: '♐', col: 1, row: 4 },
-  { num:  8, rashi: 'वृश्चिक',sym: '♏', col: 2, row: 4 },
-  { num:  7, rashi: 'तुला',   sym: '♎', col: 3, row: 4 },
-  { num:  6, rashi: 'कन्या',  sym: '♍', col: 4, row: 4 },
+// North Indian chart — Moon rashi as H1 (Chandra Kundali for matching)
+const NI_GRID_KM = [
+  {h:12,col:1,row:1},{h:1,col:2,row:1},{h:2,col:3,row:1},{h:3,col:4,row:1},
+  {h:11,col:1,row:2},                                    {h:4,col:4,row:2},
+  {h:10,col:1,row:3},                                    {h:5,col:4,row:3},
+  {h:9,col:1,row:4},{h:8,col:2,row:4},{h:7,col:3,row:4},{h:6,col:4,row:4},
 ];
+const RS = ['मेष','वृष','मिथु','कर्क','सिंह','कन्या','तुला','वृश्चि','धनु','मकर','कुंभ','मीन'];
+const SIGN_NUM = [1,2,3,4,5,6,7,8,9,10,11,12];
 
-function MiniKundali({ label, color, moonRashi, sunRashi }) {
+function NorthIndianChart({ label, color, planets = [], moonRashiIdx }) {
+  // Group planets by house (moon = H1)
+  const byHouse = {};
+  for (let h = 1; h <= 12; h++) byHouse[h] = [];
+  planets.forEach(p => {
+    const h = ((p.rashiIdx - moonRashiIdx + 12) % 12) + 1;
+    byHouse[h].push(p.name);
+  });
+  byHouse[1] = ['च', ...byHouse[1]]; // Moon marker at H1
+
+  const signInHouse = h => (moonRashiIdx + h - 1) % 12;
+
   return (
-    <div className={styles.miniKundaliWrap}>
-      <h4 className={styles.miniLabel} style={{ color }}>{label}</h4>
-      <div className={styles.miniGrid}>
-        {KUNDALI_HOUSES.map(h => {
-          const isMoon = h.rashi === moonRashi;
-          const isSun  = h.rashi === sunRashi;
+    <div className={styles.niKMWrap}>
+      <h4 className={styles.niKMLabel} style={{ color }}>{label}</h4>
+      <div className={styles.niKMGrid}>
+        {NI_GRID_KM.map(cell => {
+          const rashiIdx = signInHouse(cell.h);
+          const cellPlanets = byHouse[cell.h] || [];
+          const isH1 = cell.h === 1;
           return (
             <div
-              key={h.num}
-              className={`${styles.miniHouse} ${isMoon ? styles.miniMoon : ''} ${isSun ? styles.miniSun : ''}`}
-              style={{ gridColumn: h.col, gridRow: h.row, '--hc': color }}
+              key={cell.h}
+              className={`${styles.niKMCell} ${isH1 ? styles.niKMH1 : ''}`}
+              style={{ gridColumn: cell.col, gridRow: cell.row, '--hc': color }}
             >
-              <span className={styles.miniHouseNum}>{h.num}</span>
-              <span className={styles.miniRashi}>{h.rashi}</span>
-              {isMoon && <span className={styles.miniPlanet}>☽</span>}
-              {isSun  && <span className={styles.miniPlanet}>☀</span>}
+              <span className={styles.niKMHouseNum}>{cell.h}</span>
+              <span className={styles.niKMSign}>{SIGN_NUM[rashiIdx]} {RS[rashiIdx]}</span>
+              {cellPlanets.length > 0 && (
+                <span className={styles.niKMPlanets}>{cellPlanets.join(' ')}</span>
+              )}
             </div>
           );
         })}
-        {/* Center */}
-        <div className={styles.miniCenter}>
-          <span>🕉</span>
-        </div>
+        <div className={styles.niKMCenter}>🕉</div>
       </div>
     </div>
   );
@@ -408,14 +400,11 @@ export default function KundaliMilan() {
 
   // ── Render ───────────────────────────────────────────────────
   return (
-    <div className={styles.page}>
-      <Header />
-      <main className={styles.main}>
-        <div className="container">
+    <AdminLayout>
+      <div className={styles.page}>
 
           {/* Page header */}
           <div className={styles.pageHeader}>
-            <Link to="/admin" className={styles.backLink}>← प्रशासन</Link>
             <div className={styles.pageTitle}>
               <span className={styles.pageTitleIcon}>🔯</span>
               <div>
@@ -511,23 +500,25 @@ export default function KundaliMilan() {
                     <GunTable kootas={result.kootas} />
                   </div>
 
-                  {/* Dual Kundali charts */}
+                  {/* Dual Kundali charts — South Indian style */}
                   <div className={styles.resultCard}>
-                    <h2 className={styles.sectionTitle}>🔮 कुंडली चार्ट</h2>
+                    <h2 className={styles.sectionTitle}>🔮 कुंडली चार्ट (दक्षिण भारतीय पद्धत)</h2>
                     <div className={styles.kundaliRow}>
-                      <MiniKundali
+                      <NorthIndianChart
                         label={`👰 ${result.bride.name} (वधू)`}
                         color="#e91e8c"
-                        moonRashi={result.bride.rashi}
+                        planets={result.bride.planets || []}
+                        moonRashiIdx={result.bride.rashiIdx}
                       />
-                      <MiniKundali
+                      <NorthIndianChart
                         label={`🤵 ${result.groom.name} (वर)`}
                         color="#1565c0"
-                        moonRashi={result.groom.rashi}
+                        planets={result.groom.planets || []}
+                        moonRashiIdx={result.groom.rashiIdx}
                       />
                     </div>
                     <p className={styles.kundaliNote}>
-                      ℹ️ रंगीत घर = चंद्र राशी. उत्तर भारतीय पद्धत (राशी स्थिर).
+                      ℹ️ रंगीत घर (H1) = चंद्र राशी. उत्तर भारतीय पद्धत — घर क्र. 1-12 दाखवले.
                     </p>
                   </div>
 
@@ -588,10 +579,8 @@ export default function KundaliMilan() {
             </div>
           )}
 
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
 

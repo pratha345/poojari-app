@@ -17,4 +17,24 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react':  ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui':     ['react-hot-toast', 'react-helmet-async'],
+          'vendor-utils':  ['axios'],
+          'admin':         [
+            './src/pages/admin/AdminDashboard.jsx',
+            './src/pages/admin/ManagePujaris.jsx',
+            './src/pages/admin/ManageBookings.jsx',
+            './src/pages/admin/ManagePoojas.jsx',
+            './src/pages/admin/KundaliMilan.jsx',
+            './src/pages/admin/AdminTheme.jsx',
+          ],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
+  },
 });

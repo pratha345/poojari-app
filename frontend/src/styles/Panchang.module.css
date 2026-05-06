@@ -948,4 +948,5 @@
   .planetSun, .planetMoon { font-size: 0.8rem; }
 
   .kundaliLegend { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .kundaliWrap   { overflow-x: auto; }
 }

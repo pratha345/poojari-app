@@ -2,12 +2,12 @@
 
 .header { position: sticky; top: 0; z-index: 100; font-family: var(--font-body); }
 
-/* Top bar */
+/* ── Top Info Bar ─────────────────────────────────────────────── */
 .topBar {
   background: var(--secondary);
   color:      var(--gold-light);
   font-size:  13px;
-  padding:    6px 0;
+  padding:    5px 0;
 }
 .topBar > div {
   display:         flex;
@@ -15,45 +15,53 @@
   align-items:     center;
 }
 .topBar a { color: var(--gold-light); }
+/* Hide tagline on small mobile, keep phone link */
+@media (max-width: 480px) {
+  .topTagline { display: none; }
+  .topBar > div { justify-content: center; }
+}
 
-/* Main Nav */
+/* ── Main Nav ─────────────────────────────────────────────────── */
 .mainNav {
-  background: var(--white);
+  background:    var(--white);
   border-bottom: 1px solid var(--border);
-  padding:    10px 0;
+  padding:       8px 0;
 }
 .navInner {
   display:     flex;
   align-items: center;
-  gap:         20px;
+  gap:         16px;
 }
 
-/* Logo */
+/* ── Logo ─────────────────────────────────────────────────────── */
 .logo {
   display:     flex;
   align-items: center;
-  gap:         10px;
+  gap:         9px;
   flex-shrink: 0;
+  min-width:   0;
 }
-.logoIcon { font-size: 28px; animation: float 3s ease-in-out infinite; }
-.logoText { display: flex; flex-direction: column; }
+.logoIcon { font-size: 26px; animation: float 3s ease-in-out infinite; flex-shrink: 0; }
+.logoText { display: flex; flex-direction: column; min-width: 0; }
 .logoMain {
   font-family: var(--font-display);
-  font-size:   22px;
+  font-size:   20px;
   color:       var(--primary);
   font-weight: 700;
   line-height: 1.1;
+  white-space: nowrap;
 }
 .logoSub {
-  font-size:  10px;
-  color:      var(--text-muted);
+  font-size:      10px;
+  color:          var(--text-muted);
   letter-spacing: 0.5px;
+  white-space:    nowrap;
 }
 
-/* Search */
+/* ── Desktop Search ──────────────────────────────────────────��── */
 .searchForm {
   flex:          1;
-  max-width:     480px;
+  max-width:     440px;
   display:       flex;
   border:        1.5px solid var(--border);
   border-radius: var(--radius-xl);
@@ -62,37 +70,39 @@
 }
 .searchForm:focus-within { border-color: var(--primary); }
 .searchForm input {
-  flex:       1;
-  border:     none;
-  padding:    10px 16px;
-  font-size:  14px;
-  outline:    none;
-  background: transparent;
+  flex:        1;
+  border:      none;
+  padding:     9px 14px;
+  font-size:   14px;
+  outline:     none;
+  background:  transparent;
   font-family: var(--font-body);
-  color:      var(--text);
+  color:       var(--text);
+  min-width:   0;
 }
 .searchForm button {
-  padding:    10px 18px;
-  background: var(--primary);
-  color:      var(--white);
-  border:     none;
-  font-size:  16px;
-  cursor:     pointer;
-  transition: background var(--transition);
+  padding:     9px 16px;
+  background:  var(--primary);
+  color:       var(--white);
+  border:      none;
+  font-size:   15px;
+  cursor:      pointer;
+  flex-shrink: 0;
+  transition:  background var(--transition);
 }
 .searchForm button:hover { background: var(--primary-dark); }
 
-/* Auth Area */
-.authArea { flex-shrink: 0; }
-.authButtons { display: flex; gap: 10px; }
+/* ── Desktop Auth ─────────────────────────────────────────────── */
+.authArea  { flex-shrink: 0; }
+.authButtons { display: flex; gap: 8px; align-items: center; }
 
-/* User Menu */
-.userMenu { position: relative; }
+/* User menu */
+.userMenu    { position: relative; }
 .userBtn {
   display:       flex;
   align-items:   center;
   gap:           8px;
-  padding:       8px 16px;
+  padding:       7px 14px;
   border:        1.5px solid var(--border);
   border-radius: var(--radius-xl);
   background:    var(--cream);
@@ -100,11 +110,14 @@
   font-family:   var(--font-body);
   cursor:        pointer;
   transition:    all var(--transition);
+  white-space:   nowrap;
 }
 .userBtn:hover { border-color: var(--primary); background: var(--white); }
+.userName { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chevron  { font-size: 10px; }
 .avatar {
-  width:           32px;
-  height:          32px;
+  width:           30px;
+  height:          30px;
   border-radius:   50%;
   background:      var(--primary);
   color:           var(--white);
@@ -112,17 +125,18 @@
   align-items:     center;
   justify-content: center;
   font-weight:     700;
-  font-size:       15px;
+  font-size:       14px;
+  flex-shrink:     0;
 }
 .dropdown {
   position:      absolute;
-  top:           calc(100% + 8px);
+  top:           calc(100% + 6px);
   right:         0;
   background:    var(--white);
   border:        1px solid var(--border);
   border-radius: var(--radius-md);
   box-shadow:    0 8px 32px var(--shadow);
-  min-width:     200px;
+  min-width:     192px;
   z-index:       200;
   overflow:      hidden;
   animation:     fadeIn 0.15s ease;
@@ -132,7 +146,7 @@
   display:     block;
   width:       100%;
   text-align:  left;
-  padding:     12px 16px;
+  padding:     11px 16px;
   font-size:   14px;
   font-family: var(--font-body);
   color:       var(--text);
@@ -144,32 +158,131 @@
 .dropdown a:hover,
 .dropdown button:hover { background: var(--cream); color: var(--primary); }
 
-/* Hamburger */
-.hamburger {
-  display:    none;
-  font-size:  22px;
-  background: none;
-  border:     none;
-  color:      var(--text);
-  padding:    4px;
+/* ── Mobile Controls (search icon + hamburger) ────────────────── */
+.mobileControls {
+  display:     none;
+  align-items: center;
+  gap:         4px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
-/* Nav Bar */
+/* Search toggle button (mobile) */
+.searchToggle {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           38px;
+  height:          38px;
+  border-radius:   8px;
+  background:      none;
+  border:          none;
+  font-size:       18px;
+  color:           var(--text);
+  cursor:          pointer;
+  transition:      background var(--transition);
+}
+.searchToggle:hover { background: var(--cream); }
+
+/* Hamburger — 3-line CSS animated */
+.hamburger {
+  display:         flex;
+  flex-direction:  column;
+  justify-content: center;
+  align-items:     center;
+  gap:             5px;
+  width:           38px;
+  height:          38px;
+  background:      none;
+  border:          none;
+  cursor:          pointer;
+  padding:         6px;
+  border-radius:   8px;
+  transition:      background var(--transition);
+}
+.hamburger:hover { background: var(--cream); }
+.hamburger span {
+  display:          block;
+  width:            22px;
+  height:           2px;
+  background:       var(--secondary);
+  border-radius:    2px;
+  transition:       transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+  transform-origin: center;
+}
+/* X animation */
+.hamburgerOpen span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburgerOpen span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburgerOpen span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Mobile Search Bar (slides in below main nav) ─────────────── */
+.mobileSearchBar {
+  background:  var(--white);
+  border-top:  1px solid var(--border);
+  overflow:    hidden;
+  max-height:  0;
+  transition:  max-height 0.3s ease, padding 0.3s ease;
+  padding:     0;
+}
+.mobileSearchOpen {
+  max-height: 80px;
+  padding:    10px 0;
+}
+.mobileSearchForm {
+  display:       flex;
+  border:        1.5px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow:      hidden;
+  transition:    border-color var(--transition);
+}
+.mobileSearchForm:focus-within { border-color: var(--primary); }
+.mobileSearchForm input {
+  flex:        1;
+  border:      none;
+  padding:     10px 14px;
+  font-size:   15px;
+  outline:     none;
+  background:  transparent;
+  font-family: var(--font-body);
+  min-width:   0;
+}
+.mobileSearchForm button {
+  padding:     10px 18px;
+  background:  var(--primary);
+  color:       var(--white);
+  border:      none;
+  font-size:   13px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor:      pointer;
+  flex-shrink: 0;
+  transition:  background var(--transition);
+  white-space: nowrap;
+}
+.mobileSearchForm button:hover { background: var(--primary-dark); }
+
+/* ── Nav Links Bar ────────────────────────────────────────────── */
 .navBar {
-  background: var(--primary);
+  background:  var(--primary);
+  overflow:    hidden;
+  /* Mobile: collapsed by default */
+  max-height:  52px;
+  transition:  max-height 0.38s ease;
 }
 .navLinks {
-  display:  flex;
-  gap:      0;
-  overflow: hidden;
+  display:     flex;
+  gap:         0;
+  overflow:    hidden;
+  flex-wrap:   nowrap;
 }
 .navLink {
-  padding:     12px 22px;
-  color:       rgba(255,255,255,0.9);
+  padding:     12px 18px;
+  color:       rgba(255,255,255,0.88);
   font-size:   14px;
   font-weight: 500;
   transition:  all var(--transition);
   position:    relative;
+  white-space: nowrap;
 }
 .navLink::after {
   content:      '';
@@ -185,30 +298,114 @@
 .navLink:hover::after,
 .navLink.active::after { transform: translateX(-50%) scaleX(1); }
 .navLink:hover,
-.navLink.active { color: var(--white); background: rgba(0,0,0,0.15); }
+.navLink.active { color: var(--white); background: rgba(0,0,0,0.12); }
 
 .phoneLink {
   margin-left: auto;
-  padding:     12px 22px;
+  padding:     12px 18px;
   color:       var(--gold-light);
   font-weight: 600;
   font-size:   14px;
+  white-space: nowrap;
 }
 
-/* Mobile */
+/* Mobile auth section — hidden on desktop */
+.mobileAuthSection { display: none; }
+
+/* ── Responsive ───────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .searchForm { max-width: none; }
-  .authArea   { display: none; }
-  .hamburger  { display: block; }
-  .navBar {
-    display:  none;
+  /* Hide desktop search & auth */
+  .searchForm  { display: none; }
+  .authArea    { display: none; }
+
+  /* Show mobile controls */
+  .mobileControls { display: flex; }
+
+  /* Nav bar: collapse on mobile, expand when open */
+  .navBar    { max-height: 0; }
+  .navOpen   { max-height: 640px; }
+
+  /* Stack nav links vertically */
+  .navLinks {
     flex-direction: column;
+    padding:        8px 0 16px;
   }
-  .navOpen { display: flex; }
-  .navLinks { flex-direction: column; }
-  .navLink  { text-align: center; }
-  .phoneLink { text-align: center; margin-left: 0; }
+  .navLink {
+    padding:    13px 20px;
+    text-align: left;
+    font-size:  15px;
+  }
+  .navLink::after { display: none; }
+  .phoneLink {
+    padding:     13px 20px;
+    margin-left: 0;
+    font-size:   15px;
+  }
+
+  /* Mobile auth section */
+  .mobileAuthSection {
+    display:       block;
+    padding:       12px 20px 6px;
+    border-top:    1px solid rgba(255,255,255,0.15);
+    margin-top:    4px;
+  }
+  .mobileAuthLink {
+    display:     block;
+    color:       rgba(255,255,255,0.85);
+    padding:     10px 0;
+    font-size:   14px;
+    font-family: var(--font-body);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .mobileAuthLink:last-of-type { border-bottom: none; }
+  .mobileAuthLogout {
+    display:     block;
+    width:       100%;
+    text-align:  left;
+    color:       rgba(255,255,255,0.85);
+    padding:     10px 0;
+    font-size:   14px;
+    font-family: var(--font-body);
+    background:  none;
+    border:      none;
+    cursor:      pointer;
+  }
+  .mobileAuthBtns {
+    display: flex;
+    gap:     10px;
+    padding: 8px 0;
+  }
+  .mobileAuthLogin {
+    flex:            1;
+    text-align:      center;
+    padding:         10px;
+    border-radius:   var(--radius-xl);
+    border:          1.5px solid rgba(255,255,255,0.5);
+    color:           var(--white);
+    font-size:       14px;
+    font-family:     var(--font-body);
+    font-weight:     600;
+    transition:      background var(--transition);
+  }
+  .mobileAuthLogin:hover { background: rgba(255,255,255,0.1); }
+  .mobileAuthRegister {
+    flex:            1;
+    text-align:      center;
+    padding:         10px;
+    border-radius:   var(--radius-xl);
+    background:      var(--white);
+    color:           var(--primary);
+    font-size:       14px;
+    font-family:     var(--font-body);
+    font-weight:     700;
+    transition:      opacity var(--transition);
+  }
+  .mobileAuthRegister:hover { opacity: 0.9; }
 }
-@media (max-width: 480px) {
-  .searchForm { display: none; }
+
+/* Laptop: tighten search width a bit */
+@media (max-width: 1100px) and (min-width: 769px) {
+  .searchForm  { max-width: 320px; }
+  .navLink     { padding: 12px 14px; font-size: 13px; }
+  .logoMain    { font-size: 18px; }
 }

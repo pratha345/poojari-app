@@ -1,0 +1,410 @@
+/* ════════════════════════════════════════════════════════════
+   src/styles/themes.css — पूजारी Theme System
+   All themes override CSS variables defined in global.css
+   Applied via: document.documentElement.setAttribute('data-theme', name)
+   Transitions handled by global.css theme-transition class
+════════════════════════════════════════════════════════════ */
+
+/* ── Shared transition for smooth theme switching ─────────── */
+html {
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 1 — Saffron Divine (DEFAULT — same as :root)
+════════════════════════════════════════════════════════════ */
+:root[data-theme="saffron-divine"] {
+  --primary:       #E07B2A;
+  --primary-dark:  #B85E15;
+  --primary-light: #F5A55A;
+  --secondary:     #8B2500;
+  --gold:          #D4AF37;
+  --gold-light:    #F0D060;
+  --cream:         #FDF6EC;
+  --cream-dark:    #F5E8D0;
+  --brown:         #3D1C00;
+  --text:          #2D1B00;
+  --text-muted:    #7A5533;
+  --white:         #FFFFFF;
+  --border:        #E8D0B0;
+  --shadow:        rgba(139, 37, 0, 0.12);
+  --shadow-gold:   rgba(212, 175, 55, 0.3);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 2 — Royal Temple
+════════════════════════════════════════════════════════════ */
+:root[data-theme="royal-temple"] {
+  --primary:       #B22222;
+  --primary-dark:  #8B0000;
+  --primary-light: #DC6363;
+  --secondary:     #4A0E0E;
+  --gold:          #CFB53B;
+  --gold-light:    #E8D068;
+  --cream:         #FFF8F0;
+  --cream-dark:    #FAEADE;
+  --brown:         #3A0808;
+  --text:          #2A0808;
+  --text-muted:    #7A3333;
+  --white:         #FFFFFF;
+  --border:        #E8C8C8;
+  --shadow:        rgba(139, 0, 0, 0.14);
+  --shadow-gold:   rgba(207, 181, 59, 0.28);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 3 — Nature Spiritual
+════════════════════════════════════════════════════════════ */
+:root[data-theme="nature-spiritual"] {
+  --primary:       #4A7C59;
+  --primary-dark:  #2D5A3D;
+  --primary-light: #7AAD8A;
+  --secondary:     #1A3D2B;
+  --gold:          #7DAA5F;
+  --gold-light:    #A8CC8C;
+  --cream:         #F1F8F0;
+  --cream-dark:    #DCEDC8;
+  --brown:         #1A3020;
+  --text:          #1A2D1F;
+  --text-muted:    #4A6A55;
+  --white:         #FFFFFF;
+  --border:        #C8E0D0;
+  --shadow:        rgba(26, 61, 43, 0.12);
+  --shadow-gold:   rgba(125, 170, 95, 0.25);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 4 — Calm Blue Devotion
+════════════════════════════════════════════════════════════ */
+:root[data-theme="calm-blue-devotion"] {
+  --primary:       #1565C0;
+  --primary-dark:  #0D47A1;
+  --primary-light: #5B92D3;
+  --secondary:     #0A2744;
+  --gold:          #4FC3F7;
+  --gold-light:    #81D4FA;
+  --cream:         #F0F4FF;
+  --cream-dark:    #DDEEFF;
+  --brown:         #0A1929;
+  --text:          #0A1929;
+  --text-muted:    #3A5A80;
+  --white:         #FFFFFF;
+  --border:        #C0D8F0;
+  --shadow:        rgba(10, 39, 68, 0.12);
+  --shadow-gold:   rgba(79, 195, 247, 0.25);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 5 — Mystic Purple
+════════════════════════════════════════════════════════════ */
+:root[data-theme="mystic-purple"] {
+  --primary:       #7B2D8B;
+  --primary-dark:  #5C1A6B;
+  --primary-light: #AB5DC0;
+  --secondary:     #3A0D4A;
+  --gold:          #CE93D8;
+  --gold-light:    #E1BEE7;
+  --cream:         #F8F0FF;
+  --cream-dark:    #EDD5F8;
+  --brown:         #200830;
+  --text:          #200830;
+  --text-muted:    #6A3A7A;
+  --white:         #FFFFFF;
+  --border:        #D8B8E8;
+  --shadow:        rgba(58, 13, 74, 0.12);
+  --shadow-gold:   rgba(206, 147, 216, 0.3);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 6 — Elegant Dark  (DARK MODE)
+════════════════════════════════════════════════════════════ */
+:root[data-theme="elegant-dark"] {
+  --primary:       #D4AF37;
+  --primary-dark:  #A8892A;
+  --primary-light: #E8CC72;
+  --secondary:     #F0D080;
+  --gold:          #D4AF37;
+  --gold-light:    #F0D060;
+  --cream:         #0F0F1E;
+  --cream-dark:    #1A1A30;
+  --brown:         #F0D080;
+  --text:          #E8DCC8;
+  --text-muted:    #A09070;
+  --white:         #1E1E3A;
+  --border:        #3A3A58;
+  --shadow:        rgba(0, 0, 0, 0.4);
+  --shadow-gold:   rgba(212, 175, 55, 0.35);
+}
+:root[data-theme="elegant-dark"] body {
+  background: #0F0F1E;
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 7 — Festive Bright
+════════════════════════════════════════════════════════════ */
+:root[data-theme="festive-bright"] {
+  --primary:       #FF6B35;
+  --primary-dark:  #E85A20;
+  --primary-light: #FF9A6C;
+  --secondary:     #C0392B;
+  --gold:          #FFD700;
+  --gold-light:    #FFE84D;
+  --cream:         #FFFDE7;
+  --cream-dark:    #FFF8C0;
+  --brown:         #3D0A00;
+  --text:          #1A0800;
+  --text-muted:    #7A3010;
+  --white:         #FFFFFF;
+  --border:        #FFD0A0;
+  --shadow:        rgba(192, 57, 43, 0.15);
+  --shadow-gold:   rgba(255, 215, 0, 0.35);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRESET THEME 8 — Minimal Light
+════════════════════════════════════════════════════════════ */
+:root[data-theme="minimal-light"] {
+  --primary:       #555555;
+  --primary-dark:  #333333;
+  --primary-light: #888888;
+  --secondary:     #222222;
+  --gold:          #888888;
+  --gold-light:    #AAAAAA;
+  --cream:         #FAFAFA;
+  --cream-dark:    #F0F0F0;
+  --brown:         #111111;
+  --text:          #111111;
+  --text-muted:    #666666;
+  --white:         #FFFFFF;
+  --border:        #DDDDDD;
+  --shadow:        rgba(0, 0, 0, 0.08);
+  --shadow-gold:   rgba(0, 0, 0, 0.1);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FESTIVAL THEME 1 — Ganesh Chaturthi 🐘
+════════════════════════════════════════════════════════════ */
+:root[data-theme="ganpati"] {
+  --primary:       #FF6B00;
+  --primary-dark:  #CC5500;
+  --primary-light: #FF9A40;
+  --secondary:     #8B0000;
+  --gold:          #FFD700;
+  --gold-light:    #FFE84D;
+  --cream:         #FFF3E0;
+  --cream-dark:    #FFE0B2;
+  --brown:         #3D0000;
+  --text:          #2D1000;
+  --text-muted:    #8B4500;
+  --white:         #FFFFFF;
+  --border:        #FFCC80;
+  --shadow:        rgba(255, 107, 0, 0.18);
+  --shadow-gold:   rgba(255, 215, 0, 0.4);
+}
+
+/* Ganpati: festive glow on hero / banner elements */
+:root[data-theme="ganpati"] .festival-banner {
+  background: linear-gradient(135deg, #FF6B00, #FF0000, #FFD700);
+  animation: ganpati-glow 2s ease-in-out infinite alternate;
+}
+@keyframes ganpati-glow {
+  from { box-shadow: 0 0 20px rgba(255,107,0,0.5); }
+  to   { box-shadow: 0 0 45px rgba(255,215,0,0.7); }
+}
+
+/* Ganpati: OM pattern watermark */
+:root[data-theme="ganpati"] .om-bg::before {
+  color: rgba(255, 107, 0, 0.06);
+  font-size: 350px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   FESTIVAL THEME 2 — Diwali 🪔  (DARK)
+════════════════════════════════════════════════════════════ */
+:root[data-theme="diwali"] {
+  --primary:       #FFD700;
+  --primary-dark:  #FFA500;
+  --primary-light: #FFE84D;
+  --secondary:     #FF8C00;
+  --gold:          #FFD700;
+  --gold-light:    #FFEB80;
+  --cream:         #120800;
+  --cream-dark:    #1E1000;
+  --brown:         #FFE4B0;
+  --text:          #FFE4B0;
+  --text-muted:    #CC9940;
+  --white:         #1E1000;
+  --border:        #5A3A00;
+  --shadow:        rgba(0, 0, 0, 0.5);
+  --shadow-gold:   rgba(255, 215, 0, 0.5);
+}
+:root[data-theme="diwali"] body {
+  background: #120800;
+}
+
+/* Diwali: diya glow shimmer */
+:root[data-theme="diwali"] .festival-banner {
+  background: linear-gradient(135deg, #2A1400, #4A2000, #2A1400);
+  border: 1px solid #FFD700;
+  animation: diya-flicker 1.5s ease-in-out infinite alternate;
+}
+@keyframes diya-flicker {
+  0%   { box-shadow: 0 0 15px #FFD700, 0 0 40px rgba(255,140,0,0.4); }
+  50%  { box-shadow: 0 0 25px #FFA500, 0 0 60px rgba(255,69,0,0.5);  }
+  100% { box-shadow: 0 0 18px #FFD700, 0 0 50px rgba(255,140,0,0.35);}
+}
+
+/* Diwali: sparkle text on headings */
+:root[data-theme="diwali"] h1,
+:root[data-theme="diwali"] h2 {
+  color: #FFD700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FESTIVAL THEME 3 — Navratri 🌸
+════════════════════════════════════════════════════════════ */
+:root[data-theme="navratri"] {
+  --primary:       #E91E8C;
+  --primary-dark:  #C2185B;
+  --primary-light: #F06BB0;
+  --secondary:     #880E4F;
+  --gold:          #FF8C00;
+  --gold-light:    #FFB347;
+  --cream:         #FFF0F5;
+  --cream-dark:    #FFD6E8;
+  --brown:         #3D0020;
+  --text:          #2D001A;
+  --text-muted:    #8B2255;
+  --white:         #FFFFFF;
+  --border:        #F8B8D8;
+  --shadow:        rgba(233, 30, 140, 0.15);
+  --shadow-gold:   rgba(255, 140, 0, 0.3);
+}
+
+:root[data-theme="navratri"] .festival-banner {
+  background: linear-gradient(135deg, #E91E8C, #FF6B35, #FFD700, #E91E8C);
+  background-size: 300% 300%;
+  animation: navratri-gradient 4s ease infinite;
+}
+@keyframes navratri-gradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+:root[data-theme="navratri"] .section-heading h2::after {
+  background: linear-gradient(90deg, #E91E8C, #FF8C00, #FFD700);
+}
+
+/* ════════════════════════════════════════════════════════════
+   FESTIVAL THEME 4 — Pitru Paksha 🕯️  (Calm / Minimal)
+════════════════════════════════════════════════════════════ */
+:root[data-theme="pitru-paksha"] {
+  --primary:       #78909C;
+  --primary-dark:  #546E7A;
+  --primary-light: #B0BEC5;
+  --secondary:     #37474F;
+  --gold:          #90A4AE;
+  --gold-light:    #B0BEC5;
+  --cream:         #F5F5F5;
+  --cream-dark:    #ECEFF1;
+  --brown:         #263238;
+  --text:          #263238;
+  --text-muted:    #607D8B;
+  --white:         #FFFFFF;
+  --border:        #CFD8DC;
+  --shadow:        rgba(38, 50, 56, 0.1);
+  --shadow-gold:   rgba(144, 164, 174, 0.2);
+}
+
+/* Pitru Paksha: no flashy animations, calm appearance */
+:root[data-theme="pitru-paksha"] .festival-banner {
+  background: linear-gradient(135deg, #ECEFF1, #CFD8DC);
+  border-left: 4px solid #78909C;
+}
+:root[data-theme="pitru-paksha"] .animate-float { animation: none; }
+:root[data-theme="pitru-paksha"] .card:hover { transform: none; }
+
+/* ════════════════════════════════════════════════════════════
+   FESTIVAL THEME 5 — Shravan 🍃
+════════════════════════════════════════════════════════════ */
+:root[data-theme="shravan"] {
+  --primary:       #388E3C;
+  --primary-dark:  #2E7D32;
+  --primary-light: #66BB6A;
+  --secondary:     #1B5E20;
+  --gold:          #AED581;
+  --gold-light:    #C8E6C9;
+  --cream:         #F1F8E9;
+  --cream-dark:    #DCEDC8;
+  --brown:         #1A3A1A;
+  --text:          #1B2B1B;
+  --text-muted:    #4A7A4A;
+  --white:         #FFFFFF;
+  --border:        #C5E1A5;
+  --shadow:        rgba(27, 94, 32, 0.12);
+  --shadow-gold:   rgba(174, 213, 129, 0.3);
+}
+
+:root[data-theme="shravan"] .festival-banner {
+  background: linear-gradient(135deg, #1B5E20, #388E3C, #66BB6A);
+  animation: shravan-breathe 3s ease-in-out infinite alternate;
+}
+@keyframes shravan-breathe {
+  from { opacity: 0.9; box-shadow: 0 4px 20px rgba(56,142,60,0.3); }
+  to   { opacity: 1;   box-shadow: 0 8px 35px rgba(56,142,60,0.5); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Festival Banner — shared layout styles
+   (appears at top of page during active festival themes)
+════════════════════════════════════════════════════════════ */
+.festival-banner {
+  width:           100%;
+  padding:         12px 20px;
+  text-align:      center;
+  color:           #FFFFFF;
+  font-family:     var(--font-display);
+  font-size:       15px;
+  font-weight:     600;
+  letter-spacing:  0.5px;
+  position:        relative;
+  overflow:        hidden;
+  z-index:         100;
+}
+.festival-banner::before {
+  content:     attr(data-emoji);
+  font-size:   20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.festival-banner::after {
+  content:     attr(data-emoji);
+  font-size:   20px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ── Dark theme card adjustments ────────────────────────────── */
+:root[data-theme="elegant-dark"] .card,
+:root[data-theme="diwali"] .card {
+  background:    var(--white);
+  border-color:  var(--border);
+}
+:root[data-theme="elegant-dark"] .form-control,
+:root[data-theme="diwali"] .form-control {
+  background: var(--white);
+  color:      var(--text);
+  border-color: var(--border);
+}
+:root[data-theme="elegant-dark"] .form-control::placeholder,
+:root[data-theme="diwali"] .form-control::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Scrollbar theming ──────────────────────────────────────── */
+:root[data-theme] ::-webkit-scrollbar-thumb { background: var(--primary); }
+:root[data-theme] ::-webkit-scrollbar-track { background: var(--cream-dark); }

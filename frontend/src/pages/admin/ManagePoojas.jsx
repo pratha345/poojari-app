@@ -1,10 +1,8 @@
 // src/pages/admin/ManagePoojas.jsx
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import Header from '../../components/layout/Header';
-import Footer from '../../components/layout/Footer';
 import { poojaAPI } from '../../api/index.js';
+import AdminLayout from './AdminLayout';
 import styles from './Admin.module.css';
 
 const EMPTY_FORM = {
@@ -136,17 +134,14 @@ export default function ManagePoojas() {
   };
 
   return (
-    <div>
-      <Header />
-      <main className={styles.main}>
-        <div className="container">
-          <div className={styles.pageHeader}>
-            <Link to="/admin" className={styles.backLink}>← प्रशासन</Link>
-            <h1 className={styles.pageTitle}>🪔 पूजा व्यवस्थापन</h1>
-            <button className="btn btn-primary btn-sm" onClick={() => setShowForm(v => !v)}>
-              {showForm ? '✕ बंद करा' : '+ नवीन पूजा जोडा'}
-            </button>
-          </div>
+    <AdminLayout>
+      <div>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24 }}>
+          <h1 className={styles.pageTitle}>🪔 पूजा व्यवस्थापन</h1>
+          <button className="btn btn-primary btn-sm" onClick={() => setShowForm(v => !v)}>
+            {showForm ? '✕ बंद करा' : '+ नवीन पूजा जोडा'}
+          </button>
+        </div>
 
           {/* Add Pooja Form */}
           {showForm && (
@@ -346,9 +341,7 @@ export default function ManagePoojas() {
               </table>
             </div>
           )}
-        </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

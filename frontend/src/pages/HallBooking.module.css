@@ -1,0 +1,182 @@
+/* HallBooking.module.css */
+.main { padding-bottom: 60px; min-height: 80vh; background: var(--cream); }
+
+/* ── Breadcrumb ───────────────────────────────────────────────── */
+.breadcrumb {
+  background:    var(--white);
+  border-bottom: 1px solid var(--border);
+  padding:       10px 0;
+}
+.breadcrumb > div {
+  display:     flex;
+  gap:         8px;
+  align-items: center;
+  font-size:   13px;
+  color:       var(--text-muted);
+  flex-wrap:   wrap;
+}
+.breadcrumb a    { color: var(--primary); }
+.breadcrumb span { color: var(--text-muted); }
+
+/* ── Page header ──────────────────────────────────────────────── */
+.pageHeader   { text-align: center; padding: 32px 0 20px; }
+.pageTitle    { font-family: var(--font-display); font-size: 1.9rem; color: var(--secondary); margin-bottom: 8px; }
+.pageSubtitle { font-size: 14.5px; color: var(--text-muted); max-width: 520px; margin: 0 auto; }
+
+/* ── Location status bar ──────────────────────────────────────── */
+.locBar {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+  background:      var(--white);
+  border:          1px solid var(--border);
+  border-radius:   var(--radius-sm);
+  padding:         10px 16px;
+  margin-bottom:   14px;
+  flex-wrap:       wrap;
+}
+.locStatus { font-size: 13.5px; color: var(--text); }
+.locError  { font-size: 13px;   color: #c0392b; }
+
+.nearbyBtn {
+  padding:       7px 14px;
+  background:    var(--primary);
+  color:         #fff;
+  border:        none;
+  border-radius: var(--radius-sm);
+  font-size:     13px;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    background var(--transition);
+  white-space:   nowrap;
+}
+.nearbyBtn:hover { background: #c9621a; }
+
+/* ── Filter bar ───────────────────────────────────────────────── */
+.filterBar {
+  display:       flex;
+  gap:           8px;
+  margin-bottom: 18px;
+  flex-wrap:     wrap;
+}
+.filterInput {
+  flex:          1;
+  min-width:     200px;
+  padding:       10px 15px;
+  border:        1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size:     14px;
+  font-family:   var(--font-display);
+  background:    var(--white);
+  color:         var(--text);
+  outline:       none;
+  transition:    border-color var(--transition);
+}
+.filterInput:focus        { border-color: var(--primary); }
+.filterInput::placeholder { color: var(--text-muted); }
+
+.searchBtn {
+  padding:       10px 16px;
+  background:    var(--secondary);
+  color:         #fff;
+  border:        none;
+  border-radius: var(--radius-sm);
+  font-size:     13.5px;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    background var(--transition);
+  white-space:   nowrap;
+}
+.searchBtn:hover { background: #3a1e08; }
+
+.clearBtn {
+  padding:       10px 12px;
+  background:    transparent;
+  color:         var(--text-muted);
+  border:        1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size:     13px;
+  cursor:        pointer;
+  transition:    all var(--transition);
+  white-space:   nowrap;
+}
+.clearBtn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── View toggle ──────────────────────────────────────────────── */
+.viewToggle {
+  display:       flex;
+  gap:           0;
+  margin-bottom: 18px;
+  border:        1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow:      hidden;
+  width:         fit-content;
+}
+.toggleBtn {
+  padding:    9px 20px;
+  background: var(--white);
+  border:     none;
+  font-size:  13.5px;
+  cursor:     pointer;
+  color:      var(--text-muted);
+  transition: all var(--transition);
+  font-family: var(--font-display);
+}
+.toggleBtn + .toggleBtn { border-left: 1.5px solid var(--border); }
+.toggleBtn:hover  { background: var(--cream); color: var(--primary); }
+.toggleActive {
+  background:  var(--primary) !important;
+  color:       #fff !important;
+  font-weight: 600;
+}
+
+/* ── Result count ─────────────────────────────────────────────── */
+.resultCount { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+
+/* ── Hall grid ────────────────────────────────────────────────── */
+.hallGrid {
+  display:               grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:                   20px;
+}
+
+/* ── Skeleton cards ───────────────────────────────────────────── */
+.skeletonCard {
+  background:    var(--white);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow:      hidden;
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+.empty {
+  text-align:     center;
+  padding:        56px 24px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            14px;
+  color:          var(--text-muted);
+}
+.emptyIcon { font-size: 54px; }
+.empty h3  { font-size: 1.1rem; color: var(--text); margin: 0; }
+.empty p   { font-size: 14px; max-width: 380px; margin: 0; }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hallGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .pageTitle { font-size: 1.55rem; }
+  .hallGrid  { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .locBar    { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 480px) {
+  .hallGrid   { grid-template-columns: 1fr; gap: 12px; }
+  .pageTitle  { font-size: 1.3rem; }
+  .pageHeader { padding: 22px 0 16px; }
+  .toggleBtn  { padding: 8px 16px; font-size: 13px; }
+}
