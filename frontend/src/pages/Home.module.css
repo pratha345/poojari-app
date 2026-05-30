@@ -5,26 +5,45 @@
 /* ── Hero: warm saffron gradient + dot grid ── */
 .heroBg {
   background:
-    radial-gradient(circle, rgba(224,123,42,0.09) 1.5px, transparent 1.5px),
+    radial-gradient(circle, var(--shadow-gold) 1.5px, transparent 1.5px),
     linear-gradient(125deg,
-      #fffdf8 0%,
-      #fff8ee 25%,
-      #feefd5 55%,
-      #fde0a0 80%,
-      #f9c97a 100%
+      var(--white)      0%,
+      var(--cream)      30%,
+      var(--cream-dark) 70%,
+      var(--cream-dark) 100%
     );
   background-size: 30px 30px, 100% 100%;
+}
+
+/* ── Faint hero background image (Ganpati / admin-uploaded) ── */
+.heroBgImage {
+  position:       absolute;
+  inset:          0;
+  width:          100%;
+  height:         100%;
+  object-fit:     cover;
+  object-position: center 20%;
+  opacity:        0.08;
+  pointer-events: none;
+  user-select:    none;
+  z-index:        0;
+  filter:         blur(1.5px) saturate(0.7);
+  animation:      heroBgBreath 8s ease-in-out infinite alternate;
+}
+@keyframes heroBgBreath {
+  from { opacity: 0.06; transform: scale(1);    }
+  to   { opacity: 0.10; transform: scale(1.03); }
 }
 
 /* ── Background OM watermark ── */
 .omWatermark {
   position: absolute;
   font-family: 'Tiro Devanagari Marathi', serif;
-  font-size: 460px;
-  color: rgba(224, 123, 42, 0.042);
-  right: -50px;
+  font-size: 420px;
+  color: var(--shadow);
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
   line-height: 1;
   pointer-events: none;
   user-select: none;
@@ -33,7 +52,7 @@
 
 /* ── "विश्वासार्ह" gradient text ── */
 .highlight {
-  background: linear-gradient(130deg, #FF7A00 0%, #d44f00 40%, #C62828 75%, #FF7A00 100%);
+  background: linear-gradient(130deg, var(--primary-light) 0%, var(--primary) 40%, var(--secondary) 75%, var(--primary-light) 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -175,3 +194,1019 @@
 /* ── Category card overlay text ── */
 .catCard:hover .catText { color: #fff; }
 .catCard:hover .catDesc { color: rgba(255,255,255,0.82); }
+
+/* ════════════════════════════════════════════════════════════════
+   Festival Banner — shown when a festival is active with image
+════════════════════════════════════════════════════════════════ */
+.festivalBanner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(125deg, #3d0600 0%, #8B2500 40%, #b84300 70%, #E07B2A 100%);
+  border-top: 2px solid rgba(255, 215, 0, 0.28);
+  border-bottom: 2px solid rgba(255, 215, 0, 0.28);
+}
+
+/* OM watermark */
+.festivalBanner::before {
+  content: 'ॐ';
+  position: absolute;
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-size: 320px;
+  color: rgba(255, 255, 255, 0.04);
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+  z-index: 0;
+}
+
+/* Dot-grid overlay */
+.festivalBanner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,215,0,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.festivalBannerInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 310px;
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.festivalTextSide {
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.festivalImageSide {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Feather-blend the image into the left gradient */
+.festivalImageSide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80px;
+  bottom: 0;
+  width: 200px;
+  background: linear-gradient(to right, #8B2500, transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Dark vignette on top / bottom of image */
+.festivalImageSide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(61,6,0,0.35) 0%, transparent 20%, transparent 75%, rgba(61,6,0,0.45) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.festivalImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 8s ease-out;
+}
+.festivalBanner:hover .festivalImg {
+  transform: scale(1.04);
+}
+
+/* "आत्ता सुरू आहे" pill */
+.festivalTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 215, 0, 0.12);
+  border: 1px solid rgba(255, 215, 0, 0.42);
+  border-radius: 100px;
+  padding: 5px 14px;
+  width: fit-content;
+  animation: festTagPulse 2.8s ease-in-out infinite;
+}
+.festivalTagDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFD700;
+  animation: festDotBlink 1.4s ease-in-out infinite;
+}
+.festivalTagText {
+  color: #FFD700;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  font-family: 'Noto Serif Devanagari', serif;
+}
+@keyframes festTagPulse {
+  0%, 100% { border-color: rgba(255,215,0,0.42); box-shadow: none; }
+  50%       { border-color: rgba(255,215,0,0.8);  box-shadow: 0 0 18px rgba(255,215,0,0.18); }
+}
+@keyframes festDotBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* Festival name — big Devanagari headline */
+.festivalName {
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-size: 3rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin: 0;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.55);
+  animation: festNameEntry 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes festNameEntry {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.festivalSub {
+  font-family: 'Noto Serif Devanagari', serif;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+  line-height: 1.9;
+  margin: 0;
+}
+
+/* Booking CTA button */
+.festivalCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #8B2500;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 13px 32px;
+  border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s;
+  width: fit-content;
+  font-family: 'Tiro Devanagari Marathi', serif;
+  margin-top: 4px;
+  border: none;
+  cursor: pointer;
+}
+.festivalCta:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+  color: #6a1800;
+}
+
+/* Decorative floating circles */
+.festDot {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.13);
+  pointer-events: none;
+  z-index: 0;
+}
+.festDot1 { animation: festDotFloat 6s ease-in-out infinite; }
+.festDot2 { animation: festDotFloat 9s ease-in-out 2s infinite; }
+.festDot3 { animation: festDotFloat 5s ease-in-out 1s infinite; }
+@keyframes festDotFloat {
+  0%, 100% { transform: translateY(0) scale(1);    opacity: 0.5; }
+  50%       { transform: translateY(-20px) scale(1.12); opacity: 1; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Search Bar (inside hero)
+════════════════════════════════════════════════════════════════ */
+.searchBar {
+  display:       flex;
+  align-items:   center;
+  background:    #fff;
+  border:        2px solid rgba(224,123,42,0.25);
+  border-radius: 16px;
+  overflow:      hidden;
+  box-shadow:    0 8px 32px rgba(224,123,42,0.14);
+  max-width:     480px;
+  transition:    border-color 0.2s, box-shadow 0.2s;
+}
+.searchBar:focus-within {
+  border-color: rgba(224,123,42,0.60);
+  box-shadow:   0 10px 40px rgba(224,123,42,0.22);
+}
+.searchInner {
+  display:     flex;
+  align-items: center;
+  flex:        1;
+  padding:     0 14px;
+  gap:         8px;
+}
+.searchIcon { font-size: 16px; flex-shrink: 0; }
+.searchSelect {
+  flex:        1;
+  border:      none;
+  outline:     none;
+  font-size:   14px;
+  font-family: inherit;
+  color:       #3a1800;
+  background:  transparent;
+  padding:     14px 0;
+  cursor:      pointer;
+  appearance:  none;
+}
+.searchBtn {
+  flex-shrink:  0;
+  padding:      14px 22px;
+  background:   linear-gradient(135deg, #c04a00, #e86a00);
+  color:        #fff;
+  font-size:    14px;
+  font-weight:  700;
+  font-family:  var(--font-display, inherit);
+  border:       none;
+  cursor:       pointer;
+  transition:   background 0.2s;
+  white-space:  nowrap;
+}
+.searchBtn:hover { background: linear-gradient(135deg, #a03800, #c04a00); }
+
+/* ════════════════════════════════════════════════════════════════
+   Stats Strip
+════════════════════════════════════════════════════════════════ */
+.statsStrip {
+  background:    linear-gradient(135deg, #7a1e00 0%, #c04a00 50%, #e86a00 100%);
+  padding:       32px 0;
+}
+.statsGrid {
+  display:               grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:                   2px;
+}
+.statCard {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             4px;
+  padding:         20px 12px;
+  border-right:    1px solid rgba(255,255,255,0.15);
+  transition:      background 0.2s;
+}
+.statCard:last-child { border-right: none; }
+.statCard:hover { background: rgba(255,255,255,0.08); }
+.statIcon  { font-size: 24px; margin-bottom: 2px; }
+.statValue {
+  font-family: var(--font-display, serif);
+  font-size:   clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color:       #fff;
+  line-height: 1.1;
+}
+.statLabel {
+  font-size:  12px;
+  color:      rgba(255,255,255,0.70);
+  text-align: center;
+  font-family: var(--font-body, sans-serif);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   City Grid
+════════════════════════════════════════════════════════════════ */
+.cityGrid {
+  display:               grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap:                   14px;
+}
+.cityCard {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             8px;
+  padding:         20px 12px;
+  border-radius:   14px;
+  background:      #fffaf4;
+  border:          1.5px solid rgba(224,123,42,0.12);
+  text-decoration: none;
+  transition:      all 0.22s ease;
+  cursor:          pointer;
+}
+.cityCard:hover {
+  background:    linear-gradient(135deg, #7a1e00, #c04a00);
+  border-color:  transparent;
+  transform:     translateY(-3px);
+  box-shadow:    0 8px 24px rgba(192,74,0,0.28);
+}
+.cityCard:hover .cityName { color: #fff; }
+.cityIcon { font-size: 28px; }
+.cityName {
+  font-family: var(--font-display, serif);
+  font-size:   13px;
+  font-weight: 600;
+  color:       #5a2800;
+  text-align:  center;
+  transition:  color 0.2s;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   How It Works — Steps
+════════════════════════════════════════════════════════════════ */
+.howSection {
+  background: linear-gradient(180deg, #f5e8d0 0%, #fdf0dc 100%);
+  padding: 80px 0;
+}
+
+.stepsRow {
+  display:     flex;
+  align-items: flex-start;
+  gap:         0;
+}
+
+.stepWrap {
+  display:     flex;
+  align-items: center;
+  flex:        1;
+}
+
+.stepCard {
+  flex:          1;
+  background:    #fff;
+  border-radius: 20px;
+  padding:       36px 24px 28px;
+  text-align:    center;
+  box-shadow:    0 4px 24px rgba(122,30,0,0.08);
+  border:        1.5px solid rgba(192,74,0,0.10);
+  position:      relative;
+  transition:    transform 0.25s, box-shadow 0.25s;
+}
+.stepCard:hover {
+  transform:  translateY(-6px);
+  box-shadow: 0 16px 48px rgba(122,30,0,0.16);
+}
+
+/* large number — top center */
+.stepNum {
+  position:        absolute;
+  top:             -22px;
+  left:            50%;
+  transform:       translateX(-50%);
+  width:           44px;
+  height:          44px;
+  border-radius:   50%;
+  background:      linear-gradient(135deg, #7a1e00, #e86a00);
+  color:           #fff;
+  font-family:     var(--font-display);
+  font-size:       18px;
+  font-weight:     800;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  box-shadow:      0 4px 16px rgba(192,74,0,0.40);
+  border:          3px solid #fff;
+}
+
+/* icon box */
+.stepIconBox {
+  width:           72px;
+  height:          72px;
+  border-radius:   20px;
+  background:      linear-gradient(135deg, rgba(192,74,0,0.12), rgba(232,106,0,0.06));
+  border:          1.5px solid rgba(192,74,0,0.15);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       34px;
+  margin:          16px auto 20px;
+}
+
+.stepTitle {
+  font-family:   var(--font-display);
+  font-size:     1rem;
+  font-weight:   700;
+  color:         #7a1e00;
+  margin-bottom: 8px;
+}
+.stepDesc {
+  font-size: 13px;
+  color:       rgba(122,30,0,0.60);
+  line-height: 1.65;
+}
+
+/* arrow between steps */
+.stepArrow {
+  flex-shrink:  0;
+  width:        40px;
+  text-align:   center;
+  font-size:    22px;
+  color:        #c04a00;
+  font-weight:  700;
+  padding-top:  16px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .cityGrid  { grid-template-columns: repeat(4, 1fr); }
+  .stepArrow { width: 24px; font-size: 16px; }
+}
+@media (max-width: 768px) {
+  .stepsRow  { flex-direction: column; gap: 32px; }
+  .stepWrap  { width: 100%; flex-direction: column; }
+  .stepArrow { transform: rotate(90deg); width: 100%; text-align: center; }
+}
+@media (max-width: 640px) {
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .statCard  { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.10); }
+  .cityGrid  { grid-template-columns: repeat(3, 1fr); }
+  .searchBar { max-width: 100%; }
+}
+@media (max-width: 400px) { .cityGrid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ── Occasion Quick Chips (Hero) ───────────────────────────── */
+.occasionRow {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.occasionLabel {
+  font-size: 12px; font-weight: 700;
+  color: var(--text-muted); letter-spacing: 0.3px;
+  font-family: var(--font-body);
+}
+.occasionChips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.occasionChip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 30px;
+  background: rgba(255,255,255,0.8);
+  border: 1.5px solid rgba(224,123,42,0.25);
+  font-size: 13px; font-family: var(--font-body);
+  color: var(--secondary); font-weight: 600;
+  backdrop-filter: blur(4px);
+  transition: all var(--transition);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.occasionChip:hover {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(224,123,42,0.3);
+}
+
+/* ── Nearby Pujaris ─────────────────────────────────────────── */
+.locationPrompt {
+  background: linear-gradient(135deg, #fffaf4, #fff3e0);
+  border: 1.5px dashed rgba(224,123,42,0.35);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px; margin-bottom: 24px;
+}
+.locationPromptInner {
+  display: flex; align-items: center; gap: 20px;
+  flex-wrap: wrap; justify-content: center;
+}
+.locationIcon { font-size: 2.4rem; }
+.locationTitle { font-family: var(--font-display); font-size: 1.1rem; color: var(--secondary); margin-bottom: 4px; }
+.locationSub   { font-size: 13px; color: var(--text-muted); }
+.locationBtns  { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.cityPickerWrap { margin-bottom: 24px; }
+.cityPickerGrid {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px;
+}
+.cityPickerBtn {
+  padding: 8px 18px; border-radius: 30px;
+  border: 1.5px solid var(--border); background: var(--white);
+  font-size: 14px; font-family: var(--font-body); color: var(--text);
+  cursor: pointer; transition: all var(--transition);
+}
+.cityPickerBtn:hover { border-color: var(--primary); color: var(--primary); }
+.cityPickerActive { background: var(--primary) !important; color: var(--white) !important; border-color: var(--primary) !important; }
+
+.nearbyGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.nearbyCard {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  transition: all var(--transition);
+}
+.nearbyCard:hover { border-color: var(--primary); box-shadow: 0 8px 28px rgba(224,123,42,0.14); transform: translateY(-2px); }
+
+.nearbyCardTop { display: flex; gap: 14px; align-items: flex-start; }
+.nearbyAvatar {
+  position: relative; flex-shrink: 0;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: 2.5px solid var(--gold); overflow: visible;
+  display: flex; align-items: center; justify-content: center;
+}
+.nearbyAvatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.nearbyAvatar span { font-size: 22px; font-weight: 700; color: var(--white); font-family: var(--font-display); }
+.nearbyDot {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--white);
+}
+.nearbyDotOn  { background: #2e7d32; }
+.nearbyDotOff { background: #c62828; }
+
+.nearbyInfo  { flex: 1; min-width: 0; }
+.nearbyName  { font-family: var(--font-display); font-size: 1rem; color: var(--secondary); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nearbyLoc   { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+.nearbyRating { display: flex; align-items: center; gap: 5px; }
+.nearbyStars  { color: #f9a825; font-size: 13px; letter-spacing: 1px; }
+.nearbyRatingNum { font-size: 13px; font-weight: 700; color: var(--text); }
+.nearbyReviews   { font-size: 12px; color: var(--text-muted); }
+
+.nearbyMeta { display: flex; gap: 6px; flex-wrap: wrap; }
+.nearbyExp  { font-size: 12px; background: rgba(139,37,0,0.07); color: var(--secondary); border-radius: 12px; padding: 3px 10px; }
+.nearbySpec { font-size: 12px; background: rgba(224,123,42,0.1); color: var(--primary); border-radius: 12px; padding: 3px 10px; }
+
+.nearbyBtn  { width: 100%; justify-content: center; font-size: 13px; margin-top: auto; }
+
+.nearbyEmpty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+.nearbyEmpty span { display: block; font-size: 40px; margin-bottom: 12px; }
+.nearbyEmpty p { font-size: 15px; margin-bottom: 16px; }
+
+@media (max-width: 900px) { .nearbyGrid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .nearbyGrid { grid-template-columns: 1fr; } }
+
+/* ── Mobile: stack image above text ── */
+@media (max-width: 767px) {
+  .festivalBannerInner {
+    grid-template-columns: 1fr;
+    grid-template-rows: 220px auto;
+  }
+  .festivalImageSide { order: 1; }
+  .festivalTextSide  { order: 2; padding: 28px 24px 36px; }
+  .festivalImageSide::before { display: none; }
+  .festivalName { font-size: 2.1rem; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FEATURED PUJA SLIDER  (PanditsNearMe style full-width)
+════════════════════════════════════════════════════════════════ */
+.pSlider {
+  position:   relative;
+  width:       100%;
+  height:      520px;
+  overflow:    hidden;
+  background:  #1a0800;
+}
+
+/* Background image layer */
+.pSliderBg {
+  position:        absolute;
+  inset:           0;
+  background-size: cover;
+  background-position: center;
+  transition:      opacity 0.7s ease;
+}
+.pSliderBgVisible { opacity: 1; }
+.pSliderBgHidden  { opacity: 0; }
+
+/* Dark gradient overlay — strong on left, fades right */
+.pSliderOverlay {
+  position: absolute;
+  inset:    0;
+  background: linear-gradient(
+    to right,
+    rgba(10,4,0,0.82) 0%,
+    rgba(10,4,0,0.55) 45%,
+    rgba(10,4,0,0.18) 75%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* Content */
+.pSliderContent {
+  position:   absolute;
+  inset:      0;
+  z-index:    2;
+  display:    flex;
+  align-items: center;
+}
+
+.pSliderText {
+  max-width:  560px;
+  padding:    0 16px;
+  animation:  pSlideIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes pSlideIn {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.pSliderCat {
+  display:        inline-block;
+  background:     rgba(224,123,42,0.25);
+  border:         1px solid rgba(224,123,42,0.55);
+  color:          #ffb366;
+  padding:        4px 14px;
+  border-radius:  30px;
+  font-size:      12px;
+  font-weight:    700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom:  14px;
+}
+
+.pSliderTitle {
+  font-family:   var(--font-display);
+  font-size:     clamp(2rem, 4.5vw, 3.2rem);
+  color:         #fff;
+  line-height:   1.18;
+  margin-bottom: 14px;
+  text-shadow:   0 2px 20px rgba(0,0,0,0.5);
+}
+
+.pSliderDesc {
+  font-size:     16px;
+  color:         rgba(255,255,255,0.82);
+  line-height:   1.7;
+  margin-bottom: 10px;
+  max-width:     460px;
+}
+
+.pSliderMeta {
+  display:       flex;
+  gap:           16px;
+  margin-bottom: 28px;
+  flex-wrap:     wrap;
+}
+.pSliderMetaItem {
+  display:        flex;
+  align-items:    center;
+  gap:            6px;
+  font-size:      14px;
+  color:          rgba(255,255,255,0.7);
+  background:     rgba(255,255,255,0.1);
+  border:         1px solid rgba(255,255,255,0.18);
+  padding:        5px 14px;
+  border-radius:  20px;
+  backdrop-filter: blur(4px);
+}
+
+.pSliderActions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.pSliderBtnPrimary {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             8px;
+  padding:         13px 28px;
+  background:      linear-gradient(135deg, #FF8C00, #E07B2A);
+  color:           #fff;
+  border-radius:   30px;
+  font-size:       15px;
+  font-weight:     700;
+  font-family:     var(--font-body);
+  text-decoration: none;
+  box-shadow:      0 6px 24px rgba(224,123,42,0.5);
+  transition:      all 0.2s;
+  border:          none;
+  cursor:          pointer;
+}
+.pSliderBtnPrimary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(224,123,42,0.65); }
+
+.pSliderBtnSecondary {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             8px;
+  padding:         13px 24px;
+  background:      rgba(255,255,255,0.12);
+  color:           #fff;
+  border-radius:   30px;
+  font-size:       15px;
+  font-weight:     600;
+  font-family:     var(--font-body);
+  text-decoration: none;
+  border:          1.5px solid rgba(255,255,255,0.35);
+  backdrop-filter: blur(6px);
+  transition:      all 0.2s;
+}
+.pSliderBtnSecondary:hover { background: rgba(255,255,255,0.22); }
+
+/* Navigation arrows */
+.pSliderArrow {
+  position:        absolute;
+  top:             50%;
+  transform:       translateY(-50%);
+  z-index:         3;
+  width:           48px;
+  height:          48px;
+  border-radius:   50%;
+  background:      rgba(255,255,255,0.15);
+  border:          1.5px solid rgba(255,255,255,0.3);
+  color:           #fff;
+  font-size:       22px;
+  font-weight:     300;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  backdrop-filter: blur(6px);
+  transition:      all 0.2s;
+}
+.pSliderArrow:hover { background: rgba(255,255,255,0.28); transform: translateY(-50%) scale(1.08); }
+.pSliderArrowLeft  { left:  20px; }
+.pSliderArrowRight { right: 20px; }
+
+/* Dots */
+.pSliderDots {
+  position:        absolute;
+  bottom:          22px;
+  left:            50%;
+  transform:       translateX(-50%);
+  z-index:         3;
+  display:         flex;
+  gap:             8px;
+  align-items:     center;
+}
+.pSliderDot {
+  width:        10px;
+  height:       10px;
+  border-radius: 50%;
+  background:   rgba(255,255,255,0.4);
+  border:       none;
+  cursor:       pointer;
+  transition:   all 0.25s;
+  padding:      0;
+}
+.pSliderDotActive {
+  width:      28px;
+  border-radius: 5px;
+  background: var(--primary, #E07B2A);
+}
+
+/* Slide counter badge */
+.pSliderCounter {
+  position:   absolute;
+  top:        20px;
+  right:      72px;
+  z-index:    3;
+  background: rgba(0,0,0,0.45);
+  color:      rgba(255,255,255,0.8);
+  font-size:  13px;
+  font-weight: 600;
+  padding:    5px 14px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+/* Gradient fallback backgrounds — rich, vibrant colors */
+.pSliderGrad0 { background: radial-gradient(ellipse at 70% 50%, #ff6a00 0%, #c04a00 40%, #5a1500 100%) !important; }
+.pSliderGrad1 { background: radial-gradient(ellipse at 70% 50%, #ab47bc 0%, #6a1b9a 40%, #1a0533 100%) !important; }
+.pSliderGrad2 { background: radial-gradient(ellipse at 70% 50%, #42a5f5 0%, #1565c0 40%, #0a1929 100%) !important; }
+.pSliderGrad3 { background: radial-gradient(ellipse at 70% 50%, #66bb6a 0%, #2e7d32 40%, #0a2010 100%) !important; }
+.pSliderGrad4 { background: radial-gradient(ellipse at 70% 50%, #ef5350 0%, #b71c1c 40%, #3a0000 100%) !important; }
+.pSliderGrad5 { background: radial-gradient(ellipse at 70% 50%, #ffa726 0%, #e65100 40%, #3e1000 100%) !important; }
+.pSliderGrad6 { background: radial-gradient(ellipse at 70% 50%, #a1887f 0%, #5d4037 40%, #1a0e0a 100%) !important; }
+.pSliderGrad7 { background: radial-gradient(ellipse at 70% 50%, #5c6bc0 0%, #283593 40%, #0d1240 100%) !important; }
+
+/* ── Decorative elements container (gradient slides only) ── */
+.pSliderDecor {
+  position: absolute;
+  right:    5%;
+  top:      50%;
+  transform: translateY(-50%);
+  width:    340px;
+  height:   340px;
+  z-index:  1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Mandala rings */
+.pSliderRing1, .pSliderRing2, .pSliderRing3 {
+  position:     absolute;
+  top:          50%;
+  left:         50%;
+  transform:    translate(-50%, -50%);
+  border-radius: 50%;
+  border:       1.5px dashed rgba(255,255,255,0.2);
+}
+.pSliderRing1 {
+  width: 340px; height: 340px;
+  animation: pRingSpin 40s linear infinite;
+}
+.pSliderRing2 {
+  width: 250px; height: 250px;
+  border-style: solid;
+  border-color: rgba(212,175,55,0.2);
+  animation: pRingSpin 28s linear infinite reverse;
+}
+.pSliderRing3 {
+  width: 160px; height: 160px;
+  border-color: rgba(255,255,255,0.15);
+  animation: pRingSpin 18s linear infinite;
+}
+@keyframes pRingSpin {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to   { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+/* Large category icon in center of rings */
+.pSliderDecorIcon {
+  position:    absolute;
+  top:         50%;
+  left:        50%;
+  transform:   translate(-50%, -50%);
+  font-size:   80px;
+  filter:      drop-shadow(0 4px 24px rgba(255,180,80,0.5));
+  animation:   pIconFloat 4s ease-in-out infinite;
+  z-index:     2;
+}
+@keyframes pIconFloat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    }
+  50%       { transform: translate(-50%, -54%) scale(1.06); }
+}
+
+/* OM watermark (shown on gradient slides) */
+.pSliderOm {
+  position:   absolute;
+  right:      8%;
+  bottom:     8%;
+  font-size:  60px;
+  font-family: var(--font-display);
+  color:      rgba(255,255,255,0.12);
+  line-height: 1;
+  z-index:    1;
+}
+
+@media (max-width: 768px) {
+  .pSlider         { height: min(420px, 65vh); }
+  .pSliderTitle    { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .pSliderDesc     { font-size: 14px; }
+  .pSliderArrow    { width: 38px; height: 38px; font-size: 18px; }
+  .pSliderBtnPrimary, .pSliderBtnSecondary { padding: 11px 20px; font-size: 14px; }
+  .pSliderText     { max-width: 100%; }
+  .pSliderCounter  { display: none; }
+}
+@media (max-width: 480px) {
+  .pSlider         { height: min(360px, 62vh); }
+  .pSliderActions  { flex-direction: column; gap: 10px; }
+  .pSliderMeta     { gap: 8px; }
+}
+@media (max-width: 360px) {
+  .pSlider         { height: min(320px, 58vh); }
+  .pSliderTitle    { font-size: clamp(1.3rem, 7vw, 1.8rem); }
+  .pSliderDesc     { display: none; }
+  .pSliderBtnPrimary, .pSliderBtnSecondary { padding: 9px 16px; font-size: 13px; }
+}
+
+/* ══════════════════════════════════════════════════
+   §5.5  SOCIAL PROOF COUNTER STRIP
+══════════════════════════════════════════════════ */
+.socialProof {
+  background: linear-gradient(135deg, #8B2500 0%, #c04a00 60%, #e07b2a 100%);
+  padding: 28px 0;
+  border-top: 2px solid rgba(255,255,255,0.1);
+}
+.socialProofGrid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.spItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 36px;
+  text-align: center;
+}
+.spNum {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.spLabel {
+  font-family: var(--font-devanagari);
+  font-size: 13px;
+  color: rgba(255,255,255,0.82);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+.spDivider {
+  width: 1px;
+  height: 44px;
+  background: rgba(255,255,255,0.22);
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .spItem  { padding: 10px 18px; }
+  .spNum   { font-size: 1.45rem; }
+  .spDivider { display: none; }
+  .socialProofGrid { gap: 0; }
+}
+
+/* ══════════════════════════════════════════════════
+   §10  TESTIMONIALS — Upgrades
+══════════════════════════════════════════════════ */
+.reviewsBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: linear-gradient(90deg, #fffbf0, #fff8eb);
+  border: 1.5px solid #f5c842;
+  border-radius: 40px;
+  padding: 12px 28px;
+  margin-bottom: 32px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.reviewsBarStar { font-size: 18px; letter-spacing: 2px; }
+.reviewsBarText {
+  font-family: var(--font-devanagari);
+  font-size: 14px;
+  color: #7a4500;
+}
+.reviewsBarText strong { color: #8B2500; font-weight: 800; }
+
+.verifiedCustomer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1b5e20;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 20px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.testimonialPooja {
+  display: inline-block;
+  font-family: var(--font-devanagari);
+  font-size: 12px;
+  font-weight: 600;
+  color: #c04a00;
+  background: rgba(224,123,42,0.1);
+  border: 1px solid rgba(224,123,42,0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+  width: fit-content;
+}
+.testimonialPujari {
+  display: inline-block;
+  font-family: var(--font-devanagari);
+  font-size: 12px;
+  font-weight: 600;
+  color: #2e7d32;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 20px;
+  padding: 4px 12px;
+  width: fit-content;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.testimonialPujari:hover { background: #c8e6c9; }
+
+/* ── Service card badge (NRI / Unique) ─────────────────────── */
+.serviceBadge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  opacity: 0.92;
+}

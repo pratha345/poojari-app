@@ -4,38 +4,10 @@ import AdminLayout from './AdminLayout';
 import { janamPatrikaAPI } from '../../api/index.js';
 import DateInput from '../../components/common/DateInput';
 import TimePicker from '../../components/common/TimePicker';
+import { MAHARASHTRA_DISTRICTS } from '../../data/maharashtraDistricts.js';
 import s from './JanamPatrika.module.css';
 
-// ── City database with lat/lon ────────────────────────────
-const CITIES = [
-  { name:'पुणे',          lat:18.5204, lon:73.8567 },
-  { name:'मुंबई',         lat:19.0760, lon:72.8777 },
-  { name:'नाशिक',        lat:20.0059, lon:73.7898 },
-  { name:'नागपूर',        lat:21.1458, lon:79.0882 },
-  { name:'औरंगाबाद',     lat:19.8762, lon:75.3433 },
-  { name:'कोल्हापूर',     lat:16.6975, lon:74.2282 },
-  { name:'सोलापूर',       lat:17.6805, lon:75.9064 },
-  { name:'अमरावती',      lat:20.9333, lon:77.7500 },
-  { name:'सांगली',        lat:16.8524, lon:74.5815 },
-  { name:'सातारा',        lat:17.6805, lon:73.9853 },
-  { name:'जळगाव',        lat:21.0077, lon:75.5626 },
-  { name:'अकोला',        lat:20.7002, lon:77.0082 },
-  { name:'लातूर',         lat:18.4088, lon:76.5604 },
-  { name:'धुळे',          lat:20.9026, lon:74.7749 },
-  { name:'नवी दिल्ली',   lat:28.6139, lon:77.2090 },
-  { name:'बंगळुरू',      lat:12.9716, lon:77.5946 },
-  { name:'हैदराबाद',     lat:17.3850, lon:78.4867 },
-  { name:'चेन्नई',        lat:13.0827, lon:80.2707 },
-  { name:'अहमदाबाद',    lat:23.0225, lon:72.5714 },
-  { name:'जयपूर',        lat:26.9124, lon:75.7873 },
-  { name:'लखनऊ',        lat:26.8467, lon:80.9462 },
-  { name:'कोलकाता',      lat:22.5726, lon:88.3639 },
-  { name:'इंदूर',         lat:22.7196, lon:75.8577 },
-  { name:'भोपाळ',        lat:23.2599, lon:77.4126 },
-  { name:'रत्नागिरी',    lat:16.9940, lon:73.3120 },
-  { name:'रायगड',        lat:18.5158, lon:73.1820 },
-  { name:'ठाणे',          lat:19.2183, lon:72.9781 },
-];
+const DEFAULT_DISTRICT = MAHARASHTRA_DISTRICTS.find(d => d.en === 'Amravati');
 
 // North Indian chart — house 1 always top-center-left, clockwise
 // 4×4 grid: border = 12 houses, center 2×2 = OM
@@ -361,7 +333,12 @@ function PatrikaPreview({ data, printRef }) {
 
 // ── Main Page ─────────────────────────────────────────────
 export default function JanamPatrika() {
-  const [form,    setForm]    = useState({ name:'', dob:'', tob:'', city:'', lat:'', lon:'' });
+  const [form,    setForm]    = useState({
+    name: '', dob: '', tob: '',
+    city: DEFAULT_DISTRICT.name,
+    lat:  DEFAULT_DISTRICT.lat,
+    lon:  DEFAULT_DISTRICT.lon,
+  });
   const [data,    setData]    = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving,  setSaving]  = useState(false);
@@ -369,9 +346,9 @@ export default function JanamPatrika() {
   const [tab,     setTab]     = useState('form');
   const printRef              = useRef(null);
 
-  const handleCityChange = useCallback((e) => {
-    const city = CITIES.find(c => c.name === e.target.value);
-    setForm(f => ({ ...f, city: e.target.value, lat: city ? city.lat : '', lon: city ? city.lon : '' }));
+  const handleDistrictChange = useCallback((e) => {
+    const dist = MAHARASHTRA_DISTRICTS.find(d => d.name === e.target.value);
+    setForm(f => ({ ...f, city: e.target.value, lat: dist ? dist.lat : '', lon: dist ? dist.lon : '' }));
   }, []);
 
   const handleGenerate = async (e) => {
@@ -438,10 +415,11 @@ export default function JanamPatrika() {
               <label className={s.label}>जन्म वेळ
                 <TimePicker value={form.tob} onChange={v=>setForm(f=>({...f,tob:v}))} />
               </label>
-              <label className={s.label}>जन्म स्थळ *
-                <select className={s.input} value={form.city} onChange={handleCityChange} required>
-                  <option value="">-- शहर निवडा --</option>
-                  {CITIES.map(c=><option key={c.name} value={c.name}>{c.name}</option>)}
+              <label className={s.label}>जन्म जिल्हा *
+                <select className={s.input} value={form.city} onChange={handleDistrictChange} required>
+                  {MAHARASHTRA_DISTRICTS.map(d => (
+                    <option key={d.en} value={d.name}>{d.name}</option>
+                  ))}
                 </select>
               </label>
               <label className={s.label}>Latitude

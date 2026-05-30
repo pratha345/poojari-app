@@ -8,7 +8,12 @@ export default function HallCard({ hall }) {
       <div className={styles.cardHeader}>
         <h2 className={styles.hallName}>🏛️ {hall.name}</h2>
         <div className={styles.badges}>
-          {hall.city && <span className={styles.cityBadge}>📍 {hall.city}</span>}
+          {hall.district && (
+            <span className={styles.cityBadge}>
+              📍 {hall.district}{hall.taluka ? ` › ${hall.taluka}` : ''}
+            </span>
+          )}
+          {!hall.district && hall.city && <span className={styles.cityBadge}>📍 {hall.city}</span>}
           {hall.distance != null && (
             <span className={styles.distBadge}>📏 {hall.distance} किमी</span>
           )}
@@ -64,7 +69,7 @@ export default function HallCard({ hall }) {
             </a>
             {hall.whatsapp && (
               <a
-                href={`https://wa.me/91${hall.whatsapp}`}
+                href={`https://wa.me/${hall.whatsapp?.replace(/^(\+91|91)/, '') ? '91' + hall.whatsapp.replace(/^(\+91|91)/, '') : hall.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.waBtn}

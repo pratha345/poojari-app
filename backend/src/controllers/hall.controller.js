@@ -36,14 +36,27 @@ function haversine(lat1, lng1, lat2, lng2) {
 
 exports.getHalls = async (req, res) => {
   try {
-    const { city } = req.query;
+    const { city, district, taluka } = req.query;
     let query = 'SELECT * FROM halls';
     const params = [];
-    if (city && city.trim()) {
-      query += ' WHERE city = ?';
-      params.push(city.trim());
+    const conditions = [];
+
+    if (district && district.trim()) {
+      conditions.push('district = ?');
+      params.push(district.trim());
     }
+    if (taluka && taluka.trim()) {
+      conditions.push('taluka = ?');
+      params.push(taluka.trim());
+    }
+    if (!district && !taluka && city && city.trim()) {
+      conditions.push('city LIKE ?');
+      params.push(`%${city.trim()}%`);
+    }
+
+    if (conditions.length > 0) query += ' WHERE ' + conditions.join(' AND ');
     query += ' ORDER BY created_at DESC';
+
     const [rows] = await pool.query(query, params);
     res.json({ success: true, data: rows });
   } catch (err) {
@@ -142,11 +155,11 @@ exports.getAllHallsAdmin = async (req, res) => {
 
 exports.createHall = async (req, res) => {
   try {
-    const { name, phone, whatsapp, city, address, capacity, price_per_day, latitude, longitude } = req.body;
+    const { name, phone, whatsapp, district, taluka, city, address, capacity, price_per_day, latitude, longitude } = req.body;
     if (!name || !phone) return res.status(400).json({ success: false, message: 'नाव आणि फोन आवश्यक आहे.' });
     const [result] = await pool.query(
-      'INSERT INTO halls (name, phone, whatsapp, city, address, capacity, price_per_day, latitude, longitude) VALUES (?,?,?,?,?,?,?,?,?)',
-      [name, phone, whatsapp || null, city || null, address || null, capacity || null, price_per_day || null, latitude || null, longitude || null]
+      'INSERT INTO halls (name, phone, whatsapp, district, taluka, city, address, capacity, price_per_day, latitude, longitude) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+      [name, phone, whatsapp || null, district || null, taluka || null, city || null, address || null, capacity || null, price_per_day || null, latitude || null, longitude || null]
     );
     res.json({ success: true, message: 'हॉल यशस्वीपणे जोडला.', id: result.insertId });
   } catch (err) {
@@ -158,10 +171,10 @@ exports.createHall = async (req, res) => {
 exports.updateHall = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, phone, whatsapp, city, address, capacity, price_per_day, latitude, longitude } = req.body;
+    const { name, phone, whatsapp, district, taluka, city, address, capacity, price_per_day, latitude, longitude } = req.body;
     await pool.query(
-      'UPDATE halls SET name=?, phone=?, whatsapp=?, city=?, address=?, capacity=?, price_per_day=?, latitude=?, longitude=? WHERE id=?',
-      [name, phone, whatsapp || null, city || null, address || null, capacity || null, price_per_day || null, latitude || null, longitude || null, id]
+      'UPDATE halls SET name=?, phone=?, whatsapp=?, district=?, taluka=?, city=?, address=?, capacity=?, price_per_day=?, latitude=?, longitude=? WHERE id=?',
+      [name, phone, whatsapp || null, district || null, taluka || null, city || null, address || null, capacity || null, price_per_day || null, latitude || null, longitude || null, id]
     );
     res.json({ success: true, message: 'हॉल यशस्वीपणे अपडेट केला.' });
   } catch (err) {

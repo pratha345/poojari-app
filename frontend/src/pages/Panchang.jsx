@@ -1,27 +1,47 @@
 // src/pages/Panchang.jsx — हिंदू पंचांग + कुंडली पृष्ठ
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import ClockTimePicker from '../components/common/ClockTimePicker';
 import SEOHead from '../components/SEOHead';
 import { panchangAPI } from '../api/index.js';
+import { getSessionId } from '../utils/session.js';
 import styles from '../styles/Panchang.module.css';
 
-const PANCHANG_SCHEMA = {
-  '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  'name': 'आजचा पंचांग | Hindu Panchang Today',
-  'description': 'आजचे तिथी, नक्षत्र, योग, करण, राहुकाळ व कुंडली माहिती. पुण्यासह महाराष्ट्रातील सर्व शहरांसाठी दैनंदिन पंचांग.',
-  'url': 'https://pojjari.com/panchang',
-  'inLanguage': 'mr',
-  'breadcrumb': {
-    '@type': 'BreadcrumbList',
-    'itemListElement': [
-      { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': 'https://pojjari.com/' },
-      { '@type': 'ListItem', 'position': 2, 'name': 'पंचांग',      'item': 'https://pojjari.com/panchang' }
-    ]
-  }
-};
+function buildPanchangSchema(dateStr) {
+  const d = dateStr || new Date().toISOString().split('T')[0];
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        'name': `आजचा पंचांग ${d} | Hindu Panchang Today`,
+        'description': 'आजचे तिथी, नक्षत्र, योग, करण, राहुकाळ व कुंडली माहिती. महाराष्ट्रातील सर्व जिल्ह्यांसाठी दैनंदिन हिंदू पंचांग.',
+        'url': 'https://pojjari.com/panchang',
+        'inLanguage': 'mr',
+        'dateModified': d,
+        'breadcrumb': {
+          '@type': 'BreadcrumbList',
+          'itemListElement': [
+            { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': 'https://pojjari.com/' },
+            { '@type': 'ListItem', 'position': 2, 'name': 'पंचांग', 'item': 'https://pojjari.com/panchang' },
+          ],
+        },
+      },
+      {
+        '@type': 'FAQPage',
+        'mainEntity': [
+          { '@type': 'Question', 'name': 'आजची तिथी काय आहे?', 'acceptedAnswer': { '@type': 'Answer', 'text': 'पूजारी पंचांगवर आजची तिथी, नक्षत्र, योग, करण आणि राहुकाळ पाहता येतो. तुमचा जिल्हा निवडा आणि अचूक माहिती मिळवा.' } },
+          { '@type': 'Question', 'name': 'आजचा शुभ मुहूर्त कोणता?', 'acceptedAnswer': { '@type': 'Answer', 'text': 'पूजारी पंचांगवर आजचा अभिजित मुहूर्त, अमृत काळ आणि इतर शुभ मुहूर्त दिसतात. राहुकाळ, यमगंड टाळून शुभ काळात कार्य करावे.' } },
+          { '@type': 'Question', 'name': 'राहुकाळ म्हणजे काय?', 'acceptedAnswer': { '@type': 'Answer', 'text': 'राहुकाळ हा दिवसातील अशुभ काळ मानला जातो. या काळात नवीन काम, प्रवास किंवा शुभ कार्य सुरू करू नये. दर वारानुसार राहुकाळ वेगळा असतो.' } },
+          { '@type': 'Question', 'name': 'गुढीपाडव्याचा मुहूर्त कधी आहे?', 'acceptedAnswer': { '@type': 'Answer', 'text': 'गुढीपाडवा 2026: १९ मार्च 2026. सकाळी ६:१५ ते ७:३० हा शुभ मुहूर्त. पूजारी पंचांगवर सर्व सणांचे मुहूर्त आगाऊ पाहता येतात.' } },
+        ],
+      },
+    ],
+  };
+}
 
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -32,16 +52,43 @@ const MONTHS_MR = [
   'जुलै','ऑगस्ट','सप्टेंबर','ऑक्टोबर','नोव्हेंबर','डिसेंबर',
 ];
 
-const CITIES = [
-  { name: 'पुणे',      lat: '18.5204', lon: '73.8567' },
-  { name: 'मुंबई',     lat: '19.0760', lon: '72.8777' },
-  { name: 'नाशिक',    lat: '20.0059', lon: '73.7898' },
-  { name: 'नागपूर',    lat: '21.1458', lon: '79.0882' },
-  { name: 'औरंगाबाद', lat: '19.8762', lon: '75.3433' },
-  { name: 'कोल्हापूर', lat: '16.6975', lon: '74.2282' },
-  { name: 'रत्नागिरी', lat: '16.9902', lon: '73.3120' },
-  { name: 'सोलापूर',   lat: '17.6805', lon: '75.9064' },
-  { name: 'नवी दिल्ली',lat: '28.6139', lon: '77.2090' },
+const DISTRICTS = [
+  { name: 'पुणे',          eng: 'pune poona',                 lat: '18.5204', lon: '73.8567' },
+  { name: 'मुंबई शहर',     eng: 'mumbai city bombay shahar',  lat: '18.9388', lon: '72.8354' },
+  { name: 'मुंबई उपनगर',  eng: 'mumbai suburban upnagar',    lat: '19.0760', lon: '72.8777' },
+  { name: 'ठाणे',          eng: 'thane thana',                lat: '19.2183', lon: '72.9781' },
+  { name: 'पालघर',         eng: 'palghar',                    lat: '19.6967', lon: '72.7697' },
+  { name: 'रायगड',         eng: 'raigad raigadh',             lat: '18.5158', lon: '73.1186' },
+  { name: 'रत्नागिरी',     eng: 'ratnagiri',                  lat: '16.9902', lon: '73.3120' },
+  { name: 'सिंधुदुर्ग',    eng: 'sindhudurg',                 lat: '16.3490', lon: '73.8530' },
+  { name: 'सातारा',        eng: 'satara',                     lat: '17.6805', lon: '74.0183' },
+  { name: 'सांगली',        eng: 'sangli',                     lat: '16.8524', lon: '74.5815' },
+  { name: 'कोल्हापूर',     eng: 'kolhapur',                   lat: '16.6975', lon: '74.2282' },
+  { name: 'सोलापूर',       eng: 'solapur sholapur',           lat: '17.6805', lon: '75.9064' },
+  { name: 'नाशिक',        eng: 'nashik nasik',               lat: '20.0059', lon: '73.7898' },
+  { name: 'धुळे',          eng: 'dhule dhulia',               lat: '20.9042', lon: '74.7749' },
+  { name: 'नंदुरबार',      eng: 'nandurbar',                  lat: '21.3667', lon: '74.2333' },
+  { name: 'जळगाव',        eng: 'jalgaon',                    lat: '21.0077', lon: '75.5626' },
+  { name: 'अहमदनगर',      eng: 'ahmednagar ahmadnagar',      lat: '19.0950', lon: '74.7493' },
+  { name: 'औरंगाबाद',     eng: 'aurangabad',                 lat: '19.8762', lon: '75.3433' },
+  { name: 'जालना',         eng: 'jalna',                      lat: '19.8415', lon: '75.8816' },
+  { name: 'बीड',           eng: 'beed bid',                   lat: '18.9893', lon: '75.7602' },
+  { name: 'लातूर',         eng: 'latur',                      lat: '18.4088', lon: '76.5604' },
+  { name: 'उस्मानाबाद',    eng: 'osmanabad',                  lat: '18.1860', lon: '76.0388' },
+  { name: 'नांदेड',        eng: 'nanded',                     lat: '19.1383', lon: '77.2985' },
+  { name: 'परभणी',         eng: 'parbhani',                   lat: '19.2704', lon: '76.6076' },
+  { name: 'हिंगोली',       eng: 'hingoli',                    lat: '19.7177', lon: '77.1548' },
+  { name: 'नागपूर',        eng: 'nagpur',                     lat: '21.1458', lon: '79.0882' },
+  { name: 'वर्धा',         eng: 'wardha',                     lat: '20.7453', lon: '78.5966' },
+  { name: 'यवतमाळ',       eng: 'yavatmal yawatmal',          lat: '20.3888', lon: '78.1204' },
+  { name: 'अमरावती',       eng: 'amravati amraoti',           lat: '20.9333', lon: '77.7500' },
+  { name: 'अकोला',         eng: 'akola',                      lat: '20.7063', lon: '77.0024' },
+  { name: 'वाशिम',         eng: 'washim',                     lat: '20.1000', lon: '77.1333' },
+  { name: 'बुलढाणा',       eng: 'buldhana',                   lat: '20.5333', lon: '76.1833' },
+  { name: 'चंद्रपूर',      eng: 'chandrapur',                 lat: '19.9615', lon: '79.2961' },
+  { name: 'गडचिरोली',      eng: 'gadchiroli',                 lat: '20.1809', lon: '80.0000' },
+  { name: 'गोंदिया',       eng: 'gondia',                     lat: '21.4592', lon: '80.1953' },
+  { name: 'भंडारा',        eng: 'bhandara',                   lat: '21.1667', lon: '79.6500' },
 ];
 
 // North Indian Kundali: house number → { rashi (Marathi), col, row } in 4×4 grid
@@ -240,9 +287,9 @@ export default function Panchang() {
   const [date,       setDate]       = useState(todayIST());
   const [time,       setTime]       = useState(nowISTTime());
   const [showClock,  setShowClock]  = useState(false);
-  const [lat,        setLat]        = useState('');
-  const [lon,        setLon]        = useState('');
-  const [cityName,   setCityName]   = useState('');
+  const [lat,        setLat]        = useState('18.5204');
+  const [lon,        setLon]        = useState('73.8567');
+  const [cityName,   setCityName]   = useState('पुणे');
   const [data,       setData]       = useState(null);
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState('');
@@ -251,7 +298,47 @@ export default function Panchang() {
   const [animKey,    setAnimKey]    = useState(0);
   const [lastRefresh,setLastRefresh]= useState('');
 
+  // Rating state
+  const [panRating,  setPanRating]  = useState({ helpful: 0, not_helpful: 0, user_vote: null });
+  const [ratingDone, setRatingDone] = useState(false);
+
+  // searchable district dropdown
+  const [query,     setQuery]     = useState('पुणे');
+  const [open,      setOpen]      = useState(false);
+  const [highlight, setHighlight] = useState(0);
+  const dropRef  = useRef(null);
+  const inputRef = useRef(null);
   const debounceRef = useRef(null);
+
+  const filteredDistricts = query.trim()
+    ? (() => {
+        const q = query.trim().toLowerCase();
+        return DISTRICTS.filter(d =>
+          d.name.includes(q) || d.eng.toLowerCase().includes(q)
+        );
+      })()
+    : DISTRICTS;
+
+  useEffect(() => {
+    const handler = e => {
+      if (dropRef.current && !dropRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const selectDistrict = d => {
+    setCityName(d.name); setLat(d.lat); setLon(d.lon);
+    setQuery(d.name); setOpen(false); setHighlight(0);
+  };
+
+  const handleDropKey = e => {
+    if (!open) { setOpen(true); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setHighlight(h => Math.min(h + 1, filteredDistricts.length - 1)); }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); setHighlight(h => Math.max(h - 1, 0)); }
+    if (e.key === 'Enter')     { e.preventDefault(); if (filteredDistricts[highlight]) selectDistrict(filteredDistricts[highlight]); }
+    if (e.key === 'Escape')    { setOpen(false); }
+  };
 
   // ── Fetch ───────────────────────────────────────────────────
   const fetchPanchang = useCallback(async (d, la, lo, t) => {
@@ -281,6 +368,31 @@ export default function Panchang() {
     return () => clearTimeout(debounceRef.current);
   }, [date, time, lat, lon, fetchPanchang]);
 
+  // Load rating for current date
+  useEffect(() => {
+    const sid = getSessionId();
+    panchangAPI.getRating(date, sid)
+      .then(r => {
+        const d = r.data.data;
+        setPanRating({ helpful: d.helpful || 0, not_helpful: d.not_helpful || 0, user_vote: d.user_vote });
+        if (d.user_vote !== null) setRatingDone(true);
+      })
+      .catch(() => {});
+  }, [date]);
+
+  // ── Panchang Rating ──────────────────────────────────────────
+  const handlePanchangRate = async (is_helpful) => {
+    if (ratingDone) return;
+    try {
+      const sid = getSessionId();
+      const res = await panchangAPI.rate(date, is_helpful, sid);
+      const d = res.data.data;
+      setPanRating({ helpful: d.helpful, not_helpful: d.not_helpful, user_vote: is_helpful });
+      setRatingDone(true);
+      toast.success(is_helpful ? 'धन्यवाद! 🙏 तुमचा अभिप्राय नोंदवला.' : 'अभिप्राय नोंदवला. सुधारणा करू. 🙏');
+    } catch { toast.error('अभिप्राय देताना त्रुटी झाली.'); }
+  };
+
   // ── Geolocation ─────────────────────────────────────────────
   const detectLocation = () => {
     if (!navigator.geolocation) { setError('ब्राउझर GPS समर्थित नाही.'); return; }
@@ -289,7 +401,8 @@ export default function Panchang() {
       pos => {
         const la = pos.coords.latitude.toFixed(4);
         const lo = pos.coords.longitude.toFixed(4);
-        setLat(la); setLon(lo); setCityName('');
+        setLat(la); setLon(lo);
+        setCityName('माझे स्थान'); setQuery('माझे स्थान');
         setLocLoading(false);
         fetchPanchang(date, la, lo, time);
       },
@@ -298,20 +411,15 @@ export default function Panchang() {
     );
   };
 
-  const handleCitySelect = c => {
-    setLat(c.lat); setLon(c.lon); setCityName(c.name);
-    fetchPanchang(date, c.lat, c.lon, time);
-  };
-
   // ── Render ──────────────────────────────────────────────────
   return (
     <div className={`${styles.page} ${dark ? styles.dark : ''}`}>
       <SEOHead
-        title="आजचा पंचांग | Hindu Panchang Today - तिथी, नक्षत्र, योग"
-        description="आजचे तिथी, नक्षत्र, योग, करण, राहुकाळ व कुंडली माहिती. पुणे, मुंबई, नाशिक, नागपूर सह महाराष्ट्रातील सर्व शहरांसाठी दैनंदिन हिंदू पंचांग."
-        keywords="आजचा पंचांग, tithi today, nakshatra today, panchang 2025, हिंदू पंचांग, आजची तिथी, आजचे नक्षत्र, राहुकाळ, योग करण, कुंडली, hindu calendar marathi"
+        title={`आजचा पंचांग ${formatMR(date)} | आजचा शुभ मुहूर्त मराठी — पूजारी`}
+        description={`${formatMR(date)} चा हिंदू पंचांग — तिथी, नक्षत्र, योग, करण, राहुकाळ, अभिजित मुहूर्त. पुणे, मुंबई, नाशिक, नागपूरसह महाराष्ट्रातील सर्व ३६ जिल्ह्यांसाठी दैनंदिन पंचांग मराठीत.`}
+        keywords="आजचा पंचांग, आजचा मुहूर्त मराठी, शुभ मुहूर्त आज, आजची तिथी मराठी, आजचे नक्षत्र, राहुकाळ आज, hindu panchang today marathi, tithi today marathi, nakshatra today, panchang 2026, अभिजित मुहूर्त, आजचा योग, आजचे करण, कुंडली मराठी"
         canonical="/panchang"
-        schema={PANCHANG_SCHEMA}
+        schema={buildPanchangSchema(date)}
       />
       <Header />
 
@@ -326,15 +434,28 @@ export default function Panchang() {
                 <p className={styles.heroSub}>तिथी · नक्षत्र · योग · करण · लग्न · कुंडली</p>
               </div>
             </div>
-            {/* Dark mode toggle */}
-            <button
-              className={styles.darkToggle}
-              onClick={() => setDark(d => !d)}
-              title={dark ? 'उजेड मोड' : 'अंधार मोड'}
-            >
-              {dark ? '☀️' : '🌙'}
-              <span>{dark ? 'उजेड' : 'अंधार'}</span>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* Muhurat button */}
+              <Link to="/muhurat" style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                padding: '9px 18px', borderRadius: '22px',
+                background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(6px)',
+                border: '1.5px solid rgba(255,255,255,0.35)',
+                color: '#fff', fontWeight: '700', fontSize: '13px',
+                textDecoration: 'none', transition: 'all 0.2s',
+              }}>
+                🪔 मुहूर्त
+              </Link>
+              {/* Dark mode toggle */}
+              <button
+                className={styles.darkToggle}
+                onClick={() => setDark(d => !d)}
+                title={dark ? 'उजेड मोड' : 'अंधार मोड'}
+              >
+                {dark ? '☀️' : '🌙'}
+                <span>{dark ? 'उजेड' : 'अंधार'}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -380,50 +501,53 @@ export default function Panchang() {
               </span>
             </div>
 
-            {/* Location */}
+            {/* District searchable dropdown */}
             <div className={styles.controlGroup}>
-              <label className={styles.ctrlLabel}>📍 स्थान (ऐच्छिक)</label>
-              <div className={styles.locRow}>
-                <input
-                  type="text"
-                  className={styles.locInput}
-                  placeholder="अक्षांश"
-                  value={lat}
-                  onChange={e => setLat(e.target.value)}
-                />
-                <input
-                  type="text"
-                  className={styles.locInput}
-                  placeholder="रेखांश"
-                  value={lon}
-                  onChange={e => setLon(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className={styles.gpsBtn}
-                  onClick={detectLocation}
-                  disabled={locLoading}
-                  title="GPS वरून शोधा"
-                >
+              <label className={styles.ctrlLabel}>📍 जिल्हा निवडा</label>
+              <div className={styles.districtPickerRow}>
+                <div className={styles.searchDrop} ref={dropRef}>
+                  <div className={styles.searchInputWrap}>
+                    <span className={styles.searchInputIcon}>🔍</span>
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      className={styles.searchInput}
+                      placeholder="जिल्हा / District..."
+                      value={query}
+                      onChange={e => { setQuery(e.target.value); setOpen(true); setHighlight(0); }}
+                      onFocus={() => setOpen(true)}
+                      onKeyDown={handleDropKey}
+                      autoComplete="off"
+                    />
+                    {query && (
+                      <button className={styles.clearBtn}
+                        onClick={() => { setQuery(''); setOpen(true); inputRef.current?.focus(); }}>✕</button>
+                    )}
+                  </div>
+                  {open && filteredDistricts.length > 0 && (
+                    <ul className={styles.dropList}>
+                      {filteredDistricts.map((d, i) => (
+                        <li key={d.name}
+                          className={`${styles.dropItem} ${i === highlight ? styles.dropItemActive : ''} ${cityName === d.name ? styles.dropItemSelected : ''}`}
+                          onMouseDown={() => selectDistrict(d)}
+                          onMouseEnter={() => setHighlight(i)}>
+                          <span className={styles.dropItemIcon}>📍</span>
+                          {d.name}
+                          {cityName === d.name && <span className={styles.dropItemCheck}>✓</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {open && filteredDistricts.length === 0 && (
+                    <div className={styles.dropEmpty}>"{query}" सापडला नाही</div>
+                  )}
+                </div>
+                <button type="button" className={styles.gpsBtn}
+                  onClick={detectLocation} disabled={locLoading} title="GPS वरून शोधा">
                   {locLoading ? '⏳' : '🎯'}
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* City pills */}
-          <div className={styles.cityRow}>
-            <span className={styles.cityRowLabel}>शहर:</span>
-            {CITIES.map(c => (
-              <button
-                key={c.name}
-                type="button"
-                onClick={() => handleCitySelect(c)}
-                className={`${styles.cityPill} ${cityName === c.name ? styles.cityPillActive : ''}`}
-              >
-                {c.name}
-              </button>
-            ))}
           </div>
 
           {/* Auto-refresh indicator */}
@@ -576,6 +700,36 @@ export default function Panchang() {
               />
             </section>
 
+          </div>
+        )}
+
+        {/* ── Panchang Rating Widget ─────────────────────── */}
+        {data && (
+          <div className={styles.panchangRatingBox}>
+            {!ratingDone ? (
+              <>
+                <p className={styles.panchangRatingTitle}>
+                  📅 आजचे पंचांग उपयुक्त वाटले का?
+                </p>
+                <div className={styles.panchangRatingBtns}>
+                  <button className={styles.panRateYes} onClick={() => handlePanchangRate(true)}>
+                    👍 हो, उपयुक्त होते
+                  </button>
+                  <button className={styles.panRateNo} onClick={() => handlePanchangRate(false)}>
+                    👎 नाही, सुधारणा हवी
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className={styles.panchangRatingDone}>
+                {panRating.user_vote
+                  ? '🙏 धन्यवाद! तुमचा अभिप्राय नोंदवला.'
+                  : '🙏 अभिप्राय नोंदवला. सुधारणा करू.'}
+                <div className={styles.panRatingStats}>
+                  👍 {panRating.helpful} &nbsp;·&nbsp; 👎 {panRating.not_helpful}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

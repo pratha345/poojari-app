@@ -104,21 +104,65 @@ exports.createTenant = async (req, res) => {
 exports.updateTenant = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, domain, plan, is_active, logo_url } = req.body;
+    const { name, domain, plan, is_active, logo_url, city, phone, contact_name } = req.body;
 
     await pool.query(
       `UPDATE tenants SET
-         name      = COALESCE(?, name),
-         domain    = COALESCE(?, domain),
-         plan      = COALESCE(?, plan),
-         is_active = COALESCE(?, is_active),
-         logo_url  = COALESCE(?, logo_url)
+         name         = COALESCE(?, name),
+         domain       = COALESCE(?, domain),
+         plan         = COALESCE(?, plan),
+         is_active    = COALESCE(?, is_active),
+         logo_url     = COALESCE(?, logo_url),
+         city         = COALESCE(?, city),
+         phone        = COALESCE(?, phone),
+         contact_name = COALESCE(?, contact_name)
        WHERE id = ?`,
-      [name, domain, plan, is_active, logo_url, id]
+      [name, domain, plan, is_active, logo_url, city, phone, contact_name, id]
     );
     return success(res, {}, 'Tenant अपडेट केला.');
   } catch (err) {
     return error(res, 'Tenant अपडेट करताना त्रुटी झाली.');
+  }
+};
+
+// ── Update Plan (manual, no payment) ─────────────────────────
+exports.updatePlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { plan, months } = req.body;
+
+    if (!['trial', 'basic', 'premium'].includes(plan))
+      return error(res, 'Plan trial / basic / premium असावा.', 400);
+
+    const [[tenant]] = await pool.query('SELECT id FROM tenants WHERE id=?', [id]);
+    if (!tenant) return error(res, 'Tenant सापडला नाही.', 404);
+
+    const now = new Date();
+    let trial_ends_at   = null;
+    let plan_expires_at = null;
+
+    if (plan === 'trial') {
+      const days = months ? months * 30 : 30;
+      trial_ends_at = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+    } else if (plan === 'basic' || plan === 'premium') {
+      const m = parseInt(months) || 1;
+      plan_expires_at = new Date(now);
+      plan_expires_at.setMonth(plan_expires_at.getMonth() + m);
+    }
+
+    await pool.query(
+      `UPDATE tenants SET plan=?, trial_ends_at=?, plan_expires_at=?, is_active=TRUE WHERE id=?`,
+      [plan, trial_ends_at, plan_expires_at, id]
+    );
+
+    return success(res, {
+      plan,
+      trial_ends_at:   trial_ends_at   ? trial_ends_at.toISOString().split('T')[0]   : null,
+      plan_expires_at: plan_expires_at ? plan_expires_at.toISOString().split('T')[0] : null,
+    }, `Plan "${plan}" यशस्वीरित्या update केला.`);
+  } catch (err) {
+    console.error(err);
+    return error(res, 'Plan update करताना त्रुटी झाली.');
   }
 };
 
@@ -150,6 +194,91 @@ exports.getTenantStats = async (req, res) => {
     });
   } catch (err) {
     return error(res, 'आकडेवारी मिळवताना त्रुटी झाली.');
+  }
+};
+
+// ── Revenue Report ────────────────────────────────────────────
+exports.getRevenueReport = async (req, res) => {
+  try {
+    const { year, month, tenant_id } = req.query;
+
+    // Build date filter
+    let dateFilter = '';
+    const dateParams = [];
+    if (year && month) {
+      dateFilter = 'AND YEAR(b.created_at)=? AND MONTH(b.created_at)=?';
+      dateParams.push(year, month);
+    } else if (year) {
+      dateFilter = 'AND YEAR(b.created_at)=?';
+      dateParams.push(year);
+    }
+    const tenantFilter = tenant_id ? 'AND b.tenant_id=?' : '';
+    if (tenant_id) dateParams.push(tenant_id);
+
+    // Summary totals
+    const [[summary]] = await pool.query(
+      `SELECT
+         COUNT(*)                                                      AS total_bookings,
+         COUNT(CASE WHEN b.payment_status IN ('paid','cash_paid') THEN 1 END) AS paid_bookings,
+         COUNT(CASE WHEN b.payment_status='unpaid' THEN 1 END)        AS unpaid_bookings,
+         COUNT(CASE WHEN b.payment_method='cash' THEN 1 END)          AS cash_bookings,
+         COUNT(CASE WHEN b.payment_method='online' THEN 1 END)        AS online_bookings,
+         COALESCE(SUM(b.total_amount),0)                              AS gross_revenue,
+         COALESCE(SUM(CASE WHEN b.payment_status='paid' THEN COALESCE(b.actual_amount, b.total_amount) ELSE 0 END),0)      AS online_collected,
+         COALESCE(SUM(CASE WHEN b.payment_status='cash_paid' THEN COALESCE(b.actual_amount, b.total_amount) ELSE 0 END),0) AS cash_collected,
+         COALESCE(SUM(CASE WHEN b.payment_status IN ('paid','cash_paid') THEN b.platform_fee ELSE 0 END),0) AS platform_commission
+       FROM bookings b WHERE 1=1 ${dateFilter} ${tenantFilter}`,
+      dateParams
+    );
+
+    // Monthly breakdown
+    const [monthly] = await pool.query(
+      `SELECT
+         YEAR(b.created_at)                          AS year,
+         MONTH(b.created_at)                         AS month_num,
+         DATE_FORMAT(b.created_at,'%b %Y')           AS month_label,
+         COUNT(*)                                    AS total_bookings,
+         COUNT(CASE WHEN b.payment_status IN ('paid','cash_paid') THEN 1 END) AS paid_bookings,
+         COALESCE(SUM(CASE WHEN b.payment_status='paid'
+           THEN COALESCE(b.actual_amount, b.total_amount) ELSE 0 END),0)      AS online_revenue,
+         COALESCE(SUM(CASE WHEN b.payment_status='cash_paid'
+           THEN COALESCE(b.actual_amount, b.total_amount) ELSE 0 END),0)      AS cash_revenue,
+         COALESCE(SUM(CASE WHEN b.payment_status IN ('paid','cash_paid')
+           THEN b.platform_fee ELSE 0 END),0)                                 AS platform_fee
+       FROM bookings b WHERE 1=1 ${tenantFilter}
+       GROUP BY YEAR(b.created_at), MONTH(b.created_at)
+       ORDER BY year DESC, month_num DESC
+       LIMIT 24`,
+      tenant_id ? [tenant_id] : []
+    );
+
+    // Per tenant breakdown
+    const [byTenant] = await pool.query(
+      `SELECT t.id, t.name, t.plan,
+         COUNT(b.id)                                          AS total_bookings,
+         COUNT(CASE WHEN b.payment_status IN ('paid','cash_paid') THEN 1 END) AS paid_bookings,
+         COALESCE(SUM(CASE WHEN b.payment_status='paid'
+           THEN COALESCE(b.actual_amount, b.total_amount) ELSE 0 END),0)      AS online_revenue,
+         COALESCE(SUM(CASE WHEN b.payment_status='cash_paid'
+           THEN COALESCE(b.actual_amount, b.total_amount) ELSE 0 END),0)      AS cash_revenue,
+         COALESCE(SUM(CASE WHEN b.payment_status IN ('paid','cash_paid')
+           THEN b.platform_fee ELSE 0 END),0)                                 AS platform_commission
+       FROM tenants t
+       LEFT JOIN bookings b ON b.tenant_id=t.id ${dateFilter ? 'AND '+dateFilter.replace('AND ','') : ''}
+       GROUP BY t.id
+       ORDER BY (online_revenue + cash_revenue) DESC`,
+      dateParams
+    );
+
+    // Year list for filter dropdown
+    const [years] = await pool.query(
+      'SELECT DISTINCT YEAR(created_at) AS y FROM bookings ORDER BY y DESC'
+    );
+
+    return success(res, { summary, monthly, byTenant, years: years.map(r => r.y) });
+  } catch (err) {
+    console.error(err);
+    return error(res, 'Revenue report मिळवताना त्रुटी झाली.');
   }
 };
 

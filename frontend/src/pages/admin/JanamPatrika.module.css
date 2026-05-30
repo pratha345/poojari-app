@@ -132,7 +132,26 @@
   .niGrid    { max-width: 200px; }
 }
 
+@media (max-width: 768px) {
+  .pageTitle  { font-size: 1.25rem; }
+  .tabs       { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab        { font-size: 15px; padding: 10px 16px; white-space: nowrap; }
+  .form       { padding: 16px; }
+  .formGrid   { grid-template-columns: 1fr; gap: 12px; }
+  .formActions { flex-wrap: wrap; }
+  .generateBtn { font-size: 15px; padding: 12px 24px; }
+  .actionBar  { gap: 8px; }
+  .printBtn, .saveBtn, .editBtn { font-size: 14px; padding: 10px 16px; }
+  .patrika    { padding: 18px 16px; }
+}
 @media (max-width: 600px) {
   .formGrid { grid-template-columns: 1fr; }
   .pCharts  { grid-template-columns: 1fr; }
+  .generateBtn { width: 100%; font-size: 16px; }
+}
+@media (max-width: 480px) {
+  .patrika  { padding: 14px 12px; }
+  .pTitle   { font-size: 1.2rem; }
+  .pCharts  { grid-template-columns: 1fr; gap: 14px; }
 }

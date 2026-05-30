@@ -12,7 +12,7 @@ const norm  = d => ((d % 360) + 360) % 360;
 
 function lahiriAyanamsha(utcDate) {
   const JD = Astro.MakeTime(utcDate).tt + 2451545.0;
-  return 23.85 + (JD - 2451545.0) * 50.27 / (36525.0 * 3600.0);
+  return 23.85 + (JD - 2451545.0) * 50.27 / (365.25 * 3600.0);
 }
 
 function toUtcDate(dob, tob = '12:00', tzOffset = 330) {
@@ -77,15 +77,15 @@ function getAllPlanets(utcDate) {
   const rahuT  = rahuMeanLon(t);
 
   return [
-    { ...PLANETS[0], tropical: geoLon('Sun'),                  rashiIdx: sid(geoLon('Sun')),                 degree: deg(geoLon('Sun'))    },
-    { ...PLANETS[1], tropical: moon.lon,                        rashiIdx: sid(moon.lon),                      degree: deg(moon.lon)         },
-    { ...PLANETS[2], tropical: Astro.EclipticLongitude('Mars',    t), rashiIdx: sid(Astro.EclipticLongitude('Mars',    t)), degree: deg(Astro.EclipticLongitude('Mars',    t)) },
-    { ...PLANETS[3], tropical: Astro.EclipticLongitude('Mercury', t), rashiIdx: sid(Astro.EclipticLongitude('Mercury', t)), degree: deg(Astro.EclipticLongitude('Mercury', t)) },
-    { ...PLANETS[4], tropical: Astro.EclipticLongitude('Jupiter', t), rashiIdx: sid(Astro.EclipticLongitude('Jupiter', t)), degree: deg(Astro.EclipticLongitude('Jupiter', t)) },
-    { ...PLANETS[5], tropical: Astro.EclipticLongitude('Venus',   t), rashiIdx: sid(Astro.EclipticLongitude('Venus',   t)), degree: deg(Astro.EclipticLongitude('Venus',   t)) },
-    { ...PLANETS[6], tropical: Astro.EclipticLongitude('Saturn',  t), rashiIdx: sid(Astro.EclipticLongitude('Saturn',  t)), degree: deg(Astro.EclipticLongitude('Saturn',  t)) },
-    { ...PLANETS[7], tropical: rahuT,                           rashiIdx: sid(rahuT),                         degree: deg(rahuT)            },
-    { ...PLANETS[8], tropical: norm(rahuT + 180),               rashiIdx: sid(norm(rahuT + 180)),             degree: deg(norm(rahuT + 180)) },
+    { ...PLANETS[0], tropical: geoLon('Sun'),     rashiIdx: sid(geoLon('Sun')),     degree: deg(geoLon('Sun'))     },
+    { ...PLANETS[1], tropical: moon.lon,           rashiIdx: sid(moon.lon),          degree: deg(moon.lon)          },
+    { ...PLANETS[2], tropical: geoLon('Mars'),     rashiIdx: sid(geoLon('Mars')),    degree: deg(geoLon('Mars'))    },
+    { ...PLANETS[3], tropical: geoLon('Mercury'),  rashiIdx: sid(geoLon('Mercury')), degree: deg(geoLon('Mercury')) },
+    { ...PLANETS[4], tropical: geoLon('Jupiter'),  rashiIdx: sid(geoLon('Jupiter')), degree: deg(geoLon('Jupiter')) },
+    { ...PLANETS[5], tropical: geoLon('Venus'),    rashiIdx: sid(geoLon('Venus')),   degree: deg(geoLon('Venus'))   },
+    { ...PLANETS[6], tropical: geoLon('Saturn'),   rashiIdx: sid(geoLon('Saturn')),  degree: deg(geoLon('Saturn'))  },
+    { ...PLANETS[7], tropical: rahuT,               rashiIdx: sid(rahuT),             degree: deg(rahuT)             },
+    { ...PLANETS[8], tropical: norm(rahuT + 180),   rashiIdx: sid(norm(rahuT + 180)), degree: deg(norm(rahuT + 180)) },
   ];
 }
 
@@ -98,9 +98,9 @@ function getLagna(utcDate, lat, lon) {
   const eps  = 23.4392911 - 0.013005 * T;
 
   const ramcR = toRad(ramc), epsR = toRad(eps), latR = toRad(lat);
-  let asc = toDeg(Math.atan2(-Math.cos(ramcR), Math.sin(ramcR) * Math.cos(epsR) + Math.tan(latR) * Math.sin(epsR)));
+  // atan2(cos(RAMC), -(sin(RAMC)*cos(ε)+tan(φ)*sin(ε))) = Swiss Ephemeris standard for Ascendant
+  let asc = toDeg(Math.atan2(Math.cos(ramcR), -(Math.sin(ramcR) * Math.cos(epsR) + Math.tan(latR) * Math.sin(epsR))));
   if (asc < 0) asc += 360;
-  if (Math.sin(ramcR) < 0) asc += 180;
   asc = norm(asc);
 
   const ayan    = lahiriAyanamsha(utcDate);

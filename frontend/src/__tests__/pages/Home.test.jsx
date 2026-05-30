@@ -35,7 +35,7 @@ describe('Home Page', () => {
 
   it('renders Services section', () => {
     renderWithProviders(<Home />);
-    expect(screen.getByText('ऑनलाईन पूजा बुकिंग')).toBeInTheDocument();
+    expect(screen.getByText('ऑनलाइन पूजा बुकिंग')).toBeInTheDocument();
     expect(screen.getByText('मंदिर पूजा')).toBeInTheDocument();
     expect(screen.getByText('पुजारी सेवा')).toBeInTheDocument();
   });

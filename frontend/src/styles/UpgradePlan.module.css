@@ -1,0 +1,256 @@
+/* UpgradePlan.module.css — Full redesign */
+.wrap { padding-bottom: 48px; }
+
+/* ── Page Header ────────────────────────────────────────────── */
+.heading { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--secondary); margin-bottom: 4px; }
+.headingSub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
+/* ── Current Plan — compact top bar ────────────────────────── */
+.currentCard {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg, #c04a00 0%, #e07b2a 60%, #f59e0b 100%);
+  color: #fff; border-radius: 14px;
+  padding: 16px 24px; margin-bottom: 24px;
+  gap: 16px; flex-wrap: wrap;
+  box-shadow: 0 4px 20px rgba(192,74,0,0.3);
+}
+.currentLeft { display: flex; align-items: center; gap: 16px; }
+.currentIcon { font-size: 36px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2)); }
+.currentLabel   { font-size: 11px; opacity: 0.82; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px; }
+.currentPlanName{ font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; line-height: 1.2; }
+.daysLeft       { font-size: 12px; opacity: 0.88; margin-top: 2px; }
+.currentRight   { display: flex; align-items: center; gap: 12px; }
+
+/* ── Mock banner ─────────────────────────────────────────────── */
+.mockBanner {
+  background: #fff8e1; border: 1px solid #ffe082;
+  border-radius: 8px; padding: 11px 16px;
+  font-size: 13px; color: #e65100; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.mockBanner code { background: #ffe082; padding: 1px 5px; border-radius: 4px; }
+
+/* ── Tabs ─────────────────────────────────────────────────────── */
+.tabs {
+  display: inline-flex; border: 1.5px solid var(--border);
+  border-radius: 10px; overflow: hidden; margin-bottom: 28px;
+}
+.tab {
+  padding: 10px 28px; background: var(--white); border: none;
+  font-size: 14px; font-weight: 600; color: var(--text-muted);
+  cursor: pointer; transition: all 0.18s; font-family: var(--font-body);
+}
+.tab:hover { background: var(--cream); color: var(--primary); }
+.tabActive { background: var(--primary) !important; color: #fff !important; }
+
+/* ── 2-column layout ─────────────────────────────────────────── */
+.payLayout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ── Left column ─────────────────────────────────────────────── */
+.leftCol { display: flex; flex-direction: column; gap: 24px; }
+
+/* ── Section ─────────────────────────────────────────────────── */
+.section { background: var(--white); border: 1.5px solid var(--border); border-radius: 14px; padding: 24px; }
+.sectionTitle {
+  font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+  color: var(--secondary); margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 1.5px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Plan cards ──────────────────────────────────────────────── */
+.planCards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.planCard {
+  border: 2px solid var(--border); border-radius: 12px;
+  padding: 20px 18px; cursor: pointer; transition: all 0.18s;
+  position: relative; background: var(--white);
+}
+.planCard:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+.planCardActive {
+  border-color: var(--primary); background: #fff8f3;
+  box-shadow: 0 0 0 3px rgba(224,123,42,0.15), 0 4px 16px rgba(224,123,42,0.1);
+}
+.popularBadge {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--primary), #c04a00);
+  color: #fff; font-size: 11px; font-weight: 700;
+  padding: 3px 14px; border-radius: 10px; white-space: nowrap;
+}
+.planName  { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--secondary); margin-bottom: 8px; }
+.planPrice { font-size: 24px; font-weight: 800; color: var(--primary); margin-bottom: 14px; }
+.planPrice span { font-size: 13px; color: var(--text-muted); font-weight: 400; }
+.featureList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.featureList li { font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 6px; }
+
+/* ── Month cards ─────────────────────────────────────────────── */
+.monthCards { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.monthCard {
+  border: 2px solid var(--border); border-radius: 10px;
+  padding: 14px 10px; text-align: center; cursor: pointer;
+  transition: all 0.18s; background: var(--white); position: relative;
+}
+.monthCard:hover  { border-color: var(--primary); }
+.monthCardActive  {
+  border-color: var(--primary); background: #fff8f3;
+  box-shadow: 0 0 0 3px rgba(224,123,42,0.12);
+}
+.monthLabel    { font-weight: 700; font-size: 14px; color: var(--secondary); }
+.discountBadge {
+  background: #e8f5e9; color: #2e7d32; font-size: 11px;
+  font-weight: 700; border-radius: 8px; padding: 2px 7px;
+  margin: 4px auto 0; display: inline-block;
+}
+.monthPrice { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+
+/* ── Right col — sticky summary ──────────────────────────────── */
+.rightCol {
+  position: sticky; top: 88px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ── Order summary ───────────────────────────────────────────── */
+.summary {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 24px;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+.summaryTitle {
+  font-family: var(--font-display); font-size: 1rem; color: var(--secondary);
+  margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1.5px solid var(--border);
+}
+.summaryRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+  font-size: 14px; color: var(--text);
+}
+.summaryRow:last-of-type { border-bottom: none; }
+.totalRow {
+  font-size: 16px; font-weight: 700; padding: 14px 0 0;
+  border-top: 2px solid var(--border) !important; margin-top: 4px;
+}
+.totalRow strong { color: var(--primary); font-size: 22px; }
+.savingBadge {
+  background: #e8f5e9; color: #2e7d32; font-size: 12px;
+  font-weight: 700; padding: 3px 10px; border-radius: 10px;
+}
+
+.payBtn {
+  width: 100%; margin-top: 18px; padding: 15px;
+  background: linear-gradient(135deg, #c04a00, var(--primary));
+  color: #fff; border: none; border-radius: 12px;
+  font-family: var(--font-display); font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all 0.22s;
+  box-shadow: 0 4px 16px rgba(192,74,0,0.35);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.payBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(192,74,0,0.45);
+}
+.payBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.payNote {
+  text-align: center; font-size: 11px;
+  color: var(--text-muted); margin-top: 12px; line-height: 1.5;
+}
+.payIcons { display: flex; justify-content: center; gap: 8px; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+
+/* trust badges */
+.trustRow { display: flex; flex-direction: column; gap: 8px; }
+.trustItem {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--cream); border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; color: var(--text);
+}
+.trustItem strong { color: var(--secondary); }
+
+/* ── Request Form ─────────────────────────────────────────────── */
+.reqLayout { display: grid; grid-template-columns: 1fr 320px; gap: 28px; align-items: start; }
+
+.requestCard {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 28px;
+}
+.requestInfo {
+  display: flex; gap: 14px; align-items: flex-start;
+  margin-bottom: 24px; padding-bottom: 20px;
+  border-bottom: 1.5px solid var(--border);
+}
+.requestIcon { font-size: 40px; flex-shrink: 0; }
+.requestInfo h3 { font-family: var(--font-display); font-size: 1.1rem; color: var(--secondary); margin-bottom: 6px; }
+.requestInfo p  { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+
+.reqForm { display: flex; flex-direction: column; }
+.reqGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.reqField { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.reqField label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.reqInput {
+  padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 14px; font-family: var(--font-body); background: var(--cream);
+  outline: none; transition: border-color 0.2s; width: 100%; box-sizing: border-box;
+  resize: vertical;
+}
+.reqInput:focus { border-color: var(--primary); background: var(--white); }
+
+.reqBtn {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, var(--secondary), #c04a00);
+  color: #fff; border: none; border-radius: 10px;
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(139,37,0,0.3);
+}
+.reqBtn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,37,0,0.4); }
+.reqBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── Request sidebar ─────────────────────────────────────────── */
+.reqSideCard {
+  position: sticky; top: 88px;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 24px;
+  box-shadow: 0 4px 20px var(--shadow);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.reqSideTitle { font-family: var(--font-display); font-size: 1rem; color: var(--secondary); margin-bottom: 4px; }
+
+.reqSummary {
+  background: var(--cream); border-radius: 10px; padding: 14px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.reqSummaryRow { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); }
+.reqSummaryRow strong { color: var(--secondary); }
+
+.contactBox { border-top: 1.5px solid var(--border); padding-top: 16px; }
+.contactBox p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+.waContact {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 20px; background: #25D366; color: #fff;
+  border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none;
+  transition: all 0.2s; box-shadow: 0 4px 12px rgba(37,211,102,0.35);
+}
+.waContact:hover { background: #128c7e; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .payLayout  { grid-template-columns: 1fr 300px; }
+  .reqLayout  { grid-template-columns: 1fr 280px; }
+  .monthCards { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 768px) {
+  .payLayout  { grid-template-columns: 1fr; }
+  .reqLayout  { grid-template-columns: 1fr; }
+  .rightCol   { position: static; }
+  .reqSideCard{ position: static; }
+  .planCards  { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .monthCards { grid-template-columns: repeat(2,1fr); }
+  .reqGrid    { grid-template-columns: 1fr; }
+  .currentCard{ padding: 14px 16px; }
+}

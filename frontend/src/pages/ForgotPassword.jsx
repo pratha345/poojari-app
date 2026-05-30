@@ -82,7 +82,7 @@ export default function ForgotPassword() {
                 <input
                   type="tel"
                   className="form-control"
-                  placeholder="उदा: 9307720459"
+                  placeholder="उदा: 9561903219"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                   maxLength={10}

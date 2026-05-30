@@ -23,6 +23,8 @@
   gap:                   36px;
   padding-top:           32px;
 }
+/* Prevent any grid item from expanding its track beyond the container width */
+.layout > * { min-width: 0; }
 
 /* LEFT: detail column */
 .details {}
@@ -30,10 +32,17 @@
   position:      relative;
   border-radius: var(--radius-lg);
   overflow:      hidden;
-  aspect-ratio:  16 / 7;
+  aspect-ratio:  16 / 9;
   margin-bottom: 24px;
+  background:    var(--cream-dark);
 }
-.imageWrap img { width: 100%; height: 100%; object-fit: cover; }
+.imageWrap img {
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  object-position: center center;
+  display:         block;
+}
 .featuredBadge {
   position:   absolute;
   top:        14px;
@@ -48,7 +57,7 @@
 
 .info {}
 .category {
-  font-size:       11px;
+  font-size: 12px;
   color:           var(--primary);
   font-weight:     700;
   text-transform:  uppercase;
@@ -94,7 +103,8 @@
 }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
-  padding:      10px 18px;
+  padding:      12px 18px;       /* increased for touch target */
+  min-height:   44px;            /* iOS/Android minimum */
   font-size:    14px;
   font-family:  var(--font-body);
   font-weight:  500;
@@ -107,6 +117,8 @@
   transition:   all var(--transition);
   white-space:  nowrap;
   flex-shrink:  0;
+  display:      inline-flex;
+  align-items:  center;
 }
 .tab:hover    { color: var(--primary); }
 .tabActive    { color: var(--primary) !important; border-bottom-color: var(--primary) !important; font-weight: 700; }
@@ -136,16 +148,19 @@
 /* Steps */
 .stepList { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .stepItem {
-  display:    flex;
-  align-items: flex-start;
-  gap:        12px;
-  background: var(--white);
-  border:     1px solid var(--border);
-  padding:    12px 14px;
-  border-radius: var(--radius-sm);
-  font-size:  14px;
-  line-height: 1.7;
-  transition: all var(--transition);
+  display:          flex;
+  align-items:      flex-start;
+  gap:              12px;
+  background:       var(--white);
+  border:           1px solid var(--border);
+  padding:          12px 14px;
+  border-radius:    var(--radius-sm);
+  font-size:        14px;
+  line-height:      1.7;
+  transition:       all var(--transition);
+  overflow-wrap:    break-word;
+  word-break:       break-word;
+  min-width:        0;
 }
 .stepItem:hover { border-color: var(--primary); box-shadow: 0 4px 12px var(--shadow); }
 .stepNum {
@@ -157,7 +172,7 @@
   display:         flex;
   align-items:     center;
   justify-content: center;
-  font-size:       11px;
+  font-size: 12px;
   font-weight:     700;
   flex-shrink:     0;
 }
@@ -175,16 +190,30 @@
 .reviewItem p { font-size: 13px; color: var(--text-muted); line-height: 1.7; font-style: italic; }
 
 /* RIGHT: Booking Panel */
-.bookPanel  { display: flex; flex-direction: column; gap: 18px; }
+.bookPanel  { display: flex; flex-direction: column; gap: 18px; align-self: start; }
 .bookCard {
   background:    var(--white);
   border:        1.5px solid var(--border);
   border-radius: var(--radius-lg);
   padding:       24px;
   box-shadow:    0 8px 32px var(--shadow);
-  position:      sticky;
-  top:           120px;
+  /* sticky only applied on desktop via min-width query below */
 }
+/* Verified trust strip */
+.verifiedStrip {
+  display:       flex;
+  align-items:   center;
+  gap:           10px;
+  background:    #e8f5e9;
+  border:        1px solid #a5d6a7;
+  border-radius: var(--radius-sm);
+  padding:       10px 14px;
+  margin-bottom: 16px;
+}
+.verifiedIcon { font-size: 20px; flex-shrink: 0; }
+.verifiedStrip strong { font-size: 13px; color: #2e7d32; display: block; font-weight: 700; }
+.verifiedStrip p { font-size: 12px; color: #388e3c; margin: 0; }
+
 .bookPrice     { font-family: var(--font-display); font-size: 2rem; color: var(--primary); margin-bottom: 2px; }
 .bookPriceSub  { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
 .bookFeatures  { display: flex; flex-direction: column; gap: 9px; margin-bottom: 20px; }
@@ -205,21 +234,45 @@
 .whyBox h3  { font-size: 13px; color: var(--secondary); margin-bottom: 4px; }
 .whyBox div { font-size: 13px; color: var(--text-muted); }
 
+/* ── Desktop only: sticky booking panel ──────────────────────── */
+@media (min-width: 1025px) {
+  .bookCard { position: sticky; top: 116px; }
+}
+
 /* ── Laptop (1024px) ──────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .layout { grid-template-columns: 1fr 300px; gap: 24px; }
 }
 
-/* ── Tablet/Mobile (768px) ────────────────────────────────────── */
-@media (max-width: 768px) {
-  .layout   { grid-template-columns: 1fr; }
-  .bookCard { position: static; }
+/* ── Tablet/Mobile (860px) — covers phones in landscape too ───── */
+@media (max-width: 860px) {
+  .layout  { grid-template-columns: 1fr; }
   .title    { font-size: 1.5rem; }
+  .tab      { font-size: 15px; padding: 12px 16px; }
+  .desc     { font-size: 15px; line-height: 1.85; }
+  .stepItem { font-size: 15px; }
+  .samagriItem { font-size: 15px; }
+  .bookFeature { font-size: 15px; }
+  .bookBtn  { font-size: 16px; }
+  .metaBadge { font-size: 14px; }
+  .titleEn  { font-size: 15px; }
 }
 
 /* ── Mobile (480px) ───────────────────────────────────────────── */
 @media (max-width: 480px) {
   .samagriList { grid-template-columns: 1fr; }
   .bookCard    { padding: 20px 16px; }
-  .imageWrap   { border-radius: var(--radius-md); }
+  .imageWrap   { border-radius: var(--radius-md); max-height: 260px; }
+  .title       { font-size: 1.55rem; }
+  .tab         { font-size: 16px; padding: 13px 14px; }
+  .desc        { font-size: 16px; line-height: 1.9; }
+  .stepItem    { font-size: 16px; line-height: 1.8; }
+  .samagriItem { font-size: 16px; }
+  .bookFeature { font-size: 16px; }
+  .bookBtn     { font-size: 17px; }
+  .metaBadge   { font-size: 15px; padding: 6px 14px; }
+  .titleEn     { font-size: 15px; }
+  .tabTitle    { font-size: 1.1rem; }
+  .reviewHeader strong { font-size: 15px; }
+  .reviewItem p        { font-size: 15px; }
 }

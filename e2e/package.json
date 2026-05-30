@@ -14,7 +14,11 @@
     "test:responsive":"playwright test tests/responsive.spec.js",
     "test:seo":       "playwright test tests/seo.spec.js",
     "test:stress":    "playwright test tests/stress.spec.js",
-    "test:errors":    "playwright test tests/error-handling.spec.js"
+    "test:errors":    "playwright test tests/error-handling.spec.js",
+    "test:halls":     "playwright test tests/hall-booking.spec.js",
+    "test:samagri":   "playwright test tests/samagri.spec.js",
+    "test:poojas":    "playwright test tests/poojas.spec.js",
+    "test:new":       "playwright test tests/hall-booking.spec.js tests/samagri.spec.js tests/poojas.spec.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.44.0"

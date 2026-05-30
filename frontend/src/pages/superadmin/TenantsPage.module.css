@@ -1,7 +1,18 @@
 /* TenantsPage.module.css */
-.wrap    { max-width: 1200px; }
-.header  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-.heading { font-size: 22px; font-weight: 700; color: var(--secondary); }
+.wrap    { max-width: 1300px; }
+.header  { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.heading { font-size: 22px; font-weight: 700; color: var(--secondary); margin: 0; }
+.sub     { font-size: 13px; color: var(--text-muted); margin: 4px 0 0; }
+
+/* Stats strip */
+.statsStrip { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.statBox {
+  background: var(--white); border-radius: var(--radius-sm);
+  padding: 12px 20px; display: flex; flex-direction: column; align-items: center;
+  box-shadow: 0 1px 6px var(--shadow); min-width: 80px;
+}
+.statNum   { font-size: 22px; font-weight: 800; color: var(--primary); }
+.statLabel { font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
 
 .tableWrap { background: var(--white); border-radius: var(--radius-md); overflow-x: auto; box-shadow: 0 2px 12px var(--shadow); }
 .table     { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -10,8 +21,18 @@
 .table tr:hover td { background: var(--cream); }
 .slug { background: var(--cream-dark); padding: 2px 7px; border-radius: 4px; font-size: 12px; }
 
-.actions { display: flex; gap: 6px; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .empty   { padding: 40px; text-align: center; color: var(--text-muted); }
+.subText { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.inactiveRow td { opacity: 0.55; }
+
+/* Plan button */
+.btnPlan {
+  background: #1565c0; color: #fff; border: none; border-radius: 6px;
+  padding: 4px 10px; font-size: 12px; cursor: pointer; font-weight: 600;
+  white-space: nowrap;
+}
+.btnPlan:hover { background: #0d47a1; }
 
 /* Modal */
 .overlay {
@@ -55,6 +76,59 @@
 
 .modalActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 
-@media (max-width: 520px) {
-  .grid2 { grid-template-columns: 1fr; }
+/* Plan modal */
+.planInfo {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--cream); border-radius: var(--radius-sm);
+  padding: 10px 14px; margin-bottom: 12px; font-size: 14px;
 }
+.planInfo strong { font-size: 15px; color: var(--secondary); }
+.planInfo span   { color: var(--text-muted); }
+
+.currentPlan {
+  font-size: 13px; color: var(--text-muted);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+.planOptions { display: flex; gap: 10px; margin-top: 6px; }
+.planOpt {
+  flex: 1; border: 2px solid var(--border); border-radius: 10px;
+  padding: 12px 8px; text-align: center; cursor: pointer;
+  transition: all 0.15s;
+}
+.planOpt:hover     { border-color: var(--primary); }
+.planOptActive     { box-shadow: 0 0 0 1px currentColor; }
+
+.monthBtns { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.monthBtn  {
+  border: 1.5px solid var(--border); background: var(--cream);
+  border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 13px;
+  color: var(--text); transition: all 0.15s;
+}
+.monthBtn:hover       { border-color: var(--primary); color: var(--primary); }
+.monthBtnActive       {
+  background: var(--primary); color: #fff !important;
+  border-color: var(--primary);
+}
+
+.planSummary {
+  background: #e8f5e9; border: 1px solid #a5d6a7;
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; color: #2e7d32; font-weight: 600;
+  margin-bottom: 4px; text-align: center;
+}
+
+@media (max-width: 520px) {
+  .grid2       { grid-template-columns: 1fr; }
+  .planOptions { flex-direction: column; }
+}
+
+/* ── Upgrade Requests Panel ─────────────────────────────────── */
+.reqPanel { background:var(--white); border:1.5px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px; box-shadow:0 2px 8px var(--shadow); }
+.reqPanelHead { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+.reqPanelHead h3 { font-family:var(--font-display); font-size:1rem; color:var(--secondary); }
+.reqFilterBtn { padding:6px 14px; border:1.5px solid var(--border); border-radius:20px; background:var(--white); font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all 0.18s; font-family:var(--font-body); }
+.reqFilterBtn:hover { border-color:var(--primary); color:var(--primary); }
+.reqFilterActive { background:var(--primary) !important; color:#fff !important; border-color:var(--primary) !important; }
+.reqEmpty { text-align:center; color:var(--text-muted); padding:32px; font-size:14px; }
+.reqTable { overflow-x:auto; border:1px solid var(--border); border-radius:8px; }

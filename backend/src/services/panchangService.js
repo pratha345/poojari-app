@@ -61,10 +61,8 @@ function getLagnaTropical(JD, lat, lon) {
 
   // Ascendant formula: atan2(-cos(RAMC), sin(RAMC)*cos(ε) + tan(φ)*sin(ε))
   // Quadrant correction: if denominator x < 0, add 180°
-  const y = -Math.cos(ramcR);
-  const x = Math.sin(ramcR) * Math.cos(epsR) + Math.tan(latR) * Math.sin(epsR);
-  let asc = Math.atan2(y, x) * 180 / Math.PI;
-  if (x < 0) asc += 180;
+  // Swiss Ephemeris standard: atan2(cos(RAMC), -(sin(RAMC)*cos(ε)+tan(φ)*sin(ε)))
+  const asc = Math.atan2(Math.cos(ramcR), -(Math.sin(ramcR) * Math.cos(epsR) + Math.tan(latR) * Math.sin(epsR))) * 180 / Math.PI;
   return norm360(asc);
 }
 
@@ -609,4 +607,6 @@ async function getPanchang(dateStr, lat, lon, tzOffset, timeStr) {
   return result;
 }
 
-module.exports = { getPanchang };
+function clearCache() { _cache.clear(); }
+
+module.exports = { getPanchang, clearCache };

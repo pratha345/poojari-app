@@ -23,7 +23,9 @@ export function ThemeProvider({ children }) {
 
   const fetchTheme = useCallback(async () => {
     try {
-      const { data } = await api.get('/theme');
+      const slug   = sessionStorage.getItem('tenant_slug');
+      const params = slug ? `?tenant_slug=${slug}` : '';
+      const { data } = await api.get(`/theme${params}`);
       const td = data.data || data;
       setThemeData(td);
       applyTheme(td.theme);

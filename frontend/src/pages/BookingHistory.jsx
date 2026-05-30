@@ -6,6 +6,9 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { bookingAPI } from '../api/index.js';
 import styles from './BookingHistory.module.css';
+import { FaClipboardList, FaHourglass, FaCircleCheck, FaFire, FaCircleXmark,
+         FaInbox, FaCalendarDays, FaClock, FaLocationDot, FaStar, FaHandsPraying,
+         FaPhone, FaUser } from 'react-icons/fa6';
 
 const STATUS_LABELS = {
   pending:     { label: 'प्रतीक्षेत',    color: 'warning' },
@@ -59,7 +62,7 @@ export default function BookingHistory() {
       <main className={styles.main}>
         <div className="container">
           <div className={styles.header}>
-            <h1 className={styles.title}>📋 माझ्या बुकिंग्ज</h1>
+            <h1 className={styles.title}><FaClipboardList style={{marginRight:8}}/> माझ्या बुकिंग्ज</h1>
             <Link to="/pooja" className="btn btn-primary">+ नवीन बुकिंग</Link>
           </div>
 
@@ -67,10 +70,10 @@ export default function BookingHistory() {
           <div className={styles.filters}>
             {[
               { key: 'all',       label: 'सर्व'          },
-              { key: 'pending',   label: '⏳ प्रतीक्षेत' },
-              { key: 'confirmed', label: '✅ पुष्टी'      },
-              { key: 'completed', label: '🪔 पूर्ण'       },
-              { key: 'cancelled', label: '❌ रद्द'        },
+              { key: 'pending',   label: <><FaHourglass   style={{marginRight:5}}/> प्रतीक्षेत</> },
+              { key: 'confirmed', label: <><FaCircleCheck  style={{marginRight:5}}/> पुष्टी</>     },
+              { key: 'completed', label: <><FaFire         style={{marginRight:5}}/> पूर्ण</>       },
+              { key: 'cancelled', label: <><FaCircleXmark  style={{marginRight:5}}/> रद्द</>        },
             ].map(f => (
               <button
                 key={f.key}
@@ -86,7 +89,7 @@ export default function BookingHistory() {
             <div className="page-loader"><div className="spinner"/><p>लोड होत आहे...</p></div>
           ) : bookings.length === 0 ? (
             <div className={styles.empty}>
-              <span>📭</span>
+              <FaInbox style={{fontSize:'2.5rem',color:'#ccc'}}/>
               <h3>कोणतीही बुकिंग सापडली नाही</h3>
               <Link to="/pooja" className="btn btn-primary">पूजा बुक करा</Link>
             </div>
@@ -104,15 +107,45 @@ export default function BookingHistory() {
                         <div className={styles.cardCode}>#{b.booking_code}</div>
                         <h3 className={styles.poojaName}>{b.pooja_name}</h3>
                         <div className={styles.cardMeta}>
-                          <span>📅 {new Date(b.booking_date).toLocaleDateString('mr-IN')}</span>
-                          <span>🕐 {b.booking_time?.slice(0,5)}</span>
-                          <span>📍 {b.city}</span>
+                          <span><FaCalendarDays style={{marginRight:4}}/>{new Date(b.booking_date).toLocaleDateString('mr-IN')}</span>
+                          <span><FaClock style={{marginRight:4}}/>{b.booking_time?.slice(0,5)}</span>
+                          <span><FaLocationDot style={{marginRight:4}}/>{b.city}</span>
                         </div>
-                        {b.pujari_name && (
-                          <div className={styles.pujariInfo}>
-                            🧑‍🦳 पुजारी: <strong>{b.pujari_name}</strong>
-                            {b.pujari_phone && <span> • {b.pujari_phone}</span>}
+                        {b.pujari_name ? (
+                          <div className={styles.pujariCard}>
+                            {b.pujari_photo
+                              ? <img src={b.pujari_photo} alt={b.pujari_name} className={styles.pujariAvatar}/>
+                              : <div className={styles.pujariAvatarFallback}><FaUser/></div>
+                            }
+                            <div className={styles.pujariCardInfo}>
+                              <div className={styles.pujariCardName}>
+                                🧑‍🦳 {b.pujari_name}
+                              </div>
+                              {b.pujari_city && (
+                                <div className={styles.pujariCardMeta}>
+                                  <FaLocationDot style={{marginRight:3,fontSize:10}}/>{b.pujari_city}
+                                  {b.pujari_experience > 0 && <span> • {b.pujari_experience} वर्षे अनुभव</span>}
+                                </div>
+                              )}
+                              {b.pujari_rating > 0 && (
+                                <div className={styles.pujariCardRating}>
+                                  {'⭐'.repeat(Math.round(b.pujari_rating))}
+                                  <span style={{marginLeft:4,fontSize:11}}>{Number(b.pujari_rating).toFixed(1)}</span>
+                                </div>
+                              )}
+                              {b.pujari_phone && (
+                                <a href={`tel:${b.pujari_phone}`} className={styles.pujariPhone}>
+                                  <FaPhone style={{marginRight:4,fontSize:10}}/>{b.pujari_phone}
+                                </a>
+                              )}
+                            </div>
                           </div>
+                        ) : (
+                          ['confirmed','pending'].includes(b.status) && (
+                            <div className={styles.pujariPending}>
+                              ⏳ पुजारी नियुक्ती प्रतीक्षेत…
+                            </div>
+                          )
                         )}
                       </div>
                     </div>
@@ -129,7 +162,7 @@ export default function BookingHistory() {
                         )}
                         {b.status === 'completed' && !b.has_review && (
                           <button className="btn btn-primary btn-sm" onClick={() => setReviewModal(b)}>
-                            ⭐ अभिप्राय द्या
+                            <FaStar style={{marginRight:5}}/> अभिप्राय द्या
                           </button>
                         )}
                       </div>
@@ -146,7 +179,7 @@ export default function BookingHistory() {
       {reviewModal && (
         <div className={styles.modalOverlay} onClick={() => setReviewModal(null)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h2>⭐ अभिप्राय द्या</h2>
+            <h2><FaStar style={{marginRight:6,color:'#f7c948'}}/> अभिप्राय द्या</h2>
             <p className={styles.modalSubtitle}>{reviewModal.pooja_name}</p>
             <div className={styles.ratingRow}>
               {[1,2,3,4,5].map(n => (
@@ -168,7 +201,7 @@ export default function BookingHistory() {
             </div>
             <div className={styles.modalActions}>
               <button className="btn btn-secondary" onClick={() => setReviewModal(null)}>रद्द करा</button>
-              <button className="btn btn-primary" onClick={handleReview}>पाठवा 🙏</button>
+              <button className="btn btn-primary" onClick={handleReview}>पाठवा <FaHandsPraying style={{marginLeft:5}}/></button>
             </div>
           </div>
         </div>

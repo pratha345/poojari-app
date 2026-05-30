@@ -10,8 +10,10 @@ router.get('/tenants',                ...guard, ctrl.getTenants);
 router.get('/tenants/:id',            ...guard, ctrl.getTenant);
 router.post('/tenants',               ...guard, ctrl.createTenant);
 router.put('/tenants/:id',            ...guard, ctrl.updateTenant);
+router.patch('/tenants/:id/plan',     ...guard, ctrl.updatePlan);
 router.delete('/tenants/:id',         ...guard, ctrl.deleteTenant);
 router.get('/tenants/:id/stats',      ...guard, ctrl.getTenantStats);
 router.get('/users',                  ...guard, ctrl.getAllUsers);
+router.get('/revenue',                ...guard, ctrl.getRevenueReport);
 
 module.exports = router;

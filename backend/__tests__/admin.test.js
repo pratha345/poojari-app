@@ -11,8 +11,9 @@ jest.mock('../src/config/db', () => ({
 }));
 
 jest.mock('../src/middleware/tenant.middleware', () => ({
-  resolveTenant: (req, res, next) => { req.tenantId = 1; req.tenant = { id: 1 }; next(); },
-  attachTenant:  (req, res, next) => { req.tenantId = req.user?.tenant_id ?? 1; next(); },
+  resolveTenant:    (req, res, next) => { req.tenantId = 1; req.tenant = { id: 1, plan: 'premium' }; next(); },
+  attachTenant:     (req, res, next) => { req.tenantId = req.user?.tenant_id ?? 1; next(); },
+  subscriptionGate: (req, res, next) => next(),
 }));
 
 const app  = require('../src/app');
@@ -89,8 +90,9 @@ describe('GET /api/admin/pujaris', () => {
 
   it('returns approved pujaris list for admin', async () => {
     pool.query
-      .mockResolvedValueOnce([[MOCK_ADMIN]])
-      .mockResolvedValueOnce([[MOCK_APPROVED_PUJARI]]);
+      .mockResolvedValueOnce([[MOCK_ADMIN]])             // authenticate
+      .mockResolvedValueOnce([[{ total: 1 }]])           // COUNT(*) — runs first in controller
+      .mockResolvedValueOnce([[MOCK_APPROVED_PUJARI]]); // SELECT rows
 
     const res = await request(app)
       .get('/api/admin/pujaris')
@@ -98,7 +100,7 @@ describe('GET /api/admin/pujaris', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.data[0]).toMatchObject({ status: 'approved' });
+    expect(res.body.data.rows[0]).toMatchObject({ status: 'approved' });
   });
 });
 

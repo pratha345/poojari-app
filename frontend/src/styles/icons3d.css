@@ -1,0 +1,80 @@
+/* ── 3D Icon System — pojjari ─────────────────────────────── */
+
+/* Inline icon — text-level, colored with drop-shadow */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  transition: transform 0.2s, filter 0.2s;
+}
+.icon:hover { transform: translateY(-1px); filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35)); }
+
+/* ── Badge icon box ── */
+.iconBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.iconBox:hover { transform: translateY(-3px) scale(1.05); }
+
+/* Sizes */
+.iconBoxSm  { width: 36px; height: 36px; font-size: 16px; border-radius: 10px; }
+.iconBoxMd  { width: 48px; height: 48px; font-size: 22px; border-radius: 14px; }
+.iconBoxLg  { width: 64px; height: 64px; font-size: 28px; border-radius: 18px; }
+.iconBoxXl  { width: 80px; height: 80px; font-size: 36px; border-radius: 22px; }
+
+/* ── Color themes ── */
+.iconOrange {
+  background: linear-gradient(145deg, #ff8c42, #e05a10);
+  box-shadow: 0 6px 18px rgba(224,90,16,0.45), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}
+.iconRed {
+  background: linear-gradient(145deg, #f05252, #c0392b);
+  box-shadow: 0 6px 18px rgba(192,57,43,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}
+.iconGreen {
+  background: linear-gradient(145deg, #34d058, #1a9e3a);
+  box-shadow: 0 6px 18px rgba(26,158,58,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}
+.iconBlue {
+  background: linear-gradient(145deg, #4da6ff, #1a6bbf);
+  box-shadow: 0 6px 18px rgba(26,107,191,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}
+.iconPurple {
+  background: linear-gradient(145deg, #9b59b6, #6c3483);
+  box-shadow: 0 6px 18px rgba(108,52,131,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}
+.iconGold {
+  background: linear-gradient(145deg, #f7c948, #d4a017);
+  box-shadow: 0 6px 18px rgba(212,160,23,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #7a5200;
+}
+.iconTeal {
+  background: linear-gradient(145deg, #20c997, #0e8c67);
+  box-shadow: 0 6px 18px rgba(14,140,103,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}
+.iconDark {
+  background: linear-gradient(145deg, #4a4a6a, #2d2d4e);
+  box-shadow: 0 6px 18px rgba(45,45,78,0.5), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+  color: #fff;
+}
+.iconPink {
+  background: linear-gradient(145deg, #ff79b0, #e91e8c);
+  box-shadow: 0 6px 18px rgba(233,30,140,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}
+.iconBrown {
+  background: linear-gradient(145deg, #a0522d, #6b3318);
+  box-shadow: 0 6px 18px rgba(107,51,24,0.4), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.25);
+  color: #fff;
+}

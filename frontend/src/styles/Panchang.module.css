@@ -57,7 +57,7 @@
 ═══════════════════════════════════════════════════════════════ */
 .hero {
   background: linear-gradient(135deg, #5a1500 0%, var(--secondary) 50%, #8b3a00 100%);
-  padding: 44px 0 36px;
+  padding: 32px 0 26px;
 }
 .heroInner {
   display: flex;
@@ -83,7 +83,7 @@
 }
 .heroTitle {
   font-family: var(--font-display);
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: #fff;
   margin: 0;
   text-shadow: 0 2px 16px rgba(0,0,0,0.4);
@@ -120,8 +120,8 @@
   background: var(--pg-card);
   border: 1px solid var(--pg-border);
   border-radius: var(--radius-lg);
-  padding: 28px;
-  margin: 28px 0 22px;
+  padding: 20px 24px;
+  margin: 20px 0 16px;
   box-shadow: 0 4px 24px var(--pg-shadow);
   transition: background 0.3s, border-color 0.3s;
 }
@@ -300,6 +300,65 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   DISTRICT SEARCHABLE DROPDOWN
+═══════════════════════════════════════════════════════════════ */
+.districtPickerRow { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+
+.searchDrop      { position: relative; min-width: 240px; }
+.searchInputWrap {
+  display: flex; align-items: center;
+  border: 1.5px solid var(--pg-border);
+  border-radius: 10px;
+  background: var(--pg-input-bg);
+  padding: 0 10px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.searchInputWrap:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(192,74,0,0.10);
+  background: var(--pg-card);
+}
+.searchInputIcon { font-size: 14px; flex-shrink: 0; color: var(--primary); }
+.searchInput {
+  flex: 1; border: none; outline: none;
+  background: transparent;
+  font-size: 14px; font-family: inherit;
+  color: var(--pg-text); padding: 10px 6px;
+}
+.searchInput::placeholder { color: var(--pg-muted); }
+.clearBtn {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: var(--pg-muted); padding: 2px 4px;
+}
+.clearBtn:hover { color: var(--primary); }
+
+.dropList {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--pg-card);
+  border: 1.5px solid var(--pg-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(122,30,0,0.14);
+  max-height: 250px; overflow-y: auto;
+  z-index: 200; list-style: none; padding: 4px; margin: 0;
+}
+.dropList::-webkit-scrollbar       { width: 5px; }
+.dropList::-webkit-scrollbar-track { background: #fff5ee; border-radius: 10px; }
+.dropList::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+.dropItem {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: 8px;
+  font-size: 13.5px; color: var(--pg-text);
+  cursor: pointer; transition: background 0.12s;
+}
+.dropItem:hover     { background: rgba(224,123,42,0.08); }
+.dropItemActive     { background: rgba(224,123,42,0.12); }
+.dropItemSelected   { font-weight: 700; color: var(--secondary); }
+.dropItemIcon       { font-size: 12px; flex-shrink: 0; }
+.dropItemCheck      { margin-left: auto; color: var(--primary); font-weight: 700; }
+.dropEmpty          { padding: 14px 16px; font-size: 13px; color: var(--pg-muted); text-align: center; }
+
+/* ═══════════════════════════════════════════════════════════════
    ERROR
 ═══════════════════════════════════════════════════════════════ */
 .errorBox {
@@ -363,11 +422,11 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 22px 28px;
+  gap: 10px;
+  padding: 14px 20px;
   background: linear-gradient(135deg, var(--secondary), #7a1e00);
   border-radius: var(--radius-lg);
-  margin-bottom: 22px;
+  margin-bottom: 16px;
   box-shadow: 0 6px 28px rgba(139,37,0,0.28);
 }
 .dark .dateBanner {
@@ -421,12 +480,12 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  padding: 16px 22px;
+  gap: 8px;
+  padding: 12px 18px;
   background: linear-gradient(135deg, #fffde7, #fff8e1);
   border: 1.5px solid #ffe082;
   border-radius: var(--radius-lg);
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 .dark .festivalBand {
   background: linear-gradient(135deg, #2a2000, #1e1800);
@@ -462,8 +521,8 @@
   background: var(--pg-card);
   border: 1px solid var(--pg-border);
   border-radius: var(--radius-lg);
-  padding: 26px;
-  margin-bottom: 20px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
   box-shadow: 0 2px 16px var(--pg-shadow);
   transition: background 0.3s, border-color 0.3s;
 }
@@ -472,10 +531,10 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--pg-title);
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
   border-bottom: 2px solid var(--pg-border);
 }
 .sectionIcon { font-size: 1.1rem; }
@@ -503,8 +562,8 @@
 .pCard {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
+  gap: 6px;
+  padding: 12px 14px;
   border-radius: var(--radius-md);
   background: var(--pg-bg);
   border: 1.5px solid var(--pg-border);
@@ -570,18 +629,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 28px 20px;
-  gap: 6px;
+  padding: 16px 14px;
+  gap: 4px;
 }
 .sunSep {
   width: 1px;
   background: #f0d090;
-  margin: 20px 0;
+  margin: 12px 0;
 }
 .dark .sunSep { background: #3a2a00; }
-.sunEmoji  { font-size: 2.4rem; }
+.sunEmoji  { font-size: 1.8rem; }
 .sunName {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--pg-muted);
   text-transform: uppercase;
@@ -589,7 +648,7 @@
 }
 .sunTime {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--primary-dark);
 }
@@ -605,7 +664,7 @@
   margin-bottom: 14px;
 }
 .muhurtaBlock {
-  padding: 16px;
+  padding: 12px 14px;
   border-radius: var(--radius-md);
   border: 1.5px solid;
   transition: transform 0.2s;
@@ -653,12 +712,12 @@
 .shubhBanner {
   display: flex;
   align-items: flex-start;
-  gap: 18px;
-  padding: 22px 26px;
+  gap: 14px;
+  padding: 14px 18px;
   background: linear-gradient(135deg, #fffde7, #fff8c4);
   border: 2px solid var(--gold);
   border-radius: var(--radius-lg);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   box-shadow: 0 4px 20px var(--shadow-gold);
   animation: pulseGold 2.5s ease-in-out infinite;
 }
@@ -671,7 +730,7 @@
   0%,100% { box-shadow: 0 4px 20px rgba(212,175,55,0.3); }
   50%      { box-shadow: 0 4px 30px rgba(212,175,55,0.6); }
 }
-.shubhBannerIcon { font-size: 2.2rem; flex-shrink: 0; }
+.shubhBannerIcon { font-size: 1.7rem; flex-shrink: 0; }
 .shubhBannerBody { display: flex; flex-direction: column; gap: 4px; }
 .shubhBannerTitle {
   font-family: var(--font-display);
@@ -910,7 +969,7 @@
 }
 
 @media (max-width: 768px) {
-  .heroTitle { font-size: 1.9rem; }
+  .heroTitle { font-size: clamp(1.4rem, 4vw, 1.9rem); }
   .heroOm    { font-size: 40px; }
   .heroInner { flex-direction: column; align-items: flex-start; gap: 14px; }
   .darkToggle { align-self: flex-end; }
@@ -933,13 +992,16 @@
 }
 
 @media (max-width: 480px) {
-  .hero { padding: 28px 0 22px; }
-  .controls { padding: 16px 14px; }
-  .section  { padding: 18px 14px; }
-  .shubhBanner { padding: 16px 14px; gap: 12px; }
+  .hero { padding: 20px 0 16px; }
+  .controls { padding: 14px 12px; }
+  .section  { padding: 14px 12px; }
+  .shubhBanner { padding: 12px; gap: 10px; }
 
   .panchangGrid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .muhurtaGrid  { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .pCardLabel  { font-size: 0.65rem; }
+  .pCardValue  { font-size: 0.95rem; }
 
   .houseRashi  { font-size: 0.6rem; }
   .houseSymbol { font-size: 0.85rem; }
@@ -949,4 +1011,64 @@
 
   .kundaliLegend { flex-direction: column; align-items: flex-start; gap: 8px; }
   .kundaliWrap   { overflow-x: auto; }
+}
+
+/* ── Panchang Rating Widget ───────────────────────────────── */
+.panchangRatingBox {
+  max-width: 680px;
+  margin: 32px auto 8px;
+  background: #fff8f0;
+  border: 1.5px solid #ffe0b2;
+  border-radius: 12px;
+  padding: 22px 28px;
+  text-align: center;
+}
+.panchangRatingTitle {
+  font-family: var(--font-display, serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #5D1A00;
+  margin-bottom: 16px;
+}
+.panchangRatingBtns {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.panRateYes {
+  padding: 10px 24px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1.5px solid #a5d6a7;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body, sans-serif);
+}
+.panRateYes:hover { background: #2e7d32; color: #fff; }
+.panRateNo {
+  padding: 10px 24px;
+  background: #fce4ec;
+  color: #c62828;
+  border: 1.5px solid #ef9a9a;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body, sans-serif);
+}
+.panRateNo:hover { background: #c62828; color: #fff; }
+.panchangRatingDone {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary, #E07B2A);
+}
+.panRatingStats {
+  font-size: 13px;
+  color: #888;
+  margin-top: 8px;
 }

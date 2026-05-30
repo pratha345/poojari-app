@@ -1,11 +1,22 @@
 // src/pages/Booking.jsx
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import SEOHead from '../components/SEOHead';
-import { poojaAPI, bookingAPI } from '../api/index.js';
+import { poojaAPI, bookingAPI, authAPI } from '../api/index.js';
+
+const loadRazorpay = () =>
+  new Promise((resolve) => {
+    if (window.Razorpay) { resolve(true); return; }
+    const s = document.createElement('script');
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    s.onload  = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.body.appendChild(s);
+  });
+import { useAuth } from '../context/AuthContext';
 import styles from './Booking.module.css';
 
 const TIMES = [
@@ -31,11 +42,26 @@ const MAHARASHTRA_DISTRICTS = [
 export default function Booking() {
   const { slug }    = useParams();
   const navigate    = useNavigate();
+  const { state: navState } = useLocation();
+  const preferredPujariId   = navState?.pujariId   || null;
+  const preferredPujariName = navState?.pujariName || null;
+  const { isAuthenticated, login } = useAuth();
   const [pooja,     setPooja]     = useState(null);
   const [loading,   setLoading]   = useState(true);
   const [submitting,setSubmitting]= useState(false);
-  const [step,      setStep]      = useState(1); // 1=details, 2=confirm, 3=success
+  // step 0=OTP (if not logged in), 1=details, 2=confirm, 3=success
+  // step: 0=OTP, 1=details, 2=confirm, 3=payment, 4=success
+  const [step,        setStep]        = useState(isAuthenticated ? 1 : 0);
   const [bookingCode, setBookingCode] = useState('');
+  const [bookingId,   setBookingId]   = useState(null);
+  const [payLoading,  setPayLoading]  = useState(false);
+
+  // OTP state
+  const [otpPhone,    setOtpPhone]    = useState('');
+  const [otpName,     setOtpName]     = useState('');
+  const [otpCode,     setOtpCode]     = useState('');
+  const [otpSent,     setOtpSent]     = useState(false);
+  const [otpLoading,  setOtpLoading]  = useState(false);
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -61,6 +87,75 @@ export default function Booking() {
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
+  // ── Razorpay handler ──────────────────────────────────────────
+  const handleRazorpay = async () => {
+    setPayLoading(true);
+    try {
+      const ok = await loadRazorpay();
+      if (!ok) { toast.error('Razorpay लोड होऊ शकले नाही.'); return; }
+
+      const orderRes = await bookingAPI.createPayment(bookingId);
+      const { order_id, amount, currency, key_id } = orderRes.data.data;
+
+      const rzp = new window.Razorpay({
+        key:         key_id,
+        amount,
+        currency,
+        order_id,
+        name:        'पूजारी Platform',
+        description: pooja.name_mr,
+        image:       '/logo.png',
+        prefill: {
+          contact: form.phone || '',
+          name:    form.name  || '',
+        },
+        theme:   { color: '#b35c00' },
+        handler: async (response) => {
+          try {
+            await bookingAPI.verifyPayment({
+              booking_id:          bookingId,
+              razorpay_order_id:   response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature:  response.razorpay_signature,
+            });
+            toast.success('पेमेंट यशस्वी! 🙏');
+            setStep(4);
+          } catch { toast.error('पेमेंट पडताळणी अयशस्वी.'); }
+        },
+        modal: { ondismiss: () => setPayLoading(false) },
+      });
+      rzp.open();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'पेमेंट सुरू करताना त्रुटी.');
+    } finally { setPayLoading(false); }
+  };
+
+  // ── OTP handlers ──────────────────────────────────────────────
+  const handleSendOtp = async () => {
+    if (!otpPhone || otpPhone.length < 10) { toast.error('वैध फोन नंबर टाका.'); return; }
+    setOtpLoading(true);
+    try {
+      await authAPI.sendOtp(otpPhone);
+      setOtpSent(true);
+      toast.success('OTP पाठवला! फोनवर तपासा.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'OTP पाठवताना त्रुटी.');
+    } finally { setOtpLoading(false); }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode || otpCode.length !== 6) { toast.error('6 अंकी OTP टाका.'); return; }
+    setOtpLoading(true);
+    try {
+      const res = await authAPI.verifyOtp({ phone: otpPhone, otp: otpCode, name: otpName || undefined });
+      login(res.data.data.token, res.data.data.user);
+      toast.success('OTP पडताळणी यशस्वी! 🙏');
+      setStep(1);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'OTP चुकीचा आहे.');
+    } finally { setOtpLoading(false); }
+  };
+
   const handleSubmit = async () => {
     if (!form.booking_date || !form.booking_time || !form.address || !form.city) {
       toast.error('कृपया सर्व आवश्यक माहिती भरा.');
@@ -68,7 +163,7 @@ export default function Booking() {
     }
     setSubmitting(true);
     try {
-      const res = await bookingAPI.create({
+      const payload = {
         pooja_id:      pooja.id,
         booking_date:  form.booking_date,
         booking_time:  form.booking_time,
@@ -76,10 +171,13 @@ export default function Booking() {
         city:          form.city,
         district:      form.district,
         special_notes: form.special_notes,
-      });
+      };
+      if (preferredPujariId) payload.preferred_pujari_id = preferredPujariId;
+      const res = await bookingAPI.create(payload);
       setBookingCode(res.data.data.booking_code);
-      setStep(3);
-      toast.success('बुकिंग यशस्वी झाली! 🙏');
+      setBookingId(res.data.data.booking_id);
+      setStep(3); // payment step
+      toast.success('बुकिंग नोंदणी झाली! 🙏');
     } catch (err) {
       toast.error(err.response?.data?.message || 'बुकिंग करताना त्रुटी झाली.');
     } finally {
@@ -98,8 +196,8 @@ export default function Booking() {
   return (
     <div>
       <SEOHead
-        title={`${pooja.name_mr} बुक करा - ऑनलाईन बुकिंग`}
-        description={`${pooja.name_mr} ऑनलाईन बुक करा. तारीख, वेळ व स्थान निश्चित करा. महाराष्ट्रातील अनुभवी पुजारी घरी येतात.`}
+        title={`${pooja.name_mr} बुक करा - ऑनलाइन बुकिंग`}
+        description={`${pooja.name_mr} ऑनलाइन बुक करा. तारीख, वेळ व स्थान निश्चित करा. महाराष्ट्रातील अनुभवी पुजारी घरी येतात.`}
         canonical={`/booking/${pooja.slug}`}
         noindex={true}
       />
@@ -108,21 +206,115 @@ export default function Booking() {
         <div className="container">
           {/* Progress */}
           <div className={styles.progress}>
-            {['माहिती भरा','पुष्टी करा','बुकिंग यशस्वी'].map((label, i) => (
-              <div key={i} className={`${styles.progressStep} ${step > i ? styles.done : ''} ${step === i + 1 ? styles.current : ''}`}>
-                <div className={styles.progressDot}>{step > i + 1 ? '✓' : i + 1}</div>
-                <span>{label}</span>
-                {i < 2 && <div className={styles.progressLine}/>}
-              </div>
-            ))}
+            {(isAuthenticated
+              ? ['माहिती भरा','पुष्टी करा','बुकिंग यशस्वी']
+              : ['ओळख पटवा','माहिती भरा','पुष्टी करा','बुकिंग यशस्वी']
+            ).map((label, i) => {
+              const stepNum = isAuthenticated ? i + 1 : i;
+              return (
+                <div key={i} className={`${styles.progressStep} ${step > stepNum ? styles.done : ''} ${step === stepNum ? styles.current : ''}`}>
+                  <div className={styles.progressDot}>{step > stepNum ? '✓' : stepNum + 1}</div>
+                  <span>{label}</span>
+                  {i < (isAuthenticated ? 2 : 3) && <div className={styles.progressLine}/>}
+                </div>
+              );
+            })}
           </div>
 
           <div className={styles.layout}>
             {/* LEFT: Form */}
             <div className={styles.formSection}>
+              {/* ── Step 0: Phone OTP (not logged in) ── */}
+              {step === 0 && (
+                <div className={styles.card}>
+                  <h2 className={styles.cardTitle}>📱 फोन नंबर पडताळणी</h2>
+                  <p style={{ color: 'var(--text-muted)', marginBottom: 20, fontSize: 14 }}>
+                    बुकिंग करण्यासाठी OTP पडताळणी आवश्यक आहे. नाव व फोन नंबर टाका.
+                  </p>
+
+                  <div className="form-group">
+                    <label>नाव (पर्यायी)</label>
+                    <input
+                      type="text" className="form-control"
+                      placeholder="तुमचे नाव"
+                      value={otpName} onChange={e => setOtpName(e.target.value)}
+                      disabled={otpSent}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>फोन नंबर *</label>
+                    <input
+                      type="tel" className="form-control"
+                      placeholder="10 अंकी फोन नंबर"
+                      maxLength={10}
+                      value={otpPhone} onChange={e => setOtpPhone(e.target.value.replace(/\D/g, ''))}
+                      disabled={otpSent}
+                    />
+                  </div>
+
+                  {!otpSent ? (
+                    <button
+                      className="btn btn-primary btn-lg" style={{ width: '100%' }}
+                      onClick={handleSendOtp} disabled={otpLoading}
+                    >
+                      {otpLoading ? '⏳ पाठवत आहे...' : '📲 OTP पाठवा'}
+                    </button>
+                  ) : (
+                    <>
+                      <div className="form-group" style={{ marginTop: 16 }}>
+                        <label>6 अंकी OTP *</label>
+                        <input
+                          type="text" className="form-control"
+                          placeholder="OTP टाका"
+                          maxLength={6}
+                          value={otpCode} onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                          style={{ letterSpacing: 8, fontSize: 20, textAlign: 'center' }}
+                        />
+                        <small style={{ color: 'var(--text-muted)' }}>
+                          {otpPhone} वर OTP पाठवला. &nbsp;
+                          <span
+                            style={{ color: 'var(--primary)', cursor: 'pointer' }}
+                            onClick={() => { setOtpSent(false); setOtpCode(''); }}
+                          >बदला</span>
+                        </small>
+                      </div>
+                      <button
+                        className="btn btn-primary btn-lg" style={{ width: '100%' }}
+                        onClick={handleVerifyOtp} disabled={otpLoading}
+                      >
+                        {otpLoading ? '⏳ तपासत आहे...' : '✅ OTP पडताळा व पुढे जा'}
+                      </button>
+                    </>
+                  )}
+
+                  <div style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: 'var(--text-muted)' }}>
+                    आधीच खाते आहे?{' '}
+                    <span
+                      style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}
+                      onClick={() => navigate('/login')}
+                    >लॉगिन करा</span>
+                  </div>
+                </div>
+              )}
+
               {step === 1 && (
                 <div className={styles.card}>
                   <h2 className={styles.cardTitle}>📅 बुकिंग तपशील</h2>
+
+                  {preferredPujariName && (
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      background: '#fdf6ee', border: '1px solid #f0e0c8',
+                      borderRadius: 10, padding: '10px 16px', marginBottom: 20,
+                    }}>
+                      <span style={{ fontSize: 20 }}>🙏</span>
+                      <div>
+                        <div style={{ fontSize: 12, color: '#888' }}>पसंतीचे पुजारी</div>
+                        <div style={{ fontWeight: 700, color: '#7c2d00' }}>{preferredPujariName}</div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid-2">
                     <div className="form-group">
@@ -191,6 +383,11 @@ export default function Booking() {
                     <div className={styles.confirmItem}>
                       <span>पूजा</span><strong>{pooja.name_mr}</strong>
                     </div>
+                    {preferredPujariName && (
+                      <div className={styles.confirmItem}>
+                        <span>पसंतीचे पुजारी</span><strong>🙏 {preferredPujariName}</strong>
+                      </div>
+                    )}
                     <div className={styles.confirmItem}>
                       <span>तारीख</span>
                       <strong>{new Date(form.booking_date).toLocaleDateString('mr-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
@@ -227,7 +424,49 @@ export default function Booking() {
                 </div>
               )}
 
+              {/* ── Step 3: Payment Choice ── */}
               {step === 3 && (
+                <div className={styles.card}>
+                  <h2 className={styles.cardTitle}>💳 पेमेंट करा</h2>
+                  <p style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: 14 }}>
+                    बुकिंग कोड: <strong>{bookingCode}</strong>
+                  </p>
+                  <div className={`${styles.confirmItem} ${styles.totalRow}`} style={{ marginBottom: 24 }}>
+                    <span>एकूण रक्कम</span>
+                    <strong className={styles.totalAmt}>₹{Number(pooja.price).toLocaleString('mr-IN')}</strong>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <button
+                      className="btn btn-primary btn-lg"
+                      onClick={handleRazorpay}
+                      disabled={payLoading}
+                      style={{ width: '100%' }}
+                    >
+                      {payLoading ? '⏳ उघडत आहे...' : '💳 ऑनलाइन पेमेंट करा (UPI / Card)'}
+                    </button>
+
+                    <button
+                      className="btn btn-secondary btn-lg"
+                      onClick={async () => {
+                        try {
+                          await bookingAPI.chooseCash(bookingId);
+                        } catch {}
+                        setStep(4);
+                      }}
+                      style={{ width: '100%' }}
+                    >
+                      🏠 नंतर पेमेंट करा (पुजारी आल्यावर रोख/UPI)
+                    </button>
+                  </div>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 12, textAlign: 'center' }}>
+                    ऑनलाइन पेमेंट केल्यास बुकिंग लगेच confirmed होते.
+                  </p>
+                </div>
+              )}
+
+              {/* ── Step 4: Success ── */}
+              {step === 4 && (
                 <div className={`${styles.card} ${styles.successCard}`}>
                   <div className={styles.successIcon}>🎉</div>
                   <h2>बुकिंग यशस्वी झाली!</h2>

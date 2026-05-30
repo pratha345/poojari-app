@@ -1,100 +1,411 @@
-/* Header.module.css */
+/* Header.module.css — Attractive single-row navbar with theme-awareness */
 
-.header { position: sticky; top: 0; z-index: 100; font-family: var(--font-body); }
+/* ── Wrapper ──────────────────────────────────────────────────── */
+.header {
+  position:   sticky;
+  top:        0;
+  z-index:    100;
+  background: var(--white);
+  font-family: var(--font-body);
+  box-shadow: 0 4px 28px rgba(0,0,0,0.10);
+}
 
-/* ── Top Info Bar ─────────────────────────────────────────────── */
+/* ── Top Bar ──────────────────────────────────────────────────── */
 .topBar {
-  background: var(--secondary);
-  color:      var(--gold-light);
-  font-size:  13px;
-  padding:    5px 0;
+  background: linear-gradient(90deg, #3d1100 0%, #7c2d00 40%, #b35c00 70%, #7c2d00 85%, #3d1100 100%);
+  padding: 0;
 }
-.topBar > div {
+.topBarInner {
   display:         flex;
-  justify-content: space-between;
   align-items:     center;
+  justify-content: space-between;
+  height:          34px;
+  font-size:       12px;
 }
-.topBar a { color: var(--gold-light); }
-/* Hide tagline on small mobile, keep phone link */
-@media (max-width: 480px) {
-  .topTagline { display: none; }
-  .topBar > div { justify-content: center; }
+.topBarLeft {
+  display:     flex;
+  align-items: center;
+  gap:         7px;
+  color:       rgba(255,255,255,0.82);
+  font-size:   11.5px;
+  letter-spacing: 0.2px;
+}
+.topBarDot {
+  width:        7px;
+  height:       7px;
+  border-radius: 50%;
+  background:   #fbbf24;
+  flex-shrink:  0;
+  animation:    topDotPulse 2.2s ease-in-out infinite;
+}
+@keyframes topDotPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(251,191,36,0); }
+}
+.topBarRight {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+}
+.topBarPhone {
+  color:           #fde68a;
+  font-size:       11.5px;
+  font-weight:     600;
+  text-decoration: none;
+  letter-spacing:  0.3px;
+  transition:      color 0.15s;
+}
+.topBarPhone:hover { color: #fff; }
+.topBarSep  { color: rgba(255,255,255,0.25); font-size: 11px; }
+.topBarJoin {
+  color:           #fbbf24;
+  font-size:       11.5px;
+  font-weight:     700;
+  text-decoration: none;
+  letter-spacing:  0.2px;
+  transition:      color 0.15s;
+}
+.topBarJoin:hover { color: #fff; }
+
+/* ── Main nav row ─────────────────────────────────────────────── */
+.mainNav {
+  background: #fff;
+  border-bottom: 1px solid rgba(224,123,42,0.13);
 }
 
-/* ── Main Nav ─────────────────────────────────────────────────── */
-.mainNav {
-  background:    var(--white);
-  border-bottom: 1px solid var(--border);
-  padding:       8px 0;
-}
 .navInner {
   display:     flex;
   align-items: center;
-  gap:         16px;
+  gap:         6px;
+  height:      68px;
 }
 
 /* ── Logo ─────────────────────────────────────────────────────── */
 .logo {
   display:     flex;
   align-items: center;
-  gap:         9px;
   flex-shrink: 0;
-  min-width:   0;
-}
-.logoIcon { font-size: 26px; animation: float 3s ease-in-out infinite; flex-shrink: 0; }
-.logoText { display: flex; flex-direction: column; min-width: 0; }
-.logoMain {
-  font-family: var(--font-display);
-  font-size:   20px;
-  color:       var(--primary);
-  font-weight: 700;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-.logoSub {
-  font-size:      10px;
-  color:          var(--text-muted);
-  letter-spacing: 0.5px;
-  white-space:    nowrap;
+  margin-right: 4px;
+  text-decoration: none;
 }
 
-/* ── Desktop Search ──────────────────────────────────────────��── */
-.searchForm {
-  flex:          1;
-  max-width:     440px;
-  display:       flex;
-  border:        1.5px solid var(--border);
-  border-radius: var(--radius-xl);
-  overflow:      hidden;
-  transition:    border-color var(--transition);
+.logoImg {
+  height:      66px;
+  width:       auto;
+  display:     block;
+  object-fit:  contain;
+  transition:  transform 0.25s ease, opacity 0.2s;
+  /* trim any extra whitespace from the image edges */
+  mix-blend-mode: multiply; /* blends white background with header bg */
 }
-.searchForm:focus-within { border-color: var(--primary); }
-.searchForm input {
-  flex:        1;
-  border:      none;
-  padding:     9px 14px;
-  font-size:   14px;
-  outline:     none;
-  background:  transparent;
-  font-family: var(--font-body);
-  color:       var(--text);
-  min-width:   0;
+.logo:hover .logoImg {
+  transform: scale(1.04);
+  opacity:   0.92;
 }
-.searchForm button {
-  padding:     9px 16px;
-  background:  var(--primary);
-  color:       var(--white);
-  border:      none;
+
+/* ── Desktop Nav Links — CENTER ───────────────────────────────── */
+.desktopNav {
+  flex:            1;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             2px;
+  overflow:        visible;
+}
+
+.navLink {
+  padding:     8px 13px;
+  color:       #3d2000;
   font-size:   15px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  border-radius: 8px;
+  transition:  all 0.18s ease;
+  position:    relative;
+  white-space: nowrap;
+  display:     inline-flex;
+  align-items: center;
+  gap:         4px;
+  background:  none;
+  border:      none;
   cursor:      pointer;
-  flex-shrink: 0;
-  transition:  background var(--transition);
+  text-decoration: none;
+  letter-spacing: 0.1px;
 }
-.searchForm button:hover { background: var(--primary-dark); }
+.navLink::after {
+  content:    '';
+  position:   absolute;
+  bottom:     4px;
+  left:       50%;
+  transform:  translateX(-50%) scaleX(0);
+  width:      70%;
+  height:     2px;
+  background: var(--primary, #E07B2A);
+  border-radius: 2px;
+  transition: transform 0.22s ease;
+}
+.navLink:hover {
+  color:      var(--primary, #E07B2A);
+  background: rgba(224,123,42,0.07);
+}
+.navLink:hover::after { transform: translateX(-50%) scaleX(1); }
 
-/* ── Desktop Auth ─────────────────────────────────────────────── */
-.authArea  { flex-shrink: 0; }
-.authButtons { display: flex; gap: 8px; align-items: center; }
+.navLinkHighlight {
+  background:    linear-gradient(135deg, #FF8C00 0%, #b35c00 100%) !important;
+  color:         #fff !important;
+  font-weight:   700 !important;
+  border-radius: 22px !important;
+  padding:       7px 18px !important;
+  box-shadow:    0 3px 14px rgba(179,92,0,0.35);
+  letter-spacing: 0.2px;
+}
+.navLinkHighlight::after { display: none; }
+.navLinkHighlight:hover {
+  background:  linear-gradient(135deg, #FF9A1A 0%, #8b3a00 100%) !important;
+  box-shadow:  0 5px 20px rgba(179,92,0,0.5) !important;
+  transform:   translateY(-1px);
+  color:       #fff !important;
+}
+
+.active {
+  color:       var(--primary, #E07B2A) !important;
+  font-weight: 700 !important;
+  background:  rgba(224,123,42,0.09) !important;
+}
+.active::after {
+  transform: translateX(-50%) scaleX(1) !important;
+  background: var(--primary, #E07B2A);
+}
+
+/* ── Dropdown group ───────────────────────────────────────────── */
+.dropGroup   { position: relative; display: inline-flex; align-items: center; }
+.dropTrigger { cursor: pointer; }
+
+.dropArrow {
+  font-size:  12px;  /* 10→12 */
+  transition: transform 0.2s ease;
+  display:    inline-block;
+  opacity:    0.55;
+  margin-top: 1px;
+}
+.dropArrowOpen { transform: rotate(180deg); opacity: 0.8; }
+
+.megaMenu {
+  position:      absolute;
+  top:           calc(100% + 10px);
+  left:          50%;
+  transform:     translateX(-40%);
+  background:    #fff;
+  border:        1px solid rgba(224,123,42,0.15);
+  border-radius: 16px;
+  box-shadow:    0 20px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(224,123,42,0.08);
+  min-width:     250px;
+  z-index:       999;
+  animation:     fadeIn 0.18s ease;
+  overflow:      hidden;
+}
+.megaItem {
+  display:     flex;
+  align-items: center;
+  gap:         14px;
+  padding:     14px 18px;
+  transition:  background 0.15s;
+  border-bottom: 1px solid rgba(224,123,42,0.08);
+}
+.megaItem:last-child { border-bottom: none; }
+.megaItem:hover,
+.megaItemActive { background: #fffaf4; }
+.megaIcon {
+  font-size:       18px;
+  flex-shrink:     0;
+  margin-top:      0;
+  width:           46px;
+  height:          46px;
+  border-radius:   13px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           #fff;
+  box-shadow:      0 4px 14px rgba(0,0,0,0.18);
+  transition:      transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease;
+}
+.megaItem:hover .megaIcon {
+  transform:  scale(1.13) rotate(-5deg);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.22);
+}
+
+.mobileSubIcon {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  width:           30px;
+  height:          30px;
+  border-radius:   9px;
+  font-size:       14px;
+  margin-right:    10px;
+  flex-shrink:     0;
+  box-shadow:      0 2px 8px rgba(0,0,0,0.12);
+  vertical-align:  middle;
+}
+.megaLabel {
+  display:     block;
+  font-size:   15px;
+  font-weight: 600;
+  color:       var(--secondary, #8B2500);
+  font-family: var(--font-body);
+}
+.megaDesc {
+  display:    block;
+  font-size:  13px;
+  color:      var(--text-muted, #7A5533);
+  margin-top: 3px;
+  line-height: 1.5;    /* 1.4→1.5 for Devanagari */
+}
+
+/* ── Right section ────────────────────────────────────────────── */
+.rightSection {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+/* Search icon */
+.searchIconBtn {
+  width:           38px;
+  height:          38px;
+  border-radius:   50%;
+  background:      rgba(224,123,42,0.08);
+  border:          1px solid rgba(224,123,42,0.18);
+  font-size:       16px;
+  cursor:          pointer;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      all 0.18s;
+  color:           var(--primary, #E07B2A);
+}
+.searchIconBtn:hover {
+  background: rgba(224,123,42,0.15);
+  transform:  scale(1.05);
+}
+
+/* Festival theme chip */
+.festivalChip {
+  display:       inline-flex;
+  align-items:   center;
+  justify-content: center;
+  width:         34px;
+  height:        34px;
+  border-radius: 50%;
+  background:    linear-gradient(135deg, rgba(224,123,42,0.15), rgba(212,175,55,0.2));
+  border:        1.5px solid rgba(224,123,42,0.25);
+  font-size:     16px;
+  animation:     festivalPulse 2s ease-in-out infinite;
+  cursor:        default;
+}
+@keyframes festivalPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(224,123,42,0.3); }
+  50%       { box-shadow: 0 0 0 6px rgba(224,123,42,0); }
+}
+
+/* Language dropdown */
+.langDropdown {
+  padding:       7px 28px 7px 12px;
+  border-radius: 30px;
+  background:    #1e3050;
+  border:        none;
+  font-size:     13px;
+  font-weight:   600;
+  color:         #fff;
+  cursor:        pointer;
+  transition:    all 0.18s;
+  white-space:   nowrap;
+  font-family:   var(--font-body);
+  box-shadow:    0 2px 8px rgba(30,48,80,0.25);
+  appearance:    none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='rgba(255,255,255,0.7)' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat:   no-repeat;
+  background-position: right 10px center;
+  flex-shrink:   0;
+}
+.langDropdown:hover {
+  background-color: #2a4270;
+  box-shadow:       0 4px 12px rgba(30,48,80,0.35);
+}
+.langDropdown option {
+  background: #1e3050;
+  color:      #fff;
+}
+
+/* Book Puja CTA pill — gradient orange */
+.bookCta {
+  padding:         9px 20px;
+  border-radius:   30px;
+  background:      linear-gradient(135deg, #FF8C00 0%, var(--primary, #E07B2A) 100%);
+  color:           #fff;
+  font-size:       13px;
+  font-weight:     700;
+  font-family:     var(--font-body);
+  border:          none;
+  cursor:          pointer;
+  white-space:     nowrap;
+  transition:      all 0.2s ease;
+  text-decoration: none;
+  display:         inline-flex;
+  align-items:     center;
+  gap:             5px;
+  box-shadow:      0 4px 14px rgba(224,123,42,0.4);
+  letter-spacing:  0.01em;
+}
+.bookCta:hover {
+  transform:  translateY(-2px);
+  box-shadow: 0 6px 22px rgba(224,123,42,0.55);
+  background: linear-gradient(135deg, #FF9A1A 0%, #d06010 100%);
+}
+
+/* Login pill — dark navy */
+.loginPill {
+  padding:         9px 18px;
+  border-radius:   30px;
+  background:      #1e3050;
+  color:           #fff;
+  font-size:       13px;
+  font-weight:     600;
+  font-family:     var(--font-body);
+  border:          none;
+  text-decoration: none;
+  white-space:     nowrap;
+  transition:      all 0.18s;
+  display:         inline-flex;
+  align-items:     center;
+  box-shadow:      0 2px 8px rgba(30,48,80,0.2);
+}
+.loginPill:hover {
+  background: #2a4270;
+  transform:  translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30,48,80,0.3);
+}
+
+/* Register pill */
+.registerPill {
+  padding:         9px 18px;
+  border-radius:   30px;
+  background:      transparent;
+  color:           var(--primary, #E07B2A);
+  border:          1.5px solid var(--primary, #E07B2A);
+  font-size:       13px;
+  font-weight:     600;
+  font-family:     var(--font-body);
+  text-decoration: none;
+  white-space:     nowrap;
+  transition:      all 0.18s;
+  display:         inline-flex;
+  align-items:     center;
+}
+.registerPill:hover { background: var(--primary, #E07B2A); color: #fff; }
 
 /* User menu */
 .userMenu    { position: relative; }
@@ -102,41 +413,43 @@
   display:       flex;
   align-items:   center;
   gap:           8px;
-  padding:       7px 14px;
-  border:        1.5px solid var(--border);
-  border-radius: var(--radius-xl);
-  background:    var(--cream);
+  padding:       7px 14px 7px 7px;
+  border:        1.5px solid rgba(224,123,42,0.2);
+  border-radius: 30px;
+  background:    #fff;
   font-size:     14px;
   font-family:   var(--font-body);
   cursor:        pointer;
-  transition:    all var(--transition);
+  transition:    all 0.18s;
   white-space:   nowrap;
+  box-shadow:    0 2px 8px rgba(0,0,0,0.05);
 }
-.userBtn:hover { border-color: var(--primary); background: var(--white); }
-.userName { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.chevron  { font-size: 10px; }
+.userBtn:hover { border-color: var(--primary, #E07B2A); box-shadow: 0 4px 12px rgba(224,123,42,0.15); }
+.userName { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--text, #2D1B00); }
+.chevron  { font-size: 12px; opacity: 0.5; }  /* 10→12 */
 .avatar {
-  width:           30px;
-  height:          30px;
+  width:           32px;
+  height:          32px;
   border-radius:   50%;
-  background:      var(--primary);
-  color:           var(--white);
+  background:      linear-gradient(135deg, var(--primary-light, #F5A55A), var(--primary, #E07B2A));
+  color:           #fff;
   display:         flex;
   align-items:     center;
   justify-content: center;
-  font-weight:     700;
+  font-weight:     800;
   font-size:       14px;
   flex-shrink:     0;
+  box-shadow:      0 2px 8px rgba(224,123,42,0.3);
 }
 .dropdown {
   position:      absolute;
-  top:           calc(100% + 6px);
+  top:           calc(100% + 10px);
   right:         0;
-  background:    var(--white);
-  border:        1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow:    0 8px 32px var(--shadow);
-  min-width:     192px;
+  background:    #fff;
+  border:        1px solid rgba(224,123,42,0.15);
+  border-radius: 16px;
+  box-shadow:    0 16px 50px rgba(0,0,0,0.12);
+  min-width:     210px;
   z-index:       200;
   overflow:      hidden;
   animation:     fadeIn 0.15s ease;
@@ -146,100 +459,114 @@
   display:     block;
   width:       100%;
   text-align:  left;
-  padding:     11px 16px;
+  padding:     12px 18px;
   font-size:   14px;
   font-family: var(--font-body);
-  color:       var(--text);
+  color:       var(--text, #2D1B00);
   background:  transparent;
   border:      none;
   cursor:      pointer;
-  transition:  background var(--transition);
+  transition:  background 0.15s;
+  border-bottom: 1px solid rgba(224,123,42,0.07);
 }
+.dropdown a:last-child,
+.dropdown button:last-child { border-bottom: none; }
 .dropdown a:hover,
-.dropdown button:hover { background: var(--cream); color: var(--primary); }
+.dropdown button:hover { background: #fffaf4; color: var(--primary, #E07B2A); }
 
-/* ── Mobile Controls (search icon + hamburger) ────────────────── */
+/* ── Theme-aware accent strip ─────────────────────────────────── */
+.accentStrip {
+  height:     4px;
+  background: linear-gradient(
+    90deg,
+    var(--secondary, #8B2500) 0%,
+    var(--primary,   #E07B2A) 25%,
+    var(--gold,      #D4AF37) 50%,
+    var(--primary,   #E07B2A) 75%,
+    var(--secondary, #8B2500) 100%
+  );
+  opacity: 1;
+}
+
+/* ── Hide top bar on mobile ───────────────────────────────────── */
+@media (max-width: 768px) {
+  .topBar { display: none; }
+  .navInner { height: 60px; }
+}
+
+/* ── Mobile Controls ──────────────────────────────────────────── */
 .mobileControls {
   display:     none;
   align-items: center;
-  gap:         4px;
+  gap:         6px;
   margin-left: auto;
-  flex-shrink: 0;
 }
-
-/* Search toggle button (mobile) */
 .searchToggle {
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  width:           38px;
-  height:          38px;
-  border-radius:   8px;
+  width:           40px;
+  height:          40px;
+  border-radius:   10px;
   background:      none;
   border:          none;
   font-size:       18px;
-  color:           var(--text);
+  color:           var(--primary, #E07B2A);
   cursor:          pointer;
-  transition:      background var(--transition);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      background 0.18s;
 }
-.searchToggle:hover { background: var(--cream); }
+.searchToggle:hover { background: rgba(224,123,42,0.08); }
 
-/* Hamburger — 3-line CSS animated */
 .hamburger {
   display:         flex;
   flex-direction:  column;
   justify-content: center;
   align-items:     center;
   gap:             5px;
-  width:           38px;
-  height:          38px;
+  width:           40px;
+  height:          40px;
   background:      none;
   border:          none;
   cursor:          pointer;
   padding:         6px;
-  border-radius:   8px;
-  transition:      background var(--transition);
+  border-radius:   10px;
+  transition:      background 0.18s;
 }
-.hamburger:hover { background: var(--cream); }
+.hamburger:hover { background: rgba(224,123,42,0.08); }
 .hamburger span {
   display:          block;
   width:            22px;
-  height:           2px;
-  background:       var(--secondary);
-  border-radius:    2px;
-  transition:       transform 0.3s ease, opacity 0.3s ease, width 0.3s ease;
+  height:           2.5px;
+  background:       var(--secondary, #8B2500);
+  border-radius:    3px;
+  transition:       transform 0.3s ease, opacity 0.3s ease;
   transform-origin: center;
 }
-/* X animation */
-.hamburgerOpen span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburgerOpen span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
 .hamburgerOpen span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.hamburgerOpen span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.hamburgerOpen span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
-/* ── Mobile Search Bar (slides in below main nav) ─────────────── */
+/* ── Mobile Search Bar ────────────────────────────────────────── */
 .mobileSearchBar {
-  background:  var(--white);
-  border-top:  1px solid var(--border);
+  background:  #fff;
+  border-top:  1px solid rgba(224,123,42,0.1);
   overflow:    hidden;
   max-height:  0;
   transition:  max-height 0.3s ease, padding 0.3s ease;
   padding:     0;
 }
-.mobileSearchOpen {
-  max-height: 80px;
-  padding:    10px 0;
-}
+.mobileSearchOpen { max-height: 80px; padding: 10px 0; }
 .mobileSearchForm {
   display:       flex;
-  border:        1.5px solid var(--border);
-  border-radius: var(--radius-xl);
+  border:        1.5px solid rgba(224,123,42,0.2);
+  border-radius: 30px;
   overflow:      hidden;
-  transition:    border-color var(--transition);
 }
-.mobileSearchForm:focus-within { border-color: var(--primary); }
+.mobileSearchForm:focus-within { border-color: var(--primary, #E07B2A); }
 .mobileSearchForm input {
   flex:        1;
   border:      none;
-  padding:     10px 14px;
+  padding:     10px 16px;
   font-size:   15px;
   outline:     none;
   background:  transparent;
@@ -248,164 +575,192 @@
 }
 .mobileSearchForm button {
   padding:     10px 18px;
-  background:  var(--primary);
-  color:       var(--white);
+  background:  linear-gradient(135deg, #FF8C00, var(--primary, #E07B2A));
+  color:       #fff;
   border:      none;
   font-size:   13px;
   font-weight: 600;
   font-family: var(--font-body);
   cursor:      pointer;
   flex-shrink: 0;
-  transition:  background var(--transition);
-  white-space: nowrap;
 }
-.mobileSearchForm button:hover { background: var(--primary-dark); }
 
-/* ── Nav Links Bar ────────────────────────────────────────────── */
+/* ── Mobile Slide-down Menu ───────────────────────────────────── */
 .navBar {
-  background:  var(--primary);
+  background:  #fff;
   overflow:    hidden;
-  /* Mobile: collapsed by default */
-  max-height:  52px;
+  max-height:  0;
   transition:  max-height 0.38s ease;
+  border-top:  1px solid rgba(224,123,42,0.12);
+  display:     none;
 }
+.navOpen { max-height: 900px; }
+
 .navLinks {
-  display:     flex;
-  gap:         0;
-  overflow:    hidden;
-  flex-wrap:   nowrap;
+  display:        flex;
+  flex-direction: column;
+  padding:        6px 0 14px;
 }
-.navLink {
-  padding:     12px 18px;
-  color:       rgba(255,255,255,0.88);
-  font-size:   14px;
+.mobileNavLink {
+  padding:         13px 20px;
+  color:           var(--text, #2D1B00);
+  font-size:       16px;
+  font-weight:     500;
+  font-family:     var(--font-body);
+  border-bottom:   1px solid rgba(224,123,42,0.07);
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  text-decoration: none;
+}
+.mobileNavLink:hover { color: var(--primary, #E07B2A); background: #fffaf4; }
+
+.mobileGroup    { width: 100%; }
+.mobileGroupBtn {
+  width:       100%;
+  text-align:  left;
+  padding:     13px 20px;
+  color:       var(--text, #2D1B00);
+  font-size:   16px;
   font-weight: 500;
-  transition:  all var(--transition);
-  position:    relative;
-  white-space: nowrap;
+  font-family: var(--font-body);
+  background:  none;
+  border:      none;
+  border-bottom: 1px solid rgba(224,123,42,0.07);
+  cursor:      pointer;
+  display:     flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.navLink::after {
-  content:      '';
-  position:     absolute;
-  bottom:       0;
-  left:         50%;
-  transform:    translateX(-50%) scaleX(0);
-  width:        60%;
-  height:       2px;
-  background:   var(--gold-light);
-  transition:   transform var(--transition);
+.mobileGroupBtn:hover { color: var(--primary, #E07B2A); background: #fffaf4; }
+.mobileSubMenu { background: #fffaf4; }
+.mobileSubLink {
+  display:       block;
+  padding:       11px 20px 11px 36px;
+  color:         var(--text-muted, #7A5533);
+  font-size:     14px;
+  font-family:   var(--font-body);
+  border-bottom: 1px solid rgba(224,123,42,0.06);
+  text-decoration: none;
 }
-.navLink:hover::after,
-.navLink.active::after { transform: translateX(-50%) scaleX(1); }
-.navLink:hover,
-.navLink.active { color: var(--white); background: rgba(0,0,0,0.12); }
+.mobileSubLink:last-child { border-bottom: none; }
+.mobileSubLink:hover { color: var(--primary, #E07B2A); background: #fff8f0; }
 
 .phoneLink {
-  margin-left: auto;
-  padding:     12px 18px;
-  color:       var(--gold-light);
-  font-weight: 600;
-  font-size:   14px;
-  white-space: nowrap;
+  padding:       13px 20px;
+  color:         var(--primary, #E07B2A);
+  font-weight:   600;
+  font-size:     14px;
+  font-family:   var(--font-body);
+  border-bottom: 1px solid rgba(224,123,42,0.07);
+  display:       block;
+  text-decoration: none;
 }
 
-/* Mobile auth section — hidden on desktop */
-.mobileAuthSection { display: none; }
+/* Mobile auth */
+.mobileAuthSection {
+  display:    none;
+  padding:    12px 20px 8px;
+  border-top: 1px solid rgba(224,123,42,0.1);
+}
+.mobileAuthLink {
+  display:       block;
+  color:         var(--text, #2D1B00);
+  padding:       10px 0;
+  font-size:     14px;
+  font-family:   var(--font-body);
+  border-bottom: 1px solid rgba(224,123,42,0.08);
+  text-decoration: none;
+}
+.mobileAuthLogout {
+  display:     block;
+  width:       100%;
+  text-align:  left;
+  color:       #c0392b;
+  padding:     10px 0;
+  font-size:   14px;
+  font-family: var(--font-body);
+  background:  none;
+  border:      none;
+  cursor:      pointer;
+}
+.mobileAuthBtns  { display: flex; gap: 10px; padding: 8px 0; }
+.mobileAuthLogin {
+  flex: 1; text-align: center; padding: 11px;
+  border-radius: 30px;
+  border: 1.5px solid #1e3050;
+  color: #1e3050; font-size: 14px;
+  font-family: var(--font-body); font-weight: 600;
+  text-decoration: none;
+}
+.mobileAuthRegister {
+  flex: 1; text-align: center; padding: 11px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #FF8C00, var(--primary, #E07B2A));
+  color: #fff;
+  font-size: 14px; font-family: var(--font-body); font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(224,123,42,0.35);
+}
+
+/* Desktop-only helpers */
+.desktopOnly { display: flex; align-items: center; }
+.mobileOnly  { display: none; }
 
 /* ── Responsive ───────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  /* Hide desktop search & auth */
-  .searchForm  { display: none; }
-  .authArea    { display: none; }
-
-  /* Show mobile controls */
-  .mobileControls { display: flex; }
-
-  /* Nav bar: collapse on mobile, expand when open */
-  .navBar    { max-height: 0; }
-  .navOpen   { max-height: 640px; }
-
-  /* Stack nav links vertically */
-  .navLinks {
-    flex-direction: column;
-    padding:        8px 0 16px;
-  }
-  .navLink {
-    padding:    13px 20px;
-    text-align: left;
-    font-size:  15px;
-  }
-  .navLink::after { display: none; }
-  .phoneLink {
-    padding:     13px 20px;
-    margin-left: 0;
-    font-size:   15px;
-  }
-
-  /* Mobile auth section */
-  .mobileAuthSection {
-    display:       block;
-    padding:       12px 20px 6px;
-    border-top:    1px solid rgba(255,255,255,0.15);
-    margin-top:    4px;
-  }
-  .mobileAuthLink {
-    display:     block;
-    color:       rgba(255,255,255,0.85);
-    padding:     10px 0;
-    font-size:   14px;
-    font-family: var(--font-body);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  .mobileAuthLink:last-of-type { border-bottom: none; }
-  .mobileAuthLogout {
-    display:     block;
-    width:       100%;
-    text-align:  left;
-    color:       rgba(255,255,255,0.85);
-    padding:     10px 0;
-    font-size:   14px;
-    font-family: var(--font-body);
-    background:  none;
-    border:      none;
-    cursor:      pointer;
-  }
-  .mobileAuthBtns {
-    display: flex;
-    gap:     10px;
-    padding: 8px 0;
-  }
-  .mobileAuthLogin {
-    flex:            1;
-    text-align:      center;
-    padding:         10px;
-    border-radius:   var(--radius-xl);
-    border:          1.5px solid rgba(255,255,255,0.5);
-    color:           var(--white);
-    font-size:       14px;
-    font-family:     var(--font-body);
-    font-weight:     600;
-    transition:      background var(--transition);
-  }
-  .mobileAuthLogin:hover { background: rgba(255,255,255,0.1); }
-  .mobileAuthRegister {
-    flex:            1;
-    text-align:      center;
-    padding:         10px;
-    border-radius:   var(--radius-xl);
-    background:      var(--white);
-    color:           var(--primary);
-    font-size:       14px;
-    font-family:     var(--font-body);
-    font-weight:     700;
-    transition:      opacity var(--transition);
-  }
-  .mobileAuthRegister:hover { opacity: 0.9; }
+@media (max-width: 1100px) {
+  .navLink     { padding: 9px 10px; font-size: 14px; }
+  .bookCta     { padding: 8px 15px; font-size: 12px; }
+  .loginPill   { padding: 8px 14px; font-size: 12px; }
+  .langDropdown { padding: 6px 24px 6px 10px; font-size: 12px; }
 }
 
-/* Laptop: tighten search width a bit */
-@media (max-width: 1100px) and (min-width: 769px) {
-  .searchForm  { max-width: 320px; }
-  .navLink     { padding: 12px 14px; font-size: 13px; }
-  .logoMain    { font-size: 18px; }
+@media (max-width: 900px) {
+  .bookCta   { display: none; }  /* hide on small desktop to save space */
+}
+
+@media (max-width: 768px) {
+  .navInner    { height: 62px; }
+  .desktopNav  { display: none; }
+  .rightSection{ display: none; }
+  .mobileControls { display: flex; }
+  .desktopOnly { display: none; }
+  .mobileOnly  { display: block; }
+
+  .navBar      { display: block; }
+  .navOpen     { max-height: 900px; }
+  .mobileAuthSection { display: block; }
+
+  .navInner    { height: 68px; }
+  .logoImg     { height: 54px; }
+}
+
+/* ── Animations ───────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Mobile Touch Target Fixes (added) ──────────────────────── */
+/* Nav links, pills, and buttons need min 44px height for iOS/Android */
+.navLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.bookCta,
+.loginPill,
+.registerPill {
+  min-height: 44px;
+}
+
+/* Mobile hamburger always easy to tap */
+@media (max-width: 768px) {
+  .navLink    { min-height: 48px; padding: 12px 16px; }
+  .bookCta    { padding: 12px 20px; }
+  .loginPill, .registerPill { padding: 12px 18px; }
 }

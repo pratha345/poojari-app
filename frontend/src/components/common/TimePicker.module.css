@@ -22,7 +22,7 @@
 /* Picker panel */
 .picker {
   background: #1e1e1e; border-radius: 16px;
-  padding: 20px; width: 300px;
+  padding: 20px; width: min(300px, 92vw);
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
   display: flex; flex-direction: column; gap: 14px;
 }

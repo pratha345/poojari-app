@@ -1,5 +1,5 @@
 /* Booking.module.css */
-.main { background: var(--cream); padding: 32px 0 60px; min-height: 80vh; }
+.main { background: var(--cream); padding: 40px 0 64px; min-height: 80vh; }
 
 /* ── Progress bar ─────────────────────────────────────────────── */
 .progress {
@@ -51,7 +51,7 @@
   background:    var(--white);
   border-radius: var(--radius-lg);
   border:        1.5px solid var(--border);
-  padding:       28px 32px;
+  padding:       28px;
   box-shadow:    0 4px 20px var(--shadow);
 }
 .cardTitle {
@@ -127,11 +127,11 @@
   overflow:      hidden;
   box-shadow:    0 4px 20px var(--shadow);
   position:      sticky;
-  top:           120px;
+  top:           88px;
 }
 .summaryImg       { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
 .summaryBody      { padding: 18px; }
-.summaryCat       { font-size: 11px; color: var(--primary); font-weight: 700; text-transform: uppercase; }
+.summaryCat       { font-size: 12px; color: var(--primary); font-weight: 700; text-transform: uppercase; }
 .summaryTitle     { font-family: var(--font-display); font-size: 1.05rem; color: var(--secondary); margin: 5px 0; }
 .summaryMeta      { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
 .summaryPrice     { font-size: 22px; font-weight: 700; color: var(--primary); font-family: var(--font-display); }
@@ -173,4 +173,9 @@
   .bookingCode { font-size: 18px; padding: 10px 16px; }
   .successCard { padding: 36px 16px; }
   .progress    { flex-wrap: wrap; justify-content: center; }
+}
+
+/* Landscape on short mobile screens */
+@media (max-width: 640px) and (orientation: landscape) {
+  .summaryCard { position: static; }
 }

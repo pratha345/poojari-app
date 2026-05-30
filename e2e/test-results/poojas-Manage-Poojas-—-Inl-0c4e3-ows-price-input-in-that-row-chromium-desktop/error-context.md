@@ -1,0 +1,1171 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: poojas.spec.js >> Manage Poojas — Inline Price Edit >> TC-PE-01: clicking ✏️ किंमत shows price input in that row
+- Location: tests\poojas.spec.js:121:3
+
+# Error details
+
+```
+Tearing down "context" exceeded the test timeout of 60000ms.
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - img [ref=e7]
+      - generic [ref=e9]:
+        - generic [ref=e10]: पूजारी
+        - generic [ref=e11]: Admin Panel
+      - button "←" [ref=e12] [cursor=pointer]
+    - navigation [ref=e13]:
+      - link "Dashboard" [ref=e14] [cursor=pointer]:
+        - /url: /admin/dashboard
+        - img [ref=e16]
+        - generic [ref=e18]: Dashboard
+      - link "📊 Report" [ref=e19] [cursor=pointer]:
+        - /url: /admin/report
+        - img [ref=e21]
+        - generic [ref=e23]: 📊 Report
+      - link "Pujari Requests" [ref=e24] [cursor=pointer]:
+        - /url: /admin/pujaris/pending
+        - img [ref=e26]
+        - generic [ref=e28]: Pujari Requests
+      - link "Approved Pujaris" [ref=e29] [cursor=pointer]:
+        - /url: /admin/pujaris
+        - img [ref=e31]
+        - generic [ref=e33]: Approved Pujaris
+      - link "Bookings" [ref=e34] [cursor=pointer]:
+        - /url: /admin/bookings
+        - img [ref=e36]
+        - generic [ref=e38]: Bookings
+      - link "Manage Poojas" [ref=e39] [cursor=pointer]:
+        - /url: /admin/poojas
+        - img [ref=e41]
+        - generic [ref=e43]: Manage Poojas
+      - link "Homepage" [ref=e44] [cursor=pointer]:
+        - /url: /admin/home
+        - img [ref=e46]
+        - generic [ref=e48]: Homepage
+      - link "Theme Settings" [ref=e49] [cursor=pointer]:
+        - /url: /admin/theme
+        - img [ref=e51]
+        - generic [ref=e53]: Theme Settings
+      - link "Kundali Milan" [ref=e54] [cursor=pointer]:
+        - /url: /admin/kundali-milan
+        - img [ref=e56]
+        - generic [ref=e58]: Kundali Milan
+      - link "Manage Halls" [ref=e59] [cursor=pointer]:
+        - /url: /admin/halls
+        - img [ref=e61]
+        - generic [ref=e63]: Manage Halls
+      - link "Samagri यादी" [ref=e64] [cursor=pointer]:
+        - /url: /admin/samagri
+        - img [ref=e66]
+        - generic [ref=e68]: Samagri यादी
+      - link "जन्म पत्रिका" [ref=e69] [cursor=pointer]:
+        - /url: /admin/janam-patrika
+        - img [ref=e71]
+        - generic [ref=e73]: जन्म पत्रिका
+      - link "ब्लॉग" [ref=e74] [cursor=pointer]:
+        - /url: /admin/blog
+        - img [ref=e76]
+        - generic [ref=e78]: ब्लॉग
+      - link "अभ्यासक" [ref=e79] [cursor=pointer]:
+        - /url: /admin/abhyasak
+        - img [ref=e81]
+        - generic [ref=e83]: अभ्यासक
+      - link "अभिप्राय" [ref=e84] [cursor=pointer]:
+        - /url: /admin/reviews
+        - img [ref=e86]
+        - generic [ref=e88]: अभिप्राय
+      - link "💳 Plan Upgrade" [ref=e89] [cursor=pointer]:
+        - /url: /admin/upgrade-plan
+        - img [ref=e91]
+        - generic [ref=e93]: 💳 Plan Upgrade
+    - generic [ref=e94]:
+      - generic [ref=e95]:
+        - generic [ref=e96]: Test Admin
+        - generic [ref=e97]: admin
+      - button "Logout" [ref=e98] [cursor=pointer]:
+        - img [ref=e99]
+        - generic [ref=e101]: Logout
+  - main [ref=e102]:
+    - generic [ref=e103]:
+      - heading "Manage Poojas" [level=2] [ref=e104]
+      - generic [ref=e106]:
+        - img [ref=e107]
+        - text: Test Admin
+    - generic [ref=e110]:
+      - generic [ref=e111]:
+        - heading "🪔 पूजा व्यवस्थापन" [level=1] [ref=e112]
+        - button "+ नवीन पूजा जोडा" [ref=e113] [cursor=pointer]
+      - table [ref=e115]:
+        - rowgroup [ref=e116]:
+          - row "छायाचित्र नाव श्रेणी किंमत (₹) कालावधी लोकप्रिय कृती" [ref=e117]:
+            - columnheader "छायाचित्र" [ref=e118]
+            - columnheader "नाव" [ref=e119]
+            - columnheader "श्रेणी" [ref=e120]
+            - columnheader "किंमत (₹)" [ref=e121]
+            - columnheader "कालावधी" [ref=e122]
+            - columnheader "लोकप्रिय" [ref=e123]
+            - columnheader "कृती" [ref=e124]
+        - rowgroup [ref=e125]:
+          - row "सत्यनारायण पूजा 🔄 बदला सत्यनारायण पूजा satyanarayan-pooja गृह पूजा ₹ 4500.00 2.5 तास ⭐ हो ✅ जतन ✕" [ref=e126]:
+            - cell "सत्यनारायण पूजा 🔄 बदला" [ref=e127]:
+              - generic [ref=e128]:
+                - img "सत्यनारायण पूजा" [ref=e130]
+                - button "🔄 बदला" [ref=e131] [cursor=pointer]
+            - cell "सत्यनारायण पूजा satyanarayan-pooja" [ref=e132]:
+              - strong [ref=e133]: सत्यनारायण पूजा
+              - text: satyanarayan-pooja
+            - cell "गृह पूजा" [ref=e134]
+            - cell "₹ 4500.00" [ref=e135]:
+              - generic [ref=e136]:
+                - generic [ref=e137]: ₹
+                - spinbutton [active] [ref=e138]: "4500.00"
+            - cell "2.5 तास" [ref=e139]
+            - cell "⭐ हो" [ref=e140]:
+              - button "⭐ हो" [ref=e141] [cursor=pointer]
+            - cell "✅ जतन ✕" [ref=e142]:
+              - generic [ref=e143]:
+                - button "✅ जतन" [ref=e144] [cursor=pointer]
+                - button "✕" [ref=e145] [cursor=pointer]
+          - row "🪔 🔄 बदला मुंज / उपनयन संस्कार munj-upanayan गृह पूजा ₹५,००० 4 तास ⭐ हो ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e146]:
+            - cell "🪔 🔄 बदला" [ref=e147]:
+              - generic [ref=e148]:
+                - generic [ref=e150]: 🪔
+                - button "🔄 बदला" [ref=e151] [cursor=pointer]
+            - cell "मुंज / उपनयन संस्कार munj-upanayan" [ref=e152]:
+              - strong [ref=e153]: मुंज / उपनयन संस्कार
+              - text: munj-upanayan
+            - cell "गृह पूजा" [ref=e154]
+            - cell "₹५,०००" [ref=e155]:
+              - strong [ref=e156]: ₹५,०००
+            - cell "4 तास" [ref=e157]
+            - cell "⭐ हो" [ref=e158]:
+              - button "⭐ हो" [ref=e159] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e160]:
+              - generic [ref=e161]:
+                - button "✏️ संपादित" [ref=e162] [cursor=pointer]
+                - button "₹ किंमत" [ref=e163] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e164] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e165] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e166] [cursor=pointer]
+          - row "🪔 🔄 बदला महा मृत्युंजय जाप maha-mrityunjay-jap हवन / जाप ₹५,००१ 3 तास ⭐ हो ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e167]:
+            - cell "🪔 🔄 बदला" [ref=e168]:
+              - generic [ref=e169]:
+                - generic [ref=e171]: 🪔
+                - button "🔄 बदला" [ref=e172] [cursor=pointer]
+            - cell "महा मृत्युंजय जाप maha-mrityunjay-jap" [ref=e173]:
+              - strong [ref=e174]: महा मृत्युंजय जाप
+              - text: maha-mrityunjay-jap
+            - cell "हवन / जाप" [ref=e175]
+            - cell "₹५,००१" [ref=e176]:
+              - strong [ref=e177]: ₹५,००१
+            - cell "3 तास" [ref=e178]
+            - cell "⭐ हो" [ref=e179]:
+              - button "⭐ हो" [ref=e180] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e181]:
+              - generic [ref=e182]:
+                - button "✏️ संपादित" [ref=e183] [cursor=pointer]
+                - button "₹ किंमत" [ref=e184] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e185] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e186] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e187] [cursor=pointer]
+          - row "दशक्रिया विधी 🔄 बदला दशक्रिया विधी dashkriya-vidhi पित्रुश्राद्ध ₹१,५०० 3 तास ⭐ हो ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e188]:
+            - cell "दशक्रिया विधी 🔄 बदला" [ref=e189]:
+              - generic [ref=e190]:
+                - img "दशक्रिया विधी" [ref=e192]
+                - button "🔄 बदला" [ref=e193] [cursor=pointer]
+            - cell "दशक्रिया विधी dashkriya-vidhi" [ref=e194]:
+              - strong [ref=e195]: दशक्रिया विधी
+              - text: dashkriya-vidhi
+            - cell "पित्रुश्राद्ध" [ref=e196]
+            - cell "₹१,५००" [ref=e197]:
+              - strong [ref=e198]: ₹१,५००
+            - cell "3 तास" [ref=e199]
+            - cell "⭐ हो" [ref=e200]:
+              - button "⭐ हो" [ref=e201] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e202]:
+              - generic [ref=e203]:
+                - button "✏️ संपादित" [ref=e204] [cursor=pointer]
+                - button "₹ किंमत" [ref=e205] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e206] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e207] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e208] [cursor=pointer]
+          - row "गणपती स्थापना 🔄 बदला गणपती स्थापना ganpati-sthapna उत्सव पूजा ₹५,०९८ 2 तास ⭐ हो ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e209]:
+            - cell "गणपती स्थापना 🔄 बदला" [ref=e210]:
+              - generic [ref=e211]:
+                - img "गणपती स्थापना" [ref=e213]
+                - button "🔄 बदला" [ref=e214] [cursor=pointer]
+            - cell "गणपती स्थापना ganpati-sthapna" [ref=e215]:
+              - strong [ref=e216]: गणपती स्थापना
+              - text: ganpati-sthapna
+            - cell "उत्सव पूजा" [ref=e217]
+            - cell "₹५,०९८" [ref=e218]:
+              - strong [ref=e219]: ₹५,०९८
+            - cell "2 तास" [ref=e220]
+            - cell "⭐ हो" [ref=e221]:
+              - button "⭐ हो" [ref=e222] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e223]:
+              - generic [ref=e224]:
+                - button "✏️ संपादित" [ref=e225] [cursor=pointer]
+                - button "₹ किंमत" [ref=e226] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e227] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e228] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e229] [cursor=pointer]
+          - row "लक्ष्मी पूजन (दिवाळी) 🔄 बदला लक्ष्मी पूजन (दिवाळी) lakshmi-poojan-diwali उत्सव पूजा ₹३,६८२ 2 तास ⭐ हो ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e230]:
+            - cell "लक्ष्मी पूजन (दिवाळी) 🔄 बदला" [ref=e231]:
+              - generic [ref=e232]:
+                - img "लक्ष्मी पूजन (दिवाळी)" [ref=e234]
+                - button "🔄 बदला" [ref=e235] [cursor=pointer]
+            - cell "लक्ष्मी पूजन (दिवाळी) lakshmi-poojan-diwali" [ref=e236]:
+              - strong [ref=e237]: लक्ष्मी पूजन (दिवाळी)
+              - text: lakshmi-poojan-diwali
+            - cell "उत्सव पूजा" [ref=e238]
+            - cell "₹३,६८२" [ref=e239]:
+              - strong [ref=e240]: ₹३,६८२
+            - cell "2 तास" [ref=e241]
+            - cell "⭐ हो" [ref=e242]:
+              - button "⭐ हो" [ref=e243] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e244]:
+              - generic [ref=e245]:
+                - button "✏️ संपादित" [ref=e246] [cursor=pointer]
+                - button "₹ किंमत" [ref=e247] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e248] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e249] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e250] [cursor=pointer]
+          - row "गृहप्रवेश व गृहशांती 🔄 बदला गृहप्रवेश व गृहशांती gruhpravesh-gruhshanti वास्तू पूजा ₹५,००१ 4 तास ⭐ हो ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e251]:
+            - cell "गृहप्रवेश व गृहशांती 🔄 बदला" [ref=e252]:
+              - generic [ref=e253]:
+                - img "गृहप्रवेश व गृहशांती" [ref=e255]
+                - button "🔄 बदला" [ref=e256] [cursor=pointer]
+            - cell "गृहप्रवेश व गृहशांती gruhpravesh-gruhshanti" [ref=e257]:
+              - strong [ref=e258]: गृहप्रवेश व गृहशांती
+              - text: gruhpravesh-gruhshanti
+            - cell "वास्तू पूजा" [ref=e259]
+            - cell "₹५,००१" [ref=e260]:
+              - strong [ref=e261]: ₹५,००१
+            - cell "4 तास" [ref=e262]
+            - cell "⭐ हो" [ref=e263]:
+              - button "⭐ हो" [ref=e264] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e265]:
+              - generic [ref=e266]:
+                - button "✏️ संपादित" [ref=e267] [cursor=pointer]
+                - button "₹ किंमत" [ref=e268] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e269] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e270] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e271] [cursor=pointer]
+          - row "लग्न विधी 🔄 बदला लग्न विधी lagn-vidhi गृह पूजा ₹५,००० 5 तास ⭐ हो ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e272]:
+            - cell "लग्न विधी 🔄 बदला" [ref=e273]:
+              - generic [ref=e274]:
+                - img "लग्न विधी" [ref=e276]
+                - button "🔄 बदला" [ref=e277] [cursor=pointer]
+            - cell "लग्न विधी lagn-vidhi" [ref=e278]:
+              - strong [ref=e279]: लग्न विधी
+              - text: lagn-vidhi
+            - cell "गृह पूजा" [ref=e280]
+            - cell "₹५,०००" [ref=e281]:
+              - strong [ref=e282]: ₹५,०००
+            - cell "5 तास" [ref=e283]
+            - cell "⭐ हो" [ref=e284]:
+              - button "⭐ हो" [ref=e285] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e286]:
+              - generic [ref=e287]:
+                - button "✏️ संपादित" [ref=e288] [cursor=pointer]
+                - button "₹ किंमत" [ref=e289] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e290] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e291] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e292] [cursor=pointer]
+          - row "🪔 🔄 बदला बाळ शॉवर पूजा baby-shower-pooja गृह पूजा ₹३,८५८ 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e293]:
+            - cell "🪔 🔄 बदला" [ref=e294]:
+              - generic [ref=e295]:
+                - generic [ref=e297]: 🪔
+                - button "🔄 बदला" [ref=e298] [cursor=pointer]
+            - cell "बाळ शॉवर पूजा baby-shower-pooja" [ref=e299]:
+              - strong [ref=e300]: बाळ शॉवर पूजा
+              - text: baby-shower-pooja
+            - cell "गृह पूजा" [ref=e301]
+            - cell "₹३,८५८" [ref=e302]:
+              - strong [ref=e303]: ₹३,८५८
+            - cell "2 तास" [ref=e304]
+            - cell "☆ नाही" [ref=e305]:
+              - button "☆ नाही" [ref=e306] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e307]:
+              - generic [ref=e308]:
+                - button "✏️ संपादित" [ref=e309] [cursor=pointer]
+                - button "₹ किंमत" [ref=e310] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e311] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e312] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e313] [cursor=pointer]
+          - row "🪔 🔄 बदला वाढदिवस पूजा birthday-pooja गृह पूजा ₹२,९७४ 1.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e314]:
+            - cell "🪔 🔄 बदला" [ref=e315]:
+              - generic [ref=e316]:
+                - generic [ref=e318]: 🪔
+                - button "🔄 बदला" [ref=e319] [cursor=pointer]
+            - cell "वाढदिवस पूजा birthday-pooja" [ref=e320]:
+              - strong [ref=e321]: वाढदिवस पूजा
+              - text: birthday-pooja
+            - cell "गृह पूजा" [ref=e322]
+            - cell "₹२,९७४" [ref=e323]:
+              - strong [ref=e324]: ₹२,९७४
+            - cell "1.5 तास" [ref=e325]
+            - cell "☆ नाही" [ref=e326]:
+              - button "☆ नाही" [ref=e327] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e328]:
+              - generic [ref=e329]:
+                - button "✏️ संपादित" [ref=e330] [cursor=pointer]
+                - button "₹ किंमत" [ref=e331] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e332] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e333] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e334] [cursor=pointer]
+          - row "साखरपुडा पूजा 🔄 बदला साखरपुडा पूजा engagement-pooja गृह पूजा ₹३,९६४ 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e335]:
+            - cell "साखरपुडा पूजा 🔄 बदला" [ref=e336]:
+              - generic [ref=e337]:
+                - img "साखरपुडा पूजा" [ref=e339]
+                - button "🔄 बदला" [ref=e340] [cursor=pointer]
+            - cell "साखरपुडा पूजा engagement-pooja" [ref=e341]:
+              - strong [ref=e342]: साखरपुडा पूजा
+              - text: engagement-pooja
+            - cell "गृह पूजा" [ref=e343]
+            - cell "₹३,९६४" [ref=e344]:
+              - strong [ref=e345]: ₹३,९६४
+            - cell "2 तास" [ref=e346]
+            - cell "☆ नाही" [ref=e347]:
+              - button "☆ नाही" [ref=e348] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e349]:
+              - generic [ref=e350]:
+                - button "✏️ संपादित" [ref=e351] [cursor=pointer]
+                - button "₹ किंमत" [ref=e352] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e353] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e354] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e355] [cursor=pointer]
+          - row "नवग्रह शांती हवन 🔄 बदला नवग्रह शांती हवन navgraha-shanti-havan हवन / जाप ₹५,०९८ 4 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e356]:
+            - cell "नवग्रह शांती हवन 🔄 बदला" [ref=e357]:
+              - generic [ref=e358]:
+                - img "नवग्रह शांती हवन" [ref=e360]
+                - button "🔄 बदला" [ref=e361] [cursor=pointer]
+            - cell "नवग्रह शांती हवन navgraha-shanti-havan" [ref=e362]:
+              - strong [ref=e363]: नवग्रह शांती हवन
+              - text: navgraha-shanti-havan
+            - cell "हवन / जाप" [ref=e364]
+            - cell "₹५,०९८" [ref=e365]:
+              - strong [ref=e366]: ₹५,०९८
+            - cell "4 तास" [ref=e367]
+            - cell "☆ नाही" [ref=e368]:
+              - button "☆ नाही" [ref=e369] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e370]:
+              - generic [ref=e371]:
+                - button "✏️ संपादित" [ref=e372] [cursor=pointer]
+                - button "₹ किंमत" [ref=e373] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e374] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e375] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e376] [cursor=pointer]
+          - row "🪔 🔄 बदला धन्वंतरी हवन dhanvantari-havan हवन / जाप ₹५,५२४ 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e377]:
+            - cell "🪔 🔄 बदला" [ref=e378]:
+              - generic [ref=e379]:
+                - generic [ref=e381]: 🪔
+                - button "🔄 बदला" [ref=e382] [cursor=pointer]
+            - cell "धन्वंतरी हवन dhanvantari-havan" [ref=e383]:
+              - strong [ref=e384]: धन्वंतरी हवन
+              - text: dhanvantari-havan
+            - cell "हवन / जाप" [ref=e385]
+            - cell "₹५,५२४" [ref=e386]:
+              - strong [ref=e387]: ₹५,५२४
+            - cell "3 तास" [ref=e388]
+            - cell "☆ नाही" [ref=e389]:
+              - button "☆ नाही" [ref=e390] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e391]:
+              - generic [ref=e392]:
+                - button "✏️ संपादित" [ref=e393] [cursor=pointer]
+                - button "₹ किंमत" [ref=e394] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e395] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e396] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e397] [cursor=pointer]
+          - row "🪔 🔄 बदला सरस्वती हवन saraswati-havan हवन / जाप ₹४,५३१ 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e398]:
+            - cell "🪔 🔄 बदला" [ref=e399]:
+              - generic [ref=e400]:
+                - generic [ref=e402]: 🪔
+                - button "🔄 बदला" [ref=e403] [cursor=pointer]
+            - cell "सरस्वती हवन saraswati-havan" [ref=e404]:
+              - strong [ref=e405]: सरस्वती हवन
+              - text: saraswati-havan
+            - cell "हवन / जाप" [ref=e406]
+            - cell "₹४,५३१" [ref=e407]:
+              - strong [ref=e408]: ₹४,५३१
+            - cell "3 तास" [ref=e409]
+            - cell "☆ नाही" [ref=e410]:
+              - button "☆ नाही" [ref=e411] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e412]:
+              - generic [ref=e413]:
+                - button "✏️ संपादित" [ref=e414] [cursor=pointer]
+                - button "₹ किंमत" [ref=e415] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e416] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e417] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e418] [cursor=pointer]
+          - row "🪔 🔄 बदला गणपती अथर्वशीर्ष हवन ganpati-atharvashirsha हवन / जाप ₹४,५३१ 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e419]:
+            - cell "🪔 🔄 बदला" [ref=e420]:
+              - generic [ref=e421]:
+                - generic [ref=e423]: 🪔
+                - button "🔄 बदला" [ref=e424] [cursor=pointer]
+            - cell "गणपती अथर्वशीर्ष हवन ganpati-atharvashirsha" [ref=e425]:
+              - strong [ref=e426]: गणपती अथर्वशीर्ष हवन
+              - text: ganpati-atharvashirsha
+            - cell "हवन / जाप" [ref=e427]
+            - cell "₹४,५३१" [ref=e428]:
+              - strong [ref=e429]: ₹४,५३१
+            - cell "3 तास" [ref=e430]
+            - cell "☆ नाही" [ref=e431]:
+              - button "☆ नाही" [ref=e432] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e433]:
+              - generic [ref=e434]:
+                - button "✏️ संपादित" [ref=e435] [cursor=pointer]
+                - button "₹ किंमत" [ref=e436] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e437] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e438] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e439] [cursor=pointer]
+          - row "🪔 🔄 बदला नवचंडी याग navchandi-yag हवन / जाप ₹१२,४४१ 9 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e440]:
+            - cell "🪔 🔄 बदला" [ref=e441]:
+              - generic [ref=e442]:
+                - generic [ref=e444]: 🪔
+                - button "🔄 बदला" [ref=e445] [cursor=pointer]
+            - cell "नवचंडी याग navchandi-yag" [ref=e446]:
+              - strong [ref=e447]: नवचंडी याग
+              - text: navchandi-yag
+            - cell "हवन / जाप" [ref=e448]
+            - cell "₹१२,४४१" [ref=e449]:
+              - strong [ref=e450]: ₹१२,४४१
+            - cell "9 तास" [ref=e451]
+            - cell "☆ नाही" [ref=e452]:
+              - button "☆ नाही" [ref=e453] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e454]:
+              - generic [ref=e455]:
+                - button "✏️ संपादित" [ref=e456] [cursor=pointer]
+                - button "₹ किंमत" [ref=e457] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e458] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e459] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e460] [cursor=pointer]
+          - row "दत्त याग 🔄 बदला दत्त याग datta-yag हवन / जाप ₹१०,१९५ 6 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e461]:
+            - cell "दत्त याग 🔄 बदला" [ref=e462]:
+              - generic [ref=e463]:
+                - img "दत्त याग" [ref=e465]
+                - button "🔄 बदला" [ref=e466] [cursor=pointer]
+            - cell "दत्त याग datta-yag" [ref=e467]:
+              - strong [ref=e468]: दत्त याग
+              - text: datta-yag
+            - cell "हवन / जाप" [ref=e469]
+            - cell "₹१०,१९५" [ref=e470]:
+              - strong [ref=e471]: ₹१०,१९५
+            - cell "6 तास" [ref=e472]
+            - cell "☆ नाही" [ref=e473]:
+              - button "☆ नाही" [ref=e474] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e475]:
+              - generic [ref=e476]:
+                - button "✏️ संपादित" [ref=e477] [cursor=pointer]
+                - button "₹ किंमत" [ref=e478] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e479] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e480] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e481] [cursor=pointer]
+          - row "रुद्राभिषेक 🔄 बदला रुद्राभिषेक rudra-abhishek कथा / नित्य पूजा ₹३,५४० 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e482]:
+            - cell "रुद्राभिषेक 🔄 बदला" [ref=e483]:
+              - generic [ref=e484]:
+                - img "रुद्राभिषेक" [ref=e486]
+                - button "🔄 बदला" [ref=e487] [cursor=pointer]
+            - cell "रुद्राभिषेक rudra-abhishek" [ref=e488]:
+              - strong [ref=e489]: रुद्राभिषेक
+              - text: rudra-abhishek
+            - cell "कथा / नित्य पूजा" [ref=e490]
+            - cell "₹३,५४०" [ref=e491]:
+              - strong [ref=e492]: ₹३,५४०
+            - cell "2 तास" [ref=e493]
+            - cell "☆ नाही" [ref=e494]:
+              - button "☆ नाही" [ref=e495] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e496]:
+              - generic [ref=e497]:
+                - button "✏️ संपादित" [ref=e498] [cursor=pointer]
+                - button "₹ किंमत" [ref=e499] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e500] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e501] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e502] [cursor=pointer]
+          - row "🪔 🔄 बदला मंगळागौरी पूजा mangalagauri-pooja कथा / नित्य पूजा ₹२,९७३ 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e503]:
+            - cell "🪔 🔄 बदला" [ref=e504]:
+              - generic [ref=e505]:
+                - generic [ref=e507]: 🪔
+                - button "🔄 बदला" [ref=e508] [cursor=pointer]
+            - cell "मंगळागौरी पूजा mangalagauri-pooja" [ref=e509]:
+              - strong [ref=e510]: मंगळागौरी पूजा
+              - text: mangalagauri-pooja
+            - cell "कथा / नित्य पूजा" [ref=e511]
+            - cell "₹२,९७३" [ref=e512]:
+              - strong [ref=e513]: ₹२,९७३
+            - cell "2.5 तास" [ref=e514]
+            - cell "☆ नाही" [ref=e515]:
+              - button "☆ नाही" [ref=e516] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e517]:
+              - generic [ref=e518]:
+                - button "✏️ संपादित" [ref=e519] [cursor=pointer]
+                - button "₹ किंमत" [ref=e520] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e521] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e522] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e523] [cursor=pointer]
+          - row "🪔 🔄 बदला सोमवार पूजा somvar-pooja कथा / नित्य पूजा ₹२,९७४ 1.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e524]:
+            - cell "🪔 🔄 बदला" [ref=e525]:
+              - generic [ref=e526]:
+                - generic [ref=e528]: 🪔
+                - button "🔄 बदला" [ref=e529] [cursor=pointer]
+            - cell "सोमवार पूजा somvar-pooja" [ref=e530]:
+              - strong [ref=e531]: सोमवार पूजा
+              - text: somvar-pooja
+            - cell "कथा / नित्य पूजा" [ref=e532]
+            - cell "₹२,९७४" [ref=e533]:
+              - strong [ref=e534]: ₹२,९७४
+            - cell "1.5 तास" [ref=e535]
+            - cell "☆ नाही" [ref=e536]:
+              - button "☆ नाही" [ref=e537] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e538]:
+              - generic [ref=e539]:
+                - button "✏️ संपादित" [ref=e540] [cursor=pointer]
+                - button "₹ किंमत" [ref=e541] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e542] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e543] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e544] [cursor=pointer]
+          - row "🪔 🔄 बदला सुंदरकांड पाठ sundarkand-path कथा / नित्य पूजा ₹४,८६२ 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e545]:
+            - cell "🪔 🔄 बदला" [ref=e546]:
+              - generic [ref=e547]:
+                - generic [ref=e549]: 🪔
+                - button "🔄 बदला" [ref=e550] [cursor=pointer]
+            - cell "सुंदरकांड पाठ sundarkand-path" [ref=e551]:
+              - strong [ref=e552]: सुंदरकांड पाठ
+              - text: sundarkand-path
+            - cell "कथा / नित्य पूजा" [ref=e553]
+            - cell "₹४,८६२" [ref=e554]:
+              - strong [ref=e555]: ₹४,८६२
+            - cell "3 तास" [ref=e556]
+            - cell "☆ नाही" [ref=e557]:
+              - button "☆ नाही" [ref=e558] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e559]:
+              - generic [ref=e560]:
+                - button "✏️ संपादित" [ref=e561] [cursor=pointer]
+                - button "₹ किंमत" [ref=e562] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e563] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e564] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e565] [cursor=pointer]
+          - row "बारावे विधी 🔄 बदला बारावे विधी barave-vidhi पित्रुश्राद्ध ₹३,८०० 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e566]:
+            - cell "बारावे विधी 🔄 बदला" [ref=e567]:
+              - generic [ref=e568]:
+                - img "बारावे विधी" [ref=e570]
+                - button "🔄 बदला" [ref=e571] [cursor=pointer]
+            - cell "बारावे विधी barave-vidhi" [ref=e572]:
+              - strong [ref=e573]: बारावे विधी
+              - text: barave-vidhi
+            - cell "पित्रुश्राद्ध" [ref=e574]
+            - cell "₹३,८००" [ref=e575]:
+              - strong [ref=e576]: ₹३,८००
+            - cell "2.5 तास" [ref=e577]
+            - cell "☆ नाही" [ref=e578]:
+              - button "☆ नाही" [ref=e579] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e580]:
+              - generic [ref=e581]:
+                - button "✏️ संपादित" [ref=e582] [cursor=pointer]
+                - button "₹ किंमत" [ref=e583] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e584] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e585] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e586] [cursor=pointer]
+          - row "🪔 🔄 बदला तेरावे विधी terave-vidhi पित्रुश्राद्ध ₹४,२०० 4 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e587]:
+            - cell "🪔 🔄 बदला" [ref=e588]:
+              - generic [ref=e589]:
+                - generic [ref=e591]: 🪔
+                - button "🔄 बदला" [ref=e592] [cursor=pointer]
+            - cell "तेरावे विधी terave-vidhi" [ref=e593]:
+              - strong [ref=e594]: तेरावे विधी
+              - text: terave-vidhi
+            - cell "पित्रुश्राद्ध" [ref=e595]
+            - cell "₹४,२००" [ref=e596]:
+              - strong [ref=e597]: ₹४,२००
+            - cell "4 तास" [ref=e598]
+            - cell "☆ नाही" [ref=e599]:
+              - button "☆ नाही" [ref=e600] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e601]:
+              - generic [ref=e602]:
+                - button "✏️ संपादित" [ref=e603] [cursor=pointer]
+                - button "₹ किंमत" [ref=e604] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e605] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e606] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e607] [cursor=pointer]
+          - row "वार्षिक श्राद्ध विधी 🔄 बदला वार्षिक श्राद्ध विधी varshik-shraddha पित्रुश्राद्ध ₹४,८६२ 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e608]:
+            - cell "वार्षिक श्राद्ध विधी 🔄 बदला" [ref=e609]:
+              - generic [ref=e610]:
+                - img "वार्षिक श्राद्ध विधी" [ref=e612]
+                - button "🔄 बदला" [ref=e613] [cursor=pointer]
+            - cell "वार्षिक श्राद्ध विधी varshik-shraddha" [ref=e614]:
+              - strong [ref=e615]: वार्षिक श्राद्ध विधी
+              - text: varshik-shraddha
+            - cell "पित्रुश्राद्ध" [ref=e616]
+            - cell "₹४,८६२" [ref=e617]:
+              - strong [ref=e618]: ₹४,८६२
+            - cell "3 तास" [ref=e619]
+            - cell "☆ नाही" [ref=e620]:
+              - button "☆ नाही" [ref=e621] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e622]:
+              - generic [ref=e623]:
+                - button "✏️ संपादित" [ref=e624] [cursor=pointer]
+                - button "₹ किंमत" [ref=e625] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e626] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e627] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e628] [cursor=pointer]
+          - row "🪔 🔄 बदला भरणी श्राद्ध bharani-shraddha पित्रुश्राद्ध ₹४,८६१ 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e629]:
+            - cell "🪔 🔄 बदला" [ref=e630]:
+              - generic [ref=e631]:
+                - generic [ref=e633]: 🪔
+                - button "🔄 बदला" [ref=e634] [cursor=pointer]
+            - cell "भरणी श्राद्ध bharani-shraddha" [ref=e635]:
+              - strong [ref=e636]: भरणी श्राद्ध
+              - text: bharani-shraddha
+            - cell "पित्रुश्राद्ध" [ref=e637]
+            - cell "₹४,८६१" [ref=e638]:
+              - strong [ref=e639]: ₹४,८६१
+            - cell "3 तास" [ref=e640]
+            - cell "☆ नाही" [ref=e641]:
+              - button "☆ नाही" [ref=e642] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e643]:
+              - generic [ref=e644]:
+                - button "✏️ संपादित" [ref=e645] [cursor=pointer]
+                - button "₹ किंमत" [ref=e646] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e647] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e648] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e649] [cursor=pointer]
+          - row "🪔 🔄 बदला त्रिपिंडी श्राद्ध tripindi-shraddha पित्रुश्राद्ध ₹७,०८० 4 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e650]:
+            - cell "🪔 🔄 बदला" [ref=e651]:
+              - generic [ref=e652]:
+                - generic [ref=e654]: 🪔
+                - button "🔄 बदला" [ref=e655] [cursor=pointer]
+            - cell "त्रिपिंडी श्राद्ध tripindi-shraddha" [ref=e656]:
+              - strong [ref=e657]: त्रिपिंडी श्राद्ध
+              - text: tripindi-shraddha
+            - cell "पित्रुश्राद्ध" [ref=e658]
+            - cell "₹७,०८०" [ref=e659]:
+              - strong [ref=e660]: ₹७,०८०
+            - cell "4 तास" [ref=e661]
+            - cell "☆ नाही" [ref=e662]:
+              - button "☆ नाही" [ref=e663] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e664]:
+              - generic [ref=e665]:
+                - button "✏️ संपादित" [ref=e666] [cursor=pointer]
+                - button "₹ किंमत" [ref=e667] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e668] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e669] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e670] [cursor=pointer]
+          - row "🪔 🔄 बदला गणपती विसर्जन पूजा ganpati-visarjan उत्सव पूजा ₹४,८६२ 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e671]:
+            - cell "🪔 🔄 बदला" [ref=e672]:
+              - generic [ref=e673]:
+                - generic [ref=e675]: 🪔
+                - button "🔄 बदला" [ref=e676] [cursor=pointer]
+            - cell "गणपती विसर्जन पूजा ganpati-visarjan" [ref=e677]:
+              - strong [ref=e678]: गणपती विसर्जन पूजा
+              - text: ganpati-visarjan
+            - cell "उत्सव पूजा" [ref=e679]
+            - cell "₹४,८६२" [ref=e680]:
+              - strong [ref=e681]: ₹४,८६२
+            - cell "2 तास" [ref=e682]
+            - cell "☆ नाही" [ref=e683]:
+              - button "☆ नाही" [ref=e684] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e685]:
+              - generic [ref=e686]:
+                - button "✏️ संपादित" [ref=e687] [cursor=pointer]
+                - button "₹ किंमत" [ref=e688] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e689] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e690] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e691] [cursor=pointer]
+          - row "🪔 🔄 बदला कृष्ण जन्माष्टमी krishna-janmashtami उत्सव पूजा ₹३,६८२ 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e692]:
+            - cell "🪔 🔄 बदला" [ref=e693]:
+              - generic [ref=e694]:
+                - generic [ref=e696]: 🪔
+                - button "🔄 बदला" [ref=e697] [cursor=pointer]
+            - cell "कृष्ण जन्माष्टमी krishna-janmashtami" [ref=e698]:
+              - strong [ref=e699]: कृष्ण जन्माष्टमी
+              - text: krishna-janmashtami
+            - cell "उत्सव पूजा" [ref=e700]
+            - cell "₹३,६८२" [ref=e701]:
+              - strong [ref=e702]: ₹३,६८२
+            - cell "2 तास" [ref=e703]
+            - cell "☆ नाही" [ref=e704]:
+              - button "☆ नाही" [ref=e705] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e706]:
+              - generic [ref=e707]:
+                - button "✏️ संपादित" [ref=e708] [cursor=pointer]
+                - button "₹ किंमत" [ref=e709] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e710] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e711] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e712] [cursor=pointer]
+          - row "🪔 🔄 बदला नवरात्री घटस्थापना navratri-ghatasthapana उत्सव पूजा ₹४,८६२ 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e713]:
+            - cell "🪔 🔄 बदला" [ref=e714]:
+              - generic [ref=e715]:
+                - generic [ref=e717]: 🪔
+                - button "🔄 बदला" [ref=e718] [cursor=pointer]
+            - cell "नवरात्री घटस्थापना navratri-ghatasthapana" [ref=e719]:
+              - strong [ref=e720]: नवरात्री घटस्थापना
+              - text: navratri-ghatasthapana
+            - cell "उत्सव पूजा" [ref=e721]
+            - cell "₹४,८६२" [ref=e722]:
+              - strong [ref=e723]: ₹४,८६२
+            - cell "2.5 तास" [ref=e724]
+            - cell "☆ नाही" [ref=e725]:
+              - button "☆ नाही" [ref=e726] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e727]:
+              - generic [ref=e728]:
+                - button "✏️ संपादित" [ref=e729] [cursor=pointer]
+                - button "₹ किंमत" [ref=e730] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e731] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e732] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e733] [cursor=pointer]
+          - row "🪔 🔄 बदला होळी पूजन holi-poojan उत्सव पूजा ₹२,९७४ 1 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e734]:
+            - cell "🪔 🔄 बदला" [ref=e735]:
+              - generic [ref=e736]:
+                - generic [ref=e738]: 🪔
+                - button "🔄 बदला" [ref=e739] [cursor=pointer]
+            - cell "होळी पूजन holi-poojan" [ref=e740]:
+              - strong [ref=e741]: होळी पूजन
+              - text: holi-poojan
+            - cell "उत्सव पूजा" [ref=e742]
+            - cell "₹२,९७४" [ref=e743]:
+              - strong [ref=e744]: ₹२,९७४
+            - cell "1 तास" [ref=e745]
+            - cell "☆ नाही" [ref=e746]:
+              - button "☆ नाही" [ref=e747] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e748]:
+              - generic [ref=e749]:
+                - button "✏️ संपादित" [ref=e750] [cursor=pointer]
+                - button "₹ किंमत" [ref=e751] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e752] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e753] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e754] [cursor=pointer]
+          - row "🪔 🔄 बदला तुळशी विवाह tulsi-vivah उत्सव पूजा ₹४,८६२ 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e755]:
+            - cell "🪔 🔄 बदला" [ref=e756]:
+              - generic [ref=e757]:
+                - generic [ref=e759]: 🪔
+                - button "🔄 बदला" [ref=e760] [cursor=pointer]
+            - cell "तुळशी विवाह tulsi-vivah" [ref=e761]:
+              - strong [ref=e762]: तुळशी विवाह
+              - text: tulsi-vivah
+            - cell "उत्सव पूजा" [ref=e763]
+            - cell "₹४,८६२" [ref=e764]:
+              - strong [ref=e765]: ₹४,८६२
+            - cell "2 तास" [ref=e766]
+            - cell "☆ नाही" [ref=e767]:
+              - button "☆ नाही" [ref=e768] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e769]:
+              - generic [ref=e770]:
+                - button "✏️ संपादित" [ref=e771] [cursor=pointer]
+                - button "₹ किंमत" [ref=e772] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e773] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e774] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e775] [cursor=pointer]
+          - row "भूमिपूजन 🔄 बदला भूमिपूजन bhoomi-pujan वास्तू पूजा ₹५,०९८ 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e776]:
+            - cell "भूमिपूजन 🔄 बदला" [ref=e777]:
+              - generic [ref=e778]:
+                - img "भूमिपूजन" [ref=e780]
+                - button "🔄 बदला" [ref=e781] [cursor=pointer]
+            - cell "भूमिपूजन bhoomi-pujan" [ref=e782]:
+              - strong [ref=e783]: भूमिपूजन
+              - text: bhoomi-pujan
+            - cell "वास्तू पूजा" [ref=e784]
+            - cell "₹५,०९८" [ref=e785]:
+              - strong [ref=e786]: ₹५,०९८
+            - cell "2 तास" [ref=e787]
+            - cell "☆ नाही" [ref=e788]:
+              - button "☆ नाही" [ref=e789] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e790]:
+              - generic [ref=e791]:
+                - button "✏️ संपादित" [ref=e792] [cursor=pointer]
+                - button "₹ किंमत" [ref=e793] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e794] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e795] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e796] [cursor=pointer]
+          - row "🪔 🔄 बदला कार्यालय शुभारंभ पूजा office-shubharambh वास्तू पूजा ₹६,३७२ 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e797]:
+            - cell "🪔 🔄 बदला" [ref=e798]:
+              - generic [ref=e799]:
+                - generic [ref=e801]: 🪔
+                - button "🔄 बदला" [ref=e802] [cursor=pointer]
+            - cell "कार्यालय शुभारंभ पूजा office-shubharambh" [ref=e803]:
+              - strong [ref=e804]: कार्यालय शुभारंभ पूजा
+              - text: office-shubharambh
+            - cell "वास्तू पूजा" [ref=e805]
+            - cell "₹६,३७२" [ref=e806]:
+              - strong [ref=e807]: ₹६,३७२
+            - cell "2.5 तास" [ref=e808]
+            - cell "☆ नाही" [ref=e809]:
+              - button "☆ नाही" [ref=e810] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e811]:
+              - generic [ref=e812]:
+                - button "✏️ संपादित" [ref=e813] [cursor=pointer]
+                - button "₹ किंमत" [ref=e814] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e815] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e816] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e817] [cursor=pointer]
+          - row "वास्तूशांती व उदक शुद्धी 🔄 बदला वास्तूशांती व उदक शुद्धी vastu-shanti-udak वास्तू पूजा ₹१८,४९९ 5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e818]:
+            - cell "वास्तूशांती व उदक शुद्धी 🔄 बदला" [ref=e819]:
+              - generic [ref=e820]:
+                - img "वास्तूशांती व उदक शुद्धी" [ref=e822]
+                - button "🔄 बदला" [ref=e823] [cursor=pointer]
+            - cell "वास्तूशांती व उदक शुद्धी vastu-shanti-udak" [ref=e824]:
+              - strong [ref=e825]: वास्तूशांती व उदक शुद्धी
+              - text: vastu-shanti-udak
+            - cell "वास्तू पूजा" [ref=e826]
+            - cell "₹१८,४९९" [ref=e827]:
+              - strong [ref=e828]: ₹१८,४९९
+            - cell "5 तास" [ref=e829]
+            - cell "☆ नाही" [ref=e830]:
+              - button "☆ नाही" [ref=e831] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e832]:
+              - generic [ref=e833]:
+                - button "✏️ संपादित" [ref=e834] [cursor=pointer]
+                - button "₹ किंमत" [ref=e835] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e836] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e837] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e838] [cursor=pointer]
+          - row "नक्षत्र जनन शांती 🔄 बदला नक्षत्र जनन शांती nakshatra-janan-shanti हवन / जाप ₹४,८०० 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e839]:
+            - cell "नक्षत्र जनन शांती 🔄 बदला" [ref=e840]:
+              - generic [ref=e841]:
+                - img "नक्षत्र जनन शांती" [ref=e843]
+                - button "🔄 बदला" [ref=e844] [cursor=pointer]
+            - cell "नक्षत्र जनन शांती nakshatra-janan-shanti" [ref=e845]:
+              - strong [ref=e846]: नक्षत्र जनन शांती
+              - text: nakshatra-janan-shanti
+            - cell "हवन / जाप" [ref=e847]
+            - cell "₹४,८००" [ref=e848]:
+              - strong [ref=e849]: ₹४,८००
+            - cell "3 तास" [ref=e850]
+            - cell "☆ नाही" [ref=e851]:
+              - button "☆ नाही" [ref=e852] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e853]:
+              - generic [ref=e854]:
+                - button "✏️ संपादित" [ref=e855] [cursor=pointer]
+                - button "₹ किंमत" [ref=e856] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e857] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e858] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e859] [cursor=pointer]
+          - row "🪔 🔄 बदला लक्ष्मी हवन lakshmi-havan हवन / जाप ₹४,५०० 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e860]:
+            - cell "🪔 🔄 बदला" [ref=e861]:
+              - generic [ref=e862]:
+                - generic [ref=e864]: 🪔
+                - button "🔄 बदला" [ref=e865] [cursor=pointer]
+            - cell "लक्ष्मी हवन lakshmi-havan" [ref=e866]:
+              - strong [ref=e867]: लक्ष्मी हवन
+              - text: lakshmi-havan
+            - cell "हवन / जाप" [ref=e868]
+            - cell "₹४,५००" [ref=e869]:
+              - strong [ref=e870]: ₹४,५००
+            - cell "2.5 तास" [ref=e871]
+            - cell "☆ नाही" [ref=e872]:
+              - button "☆ नाही" [ref=e873] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e874]:
+              - generic [ref=e875]:
+                - button "✏️ संपादित" [ref=e876] [cursor=pointer]
+                - button "₹ किंमत" [ref=e877] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e878] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e879] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e880] [cursor=pointer]
+          - row "🪔 🔄 बदला गायत्री हवन gayatri-havan हवन / जाप ₹४,५०० 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e881]:
+            - cell "🪔 🔄 बदला" [ref=e882]:
+              - generic [ref=e883]:
+                - generic [ref=e885]: 🪔
+                - button "🔄 बदला" [ref=e886] [cursor=pointer]
+            - cell "गायत्री हवन gayatri-havan" [ref=e887]:
+              - strong [ref=e888]: गायत्री हवन
+              - text: gayatri-havan
+            - cell "हवन / जाप" [ref=e889]
+            - cell "₹४,५००" [ref=e890]:
+              - strong [ref=e891]: ₹४,५००
+            - cell "2.5 तास" [ref=e892]
+            - cell "☆ नाही" [ref=e893]:
+              - button "☆ नाही" [ref=e894] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e895]:
+              - generic [ref=e896]:
+                - button "✏️ संपादित" [ref=e897] [cursor=pointer]
+                - button "₹ किंमत" [ref=e898] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e899] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e900] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e901] [cursor=pointer]
+          - row "🪔 🔄 बदला सुदर्शन हवन sudarshana-havan हवन / जाप ₹५,५०० 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e902]:
+            - cell "🪔 🔄 बदला" [ref=e903]:
+              - generic [ref=e904]:
+                - generic [ref=e906]: 🪔
+                - button "🔄 बदला" [ref=e907] [cursor=pointer]
+            - cell "सुदर्शन हवन sudarshana-havan" [ref=e908]:
+              - strong [ref=e909]: सुदर्शन हवन
+              - text: sudarshana-havan
+            - cell "हवन / जाप" [ref=e910]
+            - cell "₹५,५००" [ref=e911]:
+              - strong [ref=e912]: ₹५,५००
+            - cell "3 तास" [ref=e913]
+            - cell "☆ नाही" [ref=e914]:
+              - button "☆ नाही" [ref=e915] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e916]:
+              - generic [ref=e917]:
+                - button "✏️ संपादित" [ref=e918] [cursor=pointer]
+                - button "₹ किंमत" [ref=e919] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e920] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e921] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e922] [cursor=pointer]
+          - row "🪔 🔄 बदला चंडी हवन chandi-havan हवन / जाप ₹६,००० 4 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e923]:
+            - cell "🪔 🔄 बदला" [ref=e924]:
+              - generic [ref=e925]:
+                - generic [ref=e927]: 🪔
+                - button "🔄 बदला" [ref=e928] [cursor=pointer]
+            - cell "चंडी हवन chandi-havan" [ref=e929]:
+              - strong [ref=e930]: चंडी हवन
+              - text: chandi-havan
+            - cell "हवन / जाप" [ref=e931]
+            - cell "₹६,०००" [ref=e932]:
+              - strong [ref=e933]: ₹६,०००
+            - cell "4 तास" [ref=e934]
+            - cell "☆ नाही" [ref=e935]:
+              - button "☆ नाही" [ref=e936] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e937]:
+              - generic [ref=e938]:
+                - button "✏️ संपादित" [ref=e939] [cursor=pointer]
+                - button "₹ किंमत" [ref=e940] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e941] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e942] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e943] [cursor=pointer]
+          - row "🪔 🔄 बदला महारुद्र हवन maha-rudra-havan हवन / जाप ₹७,५०० 5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e944]:
+            - cell "🪔 🔄 बदला" [ref=e945]:
+              - generic [ref=e946]:
+                - generic [ref=e948]: 🪔
+                - button "🔄 बदला" [ref=e949] [cursor=pointer]
+            - cell "महारुद्र हवन maha-rudra-havan" [ref=e950]:
+              - strong [ref=e951]: महारुद्र हवन
+              - text: maha-rudra-havan
+            - cell "हवन / जाप" [ref=e952]
+            - cell "₹७,५००" [ref=e953]:
+              - strong [ref=e954]: ₹७,५००
+            - cell "5 तास" [ref=e955]
+            - cell "☆ नाही" [ref=e956]:
+              - button "☆ नाही" [ref=e957] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e958]:
+              - generic [ref=e959]:
+                - button "✏️ संपादित" [ref=e960] [cursor=pointer]
+                - button "₹ किंमत" [ref=e961] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e962] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e963] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e964] [cursor=pointer]
+          - row "🪔 🔄 बदला स्वयंवर पार्वती हवन swayamvara-parvati-havan हवन / जाप ₹५,००० 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e965]:
+            - cell "🪔 🔄 बदला" [ref=e966]:
+              - generic [ref=e967]:
+                - generic [ref=e969]: 🪔
+                - button "🔄 बदला" [ref=e970] [cursor=pointer]
+            - cell "स्वयंवर पार्वती हवन swayamvara-parvati-havan" [ref=e971]:
+              - strong [ref=e972]: स्वयंवर पार्वती हवन
+              - text: swayamvara-parvati-havan
+            - cell "हवन / जाप" [ref=e973]
+            - cell "₹५,०००" [ref=e974]:
+              - strong [ref=e975]: ₹५,०००
+            - cell "3 तास" [ref=e976]
+            - cell "☆ नाही" [ref=e977]:
+              - button "☆ नाही" [ref=e978] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e979]:
+              - generic [ref=e980]:
+                - button "✏️ संपादित" [ref=e981] [cursor=pointer]
+                - button "₹ किंमत" [ref=e982] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e983] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e984] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e985] [cursor=pointer]
+          - row "🪔 🔄 बदला कुबेर हवन kuber-havan हवन / जाप ₹५,००० 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e986]:
+            - cell "🪔 🔄 बदला" [ref=e987]:
+              - generic [ref=e988]:
+                - generic [ref=e990]: 🪔
+                - button "🔄 बदला" [ref=e991] [cursor=pointer]
+            - cell "कुबेर हवन kuber-havan" [ref=e992]:
+              - strong [ref=e993]: कुबेर हवन
+              - text: kuber-havan
+            - cell "हवन / जाप" [ref=e994]
+            - cell "₹५,०००" [ref=e995]:
+              - strong [ref=e996]: ₹५,०००
+            - cell "3 तास" [ref=e997]
+            - cell "☆ नाही" [ref=e998]:
+              - button "☆ नाही" [ref=e999] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1000]:
+              - generic [ref=e1001]:
+                - button "✏️ संपादित" [ref=e1002] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1003] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1004] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1005] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1006] [cursor=pointer]
+          - row "🪔 🔄 बदला काल भैरव हवन kaal-bhairav-havan हवन / जाप ₹५,५०० 3 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1007]:
+            - cell "🪔 🔄 बदला" [ref=e1008]:
+              - generic [ref=e1009]:
+                - generic [ref=e1011]: 🪔
+                - button "🔄 बदला" [ref=e1012] [cursor=pointer]
+            - cell "काल भैरव हवन kaal-bhairav-havan" [ref=e1013]:
+              - strong [ref=e1014]: काल भैरव हवन
+              - text: kaal-bhairav-havan
+            - cell "हवन / जाप" [ref=e1015]
+            - cell "₹५,५००" [ref=e1016]:
+              - strong [ref=e1017]: ₹५,५००
+            - cell "3 तास" [ref=e1018]
+            - cell "☆ नाही" [ref=e1019]:
+              - button "☆ नाही" [ref=e1020] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1021]:
+              - generic [ref=e1022]:
+                - button "✏️ संपादित" [ref=e1023] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1024] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1025] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1026] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1027] [cursor=pointer]
+          - row "🪔 🔄 बदला लघुरुद्र हवन laghu-rudra-havan हवन / जाप ₹६,५०० 4 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1028]:
+            - cell "🪔 🔄 बदला" [ref=e1029]:
+              - generic [ref=e1030]:
+                - generic [ref=e1032]: 🪔
+                - button "🔄 बदला" [ref=e1033] [cursor=pointer]
+            - cell "लघुरुद्र हवन laghu-rudra-havan" [ref=e1034]:
+              - strong [ref=e1035]: लघुरुद्र हवन
+              - text: laghu-rudra-havan
+            - cell "हवन / जाप" [ref=e1036]
+            - cell "₹६,५००" [ref=e1037]:
+              - strong [ref=e1038]: ₹६,५००
+            - cell "4 तास" [ref=e1039]
+            - cell "☆ नाही" [ref=e1040]:
+              - button "☆ नाही" [ref=e1041] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1042]:
+              - generic [ref=e1043]:
+                - button "✏️ संपादित" [ref=e1044] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1045] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1046] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1047] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1048] [cursor=pointer]
+          - row "🪔 🔄 बदला श्री सूक्त हवन shri-sukta-havan हवन / जाप ₹४,५०० 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1049]:
+            - cell "🪔 🔄 बदला" [ref=e1050]:
+              - generic [ref=e1051]:
+                - generic [ref=e1053]: 🪔
+                - button "🔄 बदला" [ref=e1054] [cursor=pointer]
+            - cell "श्री सूक्त हवन shri-sukta-havan" [ref=e1055]:
+              - strong [ref=e1056]: श्री सूक्त हवन
+              - text: shri-sukta-havan
+            - cell "हवन / जाप" [ref=e1057]
+            - cell "₹४,५००" [ref=e1058]:
+              - strong [ref=e1059]: ₹४,५००
+            - cell "2.5 तास" [ref=e1060]
+            - cell "☆ नाही" [ref=e1061]:
+              - button "☆ नाही" [ref=e1062] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1063]:
+              - generic [ref=e1064]:
+                - button "✏️ संपादित" [ref=e1065] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1066] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1067] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1068] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1069] [cursor=pointer]
+          - row "🪔 🔄 बदला पुरुष सूक्त हवन purusha-sukta-havan हवन / जाप ₹४,५०० 2.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1070]:
+            - cell "🪔 🔄 बदला" [ref=e1071]:
+              - generic [ref=e1072]:
+                - generic [ref=e1074]: 🪔
+                - button "🔄 बदला" [ref=e1075] [cursor=pointer]
+            - cell "पुरुष सूक्त हवन purusha-sukta-havan" [ref=e1076]:
+              - strong [ref=e1077]: पुरुष सूक्त हवन
+              - text: purusha-sukta-havan
+            - cell "हवन / जाप" [ref=e1078]
+            - cell "₹४,५००" [ref=e1079]:
+              - strong [ref=e1080]: ₹४,५००
+            - cell "2.5 तास" [ref=e1081]
+            - cell "☆ नाही" [ref=e1082]:
+              - button "☆ नाही" [ref=e1083] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1084]:
+              - generic [ref=e1085]:
+                - button "✏️ संपादित" [ref=e1086] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1087] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1088] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1089] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1090] [cursor=pointer]
+          - row "🪔 🔄 बदला गर्भाधान संस्कार garbhadhana-sanskar गृह पूजा ₹३,५०० 1.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1091]:
+            - cell "🪔 🔄 बदला" [ref=e1092]:
+              - generic [ref=e1093]:
+                - generic [ref=e1095]: 🪔
+                - button "🔄 बदला" [ref=e1096] [cursor=pointer]
+            - cell "गर्भाधान संस्कार garbhadhana-sanskar" [ref=e1097]:
+              - strong [ref=e1098]: गर्भाधान संस्कार
+              - text: garbhadhana-sanskar
+            - cell "गृह पूजा" [ref=e1099]
+            - cell "₹३,५००" [ref=e1100]:
+              - strong [ref=e1101]: ₹३,५००
+            - cell "1.5 तास" [ref=e1102]
+            - cell "☆ नाही" [ref=e1103]:
+              - button "☆ नाही" [ref=e1104] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1105]:
+              - generic [ref=e1106]:
+                - button "✏️ संपादित" [ref=e1107] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1108] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1109] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1110] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1111] [cursor=pointer]
+          - row "🪔 🔄 बदला पुंसवन संस्कार pumsavana-sanskar गृह पूजा ₹३,००० 1.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1112]:
+            - cell "🪔 🔄 बदला" [ref=e1113]:
+              - generic [ref=e1114]:
+                - generic [ref=e1116]: 🪔
+                - button "🔄 बदला" [ref=e1117] [cursor=pointer]
+            - cell "पुंसवन संस्कार pumsavana-sanskar" [ref=e1118]:
+              - strong [ref=e1119]: पुंसवन संस्कार
+              - text: pumsavana-sanskar
+            - cell "गृह पूजा" [ref=e1120]
+            - cell "₹३,०००" [ref=e1121]:
+              - strong [ref=e1122]: ₹३,०००
+            - cell "1.5 तास" [ref=e1123]
+            - cell "☆ नाही" [ref=e1124]:
+              - button "☆ नाही" [ref=e1125] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1126]:
+              - generic [ref=e1127]:
+                - button "✏️ संपादित" [ref=e1128] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1129] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1130] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1131] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1132] [cursor=pointer]
+          - row "🪔 🔄 बदला सीमंतोन्नयन संस्कार simantonnayana-sanskar गृह पूजा ₹३,५०० 2 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1133]:
+            - cell "🪔 🔄 बदला" [ref=e1134]:
+              - generic [ref=e1135]:
+                - generic [ref=e1137]: 🪔
+                - button "🔄 बदला" [ref=e1138] [cursor=pointer]
+            - cell "सीमंतोन्नयन संस्कार simantonnayana-sanskar" [ref=e1139]:
+              - strong [ref=e1140]: सीमंतोन्नयन संस्कार
+              - text: simantonnayana-sanskar
+            - cell "गृह पूजा" [ref=e1141]
+            - cell "₹३,५००" [ref=e1142]:
+              - strong [ref=e1143]: ₹३,५००
+            - cell "2 तास" [ref=e1144]
+            - cell "☆ नाही" [ref=e1145]:
+              - button "☆ नाही" [ref=e1146] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1147]:
+              - generic [ref=e1148]:
+                - button "✏️ संपादित" [ref=e1149] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1150] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1151] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1152] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1153] [cursor=pointer]
+          - row "🪔 🔄 बदला जातकर्म संस्कार jatakarma-sanskar गृह पूजा ₹३,००० 1.5 तास ☆ नाही ✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1154]:
+            - cell "🪔 🔄 बदला" [ref=e1155]:
+              - generic [ref=e1156]:
+                - generic [ref=e1158]: 🪔
+                - button "🔄 बदला" [ref=e1159] [cursor=pointer]
+            - cell "जातकर्म संस्कार jatakarma-sanskar" [ref=e1160]:
+              - strong [ref=e1161]: जातकर्म संस्कार
+              - text: jatakarma-sanskar
+            - cell "गृह पूजा" [ref=e1162]
+            - cell "₹३,०००" [ref=e1163]:
+              - strong [ref=e1164]: ₹३,०००
+            - cell "1.5 तास" [ref=e1165]
+            - cell "☆ नाही" [ref=e1166]:
+              - button "☆ नाही" [ref=e1167] [cursor=pointer]
+            - cell "✏️ संपादित ₹ किंमत ⏱️ कालावधी 📿 विधी चरण 🗑️ काढा" [ref=e1168]:
+              - generic [ref=e1169]:
+                - button "✏️ संपादित" [ref=e1170] [cursor=pointer]
+                - button "₹ किंमत" [ref=e1171] [cursor=pointer]
+                - button "⏱️ कालावधी" [ref=e1172] [cursor=pointer]
+                - button "📿 विधी चरण" [ref=e1173] [cursor=pointer]
+                - button "🗑️ काढा" [ref=e1174] [cursor=pointer]
+```

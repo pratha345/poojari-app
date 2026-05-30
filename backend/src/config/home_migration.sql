@@ -27,6 +27,14 @@ CREATE TABLE IF NOT EXISTS home_slider (
   created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 2b. Add stats columns (run if upgrading existing DB)
+ALTER TABLE home_content
+  ADD COLUMN IF NOT EXISTS stat_bookings VARCHAR(30) NOT NULL DEFAULT '५,०००+',
+  ADD COLUMN IF NOT EXISTS stat_pujaris  VARCHAR(30) NOT NULL DEFAULT '५००+',
+  ADD COLUMN IF NOT EXISTS stat_cities   VARCHAR(30) NOT NULL DEFAULT '३५+',
+  ADD COLUMN IF NOT EXISTS stat_years    VARCHAR(30) NOT NULL DEFAULT '५+',
+  ADD COLUMN IF NOT EXISTS bg_image      VARCHAR(500)         DEFAULT NULL;
+
 -- 3. Seed default content row (runs only if table is empty)
 INSERT INTO home_content (title, subtitle, description, button_text_1, button_text_2)
 SELECT

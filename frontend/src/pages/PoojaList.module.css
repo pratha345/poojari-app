@@ -20,11 +20,13 @@
 /* Desktop: sidebar + content */
 .layout {
   display:               grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 240px 1fr;
   gap:                   28px;
   padding-top:           28px;
   align-items:           start;
 }
+/* Prevent any grid item from expanding its track beyond the container width */
+.layout > * { min-width: 0; }
 
 /* ── Sidebar ─────────────────────────────────────────────────── */
 .sidebar {
@@ -34,8 +36,14 @@
   padding:       18px;
   height:        fit-content;
   position:      sticky;
-  top:           120px;
+  top:           116px;
+  max-height:    calc(100vh - 136px);
+  overflow-y:    auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(224,123,42,0.3) transparent;
 }
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(224,123,42,0.3); border-radius: 4px; }
 .sideTitle {
   font-family:    var(--font-display);
   font-size:      15px;
@@ -46,8 +54,10 @@
 }
 .catList  { list-style: none; }
 .catItem {
-  display:       block;
-  padding:       9px 10px;
+  display:      flex;
+  align-items:  center;
+  padding:      11px 12px;       /* increased for touch target */
+  min-height:   44px;            /* iOS/Android minimum */
   border-radius: var(--radius-sm);
   font-size:     14px;
   color:         var(--text);
@@ -69,15 +79,78 @@
 .pageTitle { font-size: 1.4rem; font-family: var(--font-display); color: var(--secondary); }
 .count     { font-size: 13px; color: var(--text-muted); }
 
+/* ── Occasion Quick Strip ─────────────────────────────────────── */
+.occasionStrip {
+  display:       flex;
+  align-items:   center;
+  gap:           12px;
+  margin-bottom: 22px;
+  background:    var(--white);
+  border:        1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding:       12px 16px;
+  min-width:     0;
+  overflow:      clip;    /* clip visually without blocking inner touch scroll */
+}
+.occasionStripLabel {
+  font-size:   12px;
+  font-weight: 700;
+  color:       var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.occasionScrollRow {
+  display:                    flex;
+  gap:                        8px;
+  overflow-x:                 auto;
+  overflow-y:                 clip;   /* prevent CSS spec from computing overflow-y:auto */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width:            none;
+  flex:                       1;
+  min-width:                  0;
+  touch-action:               pan-x;
+}
+.occasionScrollRow::-webkit-scrollbar { display: none; }
+
+.occasionBtn {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           5px;
+  padding:       10px 14px;      /* increased for touch target */
+  min-height:    44px;           /* iOS/Android minimum */
+  border-radius: 30px;
+  border:        1.5px solid var(--border);
+  background:    var(--cream);
+  font-size:     13px;
+  font-family:   var(--font-body);
+  color:         var(--text);
+  font-weight:   500;
+  cursor:        pointer;
+  white-space:   nowrap;
+  flex-shrink:   0;
+  transition:    all var(--transition);
+}
+.occasionBtn:hover {
+  border-color: var(--primary);
+  color:        var(--primary);
+  background:   var(--white);
+}
+.occasionBtnActive {
+  background:   var(--primary) !important;
+  color:        var(--white) !important;
+  border-color: var(--primary) !important;
+  font-weight:  700 !important;
+}
+
 /* ── Pooja grid ───────────────────────────────────────────────── */
-.poojaGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.loadGrid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.poojaGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.loadGrid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .skeletonCard { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); }
 .skeletonImg  { height: 180px; }
 
 .empty {
   text-align:     center;
-  padding:        60px 32px;
+  padding:        40px 24px;
   display:        flex;
   flex-direction: column;
   align-items:    center;
@@ -90,16 +163,18 @@
 /* ── Pagination ───────────────────────────────────────────────── */
 .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 36px; flex-wrap: wrap; }
 .pageBtn {
-  width:         36px; height: 36px; border-radius: 50%;
+  width:         44px; height: 44px; border-radius: 50%;
   border:        1.5px solid var(--border); background: var(--white);
   cursor:        pointer; font-size: 14px; transition: all var(--transition);
+  display:       flex; align-items: center; justify-content: center;
+  touch-action:  manipulation;
 }
 .pageBtn:hover  { border-color: var(--primary); color: var(--primary); }
 .pageActive { background: var(--primary) !important; color: var(--white) !important; border-color: var(--primary) !important; }
 
 /* ── Laptop (1024px) ──────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .layout    { grid-template-columns: 200px 1fr; gap: 20px; }
+  .layout    { grid-template-columns: 210px 1fr; gap: 20px; }
   .poojaGrid { grid-template-columns: repeat(2, 1fr); }
   .loadGrid  { grid-template-columns: repeat(2, 1fr); }
 }
@@ -111,18 +186,19 @@
   /* Sidebar: horizontal scrollable pill strip */
   .sidebar {
     position:                static;
+    min-width:               0;      /* CRITICAL: stops grid item expanding to catList max-content width */
     border-radius:           0;
     border-left:             none;
     border-right:            none;
     border-top:              none;
     padding:                 10px 0;
     background:              var(--white);
-    overflow-x:              auto;
+    overflow-x:              scroll;
+    overflow-y:              clip;
+    max-height:              none;
     -webkit-overflow-scrolling: touch;
     scrollbar-width:         none;
-    display:                 flex;
-    align-items:             center;
-    gap:                     0;
+    touch-action:            pan-x;
   }
   .sidebar::-webkit-scrollbar { display: none; }
 
@@ -133,14 +209,16 @@
     gap:         8px;
     padding:     0 16px;
     white-space: nowrap;
+    width:       max-content;
+    touch-action: pan-x;
   }
   .catItem {
     display:       inline-block;
     white-space:   nowrap;
     border:        1.5px solid var(--border);
     border-radius: 20px;
-    padding:       6px 14px;
-    font-size:     13px;
+    padding:       7px 16px;
+    font-size:     15px;
     margin-bottom: 0;
     background:    var(--cream);
   }
@@ -149,11 +227,38 @@
   .contentHeader { padding-top: 20px; }
   .poojaGrid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .loadGrid  { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+  .occasionBtn      { font-size: 15px; padding: 10px 16px; }
+  .occasionStripLabel { font-size: 14px; }
+  .sectionLabel     { font-size: 1.1rem; }
+  .pageTitle        { font-size: 1.3rem; }
 }
 
 /* ── Mobile (480px) ───────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .poojaGrid { grid-template-columns: 1fr; gap: 14px; }
-  .loadGrid  { grid-template-columns: 1fr; }
-  .pageTitle { font-size: 1.2rem; }
+  .poojaGrid  { grid-template-columns: 1fr; gap: 16px; }
+  .loadGrid   { grid-template-columns: 1fr; gap: 16px; }
+  .pageTitle  { font-size: 1.25rem; }
+  .breadcrumb > div { font-size: 13px; gap: 4px; }
+  .catItem    { font-size: 16px; padding: 8px 18px; }
+  .occasionBtn { font-size: 16px; padding: 11px 18px; }
+  .sectionLabel { font-size: 1.15rem; }
+  .count      { font-size: 14px; }
 }
+
+/* ── Featured / Section Label ────────────────────────────────── */
+.sectionLabel {
+  display:      flex;
+  align-items:  center;
+  gap:          8px;
+  font-family:  var(--font-display);
+  font-size:    1.05rem;
+  font-weight:  700;
+  color:        var(--secondary);
+  margin:       8px 0 16px;
+  padding:      10px 16px;
+  background:   linear-gradient(90deg, rgba(224,123,42,0.1), transparent);
+  border-left:  4px solid var(--primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.sectionLabelIcon { font-size: 1.1rem; }

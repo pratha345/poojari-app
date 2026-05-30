@@ -1,0 +1,371 @@
+/* src/pages/Rashifal.module.css */
+
+.page { min-height: 100vh; background: var(--cream); }
+
+/* ── Hero ──────────────────────────────────────────────────────────── */
+.hero { background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 45%, #c62828 100%); padding: 28px 0; }
+.heroInner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.heroLeft  { display: flex; align-items: center; gap: 16px; }
+.heroIcon  { font-size: 2.6rem; }
+.heroTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 1.8rem; font-weight: 800; color: #fff; margin: 0; }
+.heroSub   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.82rem; color: rgba(255,255,255,0.75); margin: 4px 0 0; }
+.heroRight { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.heroDate  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.9rem; color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.12); padding: 6px 14px; border-radius: 20px; }
+.panchangLink { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.35); color: #fff; font-family: 'Noto Serif Devanagari', serif; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: all 0.2s; }
+.panchangLink:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Rashi selection grid ──────────────────────────────────────────── */
+.gridSection { padding: 40px 0 20px; }
+.gridHeader  { text-align: center; margin-bottom: 24px; }
+.gridTitle   { font-family: 'Noto Serif Devanagari', serif; font-size: 1.6rem; font-weight: 800; color: #7a1e00; margin: 0 0 6px; }
+.gridSub     { font-family: 'Noto Serif Devanagari', serif; font-size: 0.9rem; color: #7a1e00bb; margin: 0; }
+
+.rashiGrid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+@media (max-width: 900px) { .rashiGrid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 600px) { .rashiGrid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+@media (max-width: 380px) { .rashiGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.rashiCard { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 8px 12px; border-radius: 16px; background: #fff; border: 2px solid transparent; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
+.rashiCard:hover { border-color: var(--rashiColor); box-shadow: 0 4px 18px rgba(0,0,0,0.08); }
+.rashiCardActive { border-color: var(--rashiColor) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--rashiColor) 28%, transparent) !important; background: color-mix(in srgb, var(--rashiColor) 4%, #fff) !important; }
+
+/* ── Zodiac image wrapper — selection grid ────────────────────── */
+.rashiImgWrap {
+  width: 80px; height: 80px;
+  border-radius: 18px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--rashiColor) 18%, #fff),
+    color-mix(in srgb, var(--rashiColor) 8%, #fff));
+  border: 1.5px solid color-mix(in srgb, var(--rashiColor) 30%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--rashiColor) 18%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+.rashiCard:hover .rashiImgWrap {
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--rashiColor) 35%, transparent);
+  transform: scale(1.1) translateY(-4px);
+}
+.rashiCardActive .rashiImgWrap {
+  transform: scale(1.06);
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--rashiColor) 40%, transparent);
+}
+
+.rashiImg {
+  width: 90%; height: 90%;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+.rashiCard:hover .rashiImg { transform: scale(1.08); }
+
+.rashiSymbolFallback {
+  font-size: 2.6rem;
+  display: none;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+}
+
+.rashiName { font-family: 'Noto Serif Devanagari', serif; font-size: 0.85rem; font-weight: 800; color: #3e1a00; }
+.rashiEng  { font-size: 0.63rem; color: #7a6060; }
+
+/* ── Prediction header image ──────────────────────────────────── */
+.predImgWrap {
+  width: 96px; height: 96px; flex-shrink: 0;
+  border-radius: 22px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--rashiColor) 15%, #fff),
+    color-mix(in srgb, var(--rashiColor) 5%, #fff));
+  border: 2px solid color-mix(in srgb, var(--rashiColor) 25%, transparent);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--rashiColor) 22%, transparent);
+}
+.predImg { width: 88%; height: 88%; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.18)); }
+.predSymbolFallback { font-size: 3rem; display: none; }
+
+/* ── Monthly title image ──────────────────────────────────────── */
+.monthlyImgWrap {
+  width: 60px; height: 60px; flex-shrink: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--rashiColor) 15%, #fff),
+    color-mix(in srgb, var(--rashiColor) 5%, #fff));
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+
+/* ── Overview card image ──────────────────────────────────────── */
+.overviewImgWrap {
+  width: 52px; height: 52px; flex-shrink: 0;
+  border-radius: 13px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--rashiColor) 18%, #fff),
+    color-mix(in srgb, var(--rashiColor) 6%, #fff));
+  border: 1.5px solid color-mix(in srgb, var(--rashiColor) 25%, transparent);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--rashiColor) 15%, transparent);
+}
+.overviewCard:hover .overviewImgWrap {
+  transform: scale(1.08);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--rashiColor) 28%, transparent);
+}
+.overviewImg { width: 85%; height: 85%; object-fit: contain; }
+.overviewSymbolFallback { font-size: 1.8rem; display: none; }
+
+/* ── Prediction Panel ──────────────────────────────────────────────── */
+.predPanel { background: #fff; border: 2px solid color-mix(in srgb, var(--rashiColor) 30%, transparent); border-radius: 24px; padding: 32px; margin: 24px 0; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
+@media (max-width: 600px) { .predPanel { padding: 18px 14px; } }
+
+.predHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.predRashiInfo { display: flex; align-items: center; gap: 14px; }
+/* .predSymbol replaced by .predImgWrap */
+.predName   { font-family: 'Noto Serif Devanagari', serif; font-size: 1.5rem; font-weight: 800; color: var(--rashiColor); margin: 0 0 4px; }
+.predEng    { font-size: 0.95rem; color: #999; font-weight: 400; }
+.predDates  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; color: #888; margin: 0; }
+.predMetaBlock { display: flex; flex-direction: column; gap: 6px; }
+.predMetaTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 0.7rem; color: #9a7a6a; font-style: italic; }
+.predMeta   { display: flex; flex-wrap: wrap; gap: 6px; }
+.metaPill   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.73rem; background: var(--rashiBg); color: var(--rashiColor); border: 1px solid color-mix(in srgb, var(--rashiColor) 30%, transparent); padding: 3px 10px; border-radius: 12px; white-space: nowrap; }
+
+/* ── Tabs ──────────────────────────────────────────────────────────── */
+.tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.tab  { padding: 8px 20px; border-radius: 20px; border: 1.5px solid #e0d0c0; background: transparent; font-family: 'Noto Serif Devanagari', serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #7a1e00; transition: all 0.2s; }
+.tab:hover   { border-color: var(--rashiColor); }
+.tabActive   { background: var(--rashiColor) !important; color: #fff !important; border-color: var(--rashiColor) !important; }
+
+/* ── Groq Loading ──────────────────────────────────────────────────── */
+.groqLoading {
+  display:     flex;
+  align-items: center;
+  gap:         14px;
+  padding:     28px 20px;
+  background:  linear-gradient(135deg, #f0e6ff, #e8f4ff);
+  border:      1.5px solid #c4a0f0;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  font-family:  var(--font-body);
+  font-size:    0.95rem;
+  color:        #5a1e9a;
+  font-weight:  600;
+}
+.groqSpinner {
+  width:         28px;
+  height:        28px;
+  border:        3px solid rgba(138,43,226,0.2);
+  border-top:    3px solid #8b5cf6;
+  border-radius: 50%;
+  animation:     spin 0.8s linear infinite;
+  flex-shrink:   0;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Score bar ─────────────────────────────────────────────────────── */
+.scoreWrap     { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.scoreLeft     { display: flex; flex-direction: column; gap: 4px; min-width: 110px; }
+.scoreDayLabel { font-family: 'Noto Serif Devanagari', serif; font-size: 0.73rem; font-weight: 600; color: #7a1e00aa; }
+.scoreTag      { font-family: 'Noto Serif Devanagari', serif; font-size: 0.77rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
+.scoreBar  { flex: 1; height: 10px; background: #f0e8e0; border-radius: 5px; overflow: hidden; }
+.scoreFill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
+.scoreNum  { font-family: 'Noto Serif Devanagari', serif; font-size: 1rem; font-weight: 800; white-space: nowrap; min-width: 40px; text-align: right; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   BHAVISHYA SUMMARY CARD (replaces kundali chart)
+══════════════════════════════════════════════════════════════════════ */
+.bhavCard { background: linear-gradient(135deg, #fffdf8, color-mix(in srgb, var(--rashiBg) 60%, #fff)); border: 2px solid color-mix(in srgb, var(--rashiColor) 22%, transparent); border-radius: 16px; padding: 22px 24px; margin-bottom: 24px; }
+.bhavTop  { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.bhavLabel { font-family: 'Noto Serif Devanagari', serif; font-size: 1rem; font-weight: 800; color: #7a1e00; }
+.bhavScore { font-family: 'Noto Serif Devanagari', serif; font-size: 0.82rem; font-weight: 700; padding: 4px 14px; border-radius: 12px; }
+.bhavMain  { font-family: 'Noto Serif Devanagari', serif; font-size: 1.08rem; line-height: 1.8; color: #3e1a00; margin: 0 0 16px; }
+.bhavLucky { display: flex; flex-wrap: wrap; gap: 14px; }
+.bhavLucky span { font-family: 'Noto Serif Devanagari', serif; font-size: 0.82rem; color: #7a5a4a; }
+.bhavLucky strong { color: var(--rashiColor); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   WEEKLY VIEW
+══════════════════════════════════════════════════════════════════════ */
+.weeklyHead { margin-bottom: 16px; }
+.weeklySubtext { font-family: 'Noto Serif Devanagari', serif; font-size: 0.85rem; color: #9a7a6a; margin: 4px 0 0; }
+
+.weekGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 24px; }
+@media (max-width: 1100px) { .weekGrid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 640px)  { .weekGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.weekCard { background: #fff; border: 1.5px solid #e8d8c8; border-radius: 14px; padding: 14px 10px; text-align: center; transition: all 0.2s; display: flex; flex-direction: column; gap: 6px; }
+.weekCard:hover { border-color: var(--rashiColor); box-shadow: 0 4px 14px rgba(0,0,0,0.09); transform: translateY(-2px); }
+.weekCardToday { border-color: var(--rashiColor) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--rashiColor) 20%, transparent) !important; }
+
+.weekDayName  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; font-weight: 800; color: #7a1e00; }
+.weekDate     { font-family: 'Noto Serif Devanagari', serif; font-size: 0.68rem; color: #9a7a6a; }
+.weekScoreTag { font-family: 'Noto Serif Devanagari', serif; font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 10px; display: inline-block; }
+.weekText     { font-family: 'Noto Serif Devanagari', serif; font-size: 0.74rem; color: #5a3a2a; line-height: 1.55; margin: 0; text-align: left; }
+.weekTip      { font-family: 'Noto Serif Devanagari', serif; font-size: 0.68rem; color: #8a5a40; background: #fff8f0; border-radius: 8px; padding: 6px 8px; text-align: left; line-height: 1.5; margin-top: 4px; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   MONTHLY VIEW
+══════════════════════════════════════════════════════════════════════ */
+.monthlyHead { background: linear-gradient(135deg, color-mix(in srgb, var(--rashiBg) 80%, #fff), #fffdf8); border: 2px solid color-mix(in srgb, var(--rashiColor) 20%, transparent); border-radius: 16px; padding: 22px 24px; margin-bottom: 22px; }
+.monthlyTitleRow { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.monthlyTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 1.15rem; font-weight: 800; color: var(--rashiColor); margin: 0; }
+.monthlyOverview { font-family: 'Noto Serif Devanagari', serif; font-size: 0.97rem; line-height: 1.8; color: #3e1a00; margin: 0 0 14px; }
+.monthlyMeta { display: flex; flex-wrap: wrap; gap: 8px; }
+.monthlyMeta span { font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; padding: 4px 12px; background: color-mix(in srgb, var(--rashiColor) 10%, #fff); color: var(--rashiColor); border: 1px solid color-mix(in srgb, var(--rashiColor) 25%, transparent); border-radius: 10px; }
+.monthlyMeta strong { font-weight: 800; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   KUNDALI CHART (deprecated — kept for reference only)
+══════════════════════════════════════════════════════════════════════ */
+
+.kundaliGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 2px;
+  background: #3e1a00;
+  border: 2.5px solid #b35c00;
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 520px;
+  margin: 0 auto 14px;
+  aspect-ratio: 1;
+}
+
+/* Individual house cell */
+.kHouse {
+  background: #FFFAF4;
+  padding: 6px 5px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  min-height: 80px;
+}
+.kCorner   { background: #FFF3E0; }
+.kHasGraha { background: #FFFDE7; }
+
+.kHouseNum { font-size: 0.6rem; font-weight: 700; color: #b35c0066; position: absolute; top: 4px; left: 5px; }
+.kRashiRow { display: flex; align-items: center; gap: 3px; margin-top: 14px; }
+.kSymbol   { font-size: 0.75rem; }
+.kRashi    { font-family: 'Noto Serif Devanagari', serif; font-size: 0.62rem; font-weight: 600; color: #5a3820; line-height: 1.1; }
+
+/* Planet abbreviations inside house */
+.kGrahas { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 3px; }
+.kGraha  {
+  font-family: 'Noto Serif Devanagari', serif;
+  font-size: 0.72rem; font-weight: 800;
+  padding: 1px 5px; border-radius: 6px;
+  line-height: 1.4;
+}
+
+/* Center cell — spans col 2-3, row 2-3 */
+.kCenter {
+  grid-column: 2 / 4;
+  grid-row: 2 / 4;
+  background: linear-gradient(135deg, #7a1e00 0%, #c04a00 60%, #e86a00 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+}
+.kCenterSymbol { font-size: 2rem; filter: drop-shadow(0 0 8px rgba(255,200,100,0.7)); }
+.kCenterName   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.85rem; font-weight: 800; color: #fff; }
+.kCenterLabel  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.65rem; color: rgba(255,255,255,0.7); }
+
+/* Kundali legend */
+.kundaliLegend { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.kLegendItem   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; }
+
+/* Mobile kundali */
+@media (max-width: 500px) {
+  .kHouse    { min-height: 60px; padding: 4px 3px 3px; }
+  .kRashi    { font-size: 0.55rem; }
+  .kGraha    { font-size: 0.65rem; padding: 1px 4px; }
+  .kCenterSymbol { font-size: 1.6rem; }
+  .kCenterName   { font-size: 0.75rem; }
+}
+
+/* ── Graha pills row ───────────────────────────────────────────────── */
+.grahaPills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.grahaPill  { display: flex; align-items: center; gap: 5px; border: 1.5px solid; border-radius: 12px; padding: 5px 10px; background: #fff; }
+.gpSymbol   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.85rem; font-weight: 800; }
+.gpName     { font-family: 'Noto Serif Devanagari', serif; font-size: 0.72rem; font-weight: 700; }
+.gpRashi    { font-family: 'Noto Serif Devanagari', serif; font-size: 0.72rem; color: #4a3020; }
+.gpHouse    { font-family: 'Noto Serif Devanagari', serif; font-size: 0.65rem; font-weight: 700; color: #fff; padding: 1px 7px; border-radius: 8px; }
+
+/* ── Sun monthly strip ─────────────────────────────────────────────── */
+.sunEffect     { display: flex; align-items: flex-start; gap: 10px; background: linear-gradient(135deg,#FFFDE7,#FFF8E1); border: 1.5px solid #F9A825; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; }
+.sunEffectIcon { font-size: 1.1rem; flex-shrink: 0; }
+.sunEffectText { font-family: 'Noto Serif Devanagari', serif; font-size: 0.84rem; color: #4a3000; line-height: 1.65; margin: 0; }
+
+/* ── Section heading ───────────────────────────────────────────────── */
+.sectionHeading { font-family: 'Noto Serif Devanagari', serif; font-size: 1rem; font-weight: 800; color: #7a1e00; margin: 0 0 14px; }
+
+/* ── Category cards ────────────────────────────────────────────────── */
+.catGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
+@media (max-width: 600px) { .catGrid { grid-template-columns: 1fr; gap: 10px; } }
+
+.catCard   { background: #FFFAF4; border: 1.5px solid color-mix(in srgb, var(--catColor) 22%, transparent); border-radius: 16px; padding: 16px; transition: all 0.2s; }
+.catCard:hover { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.catHeader { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.catIcon   { font-size: 1.3rem; flex-shrink: 0; }
+.catLabel  { display: block; font-family: 'Noto Serif Devanagari', serif; font-size: 0.85rem; font-weight: 700; color: var(--catColor); }
+.catPlanet { display: block; font-family: 'Noto Serif Devanagari', serif; font-size: 0.68rem; color: #888; }
+.catText   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.87rem; line-height: 1.72; color: #3e2010; margin: 0; }
+
+/* ── Guru & Shani ──────────────────────────────────────────────────── */
+.guruShaniGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+@media (max-width: 600px) { .guruShaniGrid { grid-template-columns: 1fr; } }
+
+.guruBox, .shaniBox { border-radius: 14px; padding: 16px; border: 1.5px solid; }
+.guruBox  { background: linear-gradient(135deg,#E8F5E9,#F1F8E9); border-color: #81C784; }
+.shaniBox { background: linear-gradient(135deg,#ECEFF1,#F5F5F5); border-color: #90A4AE; }
+
+.gsHeader { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.gsTitle  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; font-weight: 700; color: #1b5e20; flex: 1; }
+.shaniBox .gsTitle { color: #263238; }
+.gsHouse  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.7rem; font-weight: 700; color: #fff; padding: 2px 8px; border-radius: 8px; white-space: nowrap; }
+.gsText   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.83rem; line-height: 1.65; color: #2e4020; margin: 0; }
+.shaniBox .gsText { color: #37474F; }
+
+/* ── Tip box ───────────────────────────────────────────────────────── */
+.tipBox    { display: flex; align-items: flex-start; gap: 14px; background: linear-gradient(135deg,#fff8e1,#fff3e0); border: 1.5px solid #F9A825; border-radius: 16px; padding: 18px; margin-bottom: 22px; }
+.tipIcon   { font-size: 1.4rem; flex-shrink: 0; }
+.tipLabel  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.73rem; font-weight: 700; color: #e65100; text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 4px; }
+.tipText   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.97rem; font-weight: 700; color: #4a3020; font-style: italic; margin: 0; }
+
+/* ── CTA ───────────────────────────────────────────────────────────── */
+.predCta   { display: flex; gap: 12px; flex-wrap: wrap; }
+.ctaBtn    { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 16px; background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: #fff; font-family: 'Noto Serif Devanagari', serif; font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 16px rgba(224,123,42,0.35); }
+.ctaBtn:hover    { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(224,123,42,0.5); }
+.ctaBtnSec { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 16px; background: #fff; border: 2px solid var(--primary); color: var(--primary); font-family: 'Noto Serif Devanagari', serif; font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: all 0.2s; }
+.ctaBtnSec:hover { background: #FFF3E0; }
+
+/* ── Placeholder ───────────────────────────────────────────────────── */
+.placeholder     { text-align: center; padding: 40px 20px; background: #fff; border-radius: 24px; border: 2px dashed #e0d0c0; margin: 24px 0; }
+.placeholderIcon { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+.placeholderText { font-family: 'Noto Serif Devanagari', serif; font-size: 1.1rem; font-weight: 700; color: #7a1e00; margin: 0 0 8px; }
+.placeholderSub  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.87rem; color: #9a7a6a; margin: 0; }
+
+/* ── Overview grid ─────────────────────────────────────────────────── */
+.overviewSection { padding: 40px 0; }
+.overviewTitle   { font-family: 'Noto Serif Devanagari', serif; font-size: 1.4rem; font-weight: 800; color: #7a1e00; margin: 0 0 20px; }
+.overviewGrid    { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 900px) { .overviewGrid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .overviewGrid { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
+
+.overviewCard    { background: #fff; border: 1.5px solid color-mix(in srgb, var(--rashiColor) 25%, transparent); border-radius: 14px; padding: 14px; transition: all 0.2s; }
+.overviewCard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.overviewTop     { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.overviewSymbol  { font-size: 1.5rem; }
+.overviewName    { display: block; font-family: 'Noto Serif Devanagari', serif; font-size: 0.9rem; font-weight: 800; color: var(--rashiColor); }
+.overviewEng     { font-size: 0.68rem; color: #888; }
+.overviewDetails { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
+.overviewDetails span { font-family: 'Noto Serif Devanagari', serif; font-size: 0.72rem; color: #666; }
+.overviewDetails strong { color: #4a2020; }
+.overviewBtn     { width: 100%; padding: 8px; border-radius: 10px; border: none; background: color-mix(in srgb, var(--rashiColor) 12%, transparent); color: var(--rashiColor); font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.overviewBtn:hover { background: var(--rashiColor); color: #fff; }
+
+/* ── Info box ──────────────────────────────────────────────────────── */
+.infoBox   { display: flex; align-items: flex-start; gap: 16px; background: #E3F2FD; border: 1.5px solid #90CAF9; border-radius: 16px; padding: 20px; margin-bottom: 40px; }
+.infoIcon  { font-size: 1.4rem; flex-shrink: 0; }
+.infoTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 0.95rem; font-weight: 700; color: #1565C0; margin: 0 0 6px; }
+.infoText  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.84rem; line-height: 1.72; color: #1a3a5c; margin: 0; }
+.infoLink  { color: #1565C0; font-weight: 700; }

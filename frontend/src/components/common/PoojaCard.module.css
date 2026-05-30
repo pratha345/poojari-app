@@ -20,29 +20,88 @@
   color:         var(--brown);
   padding:       4px 10px;
   border-radius: 20px;
-  font-size:     11px;
+  font-size:     12px;   /* 11→12: Devanagari minimum */
+  font-weight:   700;
+}
+
+.verifiedBadge {
+  position:      absolute;
+  top:           12px;
+  right:         12px;
+  z-index:       2;
+  background:    #e8f5e9;
+  color:         #2e7d32;
+  border:        1px solid #a5d6a7;
+  padding:       3px 9px;
+  border-radius: 20px;
+  font-size:     12px;   /* 10→12: unreadable at 10px */
   font-weight:   700;
 }
 
 .imgWrap {
-  display:      block;
-  position:     relative;
-  overflow:     hidden;
-  aspect-ratio: 4 / 3;
-  flex-shrink:  0;
+  display:     block;
+  position:    relative;
+  overflow:    hidden;
+  height:      210px;   /* desktop fixed height */
+  flex-shrink: 0;
+  background:  var(--cream-dark);
 }
 .imgWrap img {
-  width:      100%;
-  height:     100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  object-position: center center;
+  transition:      transform 0.5s ease;
+  display:         block;
 }
 .card:hover .imgWrap img { transform: scale(1.06); }
+
+/* CSS Placeholder — shown when no image */
+.imgPlaceholder {
+  position:        absolute;
+  inset:           0;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  background:      linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 50%, var(--primary-light) 100%);
+  overflow:        hidden;
+}
+.imgPlaceholderRing {
+  position:     absolute;
+  width:        130px;
+  height:       130px;
+  border-radius: 50%;
+  border:       1.5px dashed rgba(255,255,255,0.25);
+  animation:    cardRingSpin 12s linear infinite;
+}
+@keyframes cardRingSpin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+.imgPlaceholderIcon {
+  font-size:  52px;
+  filter:     drop-shadow(0 2px 12px rgba(0,0,0,0.3));
+  z-index:    1;
+  animation:  cardIconFloat 3s ease-in-out infinite;
+}
+@keyframes cardIconFloat {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.08); }
+}
+.imgPlaceholderOm {
+  position:    absolute;
+  bottom:      8px;
+  right:       12px;
+  font-family: serif;
+  font-size:   28px;
+  color:       rgba(255,255,255,0.15);
+  line-height: 1;
+}
 
 .overlay {
   position:        absolute;
   inset:           0;
-  background:      rgba(139, 37, 0, 0.6);
+  background:      var(--shadow);
   display:         flex;
   align-items:     center;
   justify-content: center;
@@ -55,40 +114,59 @@
 .card:hover .overlay { opacity: 1; }
 
 .body {
-  padding:       16px;
+  padding:       20px;
   flex:          1;
   display:       flex;
   flex-direction: column;
-  gap:           8px;
+  gap:           10px;
 }
 
 .category {
-  font-size:     11px;
+  font-size:     12px;   /* 11→12: minimum for Devanagari */
   color:         var(--primary);
   font-weight:   600;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0;     /* 0.8px removed: Devanagari distorts with letter-spacing */
+  display:       flex;
+  align-items:   center;
+  gap:           5px;
+}
+
+.categoryDot {
+  display:       inline-block;
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  flex-shrink:   0;
 }
 
 .title {
   font-family: var(--font-display);
   font-size:   16px;
   color:       var(--secondary);
-  line-height: 1.3;
+  line-height: 1.4;   /* 1.3→1.4: Devanagari headings need more room */
 }
 .title a { color: inherit; }
 .title a:hover { color: var(--primary); }
 
 .desc {
-  font-size:   13px;
+  font-size:   15px;
   color:       var(--text-muted);
-  line-height: 1.6;
+  line-height: 1.75;
   flex:        1;
 }
 
 .meta {
-  font-size: 12px;
-  color:     var(--text-muted);
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  font-size:   14px;
+  color:       var(--text-muted);
+}
+
+.rating {
+  color:       var(--primary);
+  font-weight: 600;
 }
 
 .footer {
@@ -108,3 +186,64 @@
 }
 
 .bookBtn { flex-shrink: 0; }
+
+/* ── Mobile: horizontal card — image left, content right ────── */
+@media (max-width: 768px) {
+  .card {
+    flex-direction: row;
+  }
+
+  /* Image: fixed width, stretches full card height */
+  .imgWrap {
+    width:        125px;
+    min-width:    125px;
+    height:       auto;
+    align-self:   stretch;
+    border-radius: 0;
+    flex-shrink:  0;
+  }
+  .imgWrap img {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+  }
+
+  /* Badge repositioned for horizontal layout */
+  .badge         { top: 8px; left: 8px; font-size: 12px; padding: 3px 8px; }
+  .verifiedBadge { display: none; }
+
+  /* Content column */
+  .body {
+    flex:      1;
+    padding:   12px 14px;
+    gap:       6px;
+    min-width: 0;
+    overflow:  hidden;
+  }
+
+  .category { font-size: 13px; }
+
+  .title {
+    font-size:           16px;
+    line-height:         1.45;
+    display:             -webkit-box;
+    -webkit-line-clamp:  2;
+    -webkit-box-orient:  vertical;
+    overflow:            hidden;
+    white-space:         normal;
+  }
+
+  .desc {
+    font-size:           14px;
+    line-height:         1.7;
+    display:             -webkit-box;
+    -webkit-line-clamp:  2;
+    -webkit-box-orient:  vertical;
+    overflow:            hidden;
+  }
+
+  .meta    { font-size: 13px; gap: 6px; flex-wrap: wrap; }
+  .footer  { padding-top: 8px; margin-top: auto; }
+  .price   { font-size: 17px; }
+  .bookBtn { font-size: 14px; padding: 7px 13px; }
+}

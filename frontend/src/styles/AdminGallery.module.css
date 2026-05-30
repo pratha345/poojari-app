@@ -1,0 +1,275 @@
+/* src/styles/AdminGallery.module.css */
+
+/* ── Stats Bar ─────────────────────────────────────────────── */
+.statsBar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.statCard {
+  background: linear-gradient(135deg, #fff8f0, #fff3e0);
+  border: 1.5px solid #ffe0b2;
+  border-radius: 12px;
+  padding: 18px 16px;
+  text-align: center;
+}
+.statNum   { display: block; font-size: 2rem; font-weight: 800; color: #E07B2A; line-height: 1; }
+.statLabel { display: block; font-size: 12px; color: #8D6E63; margin-top: 4px; font-weight: 600; }
+
+/* ── Filter Bar ─────────────────────────────────────────────── */
+.filterBar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.searchInput {
+  flex: 1;
+  min-width: 180px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: var(--font-body);
+  background: var(--white);
+  color: var(--text);
+}
+.searchInput:focus { outline: none; border-color: var(--primary); }
+.filterSelect {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  background: var(--white);
+  color: var(--text);
+  cursor: pointer;
+  min-width: 130px;
+}
+.filterSelect:focus { outline: none; border-color: var(--primary); }
+
+/* ── Count Bar ── */
+.countBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 0 2px;
+}
+
+/* ── Gallery Grid ───────────────────────────────────────────── */
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+/* ── Gallery Card ───────────────────────────────────────────── */
+.card {
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--white);
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.card:hover     { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.12); }
+.cardSelected   { border-color: #E07B2A !important; box-shadow: 0 0 0 3px rgba(224,123,42,0.2) !important; }
+.cardUnpublished{ opacity: 0.6; }
+
+.selectedBadge {
+  position: absolute;
+  top: 8px; left: 8px;
+  background: #E07B2A;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  z-index: 2;
+}
+.unpublishedBadge {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  z-index: 2;
+}
+
+.cardImg {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  cursor: pointer;
+  background: #111;
+}
+.img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.card:hover .img { transform: scale(1.04); }
+.cardOverlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+}
+.card:hover .cardOverlay { opacity: 1; }
+.previewBtn {
+  background: rgba(255,255,255,0.9);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  color: #333;
+}
+
+.cardBody  { padding: 12px; }
+.cardTitle { font-size: 13px; font-weight: 700; color: var(--secondary); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cardMeta  { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+
+.typeBadge, .styleBadge, .variantBadge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.typeBadge    { background: #fff3e0; color: #E07B2A; }
+.styleBadge   { background: #e8f5e9; color: #388e3c; }
+.variantBadge { background: #e3f2fd; color: #1565c0; }
+
+.cardActions { display: flex; gap: 4px; }
+.btnSelect, .btnDownload, .btnPublish, .btnDelete {
+  flex: 1;
+  padding: 5px 4px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+  text-align: center;
+}
+.btnSelect:hover   { background: #fff3e0; border-color: #E07B2A; }
+.btnDownload:hover { background: #e8f5e9; border-color: #43a047; }
+.btnPublish:hover  { background: #e3f2fd; border-color: #1565c0; }
+.btnDelete:hover   { background: #ffebee; border-color: #c62828; }
+
+/* ── Pagination ─────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  margin: 24px 0 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Preview Modal ──────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1100; padding: 16px;
+}
+.previewModal {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%; max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 32px 100px rgba(0,0,0,0.4);
+  animation: fadeInUp 0.2s ease;
+}
+.previewHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #fff8f0, #fff3e0);
+  position: sticky; top: 0; z-index: 2;
+}
+.previewTitle { margin: 0 0 4px; font-size: 1.15rem; color: var(--secondary); }
+.previewMeta  { font-size: 12px; color: #888; }
+.closeBtn {
+  background: #f5f5f5; border: none; font-size: 18px;
+  cursor: pointer; border-radius: 8px; padding: 5px 10px;
+  line-height: 1; color: #555;
+}
+.closeBtn:hover { background: #eee; }
+
+.previewBody {
+  padding: 20px;
+  display: flex; align-items: center; justify-content: center;
+  background: #111; min-height: 320px;
+}
+.previewImg {
+  max-width: 100%; max-height: 520px;
+  border-radius: 10px; display: block;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* WhatsApp Caption */
+.captionBox {
+  padding: 16px 20px;
+  background: #f0f9f0;
+  border-top: 1px solid #c8e6c9;
+}
+.captionLabel { font-size: 12px; font-weight: 700; color: #2e7d32; margin-bottom: 8px; }
+.captionText {
+  white-space: pre-wrap;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  font-family: var(--font-body);
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #c8e6c9;
+  margin-bottom: 8px;
+}
+.copyBtn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1.5px solid #43a047;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.previewFooter {
+  display: flex; gap: 10px; align-items: center; justify-content: flex-end;
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.btnSelectLg   { padding: 9px 20px; background: linear-gradient(135deg,#E07B2A,#c9520e); color:#fff; border:none; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; }
+.btnDownloadLg { padding: 9px 18px; background: #2e7d32; color:#fff; border:none; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+.btnDeleteSm   { padding: 9px 14px; background: #c62828; color:#fff; border:none; border-radius:8px; font-size:13px; cursor:pointer; }
+.btnCloseSm    { padding: 9px 16px; background: #f5f5f5; border:1px solid #ddd; border-radius:8px; font-size:13px; cursor:pointer; }
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1200px) { .galleryGrid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px)  { .galleryGrid { grid-template-columns: repeat(2, 1fr); } .statsBar { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .galleryGrid { grid-template-columns: 1fr; } .statsBar { grid-template-columns: repeat(2, 1fr); } }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

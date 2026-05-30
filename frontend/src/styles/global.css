@@ -32,6 +32,23 @@
   --font-display:  'Tiro Devanagari Marathi', serif;
   --font-body:     'Noto Serif Devanagari', serif;
   --font-accent:   'Kalam', cursive;
+
+  /* ── Type Scale — Devanagari-optimised ─────────────────────── */
+  --text-xs:    13px;                          /* minimum — badges, tiny labels  */
+  --text-sm:    14px;                          /* meta, captions, secondary text  */
+  --text-base:  16px;                          /* body text                       */
+  --text-md:    17px;                          /* emphasized body / card titles   */
+  --text-lg:    20px;                          /* sub-headings, sidebar titles    */
+  --text-xl:    1.3rem;                        /* section sub-titles              */
+  --text-2xl:   1.65rem;                       /* card headings, page sub-titles  */
+  --text-3xl:   clamp(1.8rem, 3.5vw, 2.25rem); /* section headings h2            */
+  --text-4xl:   clamp(2rem, 4.5vw, 2.8rem);   /* page titles h1                  */
+
+  /* ── Line-heights — Devanagari needs more vertical room ─────── */
+  --lh-tight:    1.4;    /* headings — matras need breathing room  */
+  --lh-snug:     1.55;   /* sub-headings, card titles              */
+  --lh-normal:   1.7;    /* body text                              */
+  --lh-relaxed:  1.85;   /* long-form reading, blog content        */
 }
 
 /* ── Reset & Base ─────────────────────────────────────────────── */
@@ -41,13 +58,17 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-body);
+  font-size:   var(--text-base);     /* 16px explicit base */
+  font-weight: 500;                  /* Devanagari matras more legible at 500 vs 400 */
   background:  var(--cream);
   color:       var(--text);
-  line-height: 1.7;
+  line-height: var(--lh-normal);     /* 1.7 */
   -webkit-font-smoothing: antialiased;
-  /* Prevent horizontal scroll */
-  overflow-x: hidden;
 }
+
+/* overflow:clip on BOTH axes — no scroll container created, page scroll works on iOS.
+   overflow-x:clip alone forces overflow-y:hidden (CSS spec) → breaks mobile scroll. */
+#root { overflow: clip; }
 
 a { text-decoration: none; color: inherit; }
 img { display: block; max-width: 100%; height: auto; }
@@ -63,7 +84,7 @@ input, textarea, select { font-family: inherit; }
 h1, h2, h3, h4, h5 {
   font-family: var(--font-display);
   color:       var(--secondary);
-  line-height: 1.3;
+  line-height: var(--lh-tight);   /* 1.4 — Devanagari matras need space */
 }
 
 /* ── Container — max-w-7xl, responsive padding ────────────────── */
@@ -71,11 +92,11 @@ h1, h2, h3, h4, h5 {
   max-width: 1280px;
   width:     100%;
   margin:    0 auto;
-  padding:   0 16px; /* px-4 */
+  padding:   0 16px;
 }
-@media (min-width: 640px)  { .container { padding: 0 24px; } } /* sm: px-6 */
-@media (min-width: 1024px) { .container { padding: 0 32px; } } /* lg: px-8 */
-@media (min-width: 1280px) { .container { padding: 0 48px; } } /* xl: px-12 */
+@media (min-width: 640px)  { .container { padding: 0 24px; } }
+@media (min-width: 1024px) { .container { padding: 0 32px; } }
+@media (min-width: 1280px) { .container { padding: 0 40px; } } /* was 48px — reduced to avoid excess whitespace */
 
 /* ── Buttons ──────────────────────────────────────────────────── */
 .btn {
@@ -85,7 +106,7 @@ h1, h2, h3, h4, h5 {
   gap:             8px;
   padding:         12px 28px;
   border-radius:   var(--radius-xl);
-  font-size:       15px;
+  font-size:       16px;
   font-weight:     600;
   letter-spacing:  0.3px;
   transition:      all var(--transition);
@@ -122,8 +143,8 @@ h1, h2, h3, h4, h5 {
 }
 .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--shadow-gold); }
 
-.btn-sm  { padding: 8px 18px;  font-size: 13px; min-height: 36px; }
-.btn-lg  { padding: 16px 36px; font-size: 17px; }
+.btn-sm  { padding: 8px 18px;  font-size: 14px; min-height: 36px; }
+.btn-lg  { padding: 16px 36px; font-size: 18px; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 /* ── Cards ────────────────────────────────────────────────────── */
@@ -143,7 +164,7 @@ h1, h2, h3, h4, h5 {
   margin-bottom: 48px;
 }
 .section-heading h2 {
-  font-size:   clamp(1.5rem, 3vw, 2rem);
+  font-size:   clamp(1.7rem, 3.5vw, 2.2rem);
   color:       var(--secondary);
   position:    relative;
   display:     inline-block;
@@ -162,7 +183,7 @@ h1, h2, h3, h4, h5 {
 .section-heading p {
   margin-top: 20px;
   color:      var(--text-muted);
-  font-size:  1.05rem;
+  font-size:  1.1rem;
 }
 
 /* ── Section ──────────────────────────────────────────────────── */
@@ -214,7 +235,7 @@ h1, h2, h3, h4, h5 {
 }
 /* Small tablet / large mobile: grid-2 stacks (better for forms) */
 @media (max-width: 640px) {
-  .grid-2 { grid-template-columns: 1fr; gap: 0; }
+  .grid-2 { grid-template-columns: 1fr; gap: 16px; } /* was gap:0 — fields were touching each other */
 }
 /* Mobile: single column */
 @media (max-width: 480px) {
@@ -348,9 +369,207 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .btn-block-sm { display: flex; width: 100%; justify-content: center; }
 }
 
+/* ── Theme-aware utility classes (use these instead of hardcoded bg-[#hex]) ── */
+/* These auto-update when admin changes theme in ThemeContext */
+.bg-theme-cream      { background-color: var(--cream) !important; }
+.bg-theme-cream-dark { background-color: var(--cream-dark) !important; }
+.bg-theme-white      { background-color: var(--white) !important; }
+.bg-theme-primary    { background-color: var(--primary) !important; }
+.bg-theme-secondary  { background-color: var(--secondary) !important; }
+.text-theme-primary  { color: var(--primary) !important; }
+.text-theme-secondary{ color: var(--secondary) !important; }
+.border-theme        { border-color: var(--border) !important; }
+
 /* ═══════════════════════════════════════════════════════════════
    Tailwind CSS utilities — added last so they can supplement
    existing styles without overriding the design system above.
    (preflight and container are disabled in tailwind.config.cjs)
 ═══════════════════════════════════════════════════════════════ */
 @tailwind utilities;
+
+/* ════════════════════════════════════════════════════
+   MOBILE / iOS / ANDROID FIXES
+════════════════════════════════════════════════════ */
+
+/* ── iOS text size adjustment ────────────────────────
+   Prevents iOS Safari from auto-scaling text on rotation */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ── Tap highlight — remove default blue flash on iOS/Android ── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Touch action — remove 300ms click delay on mobile ──────── */
+a, button, [role="button"], input[type="submit"], input[type="button"] {
+  touch-action: manipulation;
+}
+
+/* ── Safe area insets — iPhone X/11/12/13/14/15 notch ───────── */
+/* Applies padding around the notch and home indicator */
+body {
+  /* Bottom padding for home indicator bar */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Footer needs extra bottom padding for safe area */
+footer {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Fixed/sticky headers account for status bar */
+.sticky-top, [style*="position: sticky"], [style*="position:sticky"] {
+  top: env(safe-area-inset-top, 0px);
+}
+
+/* ── Universal touch target fix ──────────────────────────────
+   Small pill buttons (filter chips, category tabs, pagination)
+   must have minimum 44px touch height for iOS/Android guidelines */
+.pill-btn,
+.filter-chip,
+.tab-btn {
+  min-height: 44px;
+  padding: 10px 16px;
+}
+
+/* ── Scrollable horizontal strips — mobile smooth scroll ───── */
+.scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-x::-webkit-scrollbar { display: none; }
+
+/* ── Prevent image drag on mobile ───────────────────────────── */
+img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+/* ── Input zoom prevention (iOS zooms when font < 16px) ─────── */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  font-size: max(16px, 1em);
+}
+
+/* ── Mobile container padding tweak ─────────────────────────── */
+@media (max-width: 360px) {
+  .container { padding: 0 12px; }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE PROFESSIONAL TYPOGRAPHY — systematic scale
+   (Zomato / MakeMyTrip level readability for Devanagari)
+══════════════════════════════════════════════════════ */
+
+/* Tablet / large mobile — bump text only, leave body/em layout alone */
+@media (max-width: 768px) {
+  :root {
+    --text-xs:    14px;
+    --text-sm:    16px;
+    --text-base:  17px;
+    --text-md:    19px;
+    --text-lg:    22px;
+    --text-xl:    1.4rem;
+    --text-2xl:   1.75rem;
+    --text-3xl:   clamp(1.75rem, 4.5vw, 2.1rem);
+    --text-4xl:   clamp(1.95rem, 5.5vw, 2.4rem);
+    --lh-normal:  1.8;
+    --lh-relaxed: 1.95;
+  }
+  /* body stays 16px — do NOT touch, it breaks em-based layouts */
+  h2    { font-size: clamp(1.4rem, 5vw, 1.75rem); }
+  h3    { font-size: clamp(1.15rem, 4.5vw, 1.45rem); }
+  p, li { font-size: 17px; line-height: 1.8; }
+  .form-group label { font-size: 15px; }
+  .form-control     { font-size: max(16px, 1em); }
+}
+
+/* Small mobile — glasses-friendly max readability */
+@media (max-width: 480px) {
+  :root {
+    --text-xs:    15px;
+    --text-sm:    16px;
+    --text-base:  18px;
+    --text-md:    20px;
+    --text-lg:    23px;
+    --text-xl:    1.45rem;
+    --text-2xl:   1.85rem;
+    --text-3xl:   clamp(1.8rem, 7vw, 2.15rem);
+    --text-4xl:   clamp(2rem, 8vw, 2.35rem);
+    --lh-normal:  1.85;
+    --lh-relaxed: 2.0;
+  }
+  /* body stays 16px — layout safe */
+  h1        { font-size: clamp(1.75rem, 8.5vw, 2.2rem); }
+  h2        { font-size: clamp(1.45rem, 7vw, 1.85rem); }
+  h3        { font-size: clamp(1.2rem, 5.5vw, 1.5rem); }
+  p, li     { font-size: 18px; line-height: 1.85; }
+  .section  { padding: 40px 0; }
+  .form-group label { font-size: 16px; font-weight: 600; }
+  .form-control     { font-size: max(16px, 1em); padding: 13px 16px; }
+  .btn      { font-size: 17px; min-height: 50px; }
+  .btn-lg   { font-size: 18px; min-height: 54px; padding: 15px 28px; }
+  .btn-sm   { font-size: 15px; }
+  .badge    { font-size: 14px; }
+}
+
+/* ── BookPujari page — responsive ───────────────────────────── */
+.book-pujari-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+.book-pujari-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .book-pujari-grid {
+    grid-template-columns: 1fr;
+  }
+  .book-pujari-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    position: static !important;
+  }
+}
+@media (max-width: 600px) {
+  .book-pujari-grid { gap: 16px; }
+  .book-pujari-sidebar {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Step indicator shrink on mobile ─────────────────────────── */
+@media (max-width: 480px) {
+  .step-label { display: none; }
+  .step-item  { min-width: 36px !important; padding: 10px 4px !important; }
+  .step-connector { width: 20px !important; }
+}
+
+/* ── Google Translate — hide toolbar, keep translation active ─── */
+.goog-te-banner-frame,
+.skiptranslate iframe,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-text-highlight {
+  display: none !important;
+}
+/* Prevent Google Translate from pushing the body down */
+body { top: 0 !important; }
+/* Hide the floating "Translate" button Google sometimes adds */
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO,
+.VIpgJd-ZVi9od-aZ2wEe { display: none !important; }

@@ -13,12 +13,22 @@ export default function Login() {
   const navigate     = useNavigate();
   const location     = useLocation();
   const from         = location.state?.from || '/';
-  const [mode,  setMode]  = useState('password'); // 'password' | 'otp'
-  const [step,  setStep]  = useState(1);          // OTP: 1=phone, 2=verify
-  const [loading,setLoading] = useState(false);
+  const [mode,    setMode]    = useState('password'); // 'password' | 'otp'
+  const [step,    setStep]    = useState(1);          // OTP: 1=phone, 2=verify
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ phone: '', password: '', otp: '' });
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
+  const doRedirect = (user) => {
+    if (user.role === 'super_admin' || user.role === 'admin') {
+      navigate('/admin/dashboard', { replace: true });
+    } else if (user.role === 'pujari') {
+      navigate('/pujari-dashboard', { replace: true });
+    } else {
+      navigate(from === '/login' ? '/' : from, { replace: true });
+    }
+  };
 
   const handlePasswordLogin = async (e) => {
     e.preventDefault();
@@ -29,14 +39,7 @@ export default function Login() {
       const { token, user } = res.data.data;
       login(token, user);
       toast.success(`स्वागत आहे, ${user.name}! 🙏`);
-      // Redirect based on role
-      if (user.role === 'super_admin' || user.role === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
-      } else if (user.role === 'pujari') {
-        navigate('/pujari-dashboard', { replace: true });
-      } else {
-        navigate(from === '/login' ? '/' : from, { replace: true });
-      }
+      doRedirect(user);
     } catch (err) {
       toast.error(err.response?.data?.message || 'लॉगिन करताना त्रुटी झाली.');
     } finally { setLoading(false); }
@@ -64,13 +67,7 @@ export default function Login() {
       const { token, user } = res.data.data;
       login(token, user);
       toast.success(`स्वागत आहे! 🙏`);
-      if (user.role === 'super_admin' || user.role === 'admin') {
-        navigate('/admin/dashboard', { replace: true });
-      } else if (user.role === 'pujari') {
-        navigate('/pujari-dashboard', { replace: true });
-      } else {
-        navigate(from === '/login' ? '/' : from, { replace: true });
-      }
+      doRedirect(user);
     } catch (err) {
       toast.error(err.response?.data?.message || 'OTP चुकीचा आहे.');
     } finally { setLoading(false); }
@@ -104,7 +101,7 @@ export default function Login() {
               <div className="form-group">
                 <label>फोन नंबर किंवा ईमेल *</label>
                 <input type="text" name="phone" value={form.phone} onChange={handleChange}
-                  className="form-control" placeholder="उदा: 9307720459 किंवा email@example.com"/>
+                  className="form-control" placeholder="उदा: 9561903219 किंवा email@example.com"/>
               </div>
               <div className="form-group">
                 <label>पासवर्ड *</label>
@@ -125,7 +122,7 @@ export default function Login() {
               <div className="form-group">
                 <label>फोन नंबर *</label>
                 <input type="tel" name="phone" value={form.phone} onChange={handleChange}
-                  className="form-control" placeholder="उदा: 9307720459"
+                  className="form-control" placeholder="उदा: 9561903219"
                   maxLength={10} disabled={step === 2}/>
               </div>
               {step === 2 && (

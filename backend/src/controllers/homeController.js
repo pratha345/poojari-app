@@ -4,7 +4,11 @@
 const pool = require('../config/db');
 const fs   = require('fs');
 const path = require('path');
-const { success, error } = require('../utils/response.util');
+const { success, error }               = require('../utils/response.util');
+const { getCache, setCache, delCache } = require('../utils/redis');
+
+const HOME_KEY = 'home:data';
+const HOME_TTL = 10 * 60; // 10 minutes
 
 // ─────────────────────────────────────────────────────────────────
 // HELPERS
@@ -24,6 +28,9 @@ const deleteFile = (relPath) => {
 // ─────────────────────────────────────────────────────────────────
 exports.getHome = async (req, res) => {
   try {
+    const cached = await getCache(HOME_KEY);
+    if (cached) return success(res, cached);
+
     const [[content]] = await pool.query(
       'SELECT * FROM home_content ORDER BY id DESC LIMIT 1'
     );
@@ -32,7 +39,9 @@ exports.getHome = async (req, res) => {
       'SELECT * FROM home_slider WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
     );
 
-    return success(res, { content: content || null, sliders });
+    const data = { content: content || null, sliders };
+    await setCache(HOME_KEY, data, HOME_TTL);
+    return success(res, data);
   } catch (err) {
     console.error('❌ getHome:', err.message);
     return error(res, 'होमपेज माहिती मिळवण्यात त्रुटी झाली.');
@@ -45,41 +54,71 @@ exports.getHome = async (req, res) => {
 exports.upsertHome = async (req, res) => {
   try {
     const {
-      title        = '',
-      subtitle     = '',
-      description  = '',
-      button_text_1 = '',
-      button_text_2 = '',
+      title           = '',
+      subtitle        = '',
+      description     = '',
+      button_text_1   = '',
+      button_text_2   = '',
+      clear_bg_image  = '0',
+      stat_bookings   = '५,०००+',
+      stat_pujaris    = '५००+',
+      stat_cities     = '३५+',
+      stat_years      = '५+',
     } = req.body;
 
-    const newImage = req.file ? `/uploads/${req.file.filename}` : null;
+    // req.files: { hero_image: [...], bg_image: [...] }
+    const files      = req.files || {};
+    const newHero    = files.hero_image?.[0] ? `/uploads/${files.hero_image[0].filename}` : null;
+    const newBgImage = files.bg_image?.[0]   ? `/uploads/${files.bg_image[0].filename}`  : null;
 
-    // Check if a row already exists
     const [[existing]] = await pool.query(
-      'SELECT id, hero_image FROM home_content ORDER BY id DESC LIMIT 1'
+      'SELECT id, hero_image, bg_image FROM home_content ORDER BY id DESC LIMIT 1'
     );
 
     if (existing) {
-      // If a new image was uploaded, delete the old one
-      if (newImage && existing.hero_image) deleteFile(existing.hero_image);
+      if (newHero    && existing.hero_image) deleteFile(existing.hero_image);
+      if (newBgImage && existing.bg_image)   deleteFile(existing.bg_image);
 
-      await pool.query(
-        `UPDATE home_content
-         SET title=?, subtitle=?, description=?, button_text_1=?, button_text_2=?,
-             hero_image = COALESCE(?, hero_image),
-             updated_at = NOW()
-         WHERE id = ?`,
-        [title, subtitle, description, button_text_1, button_text_2, newImage, existing.id]
-      );
+      const shouldClearBg = clear_bg_image === '1';
+      if (shouldClearBg && existing.bg_image) deleteFile(existing.bg_image);
+
+      if (shouldClearBg) {
+        await pool.query(
+          `UPDATE home_content
+           SET title=?, subtitle=?, description=?, button_text_1=?, button_text_2=?,
+               stat_bookings=?, stat_pujaris=?, stat_cities=?, stat_years=?,
+               hero_image = COALESCE(?, hero_image), bg_image = NULL, updated_at = NOW()
+           WHERE id = ?`,
+          [title, subtitle, description, button_text_1, button_text_2,
+           stat_bookings, stat_pujaris, stat_cities, stat_years,
+           newHero, existing.id]
+        );
+      } else {
+        await pool.query(
+          `UPDATE home_content
+           SET title=?, subtitle=?, description=?, button_text_1=?, button_text_2=?,
+               stat_bookings=?, stat_pujaris=?, stat_cities=?, stat_years=?,
+               hero_image = COALESCE(?, hero_image), bg_image = COALESCE(?, bg_image), updated_at = NOW()
+           WHERE id = ?`,
+          [title, subtitle, description, button_text_1, button_text_2,
+           stat_bookings, stat_pujaris, stat_cities, stat_years,
+           newHero, newBgImage, existing.id]
+        );
+      }
     } else {
       await pool.query(
         `INSERT INTO home_content
-           (title, subtitle, description, button_text_1, button_text_2, hero_image)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [title, subtitle, description, button_text_1, button_text_2, newImage]
+           (title, subtitle, description, button_text_1, button_text_2,
+            stat_bookings, stat_pujaris, stat_cities, stat_years,
+            hero_image, bg_image)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [title, subtitle, description, button_text_1, button_text_2,
+         stat_bookings, stat_pujaris, stat_cities, stat_years,
+         newHero, newBgImage]
       );
     }
 
+    await delCache(HOME_KEY);
     return success(res, null, 'होमपेज सामग्री यशस्वीरित्या जतन केली. 🙏');
   } catch (err) {
     console.error('❌ upsertHome:', err.message);
@@ -103,6 +142,7 @@ exports.addSlider = async (req, res) => {
       [image_url, title, description, Number(sort_order)]
     );
 
+    await delCache(HOME_KEY);
     return success(
       res,
       { id: result.insertId, image_url, title, description, is_active: 1 },
@@ -129,6 +169,7 @@ exports.deleteSlider = async (req, res) => {
 
     await pool.query('DELETE FROM home_slider WHERE id = ?', [id]);
     deleteFile(slider.image_url);
+    await delCache(HOME_KEY);
 
     return success(res, null, 'स्लाइडर इमेज काढली.');
   } catch (err) {
@@ -147,6 +188,7 @@ exports.toggleSlider = async (req, res) => {
       'UPDATE home_slider SET is_active = NOT is_active WHERE id = ?',
       [id]
     );
+    await delCache(HOME_KEY);
     return success(res, null, 'स्लाइडर स्थिती बदलली.');
   } catch (err) {
     console.error('❌ toggleSlider:', err.message);

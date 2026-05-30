@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS halls (
   name          VARCHAR(255)   NOT NULL,
   phone         VARCHAR(20)    NOT NULL,
   whatsapp      VARCHAR(20),
+  district      VARCHAR(100),
+  taluka        VARCHAR(100),
   city          VARCHAR(100),
   address       TEXT,
   capacity      INT,
@@ -44,3 +46,31 @@ DELIMITER ;
 
 CALL halls_add_location_cols();
 DROP PROCEDURE IF EXISTS halls_add_location_cols;
+
+-- Step 3: Add district and taluka columns if not already present
+DROP PROCEDURE IF EXISTS halls_add_district_cols;
+DELIMITER $$
+CREATE PROCEDURE halls_add_district_cols()
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME   = 'halls'
+      AND COLUMN_NAME  = 'district'
+  ) THEN
+    ALTER TABLE halls ADD COLUMN district VARCHAR(100) NULL AFTER whatsapp;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME   = 'halls'
+      AND COLUMN_NAME  = 'taluka'
+  ) THEN
+    ALTER TABLE halls ADD COLUMN taluka VARCHAR(100) NULL AFTER district;
+  END IF;
+END$$
+DELIMITER ;
+
+CALL halls_add_district_cols();
+DROP PROCEDURE IF EXISTS halls_add_district_cols;

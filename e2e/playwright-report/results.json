@@ -4,23 +4,23 @@
     "rootDir": "F:/pojjari_v2_with_images/pojjari_updated/e2e/tests",
     "forbidOnly": false,
     "fullyParallel": true,
-    "globalSetup": null,
+    "globalSetup": "F:\\pojjari_v2_with_images\\pojjari_updated\\e2e\\global-setup.js",
     "globalTeardown": null,
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 4
+      "actualWorkers": 1
     },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "F:/pojjari_v2_with_images/pojjari_updated/e2e/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 1,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 1
         },
         "id": "chromium-desktop",
         "name": "chromium-desktop",
@@ -29,14 +29,14 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 25000
       },
       {
         "outputDir": "F:/pojjari_v2_with_images/pojjari_updated/e2e/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 1,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 1
         },
         "id": "mobile-chrome",
         "name": "mobile-chrome",
@@ -45,14 +45,14 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 25000
       },
       {
         "outputDir": "F:/pojjari_v2_with_images/pojjari_updated/e2e/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 1,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 1
         },
         "id": "tablet-chrome",
         "name": "tablet-chrome",
@@ -61,7 +61,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 25000
       }
     ],
     "quiet": false,
@@ -93,30 +93,30 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.59.1",
-    "workers": 4,
+    "workers": 1,
     "webServer": null
   },
   "suites": [
     {
-      "title": "hall-booking.spec.js",
-      "file": "hall-booking.spec.js",
+      "title": "error-handling.spec.js",
+      "file": "error-handling.spec.js",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Hall Booking Page — Customer",
-          "file": "hall-booking.spec.js",
-          "line": 34,
+          "title": "Error Handling: API Failure Simulation",
+          "file": "error-handling.spec.js",
+          "line": 9,
           "column": 6,
           "specs": [
             {
-              "title": "hall booking page loads correctly",
+              "title": "Homepage does not show blank screen when poojas API fails",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
@@ -126,12 +126,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5858,
+                      "duration": 2791,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:58:34.250Z",
+                      "startTime": "2026-05-22T18:05:28.755Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -139,120 +139,18 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-93a99f0b6d5178293dcf",
-              "file": "hall-booking.spec.js",
-              "line": 36,
+              "id": "9f91e19d2968a941e6eb-4f2ffbc2bd5fa66d73c4",
+              "file": "error-handling.spec.js",
+              "line": 10,
               "column": 3
             },
             {
-              "title": "page shows city search input",
+              "title": "Homepage shows graceful fallback when all APIs fail",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 5745,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:34.270Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-d2d71a21625b69775792",
-              "file": "hall-booking.spec.js",
-              "line": 46,
-              "column": 3
-            },
-            {
-              "title": "city search returns results or empty state",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 6489,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:34.285Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-0ee8cb9d31ac2b22695d",
-              "file": "hall-booking.spec.js",
-              "line": 54,
-              "column": 3
-            },
-            {
-              "title": "breadcrumb shows correct navigation",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "passed",
-                      "duration": 6014,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:34.235Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-4ba03ab3debaf6c82460",
-              "file": "hall-booking.spec.js",
-              "line": 69,
-              "column": 3
-            },
-            {
-              "title": "nearby button appears when in city mode",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
@@ -262,12 +160,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6754,
+                      "duration": 2525,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:58:40.558Z",
+                      "startTime": "2026-05-22T18:05:31.807Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -275,33 +173,33 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-3fae0243f9ae64a5cab9",
-              "file": "hall-booking.spec.js",
-              "line": 79,
+              "id": "9f91e19d2968a941e6eb-c03ea2663865d58c048c",
+              "file": "error-handling.spec.js",
+              "line": 24,
               "column": 3
             },
             {
-              "title": "map/list toggle buttons are visible when halls exist",
+              "title": "Panchang page handles API failure gracefully",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6128,
+                      "duration": 1766,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:58:40.554Z",
+                      "startTime": "2026-05-22T18:05:34.385Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -309,33 +207,33 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-d82dd2e40ee5bce5488e",
-              "file": "hall-booking.spec.js",
-              "line": 97,
+              "id": "9f91e19d2968a941e6eb-65910a6d8c4c4ec2dc76",
+              "file": "error-handling.spec.js",
+              "line": 42,
               "column": 3
             },
             {
-              "title": "geolocation mock triggers nearby search",
+              "title": "Login page renders without API",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 7880,
+                      "duration": 1762,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:58:40.766Z",
+                      "startTime": "2026-05-22T18:05:36.193Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -343,94 +241,923 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-853f6aced9da809a379a",
-              "file": "hall-booking.spec.js",
-              "line": 114,
-              "column": 3
-            },
-            {
-              "title": "reset button clears city search",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 8334,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:41.310Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-266713356f426776e17d",
-              "file": "hall-booking.spec.js",
-              "line": 129,
-              "column": 3
-            },
-            {
-              "title": "map view renders Leaflet container",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 15243,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:47.054Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-dc72fdafbca163dc3342",
-              "file": "hall-booking.spec.js",
-              "line": 147,
+              "id": "9f91e19d2968a941e6eb-d277f8db59f9ba1295a3",
+              "file": "error-handling.spec.js",
+              "line": 56,
               "column": 3
             }
           ]
         },
         {
-          "title": "Admin Hall Management",
-          "file": "hall-booking.spec.js",
+          "title": "Error Handling: Server 500 Responses",
+          "file": "error-handling.spec.js",
+          "line": 72,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Panchang page does not crash on 500 from API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2081,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:37.987Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-7e2a0bf2f63d47dedbd9",
+              "file": "error-handling.spec.js",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "No JS runtime errors when poojas return 500",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3579,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:40.099Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-3b04081d2842c8741c89",
+              "file": "error-handling.spec.js",
+              "line": 89,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Error Handling: Network Timeouts",
+          "file": "error-handling.spec.js",
+          "line": 111,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Slow API does not block page render indefinitely",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2617,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:43.711Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-f16c3e18517aeac3c0cf",
+              "file": "error-handling.spec.js",
+              "line": 112,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Error Handling: Form Submission Errors",
+          "file": "error-handling.spec.js",
+          "line": 136,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Login form shows error message on wrong credentials",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1222,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:46.374Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-b93f6a316e123b691ecc",
+              "file": "error-handling.spec.js",
+              "line": 137,
+              "column": 3
+            },
+            {
+              "title": "Login form handles network error during submission",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1448,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:47.625Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-eea7297aa479d3e41d83",
+              "file": "error-handling.spec.js",
+              "line": 164,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Logging: Console Error Monitoring",
+          "file": "error-handling.spec.js",
+          "line": 193,
+          "column": 6,
+          "specs": [
+            {
+              "title": "No unhandled promise rejections on homepage",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3605,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:49.104Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-5176d0348641717cb2fe",
+              "file": "error-handling.spec.js",
+              "line": 194,
+              "column": 3
+            },
+            {
+              "title": "No React key warnings on pooja list",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2745,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:52.740Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-e4305b523287843ee8df",
+              "file": "error-handling.spec.js",
+              "line": 209,
+              "column": 3
+            },
+            {
+              "title": "No 404 API calls (broken API paths)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3274,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:55.516Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9f91e19d2968a941e6eb-eb0b6b5a6b2fc26036b4",
+              "file": "error-handling.spec.js",
+              "line": 227,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "security.spec.js",
+      "file": "security.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Security: Admin Route Protection",
+          "file": "security.spec.js",
+          "line": 26,
+          "column": 6,
+          "specs": [
+            {
+              "title": "GET /admin/stats without token → 401",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2652,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:05:58.835Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-200ed865735dca8b9c41",
+              "file": "security.spec.js",
+              "line": 36,
+              "column": 5
+            },
+            {
+              "title": "GET /admin/pujaris/pending without token → 401",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3066,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:01.517Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-6728a1dd9d4c03f3d4a5",
+              "file": "security.spec.js",
+              "line": 36,
+              "column": 5
+            },
+            {
+              "title": "GET /admin/pujaris without token → 401",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2831,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:04.613Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-854f1068287923d75a55",
+              "file": "security.spec.js",
+              "line": 36,
+              "column": 5
+            },
+            {
+              "title": "GET /admin/bookings without token → 401",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2478,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:07.483Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-ec7930be24b98011ff22",
+              "file": "security.spec.js",
+              "line": 36,
+              "column": 5
+            },
+            {
+              "title": "GET /admin/users without token → 401",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2341,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:10.000Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-adc44ab2de4049ae792a",
+              "file": "security.spec.js",
+              "line": 36,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "Security: Token Validation",
+          "file": "security.spec.js",
+          "line": 48,
+          "column": 6,
+          "specs": [
+            {
+              "title": "API rejects obviously fake token",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2280,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:12.375Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-6d108b3aaae6fcda0c81",
+              "file": "security.spec.js",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "API rejects token with wrong signature",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3273,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:14.682Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-ed982895f68adaa79abd",
+              "file": "security.spec.js",
+              "line": 57,
+              "column": 3
+            },
+            {
+              "title": "API rejects JWT with algorithm \"none\"",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2678,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:17.990Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-e9bccee2fbeea67eb34f",
+              "file": "security.spec.js",
+              "line": 68,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Security: HTTP Headers",
+          "file": "security.spec.js",
+          "line": 82,
+          "column": 6,
+          "specs": [
+            {
+              "title": "API health endpoint has security headers",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1500,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:20.709Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-7a429e60618275d159e6",
+              "file": "security.spec.js",
+              "line": 83,
+              "column": 3
+            },
+            {
+              "title": "Frontend has no mixed content (HTTPS + HTTP resources)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2736,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:22.244Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-61a16308f20861d2ef60",
+              "file": "security.spec.js",
+              "line": 93,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Security: XSS via URL Parameters",
+          "file": "security.spec.js",
+          "line": 115,
+          "column": 6,
+          "specs": [
+            {
+              "title": "XSS in URL parameter does not execute: <script>alert(1)</script>",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 971,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:25.040Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-b0d1cbc4467e32d2acc3",
+              "file": "security.spec.js",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "XSS in URL parameter does not execute: \"><img src=x onerror=aler",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 969,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:26.037Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-19fc2cf315609df83157",
+              "file": "security.spec.js",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "title": "XSS in URL parameter does not execute: javascript:alert(document",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1099,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:27.040Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-d06a3324f7c0015185ae",
+              "file": "security.spec.js",
+              "line": 123,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "Security: SQL Injection via API",
+          "file": "security.spec.js",
+          "line": 143,
+          "column": 6,
+          "specs": [
+            {
+              "title": "SQL injection in login phone: ' OR '1'='1",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4445,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:28.187Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-f1769a5823d2ff3ba5ca",
+              "file": "security.spec.js",
+              "line": 151,
+              "column": 5
+            },
+            {
+              "title": "SQL injection in login phone: '; DROP TABLE users; --",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2615,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:32.665Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-4d1efd08d10cf0dc3ca1",
+              "file": "security.spec.js",
+              "line": 151,
+              "column": 5
+            },
+            {
+              "title": "SQL injection in login phone: 1 UNION SELECT 1,2,3",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3205,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:35.313Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3efa7971ab9a8dd627a5-260be6aa8adffdca4558",
+              "file": "security.spec.js",
+              "line": 151,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "Security: CORS Policy",
+          "file": "security.spec.js",
           "line": 167,
           "column": 6,
           "specs": [
             {
-              "title": "admin can navigate to Manage Halls page",
+              "title": "API allows requests from frontend origin",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
@@ -440,12 +1167,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 8964,
+                      "duration": 7694,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:58:47.540Z",
+                      "startTime": "2026-05-22T18:06:38.545Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -453,86 +1180,18 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-c61221500caa8e6db2f6",
-              "file": "hall-booking.spec.js",
-              "line": 201,
+              "id": "3efa7971ab9a8dd627a5-1cd7155679506f48f90f",
+              "file": "security.spec.js",
+              "line": 168,
               "column": 3
             },
             {
-              "title": "Manage Halls shows add button",
+              "title": "Auth endpoint returns 400 for missing credentials (not 500)",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "passed",
-                      "duration": 8635,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:48.749Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-68544be268ec61549136",
-              "file": "hall-booking.spec.js",
-              "line": 211,
-              "column": 3
-            },
-            {
-              "title": "sidebar has Manage Halls link",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 8201,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:49.801Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-ac60dabf37675d175f99",
-              "file": "hall-booking.spec.js",
-              "line": 219,
-              "column": 3
-            },
-            {
-              "title": "clicking add button opens form modal",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
@@ -542,12 +1201,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 8177,
+                      "duration": 2457,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:58:56.727Z",
+                      "startTime": "2026-05-22T18:06:46.268Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -555,120 +1214,35 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-bc471b960b366057e6c4",
-              "file": "hall-booking.spec.js",
-              "line": 228,
+              "id": "3efa7971ab9a8dd627a5-81131698e958f471e069",
+              "file": "security.spec.js",
+              "line": 174,
               "column": 3
-            },
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "seo.spec.js",
+      "file": "seo.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "SEO: Meta Tags",
+          "file": "seo.spec.js",
+          "line": 16,
+          "column": 6,
+          "specs": [
             {
-              "title": "form has all required fields",
+              "title": "Home has <title> tag",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "passed",
-                      "duration": 7729,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:57.457Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-42b886f5d27f072a3450",
-              "file": "hall-booking.spec.js",
-              "line": 240,
-              "column": 3
-            },
-            {
-              "title": "form map picker is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 8186,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:58:58.195Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-db885bd4f023ed313e7c",
-              "file": "hall-booking.spec.js",
-              "line": 258,
-              "column": 3
-            },
-            {
-              "title": "form validation: empty submit shows error",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 8687,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:59:02.531Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-0ac3305951d86cd088af",
-              "file": "hall-booking.spec.js",
-              "line": 269,
-              "column": 3
-            },
-            {
-              "title": "admin can add a new hall successfully",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
@@ -678,12 +1252,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9035,
+                      "duration": 2668,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:05.006Z",
+                      "startTime": "2026-05-22T18:06:48.767Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -691,33 +1265,33 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-223c636c720fc4dc3e2e",
-              "file": "hall-booking.spec.js",
-              "line": 287,
-              "column": 3
+              "id": "c492e88247ecdf7201f5-5041c846ac28300bbf46",
+              "file": "seo.spec.js",
+              "line": 18,
+              "column": 5
             },
             {
-              "title": "added hall shows location as Set",
+              "title": "Home has <meta name=\"description\"> tag",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6545,
+                      "duration": 2506,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:05.271Z",
+                      "startTime": "2026-05-22T18:06:51.466Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -725,33 +1299,33 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-2fdd38f8295a5f4c2904",
-              "file": "hall-booking.spec.js",
-              "line": 318,
-              "column": 3
+              "id": "c492e88247ecdf7201f5-1902eb6f580ab93d3550",
+              "file": "seo.spec.js",
+              "line": 29,
+              "column": 5
             },
             {
-              "title": "admin can edit an existing hall",
+              "title": "Panchang has <title> tag",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5735,
+                      "duration": 931,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:06.509Z",
+                      "startTime": "2026-05-22T18:06:54.004Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -759,33 +1333,33 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-58591846b7fa76331332",
-              "file": "hall-booking.spec.js",
-              "line": 328,
-              "column": 3
+              "id": "c492e88247ecdf7201f5-c007921d2146075f274a",
+              "file": "seo.spec.js",
+              "line": 18,
+              "column": 5
             },
             {
-              "title": "admin can delete a hall",
+              "title": "Panchang has <meta name=\"description\"> tag",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 7485,
+                      "duration": 2021,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:11.338Z",
+                      "startTime": "2026-05-22T18:06:54.968Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -793,33 +1367,33 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-aad424141bf9e79b27c4",
-              "file": "hall-booking.spec.js",
-              "line": 346,
-              "column": 3
+              "id": "c492e88247ecdf7201f5-5ea261e61e59a50727ad",
+              "file": "seo.spec.js",
+              "line": 29,
+              "column": 5
             },
             {
-              "title": "close button dismisses modal without saving",
+              "title": "PoojaList has <title> tag",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6490,
+                      "duration": 1007,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:11.926Z",
+                      "startTime": "2026-05-22T18:06:57.026Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -827,41 +1401,321 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-3b01848159a17ff40d42",
-              "file": "hall-booking.spec.js",
-              "line": 361,
+              "id": "c492e88247ecdf7201f5-1df3b563f9835b79365d",
+              "file": "seo.spec.js",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "PoojaList has <meta name=\"description\"> tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2259,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:06:58.071Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-876706eb2f409b920543",
+              "file": "seo.spec.js",
+              "line": 29,
+              "column": 5
+            },
+            {
+              "title": "About has <title> tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 933,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:00.368Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-f27541b6d9d31906885a",
+              "file": "seo.spec.js",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "About has <meta name=\"description\"> tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1903,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:01.328Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-38dd2dfd5b2903eb3859",
+              "file": "seo.spec.js",
+              "line": 29,
+              "column": 5
+            },
+            {
+              "title": "Contact has <title> tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1294,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:03.260Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-0896d184041878b2610f",
+              "file": "seo.spec.js",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "Contact has <meta name=\"description\"> tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2070,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:04.590Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-d384abf8a8d7cedf71d8",
+              "file": "seo.spec.js",
+              "line": 29,
+              "column": 5
+            },
+            {
+              "title": "Login has <title> tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1529,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:06.691Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-dfacb44cdc0bae16f0cf",
+              "file": "seo.spec.js",
+              "line": 18,
+              "column": 5
+            },
+            {
+              "title": "Login has <meta name=\"description\"> tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2053,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:08.253Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-a5b3376b58394a8ac47b",
+              "file": "seo.spec.js",
+              "line": 29,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "SEO: Unique Page Titles",
+          "file": "seo.spec.js",
+          "line": 49,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Each page has a different title",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5120,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:10.337Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-6f9371cb7029452112eb",
+              "file": "seo.spec.js",
+              "line": 50,
               "column": 3
             }
           ]
         },
         {
-          "title": "Hall API — Backend",
-          "file": "hall-booking.spec.js",
-          "line": 380,
+          "title": "SEO: Sitemap",
+          "file": "seo.spec.js",
+          "line": 71,
           "column": 6,
           "specs": [
             {
-              "title": "GET /api/halls returns success",
+              "title": "GET /sitemap.xml returns valid XML",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 329,
+                      "duration": 1114,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:12.400Z",
+                      "startTime": "2026-05-22T18:07:15.491Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -869,33 +1723,33 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-5597b10cbc2a2070af8b",
-              "file": "hall-booking.spec.js",
-              "line": 382,
+              "id": "c492e88247ecdf7201f5-2cc9b575baf9f004c977",
+              "file": "seo.spec.js",
+              "line": 72,
               "column": 3
             },
             {
-              "title": "GET /api/halls/nearby requires lat & lng",
+              "title": "Sitemap contains homepage URL",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 90,
+                      "duration": 1133,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:12.847Z",
+                      "startTime": "2026-05-22T18:07:16.641Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -903,33 +1757,333 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-6e7a3ef0b5bf0cc4309c",
-              "file": "hall-booking.spec.js",
-              "line": 390,
+              "id": "c492e88247ecdf7201f5-68be65aede078b81165a",
+              "file": "seo.spec.js",
+              "line": 85,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "SEO: Open Graph Tags",
+          "file": "seo.spec.js",
+          "line": 96,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Homepage og:title meta tag — presence check (SEO finding if absent)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3148,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:17.809Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-ac15824bb14465a5efe0",
+              "file": "seo.spec.js",
+              "line": 97,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "SEO: Heading Hierarchy",
+          "file": "seo.spec.js",
+          "line": 120,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Home has exactly one H1 tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2588,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:21.004Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-15ec390a6151b22d4e11",
+              "file": "seo.spec.js",
+              "line": 122,
+              "column": 5
+            },
+            {
+              "title": "Panchang has exactly one H1 tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1759,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:23.628Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-673648e3818bdf32ba7a",
+              "file": "seo.spec.js",
+              "line": 122,
+              "column": 5
+            },
+            {
+              "title": "PoojaList has exactly one H1 tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2430,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:25.429Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-3d4574696132fd4dba96",
+              "file": "seo.spec.js",
+              "line": 122,
+              "column": 5
+            },
+            {
+              "title": "About has exactly one H1 tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1723,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:27.893Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-d45e71e815afd6d32188",
+              "file": "seo.spec.js",
+              "line": 122,
+              "column": 5
+            },
+            {
+              "title": "Contact has exactly one H1 tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2200,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:29.652Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-6a8315135f4846c6700c",
+              "file": "seo.spec.js",
+              "line": 122,
+              "column": 5
+            },
+            {
+              "title": "Login has exactly one H1 tag",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2071,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:31.913Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-82ec6b86f5a1b8043918",
+              "file": "seo.spec.js",
+              "line": 122,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "SEO: Internal Links",
+          "file": "seo.spec.js",
+          "line": 145,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Homepage internal links do not return 404",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 25000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5776,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📊 Internal links found: 49 [\n  \u001b[32m'/'\u001b[39m,\n  \u001b[32m'/blog'\u001b[39m,\n  \u001b[32m'/cities'\u001b[39m,\n  \u001b[32m'/pujari-nondni'\u001b[39m,\n  \u001b[32m'/contact'\u001b[39m,\n  \u001b[32m'/pooja'\u001b[39m,\n  \u001b[32m'/login'\u001b[39m,\n  \u001b[32m'/register'\u001b[39m,\n  \u001b[32m'/about'\u001b[39m,\n  \u001b[32m'/pooja/vastu-pooja'\u001b[39m,\n  \u001b[32m'/pooja?search=सत्यनारायण'\u001b[39m,\n  \u001b[32m'/pooja?search=लग्न'\u001b[39m,\n  \u001b[32m'/pooja?search=नामकरण'\u001b[39m,\n  \u001b[32m'/pooja/havan-jaap'\u001b[39m,\n  \u001b[32m'/pooja/pitru-shraddha'\u001b[39m,\n  \u001b[32m'/pooja?search=गणपती'\u001b[39m,\n  \u001b[32m'/pooja?search=नवग्रह'\u001b[39m,\n  \u001b[32m'/pooja?search=मुंज'\u001b[39m,\n  \u001b[32m'/pooja?search=दिवाळी'\u001b[39m,\n  \u001b[32m'/panchang'\u001b[39m,\n  \u001b[32m'/rashifal'\u001b[39m,\n  \u001b[32m'/online-puja'\u001b[39m,\n  \u001b[32m'/hall-booking'\u001b[39m,\n  \u001b[32m'/pooja?category=gruh-pooja'\u001b[39m,\n  \u001b[32m'/pooja?category=havan-jaap'\u001b[39m,\n  \u001b[32m'/pooja?category=katha-nitya'\u001b[39m,\n  \u001b[32m'/pooja?category=pitru-shraddha'\u001b[39m,\n  \u001b[32m'/pooja?category=utsav-pooja'\u001b[39m,\n  \u001b[32m'/pooja?category=vastu-pooja'\u001b[39m,\n  \u001b[32m'/pooja?category=adhyatmik-seva'\u001b[39m,\n  \u001b[32m'/cities/mumbai'\u001b[39m,\n  \u001b[32m'/cities/pune'\u001b[39m,\n  \u001b[32m'/cities/nashik'\u001b[39m,\n  \u001b[32m'/cities/nagpur'\u001b[39m,\n  \u001b[32m'/cities/aurangabad'\u001b[39m,\n  \u001b[32m'/cities/kolhapur'\u001b[39m,\n  \u001b[32m'/cities/ratnagiri'\u001b[39m,\n  \u001b[32m'/cities/solapur'\u001b[39m,\n  \u001b[32m'/cities/satara'\u001b[39m,\n  \u001b[32m'/cities/ahmednagar'\u001b[39m,\n  \u001b[32m'/cities/thane'\u001b[39m,\n  \u001b[32m'/cities/sangli'\u001b[39m,\n  \u001b[32m'/cities/navi-mumbai'\u001b[39m,\n  \u001b[32m'/cities/amravati'\u001b[39m,\n  \u001b[32m'/cities/jalgaon'\u001b[39m,\n  \u001b[32m'/cities/palghar'\u001b[39m,\n  \u001b[32m'/pooja/gruh-pooja'\u001b[39m,\n  \u001b[32m'/pooja/katha-nitya'\u001b[39m,\n  \u001b[32m'/pooja/utsav-pooja'\u001b[39m\n]\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-22T18:07:34.020Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c492e88247ecdf7201f5-d325eeb6fdc60a3d18e4",
+              "file": "seo.spec.js",
+              "line": 146,
               "column": 3
             },
             {
-              "title": "GET /api/halls/nearby with valid coords returns success",
+              "title": "Image alt tags are present",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 25000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 112,
+                      "duration": 2592,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-05T09:59:13.025Z",
+                      "startTime": "2026-05-22T18:07:39.829Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -937,111 +2091,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "ab58dc6ff7ff1de50224-75e4039baaabc7faf2e5",
-              "file": "hall-booking.spec.js",
-              "line": 395,
-              "column": 3
-            },
-            {
-              "title": "GET /api/halls/nearby results within 40km range",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 324,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:59:13.236Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-d0583e126f6ed39c3957",
-              "file": "hall-booking.spec.js",
-              "line": 403,
-              "column": 3
-            },
-            {
-              "title": "POST /api/admin/halls without auth returns 401",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 57,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:59:13.622Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-b0d91846603218452ab7",
-              "file": "hall-booking.spec.js",
-              "line": 411,
-              "column": 3
-            },
-            {
-              "title": "GET /api/admin/halls without auth returns 401",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 64,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-05T09:59:13.728Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ab58dc6ff7ff1de50224-3c6c2fa7388c9340c505",
-              "file": "hall-booking.spec.js",
-              "line": 418,
+              "id": "c492e88247ecdf7201f5-00d2704580ae4fc66dc7",
+              "file": "seo.spec.js",
+              "line": 175,
               "column": 3
             }
           ]
@@ -1051,9 +2103,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-05T09:58:31.462Z",
-    "duration": 47647.273,
-    "expected": 27,
+    "startTime": "2026-05-22T18:05:25.872Z",
+    "duration": 137158.25900000002,
+    "expected": 54,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

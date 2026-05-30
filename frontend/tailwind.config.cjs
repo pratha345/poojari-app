@@ -2,12 +2,25 @@
 module.exports = {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   corePlugins: {
-    preflight: false, // Keep existing global.css reset intact
-    container: false, // Keep existing .container class intact
+    preflight: false,
+    container: false,
   },
   theme: {
     extend: {
       colors: {
+        // ── Theme-aware aliases (auto-update when theme changes) ──
+        // Use these instead of hardcoded hex: bg-theme-cream, text-theme-primary etc.
+        'theme-primary':    'var(--primary)',
+        'theme-secondary':  'var(--secondary)',
+        'theme-cream':      'var(--cream)',
+        'theme-cream-dark': 'var(--cream-dark)',
+        'theme-gold':       'var(--gold)',
+        'theme-border':     'var(--border)',
+        'theme-text':       'var(--text)',
+        'theme-muted':      'var(--text-muted)',
+        'theme-white':      'var(--white)',
+
+        // ── Static palette (keep for backward compat) ─────────────
         saffron: {
           50:  '#fff8f0',
           100: '#ffe8cc',
@@ -56,17 +69,17 @@ module.exports = {
         },
       },
       boxShadow: {
-        saffron:    '0 8px 32px rgba(255,122,0,0.28)',
+        saffron:     '0 8px 32px rgba(255,122,0,0.28)',
         'saffron-xl':'0 20px 60px rgba(255,122,0,0.38)',
-        spiritual:  '0 12px 40px rgba(139,37,0,0.18)',
-        glow:       '0 0 40px rgba(255,122,0,0.45), 0 0 80px rgba(255,122,0,0.15)',
+        spiritual:   '0 12px 40px rgba(139,37,0,0.18)',
+        glow:        '0 0 40px rgba(255,122,0,0.45), 0 0 80px rgba(255,122,0,0.15)',
       },
       backgroundImage: {
-        'hero-warm':      'linear-gradient(118deg,#fffaf4 0%,#fff5e8 38%,#fde7c0 68%,#f8d380 100%)',
-        'dot-pattern':    'radial-gradient(circle,rgba(224,123,42,0.12) 1.5px,transparent 1.5px)',
-        'mantra-dark':    'linear-gradient(120deg,#2a0500 0%,#6a0e00 40%,#8b1a00 70%,#4a0800 100%)',
-        'saffron-grad':   'linear-gradient(135deg,#FF7A00 0%,#c25000 100%)',
-        'gold-shimmer':   'linear-gradient(105deg,transparent 40%,rgba(255,220,80,0.18) 50%,transparent 60%)',
+        'hero-warm':    'linear-gradient(118deg,#fffaf4 0%,#fff5e8 38%,#fde7c0 68%,#f8d380 100%)',
+        'dot-pattern':  'radial-gradient(circle,rgba(224,123,42,0.12) 1.5px,transparent 1.5px)',
+        'mantra-dark':  'linear-gradient(120deg,#2a0500 0%,#6a0e00 40%,#8b1a00 70%,#4a0800 100%)',
+        'saffron-grad': 'linear-gradient(135deg,#FF7A00 0%,#c25000 100%)',
+        'gold-shimmer': 'linear-gradient(105deg,transparent 40%,rgba(255,220,80,0.18) 50%,transparent 60%)',
       },
     },
   },

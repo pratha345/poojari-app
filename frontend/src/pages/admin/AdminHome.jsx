@@ -20,15 +20,25 @@ export default function AdminHome() {
 
   // Hero content form
   const [form, setForm] = useState({
-    title:         '',
-    subtitle:      '',
-    description:   '',
-    button_text_1: '',
-    button_text_2: '',
+    title:          '',
+    subtitle:       '',
+    description:    '',
+    button_text_1:  '',
+    button_text_2:  '',
+    stat_bookings:  '५,०००+',
+    stat_pujaris:   '५००+',
+    stat_cities:    '३५+',
+    stat_years:     '५+',
   });
-  const [heroImage,    setHeroImage]    = useState(null);   // existing path from DB
-  const [heroPreview,  setHeroPreview]  = useState(null);   // local blob for preview
+  const [heroImage,    setHeroImage]    = useState(null);
+  const [heroPreview,  setHeroPreview]  = useState(null);
   const heroFileRef = useRef();
+
+  // Background image
+  const [bgImage,    setBgImage]    = useState(null);
+  const [bgPreview,  setBgPreview]  = useState(null);
+  const [clearBg,    setClearBg]    = useState(false);
+  const bgFileRef = useRef();
 
   // Slider state
   const [sliders,       setSliders]       = useState([]);
@@ -52,8 +62,13 @@ export default function AdminHome() {
             description:   content.description   || '',
             button_text_1: content.button_text_1 || '',
             button_text_2: content.button_text_2 || '',
+            stat_bookings: content.stat_bookings || '५,०००+',
+            stat_pujaris:  content.stat_pujaris  || '५००+',
+            stat_cities:   content.stat_cities   || '३५+',
+            stat_years:    content.stat_years    || '५+',
           });
           setHeroImage(content.hero_image || null);
+          setBgImage(content.bg_image || null);
         }
         setSliders(sl || []);
       })
@@ -61,11 +76,16 @@ export default function AdminHome() {
       .finally(() => setLoading(false));
   }, []);
 
-  // ── Hero image local preview ───────────────────────────────────
   function onHeroFileChange(e) {
     const file = e.target.files[0];
     if (!file) return;
     setHeroPreview(URL.createObjectURL(file));
+  }
+
+  function onBgFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setBgPreview(URL.createObjectURL(file));
   }
 
   // ── Save hero content ──────────────────────────────────────────
@@ -75,15 +95,17 @@ export default function AdminHome() {
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-      const file = heroFileRef.current?.files[0];
-      if (file) fd.append('hero_image', file);
+      const heroFile = heroFileRef.current?.files[0];
+      const bgFile   = bgFileRef.current?.files[0];
+      if (heroFile) fd.append('hero_image', heroFile);
+      if (bgFile)   fd.append('bg_image',   bgFile);
+      if (clearBg)  fd.append('clear_bg_image', '1');
 
       await homeAPI.upsert(fd);
       toast.success('होमपेज सामग्री जतन केली! 🙏');
-      if (heroPreview) {
-        setHeroImage(heroPreview);
-        setHeroPreview(null);
-      }
+      if (heroPreview) { setHeroImage(heroPreview); setHeroPreview(null); }
+      if (bgPreview)   { setBgImage(bgPreview);     setBgPreview(null); }
+      if (clearBg)     { setBgImage(null);           setClearBg(false); }
     } catch {
       toast.error('जतन करण्यात त्रुटी झाली.');
     } finally {
@@ -210,6 +232,32 @@ export default function AdminHome() {
                 </div>
               </div>
 
+              {/* Stats Section */}
+              <div style={{ gridColumn: '1 / -1', background: '#faf6f0', borderRadius: 10, padding: '1.25rem', border: '1px solid #f0dfc0', marginBottom: '0.5rem' }}>
+                <h3 style={{ margin: '0 0 1rem', color: '#8B1A1A', fontWeight: 700, fontSize: 14 }}>📊 आकडेवारी (Stats Strip)</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem' }}>
+                  {[
+                    { key: 'stat_bookings', label: '📅 बुकिंग', placeholder: '५,०००+' },
+                    { key: 'stat_pujaris',  label: '🙏 पुजारी',  placeholder: '५००+' },
+                    { key: 'stat_cities',   label: '📍 शहरे',    placeholder: '३५+' },
+                    { key: 'stat_years',    label: '⭐ वर्षे',   placeholder: '५+' },
+                  ].map(s => (
+                    <div className={styles.formGroup} key={s.key}>
+                      <label className={styles.label}>{s.label}</label>
+                      <input
+                        className={styles.input}
+                        value={form[s.key]}
+                        onChange={e => setForm(p => ({ ...p, [s.key]: e.target.value }))}
+                        placeholder={s.placeholder}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p style={{ margin: '8px 0 0', fontSize: 11, color: '#aaa' }}>
+                  उदा: "५,०००+" किंवा "500+" — homepage वर hero खाली दिसेल
+                </p>
+              </div>
+
               <div className={styles.formGroup} style={{ marginBottom: '1.25rem' }}>
                 <label className={styles.label}>वर्णन (Description)</label>
                 <textarea
@@ -257,6 +305,75 @@ export default function AdminHome() {
                     <p style={{ marginTop: 6, fontSize: 12, color: '#888' }}>JPEG, PNG, WEBP — max 5MB</p>
                   </div>
                 </div>
+              </div>
+
+              {/* Background Image Upload */}
+              <div className={styles.formGroup} style={{ marginBottom: '1.5rem', background: '#faf6f0', borderRadius: 10, padding: '1.25rem', border: '1px solid #f0dfc0' }}>
+                <label className={styles.label} style={{ marginBottom: 4 }}>🌅 Background इमेज</label>
+                <p style={{ fontSize: 12, color: '#888', marginBottom: 14 }}>
+                  गणपती / ॐ / मंदिराचा फोटो upload करा — homepage च्या background मध्ये <strong>खूप faint</strong> दिसेल
+                </p>
+
+                <input ref={bgFileRef} type="file" accept="image/*" style={{ display: 'none' }}
+                  onChange={e => { onBgFileChange(e); setClearBg(false); }} />
+
+                {/* Case 1: clearBg marked — show undo option */}
+                {clearBg && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: '#ffebee', borderRadius: 8, border: '1px solid #ffcdd2' }}>
+                    <span style={{ fontSize: 20 }}>🗑️</span>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#c62828' }}>Background इमेज काढली जाईल</p>
+                      <p style={{ margin: '2px 0 0', fontSize: 12, color: '#c62828' }}>जतन केल्यावर homepage वर फक्त gradient दिसेल</p>
+                    </div>
+                    <button type="button"
+                      onClick={() => setClearBg(false)}
+                      style={{ padding: '6px 14px', borderRadius: 6, border: '1px solid #c62828', background: '#fff', color: '#c62828', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                      ↩️ रद्द करा
+                    </button>
+                  </div>
+                )}
+
+                {/* Case 2: image set and not clearing */}
+                {!clearBg && (bgPreview || imgSrc(bgImage)) && (
+                  <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    {/* Preview */}
+                    <div style={{ position: 'relative', width: 200, height: 110, borderRadius: 10, overflow: 'hidden', border: '2px solid #E07B2A', background: 'linear-gradient(125deg,#fffdf8,#feefd5,#fde0a0)', flexShrink: 0 }}>
+                      <img src={bgPreview || imgSrc(bgImage)} alt=""
+                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.13, filter: 'blur(1.5px)' }}
+                        onError={e => { e.currentTarget.style.display = 'none'; }} />
+                      <div style={{ position: 'relative', inset: 0, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: 20, opacity: 0.25, fontFamily: 'serif' }}>ॐ</span>
+                        <span style={{ fontSize: 10, color: '#8B4513', fontWeight: 600, marginTop: 4 }}>Homepage preview</span>
+                      </div>
+                      {bgPreview && <span style={{ position: 'absolute', top: 4, left: 4, background: '#E07B2A', color: '#fff', borderRadius: 4, padding: '2px 6px', fontSize: 10, fontWeight: 700 }}>नवीन</span>}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <button type="button" className={styles.btnSecondary}
+                        onClick={() => bgFileRef.current?.click()}>
+                        🔄 वेगळी इमेज निवडा
+                      </button>
+                      <button type="button"
+                        onClick={() => { setBgPreview(null); if (bgFileRef.current) bgFileRef.current.value = ''; if (bgImage) setClearBg(true); }}
+                        style={{ padding: '8px 16px', borderRadius: 6, border: '1.5px solid #c62828', background: '#fff', color: '#c62828', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                        🗑️ Background इमेज काढा
+                      </button>
+                      <p style={{ margin: 0, fontSize: 11, color: '#888' }}>JPEG, PNG, WEBP — max 5MB</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Case 3: no image set yet */}
+                {!clearBg && !bgPreview && !bgImage && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <button type="button" className={styles.btnSecondary}
+                      onClick={() => bgFileRef.current?.click()}>
+                      🖼️ Background इमेज निवडा
+                    </button>
+                    <p style={{ margin: 0, fontSize: 12, color: '#aaa' }}>JPEG, PNG, WEBP — max 5MB</p>
+                  </div>
+                )}
               </div>
 
               <button type="submit" className={styles.btn} disabled={saving}>

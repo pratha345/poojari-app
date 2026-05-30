@@ -1,5 +1,5 @@
 /* BookingHistory.module.css */
-.main { background: var(--cream); min-height: 80vh; padding: 40px 0 72px; }
+.main { background: var(--cream); min-height: 80vh; padding: 32px 0 52px; }
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
 .title { font-family: var(--font-display); font-size: 1.6rem; color: var(--secondary); }
 
@@ -27,10 +27,35 @@
   object-fit: cover; flex-shrink: 0;
 }
 .cardInfo { min-width: 0; }
-.cardCode { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-family: monospace; }
+.cardCode { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-family: monospace; }
 .poojaName { font-family: var(--font-display); font-size: 1.1rem; color: var(--secondary); margin-bottom: 8px; }
 .cardMeta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
-.pujariInfo { font-size: 13px; color: var(--text-muted); }
+/* Pujari card inside booking */
+.pujariCard {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #f0faf0; border: 1px solid #b8e0b8;
+  border-radius: 8px; padding: 10px 12px; margin-top: 8px;
+}
+.pujariAvatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0; border: 2px solid var(--primary);
+}
+.pujariAvatarFallback {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--cream); border: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--secondary); flex-shrink: 0;
+}
+.pujariCardInfo { min-width: 0; }
+.pujariCardName { font-size: 13px; font-weight: 700; color: var(--secondary); margin-bottom: 2px; }
+.pujariCardMeta { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+.pujariCardRating { font-size: 12px; margin-bottom: 3px; }
+.pujariPhone {
+  font-size: 12px; color: var(--primary); font-weight: 600;
+  text-decoration: none; display: inline-flex; align-items: center;
+}
+.pujariPhone:hover { text-decoration: underline; }
+.pujariPending { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
 
 .cardRight {
   display: flex; flex-direction: column; align-items: flex-end;
@@ -40,7 +65,7 @@
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .empty {
-  text-align: center; padding: 80px 40px;
+  text-align: center; padding: 48px 24px;
   display: flex; flex-direction: column; align-items: center; gap: 16px;
 }
 .empty span { font-size: 64px; }
@@ -65,7 +90,22 @@
 .modalActions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
 
 @media (max-width: 640px) {
-  .card { flex-direction: column; }
-  .cardRight { align-items: flex-start; }
-  .cardLeft { flex-direction: column; }
+  .card         { flex-direction: column; }
+  .cardRight    { align-items: flex-start; }
+  .cardLeft     { flex-direction: column; }
+  .modalActions { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .poojaImg { width: 60px; height: 60px; }
+  .modal    { padding: 20px 16px; }
+  .starBtn  { font-size: 24px; }
+}
+
+/* ── Missing 768px Breakpoint (added) ───────────────────────── */
+@media (max-width: 768px) {
+  .card   { flex-direction: column; gap: 16px; }
+  .header { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .filterBtn { min-height: 40px; padding: 9px 14px; }
+  .poojaImg  { width: 70px; height: 70px; }
 }

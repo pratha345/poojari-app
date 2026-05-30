@@ -1,11 +1,9 @@
 // src/utils/imageHelper.js
-// Backend now returns full absolute image URLs in API responses.
-// This helper just handles null/undefined gracefully.
-const PLACEHOLDER = 'https://placehold.co/600x400/f5e6d3/c9a96e?text=Pooja';
+// Backend returns full absolute image URLs in API responses.
+// Returns null when no image — components should render their own placeholder UI.
+export const getImageUrl = (image_url) => image_url || null;
 
-export const getImageUrl = (image_url) => image_url || PLACEHOLDER;
-
-export const POOJA_PLACEHOLDER = PLACEHOLDER;
+export const POOJA_PLACEHOLDER = null;
 
 // src/utils/formatPrice.js
 export const formatPrice = (amount) =>

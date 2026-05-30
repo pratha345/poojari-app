@@ -2,6 +2,7 @@
 const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 const { success, error } = require('../utils/response.util');
+const { notifyAdminNewBooking } = require('../services/notificationService');
 
 // Generate short booking code
 const genCode = () => 'POJ' + Date.now().toString(36).toUpperCase().slice(-6);
@@ -9,10 +10,10 @@ const genCode = () => 'POJ' + Date.now().toString(36).toUpperCase().slice(-6);
 // ── Create Booking ────────────────────────────────────────────
 exports.createBooking = async (req, res) => {
   try {
-    const { pooja_id, booking_date, booking_time, address, city, district, special_notes } = req.body;
+    const { pooja_id, booking_date, booking_time, address, city, district, special_notes, preferred_pujari_id } = req.body;
     const user_id = req.user.id;
 
-    if (!pooja_id || !booking_date || !booking_time || !address)
+    if (!pooja_id || !booking_date || !booking_time || !address?.trim())
       return error(res, 'सर्व आवश्यक माहिती भरा.', 400);
 
     // Get pooja price
@@ -23,17 +24,31 @@ exports.createBooking = async (req, res) => {
     const platform_fee = Math.round(pooja.price * 0.05); // 5% platform fee
     const pujari_amount = pooja.price - platform_fee;
     const booking_code = genCode();
+    const tenant_id = pooja.tenant_id || null;
+    const prefPujariId = preferred_pujari_id ? Number(preferred_pujari_id) : null;
 
     const [result] = await pool.query(
       `INSERT INTO bookings
        (booking_code, user_id, pooja_id, booking_date, booking_time,
         address, city, district, special_notes, total_amount,
-        platform_fee, pujari_amount)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+        platform_fee, pujari_amount, tenant_id, preferred_pujari_id)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [booking_code, user_id, pooja_id, booking_date, booking_time,
        address, city, district, special_notes, pooja.price,
-       platform_fee, pujari_amount]
+       platform_fee, pujari_amount, tenant_id, prefPujariId]
     );
+
+    // Notify admin (non-blocking)
+    notifyAdminNewBooking({
+      booking_code,
+      pooja_name:   pooja.name_mr,
+      booking_date,
+      booking_time,
+      address,
+      user_phone:   req.user.phone,
+      tenant_id,
+      io:           req.app.get('io'),
+    }).catch(() => {});
 
     return success(res, {
       booking_id: result.insertId,
@@ -57,7 +72,11 @@ exports.getMyBookings = async (req, res) => {
 
     const [bookings] = await pool.query(
       `SELECT b.*, p.name_mr AS pooja_name, p.image_url AS pooja_image,
-              pp.full_name AS pujari_name, pu.phone AS pujari_phone
+              pp.id AS pujari_profile_id, pp.full_name AS pujari_name,
+              pp.photo_url AS pujari_photo, pp.city AS pujari_city,
+              pp.avg_rating AS pujari_rating, pp.experience_yrs AS pujari_experience,
+              pu.phone AS pujari_phone,
+              (SELECT COUNT(*) FROM reviews r WHERE r.booking_id = b.id AND r.user_id = b.user_id) AS has_review
        FROM bookings b
        JOIN poojas p ON b.pooja_id = p.id
        LEFT JOIN pujari_profiles pp ON b.pujari_id = pp.id
@@ -151,6 +170,38 @@ exports.submitReview = async (req, res) => {
   }
 };
 
+// ── Mark Cash Payment Method ──────────────────────────────────
+exports.chooseCash = async (req, res) => {
+  try {
+    const { booking_id } = req.body;
+    await pool.query(
+      'UPDATE bookings SET payment_method="cash" WHERE id=? AND user_id=?',
+      [booking_id, req.user.id]
+    );
+    return success(res, {}, 'रोख पेमेंट नोंदवले.');
+  } catch (err) {
+    return error(res, 'त्रुटी झाली.');
+  }
+};
+
+// ── Admin: Mark Cash Received ─────────────────────────────────
+exports.markCashReceived = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { actual_amount } = req.body;
+    await pool.query(
+      `UPDATE bookings
+       SET payment_status="cash_paid", status="completed",
+           actual_amount = ?
+       WHERE id=?`,
+      [actual_amount || null, id]
+    );
+    return success(res, {}, 'रोख पेमेंट मिळाले. बुकिंग पूर्ण झाली! ✅');
+  } catch (err) {
+    return error(res, 'त्रुटी झाली.');
+  }
+};
+
 // ── Razorpay: Create Order ────────────────────────────────────
 exports.createPaymentOrder = async (req, res) => {
   try {
@@ -161,24 +212,32 @@ exports.createPaymentOrder = async (req, res) => {
     );
     if (!booking.length) return error(res, 'बुकिंग सापडली नाही.', 404);
 
-    // TODO: Integrate actual Razorpay SDK
-    // const Razorpay = require('razorpay');
-    // const instance = new Razorpay({ key_id, key_secret });
-    // const order = await instance.orders.create({ amount: booking[0].total_amount * 100, currency: 'INR' });
+    const Razorpay = require('razorpay');
+    const instance = new Razorpay({
+      key_id:     process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
 
-    const mockOrder = {
-      order_id: 'order_' + uuidv4().replace(/-/g, '').slice(0, 14),
-      amount: booking[0].total_amount * 100,
+    const order = await instance.orders.create({
+      amount:   Math.round(booking[0].total_amount * 100),
       currency: 'INR',
-    };
+      receipt:  `booking_${booking_id}`,
+      notes:    { booking_id: String(booking_id) },
+    });
 
     await pool.query(
       'UPDATE bookings SET razorpay_order_id = ? WHERE id = ?',
-      [mockOrder.order_id, booking_id]
+      [order.id, booking_id]
     );
 
-    return success(res, mockOrder, 'पेमेंट ऑर्डर तयार केला.');
+    return success(res, {
+      order_id:   order.id,
+      amount:     order.amount,
+      currency:   order.currency,
+      key_id:     process.env.RAZORPAY_KEY_ID,
+    }, 'पेमेंट ऑर्डर तयार केला.');
   } catch (err) {
+    console.error('Razorpay order error:', err);
     return error(res, 'पेमेंट ऑर्डर तयार करताना त्रुटी झाली.');
   }
 };
@@ -186,12 +245,21 @@ exports.createPaymentOrder = async (req, res) => {
 // ── Razorpay: Verify Payment ──────────────────────────────────
 exports.verifyPayment = async (req, res) => {
   try {
-    const { booking_id, payment_id } = req.body;
-    // TODO: Verify Razorpay signature here
+    const { booking_id, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const crypto = require('crypto');
+
+    const body      = razorpay_order_id + '|' + razorpay_payment_id;
+    const expected  = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest('hex');
+
+    if (expected !== razorpay_signature)
+      return error(res, 'पेमेंट पडताळणी अयशस्वी.', 400);
 
     await pool.query(
-      'UPDATE bookings SET payment_status="paid", payment_id=?, status="confirmed" WHERE id=?',
-      [payment_id, booking_id]
+      'UPDATE bookings SET payment_status="paid", payment_id=?, status="confirmed" WHERE id=? AND user_id=?',
+      [razorpay_payment_id, booking_id, req.user.id]
     );
     return success(res, {}, 'पेमेंट यशस्वी झाले! 🙏');
   } catch (err) {

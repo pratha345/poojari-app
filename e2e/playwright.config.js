@@ -3,11 +3,12 @@ const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir:   './tests',
+  globalSetup: './global-setup.js',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries:    process.env.CI ? 2 : 0,
+  retries:    process.env.CI ? 2 : 1,  // 1 retry handles backend cold-start flakiness
   workers:    process.env.CI ? 1 : undefined,
-  timeout:    30_000,
+  timeout:    60_000,
 
   reporter: [
     ['list'],

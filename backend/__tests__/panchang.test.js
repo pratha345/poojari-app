@@ -11,7 +11,8 @@ jest.mock('../src/config/db', () => ({
 
 jest.mock('../src/middleware/tenant.middleware', () => ({
   resolveTenant: (req, res, next) => { req.tenantId = 1; req.tenant = { id: 1 }; next(); },
-  attachTenant:  (req, res, next) => next(),
+  attachTenant:     (req, res, next) => next(),
+  subscriptionGate: (req, res, next) => next(),
 }));
 
 const app = require('../src/app');

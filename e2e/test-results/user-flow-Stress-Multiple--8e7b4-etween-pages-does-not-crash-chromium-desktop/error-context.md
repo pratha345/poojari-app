@@ -1,0 +1,191 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: user-flow.spec.js >> Stress: Multiple Simultaneous Loads @stress >> rapid navigation between pages does not crash
+- Location: tests\user-flow.spec.js:173:3
+
+# Error details
+
+```
+Tearing down "context" exceeded the test timeout of 60000ms.
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Poojaris — For All Poojas" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "Poojaris — For All Poojas" [ref=e8]
+        - navigation "मुख्य नेव्हिगेशन" [ref=e9]:
+          - link "मुख्यपृष्ठ" [ref=e10] [cursor=pointer]:
+            - /url: /
+          - button "पूजा सेवा ▾" [ref=e13] [cursor=pointer]:
+            - text: पूजा सेवा
+            - generic [ref=e14]: ▾
+          - button "ज्योतिष ▾" [ref=e17] [cursor=pointer]:
+            - text: ज्योतिष
+            - generic [ref=e18]: ▾
+          - link "ब्लॉग" [ref=e19] [cursor=pointer]:
+            - /url: /blog
+            - img [ref=e20]
+            - text: ब्लॉग
+          - link "शहरे" [ref=e22] [cursor=pointer]:
+            - /url: /cities
+            - img [ref=e23]
+            - text: शहरे
+          - link "पुजारी व्हा" [ref=e25] [cursor=pointer]:
+            - /url: /pujari-nondni
+          - link "संपर्क" [ref=e26] [cursor=pointer]:
+            - /url: /contact
+        - generic [ref=e27]:
+          - button "पूजा शोधा" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "EN ▾" [ref=e31] [cursor=pointer]:
+            - text: EN
+            - generic [ref=e32]: ▾
+          - link "🪔 पूजा बुक करा" [ref=e33] [cursor=pointer]:
+            - /url: /pooja
+          - link "लॉगिन" [ref=e34] [cursor=pointer]:
+            - /url: /login
+      - generic [ref=e37]:
+        - textbox "पूजा शोधा" [ref=e38]:
+          - /placeholder: पूजा शोधा...
+        - button "शोध" [ref=e39] [cursor=pointer]
+  - main [ref=e41]:
+    - text: ॐ
+    - generic [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]: 🪔
+        - heading "लॉगिन करा" [level=1] [ref=e45]
+        - paragraph [ref=e46]: आपल्या खात्यात प्रवेश करा
+      - generic [ref=e47]:
+        - button "पासवर्ड" [ref=e48] [cursor=pointer]
+        - button "OTP लॉगिन" [ref=e49] [cursor=pointer]
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: फोन नंबर किंवा ईमेल *
+          - 'textbox "उदा: 9561903219 किंवा email@example.com" [ref=e53]'
+        - generic [ref=e54]:
+          - generic [ref=e55]: पासवर्ड *
+          - textbox "आपला पासवर्ड टाका" [ref=e56]
+        - button "🙏 लॉगिन करा" [ref=e57] [cursor=pointer]
+        - link "🔑 पासवर्ड विसरलात?" [ref=e59] [cursor=pointer]:
+          - /url: /forgot-password
+      - generic [ref=e60]: किंवा
+      - paragraph [ref=e61]:
+        - text: खाते नाही?
+        - link "येथे नोंदणी करा" [ref=e62] [cursor=pointer]:
+          - /url: /register
+      - paragraph [ref=e63]:
+        - text: पुजारी म्हणून नोंदणी करायची आहे?
+        - link "पुजारी व्हा" [ref=e64] [cursor=pointer]:
+          - /url: /pujari-nondni
+  - contentinfo [ref=e65]:
+    - generic [ref=e66]:
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - img "Poojaris — For All Poojas" [ref=e70]
+          - paragraph [ref=e71]: महाराष्ट्रातील सर्वोत्तम पूजा बुकिंग सेवा. विश्वासू पुजारी, वेळेवर सेवा, आणि पारंपरिक विधी.
+          - generic [ref=e72]:
+            - link "Facebook" [ref=e73] [cursor=pointer]:
+              - /url: https://facebook.com
+              - img [ref=e74]
+            - link "Instagram" [ref=e76] [cursor=pointer]:
+              - /url: https://instagram.com
+              - img [ref=e77]
+            - link "YouTube" [ref=e79] [cursor=pointer]:
+              - /url: https://youtube.com
+              - img [ref=e80]
+            - link "WhatsApp" [ref=e82] [cursor=pointer]:
+              - /url: https://wa.me/9561903219
+              - img [ref=e83]
+        - generic [ref=e85]:
+          - heading "त्वरित लिंक" [level=3] [ref=e86]
+          - list [ref=e87]:
+            - listitem [ref=e88]:
+              - link "› मुख्यपृष्ठ" [ref=e89] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e90]:
+              - link "› पूजा बुक करा" [ref=e91] [cursor=pointer]:
+                - /url: /pooja
+            - listitem [ref=e92]:
+              - link "› ऑनलाइन पूजा" [ref=e93] [cursor=pointer]:
+                - /url: /online-puja
+            - listitem [ref=e94]:
+              - link "› ब्लॉग" [ref=e95] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e96]:
+              - link "› सर्व शहरे" [ref=e97] [cursor=pointer]:
+                - /url: /cities
+            - listitem [ref=e98]:
+              - link "› पुजारी व्हा" [ref=e99] [cursor=pointer]:
+                - /url: /pujari-nondni
+            - listitem [ref=e100]:
+              - link "› आमच्याबद्दल" [ref=e101] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e102]:
+              - link "› संपर्क करा" [ref=e103] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e104]:
+          - heading "पूजा श्रेणी" [level=3] [ref=e105]
+          - list [ref=e106]:
+            - listitem [ref=e107]:
+              - link "› गृह पूजा" [ref=e108] [cursor=pointer]:
+                - /url: /pooja/gruh-pooja
+            - listitem [ref=e109]:
+              - link "› हवन / जाप" [ref=e110] [cursor=pointer]:
+                - /url: /pooja/havan-jaap
+            - listitem [ref=e111]:
+              - link "› कथा / नित्य" [ref=e112] [cursor=pointer]:
+                - /url: /pooja/katha-nitya
+            - listitem [ref=e113]:
+              - link "› पित्रुश्राद्ध" [ref=e114] [cursor=pointer]:
+                - /url: /pooja/pitru-shraddha
+            - listitem [ref=e115]:
+              - link "› उत्सव पूजा" [ref=e116] [cursor=pointer]:
+                - /url: /pooja/utsav-pooja
+            - listitem [ref=e117]:
+              - link "› वास्तू पूजा" [ref=e118] [cursor=pointer]:
+                - /url: /pooja/vastu-pooja
+        - generic [ref=e119]:
+          - heading "संपर्क माहिती" [level=3] [ref=e120]
+          - list [ref=e121]:
+            - listitem [ref=e122]:
+              - img [ref=e124]
+              - link "› info@pojjari.com" [ref=e126] [cursor=pointer]:
+                - /url: mailto:info@pojjari.com
+            - listitem [ref=e127]:
+              - img [ref=e129]
+              - link "› ९५६१९०३२१९" [ref=e131] [cursor=pointer]:
+                - /url: tel:9561903219
+            - listitem [ref=e132]:
+              - img [ref=e134]
+              - generic [ref=e136]: रत्नागिरी, महाराष्ट्र
+            - listitem [ref=e137]:
+              - img [ref=e139]
+              - generic [ref=e141]: "सोम – रवि: सकाळी ७ ते रात्री ९"
+          - generic [ref=e142]:
+            - link "गोपनीयता धोरण" [ref=e143] [cursor=pointer]:
+              - /url: "#"
+            - link "नियम व अटी" [ref=e144] [cursor=pointer]:
+              - /url: "#"
+            - link "रद्दीकरण धोरण" [ref=e145] [cursor=pointer]:
+              - /url: "#"
+      - generic [ref=e146]:
+        - paragraph [ref=e147]: © 2026 पूजारी. सर्व हक्क राखीव.
+        - paragraph [ref=e148]: भक्तीने बनवले — महाराष्ट्रासाठी ❤️
+    - link "WhatsApp वर संपर्क करा" [ref=e149] [cursor=pointer]:
+      - /url: https://wa.me/9561903219?text=नमस्कार! मला पूजा बुक करायची आहे.
+      - img [ref=e150]
+    - button "पूजारी Assistant" [ref=e152] [cursor=pointer]:
+      - img [ref=e153]
+```

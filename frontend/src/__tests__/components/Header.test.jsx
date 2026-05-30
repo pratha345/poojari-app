@@ -46,10 +46,33 @@ describe('Header — Unauthenticated', () => {
     expect(screen.getByRole('link', { name: /नोंदणी/i })).toBeInTheDocument();
   });
 
-  it('shows main navigation links', () => {
+  it('shows main navigation links and dropdown triggers', () => {
     renderWithProviders(<Header />);
+    // Flat links
     expect(screen.getByRole('link', { name: /मुख्यपृष्ठ/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /पंचांग/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /ब्लॉग/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /संपर्क/i })).toBeInTheDocument();
+    // Dropdown trigger buttons (पूजा सेवा and ज्योतिष are grouped)
+    expect(screen.getByRole('button', { name: /पूजा सेवा/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ज्योतिष/i })).toBeInTheDocument();
+  });
+
+  it('पंचांग link appears inside ज्योतिष dropdown when opened', async () => {
+    renderWithProviders(<Header />);
+    const jyotishBtn = screen.getByRole('button', { name: /ज्योतिष/i });
+    fireEvent.click(jyotishBtn);
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: /पंचांग/i })).toBeInTheDocument()
+    );
+  });
+
+  it('पूजा सेवा dropdown shows sub-links when opened', async () => {
+    renderWithProviders(<Header />);
+    const poojaBtn = screen.getByRole('button', { name: /पूजा सेवा/i });
+    fireEvent.click(poojaBtn);
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: /ऑनलाइन पूजा/i })).toBeInTheDocument()
+    );
   });
 
   it('hamburger button is present in DOM (CSS-hidden on desktop)', () => {

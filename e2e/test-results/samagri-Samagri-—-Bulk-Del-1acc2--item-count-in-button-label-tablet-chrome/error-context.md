@@ -1,0 +1,24 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: samagri.spec.js >> Samagri — Bulk Delete >> TC-BD-01: सर्व हटवा shows item count in button label
+- Location: tests\samagri.spec.js:394:3
+
+# Error details
+
+```
+Error: browserType.launch: Executable doesn't exist at C:\Users\Admin\AppData\Local\ms-playwright\webkit-2272\Playwright.exe
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     npx playwright install                                 ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+```

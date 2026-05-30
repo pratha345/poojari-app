@@ -1,5 +1,5 @@
 /* PujariDashboard.module.css */
-.main { background: var(--cream); min-height: 80vh; padding: 40px 0 72px; }
+.main { background: var(--cream); min-height: 80vh; padding: 32px 0 52px; }
 
 .profileBanner {
   background: linear-gradient(135deg, var(--secondary), #5a1a00);
@@ -108,5 +108,11 @@
 
 @media (max-width: 640px) {
   .profileBanner { flex-direction: column; }
-  .profileStats { justify-content: center; }
+  .profileStats  { justify-content: center; }
+  .availSection  { padding: 20px 16px; }
+  .calGrid       { max-width: 100%; gap: 4px; }
+  .calDay        { font-size: 11px; }
+  .detailCard    { padding: 20px 16px; }
+  .respondBtns   { flex-direction: column; }
+  .bookingFooter { flex-direction: column; gap: 8px; align-items: flex-start; }
 }

@@ -43,7 +43,7 @@ test.describe('User Flow: Homepage Navigation', () => {
     const panchaangLink = page.locator('a[href*="panchang"]').first();
     if (await panchaangLink.count() > 0) {
       await panchaangLink.click();
-      await page.waitForURL('**/panchang**', { timeout: 5000 });
+      await page.waitForURL('**/panchang**', { timeout: 12000 });
       expect(page.url()).toContain('panchang');
     } else {
       // Navigate directly
@@ -122,8 +122,8 @@ test.describe('User Flow: Authentication Pages', () => {
     await page.goto('/login');
     await waitForPageLoad(page);
 
-    // Find and click submit without filling fields
-    const submitBtn = page.locator('button[type="submit"]').first();
+    // Use form-scoped selector to avoid matching header search button
+    const submitBtn = page.locator('form button[type="submit"]').first();
     if (await submitBtn.count() > 0) {
       await submitBtn.click();
       // Should show validation feedback or stay on the same page

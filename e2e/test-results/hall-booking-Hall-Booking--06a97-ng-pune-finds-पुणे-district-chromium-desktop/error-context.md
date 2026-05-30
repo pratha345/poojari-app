@@ -1,0 +1,475 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: hall-booking.spec.js >> Hall Booking — Customer Search >> TC-HB-05: typing "pune" finds पुणे district
+- Location: tests\hall-booking.spec.js:89:3
+
+# Error details
+
+```
+Tearing down "context" exceeded the test timeout of 60000ms.
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Poojaris — For All Poojas" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "Poojaris — For All Poojas" [ref=e8]
+        - navigation "मुख्य नेव्हिगेशन" [ref=e9]:
+          - link "मुख्यपृष्ठ" [ref=e10] [cursor=pointer]:
+            - /url: /
+          - button "पूजा सेवा ▾" [ref=e13] [cursor=pointer]:
+            - text: पूजा सेवा
+            - generic [ref=e14]: ▾
+          - button "ज्योतिष ▾" [ref=e17] [cursor=pointer]:
+            - text: ज्योतिष
+            - generic [ref=e18]: ▾
+          - link "ब्लॉग" [ref=e19] [cursor=pointer]:
+            - /url: /blog
+            - img [ref=e20]
+            - text: ब्लॉग
+          - link "शहरे" [ref=e22] [cursor=pointer]:
+            - /url: /cities
+            - img [ref=e23]
+            - text: शहरे
+          - link "पुजारी व्हा" [ref=e25] [cursor=pointer]:
+            - /url: /pujari-nondni
+          - link "संपर्क" [ref=e26] [cursor=pointer]:
+            - /url: /contact
+        - generic [ref=e27]:
+          - button "पूजा शोधा" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - button "EN ▾" [ref=e31] [cursor=pointer]:
+            - text: EN
+            - generic [ref=e32]: ▾
+          - link "🪔 पूजा बुक करा" [ref=e33] [cursor=pointer]:
+            - /url: /pooja
+          - link "लॉगिन" [ref=e34] [cursor=pointer]:
+            - /url: /login
+      - generic [ref=e37]:
+        - textbox "पूजा शोधा" [ref=e38]:
+          - /placeholder: पूजा शोधा...
+        - button "शोध" [ref=e39] [cursor=pointer]
+  - main [ref=e41]:
+    - generic [ref=e43]:
+      - link "मुख्यपृष्ठ" [ref=e44] [cursor=pointer]:
+        - /url: /
+      - generic [ref=e45]: ›
+      - generic [ref=e46]: हॉल बुकिंग
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]: ✨ फक्त पूजारीवर उपलब्ध
+          - heading "🏛️ महाराष्ट्रातील सर्वोत्तम हॉल बुकिंग सेवा" [level=1] [ref=e51]:
+            - text: 🏛️ महाराष्ट्रातील सर्वोत्तम
+            - text: हॉल बुकिंग सेवा
+          - paragraph [ref=e52]:
+            - text: लग्न · साखरपुडा · वाढदिवस · सत्यनारायण पूजा · समारंभ
+            - text: हॉल बुकिंग
+            - strong [ref=e53]: +
+            - text: पुजारी बुकिंग — एकाच ठिकाणी!
+          - generic [ref=e54]:
+            - generic [ref=e55]:
+              - generic [ref=e56]: ३६
+              - generic [ref=e57]: जिल्हे
+            - generic [ref=e59]:
+              - generic [ref=e60]: 📍 GPS
+              - generic [ref=e61]: जवळचे शोधा
+            - generic [ref=e63]:
+              - generic [ref=e64]: 🗺️
+              - generic [ref=e65]: Map दृश्य
+            - generic [ref=e67]:
+              - generic [ref=e68]: निःशुल्क
+              - generic [ref=e69]: बुकिंग
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - generic [ref=e73]: ✅
+            - generic [ref=e74]: GPS वापरून जवळचे हॉल
+          - generic [ref=e75]:
+            - generic [ref=e76]: ✅
+            - generic [ref=e77]: OpenStreetMap + DB एकत्र
+          - generic [ref=e78]:
+            - generic [ref=e79]: ✅
+            - generic [ref=e80]: पुजारी + हॉल एकत्र बुक करा
+          - generic [ref=e81]:
+            - generic [ref=e82]: ✅
+            - generic [ref=e83]: महाराष्ट्रातील सर्व ३६ जिल्हे
+          - generic [ref=e84]:
+            - generic [ref=e85]: 🔴
+            - generic [ref=e86]:
+              - text: PanditsNearMe — हॉल बुकिंग
+              - strong [ref=e87]: नाही
+          - generic [ref=e88]:
+            - generic [ref=e89]: 🟢
+            - generic [ref=e90]:
+              - text: पूजारी — हॉल + पुजारी
+              - strong [ref=e91]: दोन्ही
+              - text: "!"
+      - generic [ref=e92]:
+        - generic [ref=e94]:
+          - button "🏙️ जिल्हा निवडा... ▲" [expanded] [ref=e95] [cursor=pointer]:
+            - generic [ref=e96]: 🏙️ जिल्हा निवडा...
+            - generic [ref=e98]: ▲
+          - listbox [ref=e99]:
+            - generic [ref=e100]:
+              - generic [ref=e101]: 🔍
+              - textbox "जिल्हा शोधा... (e.g. rtn, pune)" [active] [ref=e102]: pune
+              - button "✕" [ref=e103] [cursor=pointer]
+            - list [ref=e104]:
+              - option "पुणे Pune" [ref=e105] [cursor=pointer]:
+                - generic [ref=e106]: पुणे
+                - generic [ref=e107]: Pune
+        - generic [ref=e108]:
+          - generic:
+            - button "🏘️ तालुका निवडा (ऐच्छिक) ▼" [disabled]:
+              - generic: 🏘️ तालुका निवडा (ऐच्छिक)
+              - generic:
+                - generic: ▼
+        - button "🔍 शोधा" [disabled] [ref=e109]
+        - button "📍 जवळचे" [ref=e110] [cursor=pointer]
+      - generic [ref=e112]: 🏛️ सर्व हॉल
+      - generic [ref=e113]:
+        - button "☰ यादी" [ref=e114] [cursor=pointer]
+        - button "🗺️ नकाशा" [ref=e115] [cursor=pointer]
+      - paragraph [ref=e116]: 10 हॉल उपलब्ध आहेत
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - heading "🏛️ Playwright Test Mangal Karyalay" [level=2] [ref=e120]
+            - generic [ref=e122]: 📍 पुणे
+          - generic [ref=e123]:
+            - paragraph [ref=e124]:
+              - generic [ref=e125]: 🗺️
+              - generic [ref=e126]: 123 Test Nagar, Shivajinagar
+            - paragraph [ref=e127]:
+              - generic [ref=e128]: 👥
+              - generic [ref=e129]:
+                - strong [ref=e130]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e131]:
+              - generic [ref=e132]: 💰
+              - generic [ref=e133]:
+                - strong [ref=e134]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e135]:
+            - link "📞 कॉल करा" [ref=e136] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e137] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - heading "🏛️ Playwright Test Mangal Karyalay" [level=2] [ref=e140]
+            - generic [ref=e142]: 📍 पुणे
+          - generic [ref=e143]:
+            - paragraph [ref=e144]:
+              - generic [ref=e145]: 🗺️
+              - generic [ref=e146]: 123 Test Nagar, Shivajinagar
+            - paragraph [ref=e147]:
+              - generic [ref=e148]: 👥
+              - generic [ref=e149]:
+                - strong [ref=e150]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e151]:
+              - generic [ref=e152]: 💰
+              - generic [ref=e153]:
+                - strong [ref=e154]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e155]:
+            - link "📞 कॉल करा" [ref=e156] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e157] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e158]:
+          - generic [ref=e159]:
+            - heading "🏛️ Playwright Test Mangal Karyalay" [level=2] [ref=e160]
+            - generic [ref=e162]: 📍 पुणे
+          - generic [ref=e163]:
+            - paragraph [ref=e164]:
+              - generic [ref=e165]: 🗺️
+              - generic [ref=e166]: 123 Test Nagar, Shivajinagar
+            - paragraph [ref=e167]:
+              - generic [ref=e168]: 👥
+              - generic [ref=e169]:
+                - strong [ref=e170]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e171]:
+              - generic [ref=e172]: 💰
+              - generic [ref=e173]:
+                - strong [ref=e174]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e175]:
+            - link "📞 कॉल करा" [ref=e176] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e177] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e178]:
+          - generic [ref=e179]:
+            - heading "🏛️ Playwright Test Mangal Karyalay" [level=2] [ref=e180]
+            - generic [ref=e182]: 📍 पुणे
+          - generic [ref=e183]:
+            - paragraph [ref=e184]:
+              - generic [ref=e185]: 🗺️
+              - generic [ref=e186]: 123 Test Nagar, Shivajinagar
+            - paragraph [ref=e187]:
+              - generic [ref=e188]: 👥
+              - generic [ref=e189]:
+                - strong [ref=e190]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e191]:
+              - generic [ref=e192]: 💰
+              - generic [ref=e193]:
+                - strong [ref=e194]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e195]:
+            - link "📞 कॉल करा" [ref=e196] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e197] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e198]:
+          - generic [ref=e199]:
+            - heading "🏛️ Playwright Test Mangal Karyalay" [level=2] [ref=e200]
+            - generic [ref=e202]: 📍 पुणे
+          - generic [ref=e203]:
+            - paragraph [ref=e204]:
+              - generic [ref=e205]: 🗺️
+              - generic [ref=e206]: 123 Test Nagar, Shivajinagar
+            - paragraph [ref=e207]:
+              - generic [ref=e208]: 👥
+              - generic [ref=e209]:
+                - strong [ref=e210]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e211]:
+              - generic [ref=e212]: 💰
+              - generic [ref=e213]:
+                - strong [ref=e214]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e215]:
+            - link "📞 कॉल करा" [ref=e216] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e217] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e218]:
+          - generic [ref=e219]:
+            - heading "🏛️ Playwright Test Mangal Karyalay" [level=2] [ref=e220]
+            - generic [ref=e222]: 📍 पुणे
+          - generic [ref=e223]:
+            - paragraph [ref=e224]:
+              - generic [ref=e225]: 🗺️
+              - generic [ref=e226]: 123 Test Nagar, Shivajinagar
+            - paragraph [ref=e227]:
+              - generic [ref=e228]: 👥
+              - generic [ref=e229]:
+                - strong [ref=e230]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e231]:
+              - generic [ref=e232]: 💰
+              - generic [ref=e233]:
+                - strong [ref=e234]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e235]:
+            - link "📞 कॉल करा" [ref=e236] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e237] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e238]:
+          - generic [ref=e239]:
+            - heading "🏛️ Playwright Test Mangal Karyalay" [level=2] [ref=e240]
+            - generic [ref=e242]: 📍 पुणे
+          - generic [ref=e243]:
+            - paragraph [ref=e244]:
+              - generic [ref=e245]: 🗺️
+              - generic [ref=e246]: 123 Test Nagar, Shivajinagar
+            - paragraph [ref=e247]:
+              - generic [ref=e248]: 👥
+              - generic [ref=e249]:
+                - strong [ref=e250]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e251]:
+              - generic [ref=e252]: 💰
+              - generic [ref=e253]:
+                - strong [ref=e254]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e255]:
+            - link "📞 कॉल करा" [ref=e256] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e257] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e258]:
+          - generic [ref=e259]:
+            - heading "🏛️ सुवर्ण मंगल कार्यालय" [level=2] [ref=e260]
+            - generic [ref=e262]: 📍 पुणे
+          - generic [ref=e263]:
+            - paragraph [ref=e264]:
+              - generic [ref=e265]: 🗺️
+              - generic [ref=e266]: कोथरूड, पुणे
+            - paragraph [ref=e267]:
+              - generic [ref=e268]: 👥
+              - generic [ref=e269]:
+                - strong [ref=e270]: "क्षमता:"
+                - text: 500 व्यक्ती
+            - paragraph [ref=e271]:
+              - generic [ref=e272]: 💰
+              - generic [ref=e273]:
+                - strong [ref=e274]: "भाडे:"
+                - text: ₹25,000 / दिवस
+          - generic [ref=e275]:
+            - link "📞 कॉल करा" [ref=e276] [cursor=pointer]:
+              - /url: tel:9876543210
+            - link "💬 WhatsApp" [ref=e277] [cursor=pointer]:
+              - /url: https://wa.me/919876543210
+        - generic [ref=e278]:
+          - generic [ref=e279]:
+            - heading "🏛️ शुभ विवाह हॉल" [level=2] [ref=e280]
+            - generic [ref=e282]: 📍 पुणे
+          - generic [ref=e283]:
+            - paragraph [ref=e284]:
+              - generic [ref=e285]: 🗺️
+              - generic [ref=e286]: वाकड, पुणे
+            - paragraph [ref=e287]:
+              - generic [ref=e288]: 👥
+              - generic [ref=e289]:
+                - strong [ref=e290]: "क्षमता:"
+                - text: 300 व्यक्ती
+            - paragraph [ref=e291]:
+              - generic [ref=e292]: 💰
+              - generic [ref=e293]:
+                - strong [ref=e294]: "भाडे:"
+                - text: ₹18,000 / दिवस
+          - generic [ref=e295]:
+            - link "📞 कॉल करा" [ref=e296] [cursor=pointer]:
+              - /url: tel:9988776655
+            - link "💬 WhatsApp" [ref=e297] [cursor=pointer]:
+              - /url: https://wa.me/919988776655
+        - generic [ref=e298]:
+          - generic [ref=e299]:
+            - heading "🏛️ गजानन मंगल कार्यालय" [level=2] [ref=e300]
+            - generic [ref=e302]: 📍 पुणे
+          - generic [ref=e303]:
+            - paragraph [ref=e304]:
+              - generic [ref=e305]: 🗺️
+              - generic [ref=e306]: हडपसर, पुणे
+            - paragraph [ref=e307]:
+              - generic [ref=e308]: 👥
+              - generic [ref=e309]:
+                - strong [ref=e310]: "क्षमता:"
+                - text: 400 व्यक्ती
+            - paragraph [ref=e311]:
+              - generic [ref=e312]: 💰
+              - generic [ref=e313]:
+                - strong [ref=e314]: "भाडे:"
+                - text: ₹20,000 / दिवस
+          - generic [ref=e315]:
+            - link "📞 कॉल करा" [ref=e316] [cursor=pointer]:
+              - /url: tel:9123456789
+            - link "💬 WhatsApp" [ref=e317] [cursor=pointer]:
+              - /url: https://wa.me/9123456789
+  - contentinfo [ref=e318]:
+    - generic [ref=e319]:
+      - generic [ref=e320]:
+        - generic [ref=e321]:
+          - img "Poojaris — For All Poojas" [ref=e323]
+          - paragraph [ref=e324]: महाराष्ट्रातील सर्वोत्तम पूजा बुकिंग सेवा. विश्वासू पुजारी, वेळेवर सेवा, आणि पारंपरिक विधी.
+          - generic [ref=e325]:
+            - link "Facebook" [ref=e326] [cursor=pointer]:
+              - /url: https://facebook.com
+              - img [ref=e327]
+            - link "Instagram" [ref=e329] [cursor=pointer]:
+              - /url: https://instagram.com
+              - img [ref=e330]
+            - link "YouTube" [ref=e332] [cursor=pointer]:
+              - /url: https://youtube.com
+              - img [ref=e333]
+            - link "WhatsApp" [ref=e335] [cursor=pointer]:
+              - /url: https://wa.me/9561903219
+              - img [ref=e336]
+        - generic [ref=e338]:
+          - heading "त्वरित लिंक" [level=3] [ref=e339]
+          - list [ref=e340]:
+            - listitem [ref=e341]:
+              - link "› मुख्यपृष्ठ" [ref=e342] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e343]:
+              - link "› पूजा बुक करा" [ref=e344] [cursor=pointer]:
+                - /url: /pooja
+            - listitem [ref=e345]:
+              - link "› ऑनलाइन पूजा" [ref=e346] [cursor=pointer]:
+                - /url: /online-puja
+            - listitem [ref=e347]:
+              - link "› ब्लॉग" [ref=e348] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e349]:
+              - link "› सर्व शहरे" [ref=e350] [cursor=pointer]:
+                - /url: /cities
+            - listitem [ref=e351]:
+              - link "› पुजारी व्हा" [ref=e352] [cursor=pointer]:
+                - /url: /pujari-nondni
+            - listitem [ref=e353]:
+              - link "› आमच्याबद्दल" [ref=e354] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e355]:
+              - link "› संपर्क करा" [ref=e356] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e357]:
+          - heading "पूजा श्रेणी" [level=3] [ref=e358]
+          - list [ref=e359]:
+            - listitem [ref=e360]:
+              - link "› गृह पूजा" [ref=e361] [cursor=pointer]:
+                - /url: /pooja/gruh-pooja
+            - listitem [ref=e362]:
+              - link "› हवन / जाप" [ref=e363] [cursor=pointer]:
+                - /url: /pooja/havan-jaap
+            - listitem [ref=e364]:
+              - link "› कथा / नित्य" [ref=e365] [cursor=pointer]:
+                - /url: /pooja/katha-nitya
+            - listitem [ref=e366]:
+              - link "› पित्रुश्राद्ध" [ref=e367] [cursor=pointer]:
+                - /url: /pooja/pitru-shraddha
+            - listitem [ref=e368]:
+              - link "› उत्सव पूजा" [ref=e369] [cursor=pointer]:
+                - /url: /pooja/utsav-pooja
+            - listitem [ref=e370]:
+              - link "› वास्तू पूजा" [ref=e371] [cursor=pointer]:
+                - /url: /pooja/vastu-pooja
+        - generic [ref=e372]:
+          - heading "संपर्क माहिती" [level=3] [ref=e373]
+          - list [ref=e374]:
+            - listitem [ref=e375]:
+              - img [ref=e377]
+              - link "› info@pojjari.com" [ref=e379] [cursor=pointer]:
+                - /url: mailto:info@pojjari.com
+            - listitem [ref=e380]:
+              - img [ref=e382]
+              - link "› ९५६१९०३२१९" [ref=e384] [cursor=pointer]:
+                - /url: tel:9561903219
+            - listitem [ref=e385]:
+              - img [ref=e387]
+              - generic [ref=e389]: रत्नागिरी, महाराष्ट्र
+            - listitem [ref=e390]:
+              - img [ref=e392]
+              - generic [ref=e394]: "सोम – रवि: सकाळी ७ ते रात्री ९"
+          - generic [ref=e395]:
+            - link "गोपनीयता धोरण" [ref=e396] [cursor=pointer]:
+              - /url: "#"
+            - link "नियम व अटी" [ref=e397] [cursor=pointer]:
+              - /url: "#"
+            - link "रद्दीकरण धोरण" [ref=e398] [cursor=pointer]:
+              - /url: "#"
+      - generic [ref=e399]:
+        - paragraph [ref=e400]: © 2026 पूजारी. सर्व हक्क राखीव.
+        - paragraph [ref=e401]: भक्तीने बनवले — महाराष्ट्रासाठी ❤️
+    - link "WhatsApp वर संपर्क करा" [ref=e402] [cursor=pointer]:
+      - /url: https://wa.me/9561903219?text=नमस्कार! मला पूजा बुक करायची आहे.
+      - img [ref=e403]
+    - button "पूजारी Assistant" [ref=e405] [cursor=pointer]:
+      - img [ref=e406]
+```

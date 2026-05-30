@@ -7,15 +7,19 @@ import { useAuth } from '../../context/AuthContext';
 import s from './AdminLogin.module.css';
 
 export default function AdminLogin() {
-  const { login, isAdmin, isSuperAdmin } = useAuth();
+  const { login, isAdmin, isSuperAdmin, isAbhyasak } = useAuth();
   const navigate = useNavigate();
   const [form, setForm]       = useState({ phone: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
 
-  // Already logged in as admin → redirect
+  // Already logged in → redirect to appropriate page
   if (isAdmin || isSuperAdmin) {
     navigate('/admin/dashboard', { replace: true });
+    return null;
+  }
+  if (isAbhyasak) {
+    navigate('/admin/blog', { replace: true });
     return null;
   }
 
@@ -27,15 +31,21 @@ export default function AdminLogin() {
       const res = await authAPI.login({ phone: form.phone, password: form.password });
       const { token, user } = res.data.data;
 
-      // Only allow admin / super_admin here
-      if (user.role !== 'admin' && user.role !== 'super_admin') {
-        toast.error('हे पोर्टल फक्त प्रशासकांसाठी आहे.');
+      // Allow admin, super_admin, and abhyasak
+      const allowedRoles = ['admin', 'super_admin', 'abhyasak'];
+      if (!allowedRoles.includes(user.role)) {
+        toast.error('हे पोर्टल फक्त प्रशासक/अभ्यासकांसाठी आहे.');
         return;
       }
 
       login(token, user);
       toast.success(`स्वागत आहे, ${user.name}! 🙏`);
-      navigate('/admin/dashboard', { replace: true });
+
+      if (user.role === 'abhyasak') {
+        navigate('/admin/blog', { replace: true });
+      } else {
+        navigate('/admin/dashboard', { replace: true });
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'लॉगिन करताना त्रुटी झाली.');
     } finally { setLoading(false); }
@@ -52,7 +62,7 @@ export default function AdminLogin() {
         </div>
 
         <h2 className={s.title}>प्रशासक लॉगिन</h2>
-        <p className={s.subtitle}>Admin / Super Admin साठी</p>
+        <p className={s.subtitle}>Admin / Abhyasak साठी</p>
 
         <form onSubmit={handleLogin} className={s.form}>
           <div className={s.field}>

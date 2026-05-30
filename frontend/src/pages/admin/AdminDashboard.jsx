@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { adminAPI, superadminAPI } from '../../api/index.js';
+import { usePushNotification } from '../../hooks/usePushNotification';
+import { useAdminSocket }    from '../../hooks/useAdminSocket';
 import AdminLayout from './AdminLayout';
 import s from './AdminDashboard.module.css';
 
@@ -19,7 +21,9 @@ function StatCard({ icon, label, value, color }) {
 }
 
 export default function AdminDashboard() {
-  const { isSuperAdmin } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
+  usePushNotification();
+  useAdminSocket(user);
   const [stats, setStats]     = useState(null);
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);

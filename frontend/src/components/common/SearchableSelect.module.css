@@ -1,0 +1,126 @@
+/* SearchableSelect.module.css */
+.wrap {
+  position: relative;
+  width: 100%;
+}
+.wrapDisabled { opacity: 0.5; pointer-events: none; }
+
+/* ── Trigger button ─────────────────────────────────────────── */
+.trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  font-size: 14px;
+  font-family: var(--font-display);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.trigger:hover      { border-color: var(--primary); }
+.triggerOpen        { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(228,103,37,0.12); }
+.trigger:disabled   { cursor: not-allowed; background: #f5f5f5; }
+
+.placeholder  { color: var(--text-muted); font-size: 13.5px; }
+.selectedText { color: var(--text); font-weight: 500; font-size: 14px; }
+
+.icons      { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.arrow      { font-size: 10px; color: var(--text-muted); }
+.clearIcon  {
+  font-size: 11px; color: var(--text-muted); cursor: pointer;
+  width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.clearIcon:hover { background: #fee2e2; color: #dc2626; }
+
+/* ── Dropdown panel ─────────────────────────────────────────── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+  z-index: 9999;
+  overflow: hidden;
+  animation: slideDown 0.12s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Search input ───────────────────────────────────────────── */
+.searchWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: #fdf6f0;
+}
+.searchIcon { font-size: 14px; flex-shrink: 0; }
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: var(--font-display);
+  background: transparent;
+  color: var(--text);
+}
+.searchInput::placeholder { color: var(--text-muted); }
+.clearQuery {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-size: 12px; padding: 2px 4px;
+}
+.clearQuery:hover { color: var(--primary); }
+
+/* ── List ───────────────────────────────────────────────────── */
+.list {
+  list-style: none;
+  margin: 0; padding: 4px 0;
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.list::-webkit-scrollbar       { width: 4px; }
+.list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.12s;
+  gap: 8px;
+}
+.item:hover  { background: #fdf0e8; }
+.active      { background: #fff0e6; font-weight: 600; }
+.active .itemLabel { color: var(--primary); }
+
+.itemLabel { font-size: 14px; font-family: var(--font-display); color: var(--text); }
+.itemSub   { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+.noResult {
+  padding: 16px 14px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ── Mobile tweaks ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .list { max-height: 200px; }
+  .trigger { font-size: 13.5px; padding: 11px 12px; }
+}

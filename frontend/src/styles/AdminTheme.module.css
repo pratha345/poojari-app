@@ -162,6 +162,92 @@
 .previewMode { font-size: 12px; color: var(--primary); }
 .previewFestival { font-size: 12px; color: var(--success); margin-top: 2px; }
 
+/* ── AI Image Generation ──────────────────────────────────── */
+
+/* Thumbnail cell */
+.aiThumb {
+  width: 54px; height: 54px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: transform 0.15s;
+}
+.aiThumb:hover { transform: scale(1.08); border-color: var(--primary); }
+.aiThumbImg    { width: 100%; height: 100%; object-fit: cover; display: block; }
+.aiThumbOverlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; opacity: 0;
+  transition: opacity 0.15s;
+}
+.aiThumb:hover .aiThumbOverlay { opacity: 1; }
+.aiSpinner { font-size: 20px; animation: spin 1.2s linear infinite; display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Action buttons */
+.aiBtnPoster {
+  padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #e46725, #c9520e);
+  color: #fff; font-size: 12px; font-weight: 600;
+  transition: opacity 0.15s; white-space: nowrap;
+}
+.aiBtnPoster:hover    { opacity: 0.88; }
+.aiBtnPoster:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.aiBtnBanner {
+  padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer;
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  color: #fff; font-size: 12px; font-weight: 600;
+  transition: opacity 0.15s; white-space: nowrap;
+}
+.aiBtnBanner:hover    { opacity: 0.88; }
+.aiBtnBanner:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.aiBtnDownload {
+  padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer;
+  background: #2e7d32; color: #fff; font-size: 13px; font-weight: 600;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+}
+.aiBtnDownload:hover { background: #1b5e20; }
+
+/* Preview Modal */
+.aiPreviewModal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%; max-width: 600px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+  animation: fadeInUp 0.22s ease;
+  overflow: hidden;
+}
+.aiPreviewHeader {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #fff8f0, #fff3e0);
+}
+.aiPreviewTitle { margin: 0; font-size: 1.1rem; color: var(--secondary); }
+.aiPreviewClose {
+  background: none; border: none; font-size: 20px; cursor: pointer;
+  color: var(--text-muted); line-height: 1; padding: 4px 8px; border-radius: 6px;
+}
+.aiPreviewClose:hover { background: #f5f5f5; }
+.aiPreviewBody {
+  padding: 20px; display: flex; align-items: center; justify-content: center;
+  background: #111; min-height: 300px;
+}
+.aiPreviewImg {
+  max-width: 100%; max-height: 460px;
+  border-radius: 8px; display: block;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.aiPreviewFooter {
+  display: flex; gap: 10px; align-items: center; justify-content: flex-end;
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .themeGrid { grid-template-columns: repeat(3, 1fr); }

@@ -28,6 +28,8 @@ exports.register = async (req, res) => {
       return error(res, 'नाव, फोन आणि पासवर्ड आवश्यक आहे.', 400);
     if (HTML_TAG_RE.test(String(name)))
       return error(res, 'नाव अवैध आहे. HTML टॅग वापरू नका.', 400);
+    if (!/^\d{10}$/.test(String(phone).replace(/\D/g, '')))
+      return error(res, 'वैध १० अंकी फोन नंबर टाका.', 400);
 
     const [exists] = await pool.query('SELECT id FROM users WHERE phone = ?', [phone]);
     if (exists.length)
@@ -80,18 +82,46 @@ exports.sendOtp = async (req, res) => {
   try {
     const { phone } = req.body;
     if (!phone) return error(res, 'फोन नंबर आवश्यक आहे.', 400);
+    if (!/^\d{10}$/.test(String(phone).replace(/\D/g, '')))
+      return error(res, 'वैध १० अंकी फोन नंबर टाका.', 400);
 
     const otp    = generateOTP();
     const expiry = new Date(Date.now() + 10 * 60 * 1000);
     const tid    = req.tenantId || 1;
+    // Always store and send as plain 10-digit number (strips +91 / 91 prefix)
+    const cleanPhone = String(phone).replace(/\D/g, '').replace(/^91(\d{10})$/, '$1');
 
     await pool.query(
       `INSERT INTO users (tenant_id, name, phone, otp_code, otp_expiry, is_verified)
        VALUES (?, ?, ?, ?, ?, FALSE)
        ON DUPLICATE KEY UPDATE otp_code=?, otp_expiry=?`,
-      [tid, 'वापरकर्ता', phone, otp, expiry, otp, expiry]
+      [tid, 'वापरकर्ता', cleanPhone, otp, expiry, otp, expiry]
     );
-    console.log(`OTP for ${phone}: ${otp}`);
+    // Send OTP via Fast2SMS (route 'q' — no DLT/website verification required)
+    const apiKey = process.env.FAST2SMS_API_KEY;
+    if (apiKey) {
+      try {
+        const smsRes = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+          method: 'POST',
+          headers: { authorization: apiKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            route: 'q',
+            message: `${otp} is your Pojjari login OTP. Valid for 10 minutes. Do not share with anyone.`,
+            language: 'english',
+            flash: 0,
+            numbers: cleanPhone,
+          }),
+        });
+        const smsData = await smsRes.json();
+        if (!smsData.return) console.error('[SMS] Fast2SMS:', smsData.message);
+        else console.log(`[SMS] OTP sent to ${cleanPhone}`);
+      } catch (smsErr) {
+        console.error('[SMS] Failed:', smsErr.message);
+      }
+    } else {
+      console.log(`[DEV] OTP for ${cleanPhone}: ${otp}`);
+    }
+
     return success(res, { phone }, 'OTP पाठवला आहे.');
   } catch (err) {
     return error(res, 'OTP पाठवताना त्रुटी झाली.');

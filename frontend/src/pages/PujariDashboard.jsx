@@ -94,6 +94,7 @@ export default function PujariDashboard() {
           <div className={styles.tabs}>
             {[
               { key: 'bookings',     label: '📋 बुकिंग्ज'     },
+              { key: 'services',     label: '🪔 माझ्या पूजा'  },
               { key: 'availability', label: '🗓️ उपलब्धता'    },
               { key: 'profile',      label: '👤 प्रोफाईल'      },
             ].map(t => (
@@ -179,6 +180,9 @@ export default function PujariDashboard() {
             </div>
           )}
 
+          {/* SERVICES TAB */}
+          {tab === 'services' && <PoojaServicesManager />}
+
           {/* AVAILABILITY TAB */}
           {tab === 'availability' && (
             <AvailabilityManager />
@@ -201,6 +205,89 @@ export default function PujariDashboard() {
         </div>
       </main>
       <Footer />
+    </div>
+  );
+}
+
+// PoojaServicesManager sub-component
+function PoojaServicesManager() {
+  const [poojas,  setPoojas]  = useState([]);
+  const [selected,setSelected]= useState({}); // { pooja_id: custom_price|'' }
+  const [saving,  setSaving]  = useState(false);
+
+  useEffect(() => {
+    pujariAPI.getMyServices()
+      .then(r => {
+        const list = r.data.data || [];
+        setPoojas(list);
+        const init = {};
+        list.filter(p => p.is_offered).forEach(p => {
+          init[p.id] = p.custom_price ?? '';
+        });
+        setSelected(init);
+      })
+      .catch(() => {});
+  }, []);
+
+  const toggle = (id) => {
+    setSelected(s => {
+      const next = { ...s };
+      if (next[id] !== undefined) delete next[id];
+      else next[id] = '';
+      return next;
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const services = Object.entries(selected).map(([pooja_id, custom_price]) => ({
+        pooja_id: parseInt(pooja_id),
+        custom_price: custom_price !== '' ? parseFloat(custom_price) : null,
+      }));
+      await pujariAPI.saveMyServices(services);
+      toast.success('सेवा यादी जतन केली! 🙏');
+    } catch { toast.error('जतन करताना त्रुटी.'); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className={styles.availSection}>
+      <div className={styles.availHeader}>
+        <h2>🪔 माझ्या पूजा सेवा</h2>
+        <p>तुम्ही कोणत्या पूजा करता ते निवडा. वेगळी किंमत असल्यास टाका.</p>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+        {poojas.map(p => (
+          <div key={p.id} style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '12px 16px', borderRadius: 8,
+            background: selected[p.id] !== undefined ? '#fdf6e3' : '#f9f9f9',
+            border: `1px solid ${selected[p.id] !== undefined ? '#e0c97f' : '#eee'}`,
+          }}>
+            <input
+              type="checkbox"
+              checked={selected[p.id] !== undefined}
+              onChange={() => toggle(p.id)}
+              style={{ width: 18, height: 18, cursor: 'pointer' }}
+            />
+            <span style={{ flex: 1, fontWeight: 500 }}>{p.name_mr}</span>
+            <span style={{ color: '#999', fontSize: 13 }}>Default: ₹{p.default_price}</span>
+            {selected[p.id] !== undefined && (
+              <input
+                type="number"
+                placeholder="माझी किंमत (optional)"
+                value={selected[p.id]}
+                onChange={e => setSelected(s => ({ ...s, [p.id]: e.target.value }))}
+                style={{ width: 160, padding: '4px 8px', borderRadius: 6, border: '1px solid #ccc', fontSize: 13 }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+        {saving ? '⏳ जतन होत आहे...' : '💾 सेवा जतन करा'}
+      </button>
     </div>
   );
 }

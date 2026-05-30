@@ -121,8 +121,8 @@ export default function TimePicker({ value = '', onChange }) {
                 {displayM}
               </span>
               <div className={s.ampmCol}>
-                <button className={`${s.ampmBtn} ${ampm === 'AM' ? s.ampmActive : ''}`} onClick={() => setAmpm('AM')}>AM</button>
-                <button className={`${s.ampmBtn} ${ampm === 'PM' ? s.ampmActive : ''}`} onClick={() => setAmpm('PM')}>PM</button>
+                <button type="button" className={`${s.ampmBtn} ${ampm === 'AM' ? s.ampmActive : ''}`} onClick={() => setAmpm('AM')}>AM</button>
+                <button type="button" className={`${s.ampmBtn} ${ampm === 'PM' ? s.ampmActive : ''}`} onClick={() => setAmpm('PM')}>PM</button>
               </div>
             </div>
 
@@ -186,8 +186,8 @@ export default function TimePicker({ value = '', onChange }) {
 
             {/* Footer buttons */}
             <div className={s.footer}>
-              <button className={s.cancelBtn} onClick={handleCancel}>रद्द करा</button>
-              <button className={s.okBtn}     onClick={handleOK}>ओके</button>
+              <button type="button" className={s.cancelBtn} onClick={handleCancel}>रद्द करा</button>
+              <button type="button" className={s.okBtn}     onClick={handleOK}>ओके</button>
             </div>
           </div>
         </div>

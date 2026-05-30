@@ -1,9 +1,10 @@
 // src/routes/pooja.routes.js
-const router = require('express').Router();
-const ctrl   = require('../controllers/pooja.controller');
+const router      = require('express').Router();
+const ctrl        = require('../controllers/pooja.controller');
 const { authenticate, authorize } = require('../middleware/auth.middleware');
-const multer = require('multer');
-const path   = require('path');
+const multer      = require('multer');
+const path        = require('path');
+const webpConvert = require('../middleware/webpConvert.middleware');
 
 const storage = multer.diskStorage({
   destination: 'uploads/',
@@ -16,9 +17,9 @@ router.get('/categories',       ctrl.getCategories);
 router.get('/',                 ctrl.getPoojas);
 router.get('/:slug',            ctrl.getPoojaBySlug);
 
-// Admin only
-router.post('/',      authenticate, authorize('admin'), upload.single('image'), ctrl.createPooja);
-router.put('/:id',    authenticate, authorize('admin'), upload.single('image'), ctrl.updatePooja);
+// Admin only — webpConvert runs after multer, before controller
+router.post('/',      authenticate, authorize('admin'), upload.single('image'), webpConvert, ctrl.createPooja);
+router.put('/:id',    authenticate, authorize('admin'), upload.single('image'), webpConvert, ctrl.updatePooja);
 router.delete('/:id', authenticate, authorize('admin'), ctrl.deletePooja);
 
 module.exports = router;

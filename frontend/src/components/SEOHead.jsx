@@ -20,8 +20,10 @@ export default function SEOHead({
 }) {
   const fullTitle    = title
     ? `${title} | ${SITE_NAME}`
-    : `${SITE_NAME} - घरी पूजा, मनासारखी | ऑनलाईन पूजा बुकिंग महाराष्ट्र`;
-  const canonicalUrl = canonical ? `${SITE_URL}${canonical}` : null;
+    : `${SITE_NAME} - घरी पूजा, मनासारखी | ऑनलाइन पूजा बुकिंग महाराष्ट्र`;
+  const canonicalUrl = canonical
+    ? `${SITE_URL}${canonical}`
+    : (typeof window !== 'undefined' ? window.location.href : SITE_URL);
   const ogImg        = ogImage
     ? (ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`)
     : `${SITE_URL}/og-image.jpg`;
@@ -34,7 +36,7 @@ export default function SEOHead({
       {keywords    && <meta name="keywords"    content={keywords}    />}
       <meta name="author"  content="पूजारी - Pojjari" />
       <meta name="robots"  content={noindex ? 'noindex,nofollow' : 'index,follow'} />
-      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      <link rel="canonical" href={canonicalUrl} />
 
       {/* ── Open Graph ────────────────────────────────── */}
       <meta property="og:title"       content={fullTitle}    />
@@ -42,8 +44,8 @@ export default function SEOHead({
       <meta property="og:image"       content={ogImg}        />
       <meta property="og:site_name"   content={SITE_NAME}    />
       <meta property="og:locale"      content="mr_IN"        />
-      {description   && <meta property="og:description" content={description}  />}
-      {canonicalUrl  && <meta property="og:url"         content={canonicalUrl} />}
+      {description && <meta property="og:description" content={description}  />}
+      <meta property="og:url" content={canonicalUrl} />
 
       {/* ── Twitter Card ──────────────────────────────── */}
       <meta name="twitter:card"        content="summary_large_image" />

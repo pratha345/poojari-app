@@ -16,7 +16,7 @@ function norm360(d) { return ((d % 360) + 360) % 360; }
  */
 function lahiriAyanamsha(utcDate) {
   const JD = Astro.MakeTime(utcDate).tt + 2451545.0;
-  return 23.85 + (JD - 2451545.0) * 50.27 / (36525.0 * 3600.0);
+  return 23.85 + (JD - 2451545.0) * 50.27 / (365.25 * 3600.0);
 }
 
 /**
@@ -61,13 +61,13 @@ function getAllPlanets(utcDate) {
   const rahuTrop = rahuLongitude(t);
 
   return [
-    { name: 'सूर्य',  sym: '☀',  rashiIdx: sid(geoLon('Sun'))     },
-    { name: 'चंद्र',  sym: '☽',  rashiIdx: sid(moon.lon)           },
-    { name: 'मंगळ',   sym: '♂',  rashiIdx: sid(Astro.EclipticLongitude('Mars',    t)) },
-    { name: 'बुध',    sym: '☿',  rashiIdx: sid(Astro.EclipticLongitude('Mercury', t)) },
-    { name: 'गुरु',   sym: '♃',  rashiIdx: sid(Astro.EclipticLongitude('Jupiter', t)) },
-    { name: 'शुक्र',  sym: '♀',  rashiIdx: sid(Astro.EclipticLongitude('Venus',   t)) },
-    { name: 'शनि',    sym: '♄',  rashiIdx: sid(Astro.EclipticLongitude('Saturn',  t)) },
+    { name: 'सूर्य',  sym: '☀',  rashiIdx: sid(geoLon('Sun'))      },
+    { name: 'चंद्र',  sym: '☽',  rashiIdx: sid(moon.lon)            },
+    { name: 'मंगळ',   sym: '♂',  rashiIdx: sid(geoLon('Mars'))     },
+    { name: 'बुध',    sym: '☿',  rashiIdx: sid(geoLon('Mercury'))  },
+    { name: 'गुरु',   sym: '♃',  rashiIdx: sid(geoLon('Jupiter'))  },
+    { name: 'शुक्र',  sym: '♀',  rashiIdx: sid(geoLon('Venus'))    },
+    { name: 'शनि',    sym: '♄',  rashiIdx: sid(geoLon('Saturn'))   },
     { name: 'राहू',   sym: 'ℛ',  rashiIdx: sid(rahuTrop)            },
     { name: 'केतू',   sym: 'K',  rashiIdx: sid(norm360(rahuTrop + 180)) },
   ];

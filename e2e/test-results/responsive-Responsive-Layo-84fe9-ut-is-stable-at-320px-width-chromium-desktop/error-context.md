@@ -1,0 +1,662 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: responsive.spec.js >> Responsive: Layout Stability >> Home page layout is stable at 320px width
+- Location: tests\responsive.spec.js:110:3
+
+# Error details
+
+```
+Tearing down "context" exceeded the test timeout of 60000ms.
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Poojaris — For All Poojas" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img "Poojaris — For All Poojas" [ref=e8]
+        - generic [ref=e9]:
+          - button "पूजा शोधा" [ref=e10] [cursor=pointer]:
+            - img [ref=e11]
+          - button "मेनू उघडा" [ref=e13] [cursor=pointer]
+      - generic [ref=e19]:
+        - textbox "पूजा शोधा" [ref=e20]:
+          - /placeholder: पूजा शोधा...
+        - button "शोध" [ref=e21] [cursor=pointer]
+    - navigation "मोबाईल नेव्हिगेशन" [ref=e23]:
+      - generic [ref=e24]:
+        - link "मुख्यपृष्ठ" [ref=e25] [cursor=pointer]:
+          - /url: /
+        - link "ब्लॉग" [ref=e26] [cursor=pointer]:
+          - /url: /blog
+        - link "शहरे" [ref=e27] [cursor=pointer]:
+          - /url: /cities
+        - link "पुजारी व्हा" [ref=e28] [cursor=pointer]:
+          - /url: /pujari-nondni
+        - link "संपर्क" [ref=e29] [cursor=pointer]:
+          - /url: /contact
+        - button "पूजा सेवा ▾" [ref=e31] [cursor=pointer]:
+          - text: पूजा सेवा
+          - generic [ref=e32]: ▾
+        - button "ज्योतिष ▾" [ref=e34] [cursor=pointer]:
+          - text: ज्योतिष
+          - generic [ref=e35]: ▾
+        - link "📞 ९५६१९०३२१९" [ref=e36] [cursor=pointer]:
+          - /url: tel:9561903219
+        - generic [ref=e38]:
+          - link "लॉगिन" [ref=e39] [cursor=pointer]:
+            - /url: /login
+          - link "पूजा बुक करा" [ref=e40] [cursor=pointer]:
+            - /url: /register
+  - main [ref=e41]:
+    - generic [ref=e42]:
+      - generic: ॐ
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]: 🙏
+          - generic [ref=e48]: घरी पूजा, मनासारखी
+        - heading "आपल्या सर्व पूजा सेवांसाठी एक विश्वासार्ह स्थान" [level=1] [ref=e49]:
+          - generic [ref=e50]: आपल्या सर्व पूजा सेवांसाठी एक विश्वासार्ह
+          - text: स्थान
+        - paragraph [ref=e51]: घरबसल्या पूजा बुक करा, अनुभवी पुजारी मिळवा, आणि सर्व धार्मिक विधी सहज पूर्ण करा.
+        - generic [ref=e52]:
+          - link "🪔 पूजा बुक करा" [ref=e53] [cursor=pointer]:
+            - /url: /pooja
+          - link "अधिक जाणून घ्या" [ref=e54] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - generic [ref=e57]: 🔍
+            - combobox [ref=e58] [cursor=pointer]:
+              - option "सर्व पूजा" [selected]
+              - option "गृह पूजा"
+              - option "हवन / जाप"
+              - option "कथा / नित्य पूजा"
+              - option "पित्रुश्राद्ध"
+              - option "उत्सव पूजा"
+              - option "वास्तू पूजा"
+          - button "पूजा शोधा →" [ref=e59] [cursor=pointer]
+        - generic [ref=e60]:
+          - generic [ref=e61]: "प्रसंग निवडा:"
+          - generic [ref=e62]:
+            - link "🏠 गृहप्रवेश" [ref=e63] [cursor=pointer]:
+              - /url: /pooja/vastu-pooja
+              - generic [ref=e64]: 🏠
+              - text: गृहप्रवेश
+            - link "🪔 सत्यनारायण" [ref=e65] [cursor=pointer]:
+              - /url: /pooja?search=सत्यनारायण
+              - generic [ref=e66]: 🪔
+              - text: सत्यनारायण
+            - link "💍 लग्न" [ref=e67] [cursor=pointer]:
+              - /url: /pooja?search=लग्न
+              - generic [ref=e68]: 💍
+              - text: लग्न
+            - link "👶 नामकरण" [ref=e69] [cursor=pointer]:
+              - /url: /pooja?search=नामकरण
+              - generic [ref=e70]: 👶
+              - text: नामकरण
+            - link "🔥 हवन" [ref=e71] [cursor=pointer]:
+              - /url: /pooja/havan-jaap
+              - generic [ref=e72]: 🔥
+              - text: हवन
+            - link "🕯️ दशक्रिया" [ref=e73] [cursor=pointer]:
+              - /url: /pooja/pitru-shraddha
+              - generic [ref=e74]: 🕯️
+              - text: दशक्रिया
+            - link "🐘 गणपती पूजा" [ref=e75] [cursor=pointer]:
+              - /url: /pooja?search=गणपती
+              - generic [ref=e76]: 🐘
+              - text: गणपती पूजा
+            - link "🌟 नवग्रह शांती" [ref=e77] [cursor=pointer]:
+              - /url: /pooja?search=नवग्रह
+              - generic [ref=e78]: 🌟
+              - text: नवग्रह शांती
+            - link "🎓 मुंज" [ref=e79] [cursor=pointer]:
+              - /url: /pooja?search=मुंज
+              - generic [ref=e80]: 🎓
+              - text: मुंज
+            - link "💡 दिवाळी पूजा" [ref=e81] [cursor=pointer]:
+              - /url: /pooja?search=दिवाळी
+              - generic [ref=e82]: 💡
+              - text: दिवाळी पूजा
+        - generic [ref=e83]:
+          - generic [ref=e84]: ✅ विश्वासू पुजारी
+          - generic [ref=e85]: ⚡ तत्काळ बुकिंग
+          - generic [ref=e86]: 🔒 सुरक्षित पेमेंट
+    - generic [ref=e89]:
+      - generic [ref=e90]:
+        - generic [ref=e91]: 📅
+        - generic [ref=e92]: ५,०००+
+        - generic [ref=e93]: यशस्वी बुकिंग
+      - generic [ref=e94]:
+        - generic [ref=e95]: 🙏
+        - generic [ref=e96]: ५००+
+        - generic [ref=e97]: अनुभवी पुजारी
+      - generic [ref=e98]:
+        - generic [ref=e99]: 📍
+        - generic [ref=e100]: ३५+
+        - generic [ref=e101]: शहरांमध्ये सेवा
+      - generic [ref=e102]:
+        - generic [ref=e103]: ⭐
+        - generic [ref=e104]: ५+
+        - generic [ref=e105]: वर्षांचा अनुभव
+    - generic [ref=e108]:
+      - link "📿 आजची पूजा बुक करा घरात किंवा मंदिरात →" [ref=e109] [cursor=pointer]:
+        - /url: /pooja
+        - generic [ref=e110]: 📿
+        - generic [ref=e111]:
+          - paragraph [ref=e112]: आजची पूजा बुक करा
+          - paragraph [ref=e113]: घरात किंवा मंदिरात
+        - generic [ref=e114]: →
+      - link "📅 पंचांग पहा आजचे तिथी-नक्षत्र →" [ref=e115] [cursor=pointer]:
+        - /url: /panchang
+        - generic [ref=e116]: 📅
+        - generic [ref=e117]:
+          - paragraph [ref=e118]: पंचांग पहा
+          - paragraph [ref=e119]: आजचे तिथी-नक्षत्र
+        - generic [ref=e120]: →
+      - link "🔮 राशिभविष्य आजचे भविष्य जाणा →" [ref=e121] [cursor=pointer]:
+        - /url: /rashifal
+        - generic [ref=e122]: 🔮
+        - generic [ref=e123]:
+          - paragraph [ref=e124]: राशिभविष्य
+          - paragraph [ref=e125]: आजचे भविष्य जाणा
+        - generic [ref=e126]: →
+    - link "🔮 आजचे राशिभविष्य मेष ते मीन — प्रेम, करिअर, आरोग्य आणि आर्थिक भविष्य मराठीत ♈ मेष ♉ वृषभ ♊ मिथुन ♋ कर्क ♌ सिंह ♍ कन्या सर्व राशी पहा →" [ref=e129] [cursor=pointer]:
+      - /url: /rashifal
+      - generic [ref=e130]:
+        - generic [ref=e131]: 🔮
+        - generic [ref=e132]:
+          - heading "आजचे राशिभविष्य" [level=2] [ref=e133]
+          - paragraph [ref=e134]: मेष ते मीन — प्रेम, करिअर, आरोग्य आणि आर्थिक भविष्य मराठीत
+      - generic [ref=e135]:
+        - generic [ref=e136]: ♈ मेष
+        - generic [ref=e137]: ♉ वृषभ
+        - generic [ref=e138]: ♊ मिथुन
+        - generic [ref=e139]: ♋ कर्क
+        - generic [ref=e140]: ♌ सिंह
+        - generic [ref=e141]: ♍ कन्या
+        - generic [ref=e142]: सर्व राशी पहा →
+    - generic [ref=e144]:
+      - generic [ref=e145]:
+        - heading "आमच्या सेवा" [level=2] [ref=e146]
+        - paragraph [ref=e147]: श्रद्धेला आधुनिक सुविधेची जोड
+      - generic [ref=e148]:
+        - link "🙏 पुजारी सेवा वेदशास्त्रसंपन्न पुजारी घरी येऊन संपूर्ण विधी भक्तीभावाने करतात. अधिक पहा →" [ref=e149] [cursor=pointer]:
+          - /url: /pooja
+          - generic [ref=e150]: 🙏
+          - heading "पुजारी सेवा" [level=3] [ref=e151]
+          - paragraph [ref=e152]: वेदशास्त्रसंपन्न पुजारी घरी येऊन संपूर्ण विधी भक्तीभावाने करतात.
+          - generic [ref=e153]: अधिक पहा →
+        - link "🌍 NRI 💻 ऑनलाइन पूजा — NRI USA · UK · UAE · Canada — WhatsApp/Zoom वर पारंपरिक मराठी पूजा. अधिक पहा →" [ref=e154] [cursor=pointer]:
+          - /url: /online-puja
+          - generic [ref=e155]: 🌍 NRI
+          - generic [ref=e156]: 💻
+          - heading "ऑनलाइन पूजा — NRI" [level=3] [ref=e157]
+          - paragraph [ref=e158]: USA · UK · UAE · Canada — WhatsApp/Zoom वर पारंपरिक मराठी पूजा.
+          - generic [ref=e159]: अधिक पहा →
+        - link "✨ युनिक 🏛️ हॉल बुकिंग लग्न · साखरपुडा · समारंभ. पूजारी + हॉल एकत्र बुक करा — फक्त पूजारीवर! अधिक पहा →" [ref=e160] [cursor=pointer]:
+          - /url: /hall-booking
+          - generic [ref=e161]: ✨ युनिक
+          - generic [ref=e162]: 🏛️
+          - heading "हॉल बुकिंग" [level=3] [ref=e163]
+          - paragraph [ref=e164]: लग्न · साखरपुडा · समारंभ. पूजारी + हॉल एकत्र बुक करा — फक्त पूजारीवर!
+          - generic [ref=e165]: अधिक पहा →
+    - generic [ref=e168]:
+      - generic [ref=e169]: 🪔
+      - generic [ref=e170]:
+        - paragraph [ref=e171]: ॐ श्री गणेशाय नमः
+        - paragraph [ref=e172]: विघ्नहर्ता • मंगलमूर्ती • गजानन
+      - generic [ref=e173]: 🪔
+    - generic [ref=e175]:
+      - generic [ref=e176]:
+        - heading "आम्हालाच का निवडायचे?" [level=2] [ref=e177]
+        - paragraph [ref=e178]: लाखो भाविकांचा विश्वास — आमची ताकद
+      - generic [ref=e179]:
+        - generic [ref=e180]:
+          - generic [ref=e181]: 🔐
+          - heading "सत्यापित पुजारी" [level=3] [ref=e182]
+          - paragraph [ref=e183]: सर्व पुजारी ओळख-सत्यापित, अनुभवी आणि पारंपरिक ज्ञानसंपन्न.
+        - generic [ref=e184]:
+          - generic [ref=e185]: ⚡
+          - heading "सहज बुकिंग" [level=3] [ref=e186]
+          - paragraph [ref=e187]: काही मिनिटांत बुकिंग पूर्ण करा. कोणतीही गुंतागुंत नाही.
+        - generic [ref=e188]:
+          - generic [ref=e189]: 💸
+          - heading "परवडणाऱ्या किंमती" [level=3] [ref=e190]
+          - paragraph [ref=e191]: कोणत्याही बजेटमध्ये उत्तम सेवा — कोणतेही छुपे शुल्क नाही.
+        - generic [ref=e192]:
+          - generic [ref=e193]: 🏠
+          - heading "घरपोच सेवा" [level=3] [ref=e194]
+          - paragraph [ref=e195]: पुजारी सामग्रीसह घरी येतो — आपण पूर्णतः निश्चिंत रहा.
+    - generic [ref=e198]:
+      - generic [ref=e199]:
+        - generic [ref=e200]: ५,०००+
+        - generic [ref=e201]: संतुष्ट ग्राहक
+      - generic [ref=e202]:
+        - generic [ref=e203]: ⭐ ४.८ / ५
+        - generic [ref=e204]: सरासरी रेटिंग
+      - generic [ref=e205]:
+        - generic [ref=e206]: ✅ ५००+
+        - generic [ref=e207]: सत्यापित पुजारी
+      - generic [ref=e208]:
+        - generic [ref=e209]: २०+
+        - generic [ref=e210]: महाराष्ट्रातील शहरे
+    - generic [ref=e212]:
+      - generic [ref=e213]:
+        - heading "कसे काम करते?" [level=2] [ref=e214]
+        - paragraph [ref=e215]: फक्त ४ सोप्या चरणांमध्ये घरी पूजा
+      - generic [ref=e216]:
+        - generic [ref=e217]:
+          - generic [ref=e218]:
+            - generic [ref=e219]: १
+            - generic [ref=e220]: 💻
+            - heading "पूजा निवडा" [level=3] [ref=e221]
+            - paragraph [ref=e222]: इच्छित पूजेची श्रेणी निवडा आणि बुकिंग फॉर्म भरा.
+          - generic [ref=e223]: →
+        - generic [ref=e224]:
+          - generic [ref=e225]:
+            - generic [ref=e226]: २
+            - generic [ref=e227]: 📲
+            - heading "पुजारी नियुक्त" [level=3] [ref=e228]
+            - paragraph [ref=e229]: आम्ही आपल्यासाठी विश्वासू व अनुभवी पुजारी निवडतो.
+          - generic [ref=e230]: →
+        - generic [ref=e231]:
+          - generic [ref=e232]:
+            - generic [ref=e233]: ३
+            - generic [ref=e234]: 💳
+            - heading "पेमेंट करा" [level=3] [ref=e235]
+            - paragraph [ref=e236]: सुरक्षित ऑनलाइन पेमेंट — Razorpay द्वारे.
+          - generic [ref=e237]: →
+        - generic [ref=e239]:
+          - generic [ref=e240]: ४
+          - generic [ref=e241]: 🪔
+          - heading "पूजा संपन्न" [level=3] [ref=e242]
+          - paragraph [ref=e243]: पुजारी घरी येऊन पूर्ण विधीसह पूजा करतात.
+    - generic [ref=e245]:
+      - generic [ref=e246]:
+        - heading "पूजा श्रेणी" [level=2] [ref=e247]
+        - paragraph [ref=e248]: आपल्या गरजेनुसार पूजा निवडा
+      - generic [ref=e249]:
+        - link "🏠 गृह पूजा सत्यनारायण, साखरपुडा" [ref=e250] [cursor=pointer]:
+          - /url: /pooja?category=gruh-pooja
+          - generic [ref=e251]: 🏠
+          - heading "गृह पूजा" [level=3] [ref=e252]
+          - paragraph [ref=e253]: सत्यनारायण, साखरपुडा
+        - link "🔥 हवन / जाप नवग्रह, महा मृत्युंजय" [ref=e254] [cursor=pointer]:
+          - /url: /pooja?category=havan-jaap
+          - generic [ref=e255]: 🔥
+          - heading "हवन / जाप" [level=3] [ref=e256]
+          - paragraph [ref=e257]: नवग्रह, महा मृत्युंजय
+        - link "📿 कथा / नित्य पूजा रुद्राभिषेक, मंगळागौरी" [ref=e258] [cursor=pointer]:
+          - /url: /pooja?category=katha-nitya
+          - generic [ref=e259]: 📿
+          - heading "कथा / नित्य पूजा" [level=3] [ref=e260]
+          - paragraph [ref=e261]: रुद्राभिषेक, मंगळागौरी
+        - link "🕯️ पित्रुश्राद्ध दशक्रिया, बारावे विधी" [ref=e262] [cursor=pointer]:
+          - /url: /pooja?category=pitru-shraddha
+          - generic [ref=e263]: 🕯️
+          - heading "पित्रुश्राद्ध" [level=3] [ref=e264]
+          - paragraph [ref=e265]: दशक्रिया, बारावे विधी
+        - link "🎉 उत्सव पूजा गणपती, नवरात्री, दिवाळी" [ref=e266] [cursor=pointer]:
+          - /url: /pooja?category=utsav-pooja
+          - generic [ref=e267]: 🎉
+          - heading "उत्सव पूजा" [level=3] [ref=e268]
+          - paragraph [ref=e269]: गणपती, नवरात्री, दिवाळी
+        - link "🏗️ वास्तू पूजा गृहप्रवेश, भूमिपूजन" [ref=e270] [cursor=pointer]:
+          - /url: /pooja?category=vastu-pooja
+          - generic [ref=e271]: 🏗️
+          - heading "वास्तू पूजा" [level=3] [ref=e272]
+          - paragraph [ref=e273]: गृहप्रवेश, भूमिपूजन
+        - link "🧘 आध्यात्मिक सेवा पाठ, अनुष्ठान, कीर्तन" [ref=e274] [cursor=pointer]:
+          - /url: /pooja?category=adhyatmik-seva
+          - generic [ref=e275]: 🧘
+          - heading "आध्यात्मिक सेवा" [level=3] [ref=e276]
+          - paragraph [ref=e277]: पाठ, अनुष्ठान, कीर्तन
+        - link "🏛️ हॉल बुकिंग लग्नसमारंभ व कार्यक्रम" [ref=e278] [cursor=pointer]:
+          - /url: /hall-booking
+          - generic [ref=e279]: 🏛️
+          - heading "हॉल बुकिंग" [level=3] [ref=e280]
+          - paragraph [ref=e281]: लग्नसमारंभ व कार्यक्रम
+    - generic [ref=e282]:
+      - generic [ref=e285]:
+        - heading "लोकप्रिय पूजा" [level=2] [ref=e286]
+        - paragraph [ref=e287]: सर्वाधिक बुक केल्या जाणाऱ्या पूजा — Slide करून पहा
+      - generic [ref=e288]:
+        - generic [ref=e292]:
+          - generic [ref=e293]: हवन / जाप
+          - heading "महा मृत्युंजय जाप" [level=2] [ref=e294]
+          - paragraph [ref=e295]: मृत्युंजय देवाला प्रसन्न करण्यासाठी व दीर्घायुष्यासाठी केला जाणारा जाप.
+          - generic [ref=e296]:
+            - generic [ref=e297]: 💰 ₹५,००१ पासून
+            - generic [ref=e298]: ⏱ 3.00 तास
+          - generic [ref=e299]:
+            - link "🪔 पूजा बुक करा" [ref=e300] [cursor=pointer]:
+              - /url: /booking/maha-mrityunjay-jap
+            - link "अधिक पहा →" [ref=e301] [cursor=pointer]:
+              - /url: /vidhi/maha-mrityunjay-jap
+        - button "मागील पूजा" [ref=e302] [cursor=pointer]: ‹
+        - button "पुढील पूजा" [ref=e303] [cursor=pointer]: ›
+        - generic [ref=e304]:
+          - button "Slide 1" [ref=e305] [cursor=pointer]
+          - button "Slide 2" [ref=e306] [cursor=pointer]
+          - button "Slide 3" [ref=e307] [cursor=pointer]
+          - button "Slide 4" [ref=e308] [cursor=pointer]
+          - button "Slide 5" [ref=e309] [cursor=pointer]
+          - button "Slide 6" [ref=e310] [cursor=pointer]
+          - button "Slide 7" [ref=e311] [cursor=pointer]
+          - button "Slide 8" [ref=e312] [cursor=pointer]
+      - link "सर्व पूजा पहा →" [ref=e314] [cursor=pointer]:
+        - /url: /pooja
+    - generic [ref=e316]:
+      - generic [ref=e317]:
+        - heading "जवळचे पुजारी" [level=2] [ref=e318]
+        - paragraph [ref=e319]: आपल्या शहरातील सर्वोत्तम पुजारी शोधा
+      - generic [ref=e321]:
+        - generic [ref=e322]: 📍
+        - generic [ref=e323]:
+          - paragraph [ref=e324]: आपले स्थान सांगा
+          - paragraph [ref=e325]: जवळचे अनुभवी पुजारी शोधण्यासाठी
+        - generic [ref=e326]:
+          - button "📍 GPS वापरा" [ref=e327] [cursor=pointer]
+          - button "शहर निवडा" [ref=e328] [cursor=pointer]
+    - generic [ref=e330]:
+      - generic [ref=e331]:
+        - heading "शहरानुसार पुजारी शोधा" [level=2] [ref=e332]
+        - paragraph [ref=e333]: महाराष्ट्रातील प्रमुख शहरांमध्ये सेवा उपलब्ध
+      - generic [ref=e334]:
+        - link "🌆 मुंबई" [ref=e335] [cursor=pointer]:
+          - /url: /cities/mumbai
+          - generic [ref=e336]: 🌆
+          - generic [ref=e337]: मुंबई
+        - link "🏛️ पुणे" [ref=e338] [cursor=pointer]:
+          - /url: /cities/pune
+          - generic [ref=e339]: 🏛️
+          - generic [ref=e340]: पुणे
+        - link "🕌 नाशिक" [ref=e341] [cursor=pointer]:
+          - /url: /cities/nashik
+          - generic [ref=e342]: 🕌
+          - generic [ref=e343]: नाशिक
+        - link "🌳 नागपूर" [ref=e344] [cursor=pointer]:
+          - /url: /cities/nagpur
+          - generic [ref=e345]: 🌳
+          - generic [ref=e346]: नागपूर
+        - link "🏯 औरंगाबाद" [ref=e347] [cursor=pointer]:
+          - /url: /cities/aurangabad
+          - generic [ref=e348]: 🏯
+          - generic [ref=e349]: औरंगाबाद
+        - link "⛩️ कोल्हापूर" [ref=e350] [cursor=pointer]:
+          - /url: /cities/kolhapur
+          - generic [ref=e351]: ⛩️
+          - generic [ref=e352]: कोल्हापूर
+        - link "🌊 रत्नागिरी" [ref=e353] [cursor=pointer]:
+          - /url: /cities/ratnagiri
+          - generic [ref=e354]: 🌊
+          - generic [ref=e355]: रत्नागिरी
+        - link "🌾 सोलापूर" [ref=e356] [cursor=pointer]:
+          - /url: /cities/solapur
+          - generic [ref=e357]: 🌾
+          - generic [ref=e358]: सोलापूर
+        - link "🏔️ सातारा" [ref=e359] [cursor=pointer]:
+          - /url: /cities/satara
+          - generic [ref=e360]: 🏔️
+          - generic [ref=e361]: सातारा
+        - link "🏺 अहमदनगर" [ref=e362] [cursor=pointer]:
+          - /url: /cities/ahmednagar
+          - generic [ref=e363]: 🏺
+          - generic [ref=e364]: अहमदनगर
+        - link "🏙️ ठाणे" [ref=e365] [cursor=pointer]:
+          - /url: /cities/thane
+          - generic [ref=e366]: 🏙️
+          - generic [ref=e367]: ठाणे
+        - link "🌻 सांगली" [ref=e368] [cursor=pointer]:
+          - /url: /cities/sangli
+          - generic [ref=e369]: 🌻
+          - generic [ref=e370]: सांगली
+        - link "🏗️ नवी मुंबई" [ref=e371] [cursor=pointer]:
+          - /url: /cities/navi-mumbai
+          - generic [ref=e372]: 🏗️
+          - generic [ref=e373]: नवी मुंबई
+        - link "🛕 अमरावती" [ref=e374] [cursor=pointer]:
+          - /url: /cities/amravati
+          - generic [ref=e375]: 🛕
+          - generic [ref=e376]: अमरावती
+        - link "🌿 जळगाव" [ref=e377] [cursor=pointer]:
+          - /url: /cities/jalgaon
+          - generic [ref=e378]: 🌿
+          - generic [ref=e379]: जळगाव
+        - link "🌴 पालघर" [ref=e380] [cursor=pointer]:
+          - /url: /cities/palghar
+          - generic [ref=e381]: 🌴
+          - generic [ref=e382]: पालघर
+      - link "सर्व शहरे पहा →" [ref=e384] [cursor=pointer]:
+        - /url: /cities
+    - generic [ref=e387]:
+      - generic [ref=e389]:
+        - paragraph [ref=e390]: 🪔
+        - heading "पूजा बुक करा" [level=2] [ref=e391]
+        - paragraph [ref=e392]: आपल्या शुभ प्रसंगासाठी विश्वासू पुजारी मिळवा
+        - link "आता बुक करा" [ref=e393] [cursor=pointer]:
+          - /url: /pooja
+      - generic [ref=e395]:
+        - paragraph [ref=e396]: 📋
+        - heading "पुजारी म्हणून नोंदणी" [level=2] [ref=e397]
+        - paragraph [ref=e398]: आपले ज्ञान शेअर करा, जास्त कमाई करा
+        - link "नोंदणी करा" [ref=e399] [cursor=pointer]:
+          - /url: /pujari-nondni
+    - generic [ref=e401]:
+      - generic [ref=e402]:
+        - heading "ग्राहकांचे अभिप्राय" [level=2] [ref=e403]
+        - paragraph [ref=e404]: प्रत्यक्ष बुकिंग केलेल्या ग्राहकांचे खरे अनुभव
+      - generic [ref=e405]:
+        - generic [ref=e406]: ⭐ ⭐ ⭐ ⭐ ⭐
+        - generic [ref=e407]:
+          - strong [ref=e408]: ४.८/५
+          - text: — सत्यापित बुकिंग अभिप्रायांवर आधारित
+      - generic [ref=e409]:
+        - generic [ref=e410]:
+          - generic [ref=e411]:
+            - generic [ref=e412]:
+              - generic [ref=e413]: ★
+              - generic [ref=e414]: ★
+              - generic [ref=e415]: ★
+              - generic [ref=e416]: ★
+              - generic [ref=e417]: ★
+            - generic [ref=e418]: ✅ सत्यापित
+          - paragraph [ref=e419]: "\"पुजारी वेळेवर आले, सामग्री सुद्धा आणली. आमचे कुटुंब खूप प्रभावित झाले!\""
+          - generic [ref=e420]: 🪔 गृहप्रवेश पूजा
+          - generic [ref=e421]:
+            - generic [ref=e422]: न
+            - generic [ref=e423]:
+              - paragraph [ref=e424]: नेहा शिंदे
+              - paragraph [ref=e425]: 📍 रत्नागिरी
+        - generic [ref=e426]:
+          - generic [ref=e427]:
+            - generic [ref=e428]:
+              - generic [ref=e429]: ★
+              - generic [ref=e430]: ★
+              - generic [ref=e431]: ★
+              - generic [ref=e432]: ★
+              - generic [ref=e433]: ★
+            - generic [ref=e434]: ✅ सत्यापित
+          - paragraph [ref=e435]: "\"सत्यनारायण पूजेसाठी बुकिंग केली — एकही फोन न करता सर्व व्यवस्था झाली.\""
+          - generic [ref=e436]: 🪔 सत्यनारायण पूजा
+          - generic [ref=e437]:
+            - generic [ref=e438]: र
+            - generic [ref=e439]:
+              - paragraph [ref=e440]: राहुल देशमुख
+              - paragraph [ref=e441]: 📍 कोल्हापूर
+        - generic [ref=e442]:
+          - generic [ref=e443]:
+            - generic [ref=e444]:
+              - generic [ref=e445]: ★
+              - generic [ref=e446]: ★
+              - generic [ref=e447]: ★
+              - generic [ref=e448]: ★
+              - generic [ref=e449]: ★
+            - generic [ref=e450]: ✅ सत्यापित
+          - paragraph [ref=e451]: "\"गणेश चतुर्थीची पूजा पहिल्यांदा ऑनलाइन बुक केली — अनुभव अप्रतिम होता!\""
+          - generic [ref=e452]: 🪔 गणपती स्थापना
+          - generic [ref=e453]:
+            - generic [ref=e454]: स
+            - generic [ref=e455]:
+              - paragraph [ref=e456]: सुनीता जोशी
+              - paragraph [ref=e457]: 📍 नाशिक
+        - generic [ref=e458]:
+          - generic [ref=e459]:
+            - generic [ref=e460]:
+              - generic [ref=e461]: ★
+              - generic [ref=e462]: ★
+              - generic [ref=e463]: ★
+              - generic [ref=e464]: ★
+              - generic [ref=e465]: ★
+            - generic [ref=e466]: ✅ सत्यापित
+          - paragraph [ref=e467]: "\"दशक्रिया विधी साठी खूपच उपयुक्त. पुजाऱ्यांनी सर्व विधी भक्तीभावाने केले.\""
+          - generic [ref=e468]: 🪔 दशक्रिया विधी
+          - generic [ref=e469]:
+            - generic [ref=e470]: अ
+            - generic [ref=e471]:
+              - paragraph [ref=e472]: अजित पाटील
+              - paragraph [ref=e473]: 📍 पुणे
+        - generic [ref=e474]:
+          - generic [ref=e475]:
+            - generic [ref=e476]:
+              - generic [ref=e477]: ★
+              - generic [ref=e478]: ★
+              - generic [ref=e479]: ★
+              - generic [ref=e480]: ★
+              - generic [ref=e481]: ★
+            - generic [ref=e482]: ✅ सत्यापित
+          - paragraph [ref=e483]: "\"नवग्रह हवनासाठी खूप अनुभवी पुजारी आले. मंत्रोच्चार इतका सुंदर होता की मन शांत झाले.\""
+          - generic [ref=e484]: 🪔 नवग्रह शांती हवन
+          - generic [ref=e485]:
+            - generic [ref=e486]: प
+            - generic [ref=e487]:
+              - paragraph [ref=e488]: प्रिया कुलकर्णी
+              - paragraph [ref=e489]: 📍 मुंबई
+        - generic [ref=e490]:
+          - generic [ref=e491]:
+            - generic [ref=e492]:
+              - generic [ref=e493]: ★
+              - generic [ref=e494]: ★
+              - generic [ref=e495]: ★
+              - generic [ref=e496]: ★
+              - generic [ref=e497]: ★
+            - generic [ref=e498]: ✅ सत्यापित
+          - paragraph [ref=e499]: "\"वास्तूशांती साठी उत्कृष्ट पुजारी. वेळेवर आले, साहित्य आणले, संपूर्ण विधी केला.\""
+          - generic [ref=e500]: 🪔 वास्तूशांती पूजा
+          - generic [ref=e501]:
+            - generic [ref=e502]: व
+            - generic [ref=e503]:
+              - paragraph [ref=e504]: विकास मोरे
+              - paragraph [ref=e505]: 📍 नागपूर
+  - contentinfo [ref=e506]:
+    - generic [ref=e507]:
+      - generic [ref=e508]:
+        - generic [ref=e509]:
+          - img "Poojaris — For All Poojas" [ref=e511]
+          - paragraph [ref=e512]: महाराष्ट्रातील सर्वोत्तम पूजा बुकिंग सेवा. विश्वासू पुजारी, वेळेवर सेवा, आणि पारंपरिक विधी.
+          - generic [ref=e513]:
+            - link "Facebook" [ref=e514] [cursor=pointer]:
+              - /url: https://facebook.com
+              - img [ref=e515]
+            - link "Instagram" [ref=e517] [cursor=pointer]:
+              - /url: https://instagram.com
+              - img [ref=e518]
+            - link "YouTube" [ref=e520] [cursor=pointer]:
+              - /url: https://youtube.com
+              - img [ref=e521]
+            - link "WhatsApp" [ref=e523] [cursor=pointer]:
+              - /url: https://wa.me/9561903219
+              - img [ref=e524]
+        - generic [ref=e526]:
+          - heading "त्वरित लिंक" [level=3] [ref=e527]
+          - list [ref=e528]:
+            - listitem [ref=e529]:
+              - link "› मुख्यपृष्ठ" [ref=e530] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e531]:
+              - link "› पूजा बुक करा" [ref=e532] [cursor=pointer]:
+                - /url: /pooja
+            - listitem [ref=e533]:
+              - link "› ऑनलाइन पूजा" [ref=e534] [cursor=pointer]:
+                - /url: /online-puja
+            - listitem [ref=e535]:
+              - link "› ब्लॉग" [ref=e536] [cursor=pointer]:
+                - /url: /blog
+            - listitem [ref=e537]:
+              - link "› सर्व शहरे" [ref=e538] [cursor=pointer]:
+                - /url: /cities
+            - listitem [ref=e539]:
+              - link "› पुजारी व्हा" [ref=e540] [cursor=pointer]:
+                - /url: /pujari-nondni
+            - listitem [ref=e541]:
+              - link "› आमच्याबद्दल" [ref=e542] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e543]:
+              - link "› संपर्क करा" [ref=e544] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e545]:
+          - heading "पूजा श्रेणी" [level=3] [ref=e546]
+          - list [ref=e547]:
+            - listitem [ref=e548]:
+              - link "› गृह पूजा" [ref=e549] [cursor=pointer]:
+                - /url: /pooja/gruh-pooja
+            - listitem [ref=e550]:
+              - link "› हवन / जाप" [ref=e551] [cursor=pointer]:
+                - /url: /pooja/havan-jaap
+            - listitem [ref=e552]:
+              - link "› कथा / नित्य" [ref=e553] [cursor=pointer]:
+                - /url: /pooja/katha-nitya
+            - listitem [ref=e554]:
+              - link "› पित्रुश्राद्ध" [ref=e555] [cursor=pointer]:
+                - /url: /pooja/pitru-shraddha
+            - listitem [ref=e556]:
+              - link "› उत्सव पूजा" [ref=e557] [cursor=pointer]:
+                - /url: /pooja/utsav-pooja
+            - listitem [ref=e558]:
+              - link "› वास्तू पूजा" [ref=e559] [cursor=pointer]:
+                - /url: /pooja/vastu-pooja
+        - generic [ref=e560]:
+          - heading "संपर्क माहिती" [level=3] [ref=e561]
+          - list [ref=e562]:
+            - listitem [ref=e563]:
+              - img [ref=e565]
+              - link "› info@pojjari.com" [ref=e567] [cursor=pointer]:
+                - /url: mailto:info@pojjari.com
+            - listitem [ref=e568]:
+              - img [ref=e570]
+              - link "› ९५६१९०३२१९" [ref=e572] [cursor=pointer]:
+                - /url: tel:9561903219
+            - listitem [ref=e573]:
+              - img [ref=e575]
+              - generic [ref=e577]: रत्नागिरी, महाराष्ट्र
+            - listitem [ref=e578]:
+              - img [ref=e580]
+              - generic [ref=e582]: "सोम – रवि: सकाळी ७ ते रात्री ९"
+          - generic [ref=e583]:
+            - link "गोपनीयता धोरण" [ref=e584] [cursor=pointer]:
+              - /url: "#"
+            - link "नियम व अटी" [ref=e585] [cursor=pointer]:
+              - /url: "#"
+            - link "रद्दीकरण धोरण" [ref=e586] [cursor=pointer]:
+              - /url: "#"
+      - generic [ref=e587]:
+        - paragraph [ref=e588]: © 2026 पूजारी. सर्व हक्क राखीव.
+        - paragraph [ref=e589]: भक्तीने बनवले — महाराष्ट्रासाठी ❤️
+    - link "WhatsApp वर संपर्क करा" [ref=e590] [cursor=pointer]:
+      - /url: https://wa.me/9561903219?text=नमस्कार! मला पूजा बुक करायची आहे.
+      - img [ref=e591]
+    - button "पूजारी Assistant" [ref=e593] [cursor=pointer]:
+      - img [ref=e594]
+```
