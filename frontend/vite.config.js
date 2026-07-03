@@ -50,6 +50,12 @@ export default defineConfig({
           if (id.includes('node_modules/suncalc/')) {
             return 'vendor-suncalc';
           }
+          // Recharts — only AdminReport uses it, split away from main admin chunk
+          if (id.includes('node_modules/recharts') ||
+              id.includes('node_modules/d3-') ||
+              id.includes('node_modules/victory-vendor')) {
+            return 'vendor-charts';
+          }
           // Admin pages — only admins load this
           if (id.includes('/pages/admin/') || id.includes('/pages/superadmin/')) {
             return 'admin';
@@ -59,8 +65,8 @@ export default defineConfig({
               id.includes('/pages/Muhurat')) {
             return 'astro-pages';
           }
-          // Map component — leaflet is heavy
-          if (id.includes('node_modules/leaflet') || id.includes('HallMap')) {
+          // Map component — leaflet and react-leaflet are heavy
+          if (id.includes('leaflet') || id.includes('HallMap')) {
             return 'vendor-map';
           }
         },

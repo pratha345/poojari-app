@@ -5,10 +5,43 @@ import AdminLayout from '../admin/AdminLayout';
 import { superadminAPI, subscriptionAPI } from '../../api/index.js';
 import s from './TenantsPage.module.css';
 
+const DEFAULT_FEATURES = {
+  pujariBookings:  false,
+  consultations:   false,
+  poojaManagement: false,
+  halls:           false,
+  franchiseConfig: false,
+  websiteHome:     false,
+  theme:           false,
+  kundali:         false,
+  blog:            false,
+  dharmasindhu:    false,
+  granth:          false,
+  teamSection:     false,
+  whatsapp:        false,
+};
+
+const FEATURE_LABELS = [
+  { key: 'pujariBookings',  label: '👨‍⚕️ पुजारी + बुकिंग्ज'              },
+  { key: 'consultations',   label: '🔮 सल्लामसलत'                       },
+  { key: 'poojaManagement', label: '🪔 पूजा + साहित्य व्यवस्थापन'       },
+  { key: 'halls',           label: '🏛️ हॉल व्यवस्थापन'                  },
+  { key: 'franchiseConfig', label: '🏷️ Franchise Config (किंमत/साहित्य)' },
+  { key: 'websiteHome',     label: '🏠 मुखपृष्ठ (Website Home)'          },
+  { key: 'theme',           label: '🎨 थीम सेटिंग्ज'                    },
+  { key: 'kundali',         label: '♾ कुंडली / जन्म पत्रिका'           },
+  { key: 'blog',            label: '📰 ब्लॉग'                            },
+  { key: 'dharmasindhu',    label: '🕉 धर्मसिंधु'                       },
+  { key: 'granth',          label: '📚 ग्रंथ संग्रह'                    },
+  { key: 'teamSection',     label: '👥 टीम (अभ्यासक / अभिप्राय)'       },
+  { key: 'whatsapp',        label: '📱 WhatsApp बुकिंग (पुजारी app)'    },
+];
+
 const EMPTY_FORM = {
   name: '', slug: '', domain: '', plan: 'trial',
   admin_name: '', admin_email: '', admin_phone: '', admin_password: '',
   city: '', phone: '', contact_name: '',
+  features: { ...DEFAULT_FEATURES },
 };
 
 const PLAN_COLORS = {
@@ -131,10 +164,14 @@ export default function TenantsPage() {
   const openCreate = () => { setEditId(null); setForm(EMPTY_FORM); setShow(true); };
   const openEdit   = (t) => {
     setEditId(t.id);
+    const existingFeatures = t.features
+      ? (typeof t.features === 'string' ? JSON.parse(t.features) : t.features)
+      : { ...DEFAULT_FEATURES };
     setForm({
       name: t.name, slug: t.slug, domain: t.domain || '', plan: t.plan,
       admin_name: '', admin_email: '', admin_phone: '', admin_password: '',
       city: t.city || '', phone: t.phone || '', contact_name: t.contact_name || '',
+      features: { ...DEFAULT_FEATURES, ...existingFeatures },
     });
     setShow(true);
   };
@@ -152,10 +189,11 @@ export default function TenantsPage() {
         await superadminAPI.updateTenant(editId, {
           name: form.name, domain: form.domain, plan: form.plan,
           city: form.city, phone: form.phone, contact_name: form.contact_name,
+          features: form.features,
         });
         toast.success('Tenant अपडेट केला.');
       } else {
-        await superadminAPI.createTenant(form);
+        await superadminAPI.createTenant({ ...form, features: form.features });
         toast.success('Tenant तयार केला! 🎉');
       }
       setShow(false); load();
@@ -491,6 +529,25 @@ export default function TenantsPage() {
                 </div>
               </>
             )}
+
+            {/* Feature Flags */}
+            <div className={s.divider}>Admin Panel Features</div>
+            <p style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>
+              या tenant च्या admin panel मध्ये कोणते sections दिसतील ते निवडा.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px 16px', marginBottom: 16 }}>
+              {FEATURE_LABELS.map(f => (
+                <label key={f.key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}>
+                  <input
+                    type="checkbox"
+                    checked={!!form.features?.[f.key]}
+                    onChange={e => setForm(p => ({ ...p, features: { ...p.features, [f.key]: e.target.checked } }))}
+                    style={{ width: 16, height: 16, accentColor: '#e65100' }}
+                  />
+                  {f.label}
+                </label>
+              ))}
+            </div>
 
             <div className={s.modalActions}>
               <button className="btn btn-secondary" onClick={() => setShow(false)}>रद्द करा</button>

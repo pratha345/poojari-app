@@ -27,6 +27,7 @@ router.post('/:slug/rate',    ctrl.rateBlog);
 router.get ('/:slug',         ctrl.getBySlug);
 
 // ── Admin/Abhyasak routes ─────────────────────────────────────
+router.post  ('/',                  ...blogEditor, upload.single('image'), webpConvert, ctrl.create);
 router.get   ('/admin/all',         ...blogEditor, ctrl.adminList);
 router.post  ('/admin',             ...blogEditor, upload.single('image'), webpConvert, ctrl.create);
 router.put   ('/admin/:id',         ...blogEditor, upload.single('image'), webpConvert, ctrl.update);

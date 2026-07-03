@@ -4,7 +4,8 @@ import AdminLayout from './AdminLayout';
 import api from '../../api/axios';
 import s from './DharmasindhuSearch.module.css';
 import { FaBookOpen, FaMagnifyingGlass, FaSpinner, FaCircleCheck,
-         FaCircleExclamation, FaBookmark, FaArrowRight, FaGear } from 'react-icons/fa6';
+         FaCircleExclamation, FaBookmark, FaArrowRight, FaGear,
+         FaWikipediaW, FaRobot } from 'react-icons/fa6';
 
 const SAMPLE_QUESTIONS = [
   'विवाह मुहूर्त कसा काढावा?',
@@ -79,16 +80,55 @@ function OCRGuide() {
   );
 }
 
-function SourceCard({ source, index }) {
-  const [expanded, setExpanded] = useState(false);
+function SourceCard({ source }) {
+  const [expanded,    setExpanded]    = useState(false);
+  const [fullContent, setFullContent] = useState(null);
+  const [loadingFull, setLoadingFull] = useState(false);
+
+  const loadFullPage = async () => {
+    if (fullContent || loadingFull) return;
+    setLoadingFull(true);
+    try {
+      const res = await api.get(`/dharmasindhu/page/${source.page_no}`);
+      setFullContent(res.data.data?.content || '');
+    } catch (_) {}
+    setLoadingFull(false);
+  };
+
   return (
     <div className={s.sourceCard}>
+      {/* Header — always visible */}
       <div className={s.sourceHeader} onClick={() => setExpanded(e => !e)}>
         <span className={s.sourceBadge}><FaBookmark /> पान {source.page_no}</span>
         <span className={s.sourceToggle}>{expanded ? '▲' : '▼'}</span>
       </div>
+
       {expanded && (
-        <p className={s.sourceText}>{source.excerpt}</p>
+        <div className={s.sourceBody}>
+          {/* Excerpt (1200 chars) */}
+          <p className={s.sourceText}>{source.excerpt}</p>
+
+          {/* Load full page button */}
+          {!fullContent && (
+            <button
+              className={s.loadFullBtn}
+              onClick={loadFullPage}
+              disabled={loadingFull}
+            >
+              {loadingFull
+                ? <><FaSpinner className={s.spin} /> लोड होत आहे...</>
+                : <>📄 पूर्ण पान पाहा ({source.page_no})</>}
+            </button>
+          )}
+
+          {/* Full page content */}
+          {fullContent && (
+            <div className={s.fullPageSection}>
+              <div className={s.fullPageDivider}>── पूर्ण पान {source.page_no} ──</div>
+              <pre className={s.fullPageText}>{fullContent}</pre>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -270,7 +310,20 @@ export default function DharmasindhuSearch() {
               </div>
             </div>
 
-            {/* Sources */}
+            {/* Search mode badge */}
+            {result.search_mode && (
+              <div className={s.keywordsBadge}>
+                <span className={s.kwLabel}>
+                  {result.search_mode === 'hybrid'
+                    ? <><FaRobot /> Hybrid (RAG + Fulltext)</>
+                    : result.search_mode === 'semantic'
+                    ? <><FaRobot /> Semantic RAG</>
+                    : <><FaMagnifyingGlass /> Fulltext</>}
+                </span>
+              </div>
+            )}
+
+            {/* Dharmasindhu Sources */}
             {result.sources?.length > 0 && (
               <div className={s.sourcesSection}>
                 <h3 className={s.sourcesTitle}>
@@ -279,6 +332,31 @@ export default function DharmasindhuSearch() {
                 <div className={s.sourcesList}>
                   {result.sources.map((src, i) => (
                     <SourceCard key={src.page_no} source={src} index={i} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Wikipedia Sources */}
+            {result.wiki_sources?.length > 0 && (
+              <div className={s.sourcesSection}>
+                <h3 className={s.sourcesTitle}>
+                  <FaWikipediaW /> Wikipedia संदर्भ
+                </h3>
+                <div className={s.sourcesList}>
+                  {result.wiki_sources.map(w => (
+                    <div key={w.url} className={s.sourceCard}>
+                      <div className={s.sourceHeader}>
+                        <span className={s.sourceBadge}>
+                          <FaWikipediaW /> {w.title}
+                        </span>
+                        <a href={w.url} target="_blank" rel="noreferrer"
+                           className={s.wikiLink}>
+                          वाचा →
+                        </a>
+                      </div>
+                      <p className={s.sourceText}>{w.excerpt}</p>
+                    </div>
                   ))}
                 </div>
               </div>

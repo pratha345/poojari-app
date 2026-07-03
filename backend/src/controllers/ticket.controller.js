@@ -8,13 +8,13 @@ const genCode = () => 'TKT' + Date.now().toString(36).toUpperCase().slice(-7);
 // ── Create ticket (authenticated) ────────────────────────────
 exports.createTicket = async (req, res) => {
   try {
-    const { subject, message } = req.body;
+    const { subject, message, name: bodyName, phone: bodyPhone, email: bodyEmail } = req.body;
     if (!subject?.trim() || !message?.trim())
       return res.status(400).json({ success: false, message: 'विषय व संदेश आवश्यक आहे.' });
 
-    const user_id = req.user.id;
-    const name    = req.user.name  || req.user.full_name || 'वापरकर्ता';
-    const phone   = req.user.phone || null;
+    const user_id = req.user?.id || null;
+    const name    = req.user?.name || req.user?.full_name || bodyName || 'वापरकर्ता';
+    const phone   = req.user?.phone || bodyPhone || null;
     const ticket_code = genCode();
 
     const [r] = await pool.query(

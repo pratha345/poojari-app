@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 
 const APP_URL  = 'http://localhost:5173';
-const API_URL  = 'http://localhost:5000/api';
+const API_URL  = process.env.API_BASE_URL || 'http://localhost:5000/api';
 
 // ── Helpers ───────────────────────────────────────────────────────
 async function waitForPageLoad(page) {

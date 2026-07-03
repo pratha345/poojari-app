@@ -1,13 +1,11 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import AdminLayout from './AdminLayout';
 import { janamPatrikaAPI } from '../../api/index.js';
 import DateInput from '../../components/common/DateInput';
 import TimePicker from '../../components/common/TimePicker';
-import { MAHARASHTRA_DISTRICTS } from '../../data/maharashtraDistricts.js';
+import { INDIA_STATES, DEFAULT_STATE_IDX, DEFAULT_DISTRICT, filterDistricts } from '../../data/indiaDistricts.js';
 import s from './JanamPatrika.module.css';
-
-const DEFAULT_DISTRICT = MAHARASHTRA_DISTRICTS.find(d => d.en === 'Amravati');
 
 // North Indian chart — house 1 always top-center-left, clockwise
 // 4×4 grid: border = 12 houses, center 2×2 = OM
@@ -333,23 +331,87 @@ function PatrikaPreview({ data, printRef }) {
 
 // ── Main Page ─────────────────────────────────────────────
 export default function JanamPatrika() {
-  const [form,    setForm]    = useState({
+  const [form,       setForm]       = useState({
     name: '', dob: '', tob: '',
     city: DEFAULT_DISTRICT.name,
-    lat:  DEFAULT_DISTRICT.lat,
-    lon:  DEFAULT_DISTRICT.lon,
+    lat:  String(DEFAULT_DISTRICT.lat),
+    lon:  String(DEFAULT_DISTRICT.lon),
   });
-  const [data,    setData]    = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [saving,  setSaving]  = useState(false);
-  const [saved,   setSaved]   = useState(false);
-  const [tab,     setTab]     = useState('form');
-  const printRef              = useRef(null);
+  const [stateIdx,   setStateIdx]   = useState(DEFAULT_STATE_IDX);
+  const [distQuery,  setDistQuery]  = useState(DEFAULT_DISTRICT.name);
+  const [showList,   setShowList]   = useState(false);
+  const [coordLoad,  setCoordLoad]  = useState(false);
+  const [data,       setData]       = useState(null);
+  const [loading,    setLoading]    = useState(false);
+  const [saving,     setSaving]     = useState(false);
+  const [saved,      setSaved]      = useState(false);
+  const [tab,        setTab]        = useState('form');
+  const printRef                    = useRef(null);
+  const distInputRef                = useRef(null);
+  const savedDistQuery              = useRef(DEFAULT_DISTRICT.name);
 
-  const handleDistrictChange = useCallback((e) => {
-    const dist = MAHARASHTRA_DISTRICTS.find(d => d.name === e.target.value);
-    setForm(f => ({ ...f, city: e.target.value, lat: dist ? dist.lat : '', lon: dist ? dist.lon : '' }));
+  const currentState = INDIA_STATES[stateIdx];
+
+  const filteredDistricts = useMemo(
+    () => filterDistricts(currentState.districts, distQuery),
+    [distQuery, stateIdx]
+  );
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const close = (e) => {
+      if (distInputRef.current && !distInputRef.current.contains(e.target)) {
+        setShowList(false);
+      }
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
   }, []);
+
+  const handleStateChange = useCallback((e) => {
+    const idx = Number(e.target.value);
+    setStateIdx(idx);
+    setDistQuery('');
+    savedDistQuery.current = '';
+    setForm(f => ({ ...f, city: '', lat: '', lon: '' }));
+    setShowList(true);
+  }, []);
+
+  const handleDistrictSelect = useCallback(async (dist) => {
+    const displayName = dist.name !== dist.en ? dist.name : dist.en;
+    setDistQuery(displayName);
+    savedDistQuery.current = displayName;
+    setShowList(false);
+    setForm(f => ({ ...f, city: displayName }));
+
+    // Maharashtra: lat/lon already in data — use directly
+    if (dist.lat && dist.lon) {
+      setForm(f => ({ ...f, city: displayName, lat: String(dist.lat), lon: String(dist.lon) }));
+      return;
+    }
+
+    // Other states: fetch via Nominatim
+    setCoordLoad(true);
+    setForm(f => ({ ...f, lat: '', lon: '' }));
+    try {
+      const q = encodeURIComponent(`${dist.en} ${currentState.stateEn} India`);
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`);
+      const json = await res.json();
+      if (json[0]) {
+        setForm(f => ({
+          ...f,
+          lat: parseFloat(json[0].lat).toFixed(4),
+          lon: parseFloat(json[0].lon).toFixed(4),
+        }));
+      } else {
+        toast.error('निर्देशांक मिळाले नाहीत — manually enter करा');
+      }
+    } catch {
+      toast.error('Nominatim पोहोचता आले नाही — manually enter करा');
+    } finally {
+      setCoordLoad(false);
+    }
+  }, [currentState]);
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -405,34 +467,177 @@ export default function JanamPatrika() {
         {/* FORM TAB */}
         {tab === 'form' && (
           <form onSubmit={handleGenerate} className={s.form}>
-            <div className={s.formGrid}>
-              <label className={s.label}>नाव (Name) *
-                <input className={s.input} value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="पूर्ण नाव" required />
-              </label>
-              <label className={s.label}>जन्म तारीख * (DD/MM/YYYY)
-                <DateInput value={form.dob} onChange={v=>setForm(f=>({...f,dob:v}))} required />
-              </label>
-              <label className={s.label}>जन्म वेळ
-                <TimePicker value={form.tob} onChange={v=>setForm(f=>({...f,tob:v}))} />
-              </label>
-              <label className={s.label}>जन्म जिल्हा *
-                <select className={s.input} value={form.city} onChange={handleDistrictChange} required>
-                  {MAHARASHTRA_DISTRICTS.map(d => (
-                    <option key={d.en} value={d.name}>{d.name}</option>
-                  ))}
-                </select>
-              </label>
-              <label className={s.label}>Latitude
-                <input className={s.input} type="number" step="0.0001" value={form.lat} onChange={e=>setForm(f=>({...f,lat:e.target.value}))} placeholder="18.5204" />
-              </label>
-              <label className={s.label}>Longitude
-                <input className={s.input} type="number" step="0.0001" value={form.lon} onChange={e=>setForm(f=>({...f,lon:e.target.value}))} placeholder="73.8567" />
-              </label>
+
+            {/* ── Saffron header strip ── */}
+            <div className={s.formHead}>
+              <span className={s.formOm}>🕉</span>
+              <div className={s.formHeadText}>
+                <p className={s.formHeadTitle}>जन्म माहिती भरा</p>
+                <p className={s.formHeadSub}>सर्व * चिन्हांकित माहिती आवश्यक आहे</p>
+              </div>
             </div>
-            <div className={s.formActions}>
-              <button type="submit" className={s.generateBtn} disabled={loading}>
-                {loading ? '⏳ गणना होत आहे...' : '📜 जन्म पत्रिका तयार करा'}
-              </button>
+
+            <div className={s.formBody}>
+              <div className={s.formGrid}>
+
+                {/* ── Section: Personal ── */}
+                <div className={s.sectionLabel}>👤 व्यक्तिगत माहिती</div>
+
+                <label className={s.label}>
+                  <span className={s.labelText}>
+                    <span className={s.labelIcon}>📝</span> नाव (Name)
+                    <span className={s.labelRequired}>*</span>
+                  </span>
+                  <input className={s.input} value={form.name}
+                    onChange={e=>setForm(f=>({...f,name:e.target.value}))}
+                    placeholder="पूर्ण नाव लिहा" required />
+                </label>
+
+                <label className={s.label}>
+                  <span className={s.labelText}>
+                    <span className={s.labelIcon}>📅</span> जन्म तारीख
+                    <span className={s.labelRequired}>*</span>
+                    <span className={s.labelHint}>(DD/MM/YYYY)</span>
+                  </span>
+                  <DateInput value={form.dob} onChange={v=>setForm(f=>({...f,dob:v}))} required />
+                  <input type="date" name="dob" value={form.dob} readOnly style={{position:'absolute',opacity:0.01,width:'1px',height:'1px',border:0,padding:0,overflow:'hidden',pointerEvents:'none'}} tabIndex={-1} />
+                </label>
+
+                <label className={s.label}>
+                  <span className={s.labelText}>
+                    <span className={s.labelIcon}>🕐</span> जन्म वेळ
+                    <span className={s.labelHint}>(optional)</span>
+                  </span>
+                  <TimePicker value={form.tob} onChange={v=>setForm(f=>({...f,tob:v}))} />
+                </label>
+
+                {/* ── Section: Location ── */}
+                <div className={s.sectionLabel}>📍 जन्म स्थळ</div>
+
+                <label className={s.label}>
+                  <span className={s.labelText}>
+                    <span className={s.labelIcon}>🗺️</span> राज्य / State
+                    <span className={s.labelRequired}>*</span>
+                  </span>
+                  <select className={`${s.input} ${s.stateSelect}`} value={stateIdx}
+                    onChange={handleStateChange} required>
+                    {INDIA_STATES.map((st, i) => (
+                      <option key={st.stateEn} value={i}>{st.state} — {st.stateEn}</option>
+                    ))}
+                  </select>
+                </label>
+
+                {/* Empty 4th cell — state is in col 2, district is full-width below */}
+                <div />
+
+                {/* ── District combobox — full width ── */}
+                <label className={s.label} style={{gridColumn:'1 / -1'}}>
+                  <span className={s.labelText}>
+                    <span className={s.labelIcon}>🏙️</span> जन्म जिल्हा
+                    <span className={s.labelRequired}>*</span>
+                    <span className={s.labelHint}>— मराठी किंवा English मध्ये टाइप करा</span>
+                  </span>
+                  <div className={s.comboWrap} ref={distInputRef}>
+                    <div className={s.comboInner}>
+                      <span className={s.comboSearchIcon}>🔍</span>
+                      <input
+                        className={`${s.input} ${s.comboInput}`}
+                        value={distQuery}
+                        onChange={e => { setDistQuery(e.target.value); setShowList(true); }}
+                        onFocus={e => {
+                          savedDistQuery.current = distQuery;
+                          setDistQuery('');
+                          setShowList(true);
+                        }}
+                        onBlur={() => {
+                          // restore display name if user didn't pick anything new
+                          setTimeout(() => {
+                            if (!form.city) return;
+                            setDistQuery(q => q === '' ? savedDistQuery.current : q);
+                            setShowList(false);
+                          }, 180);
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Escape') {
+                            setDistQuery(savedDistQuery.current);
+                            setShowList(false);
+                          }
+                          if (e.key === 'Enter' && filteredDistricts.length > 0) {
+                            e.preventDefault(); handleDistrictSelect(filteredDistricts[0]);
+                          }
+                        }}
+                        placeholder="जिल्हा बदलण्यासाठी टाइप करा…"
+                        autoComplete="off"
+                        required
+                      />
+                    </div>
+                    {showList && filteredDistricts.length > 0 && (
+                      <ul className={s.distList}>
+                        {filteredDistricts.slice(0, 12).map(d => (
+                          <li key={d.en} className={s.distItem}
+                            onMouseDown={() => handleDistrictSelect(d)}>
+                            <span className={s.distItemLeft}>
+                              <span className={s.distPin}>📍</span>
+                              <span className={s.distName}>{d.name}</span>
+                            </span>
+                            {d.name !== d.en && <span className={s.distEn}>{d.en}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </label>
+
+                {/* Selected district chip */}
+                {form.city && (
+                  <div style={{gridColumn:'1 / -1', fontSize:'12px', color:'#6b7280', marginTop:'-8px', marginBottom:'4px'}}>
+                    📍 चयनित जिल्हा: <strong style={{color:'#1d4ed8'}}>{form.city}</strong>
+                  </div>
+                )}
+
+                {/* ── Lat / Lon auto chips ── */}
+                <div className={s.coordRow}>
+                  <label className={s.label}>
+                    <span className={s.labelText}>
+                      <span className={s.labelIcon}>📐</span> Latitude
+                    </span>
+                    {coordLoad
+                      ? <div className={s.coordLoading}>⏳ निर्देशांक मिळवत आहे…</div>
+                      : form.lat
+                        ? <div className={s.coordChip} title="Edit" onClick={()=>{}}>
+                            ✅ {form.lat}
+                          </div>
+                        : <input className={s.input} type="number" step="0.0001" value={form.lat}
+                            onChange={e=>setForm(f=>({...f,lat:e.target.value}))}
+                            placeholder="20.9333" />
+                    }
+                  </label>
+                  <label className={s.label}>
+                    <span className={s.labelText}>
+                      <span className={s.labelIcon}>📐</span> Longitude
+                    </span>
+                    {coordLoad
+                      ? <div className={s.coordLoading}>⏳ निर्देशांक मिळवत आहे…</div>
+                      : form.lon
+                        ? <div className={s.coordChip} title="Edit">
+                            ✅ {form.lon}
+                          </div>
+                        : <input className={s.input} type="number" step="0.0001" value={form.lon}
+                            onChange={e=>setForm(f=>({...f,lon:e.target.value}))}
+                            placeholder="77.7500" />
+                    }
+                  </label>
+                </div>
+
+              </div>
+
+              <div className={s.formActions}>
+                <button type="submit" className={s.generateBtn} disabled={loading || coordLoad}>
+                  <span className={s.generateBtnIcon}>📜</span>
+                  {loading ? 'गणना होत आहे…' : 'जन्म पत्रिका तयार करा'}
+                </button>
+                {coordLoad && <span style={{fontSize:13,color:'#b45309'}}>⏳ निर्देशांक लोड होत आहे…</span>}
+              </div>
             </div>
           </form>
         )}

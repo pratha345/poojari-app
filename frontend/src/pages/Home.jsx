@@ -22,40 +22,33 @@ const CAT_ICON = {
 
 // ── Featured Puja Full-Width Slider ──────────────────────────
 function FeaturedPoojaSlider({ poojas }) {
-  const [current,  setCurrent]  = useState(0);
-  const [visible,  setVisible]  = useState(true); // for crossfade
-  const timerRef  = useRef(null);
-  const items     = poojas.length > 0 ? poojas : [];
+  const [current,   setCurrent]   = useState(0);
+  const [visible,   setVisible]   = useState(true);
+  const [failedIds, setFailedIds] = useState(new Set());
+  const timerRef = useRef(null);
+
+  // Only show poojas whose images haven't failed
+  const items = poojas.filter(p => !failedIds.has(p.id));
 
   const goTo = useCallback((idx) => {
     if (items.length < 2) return;
     setVisible(false);
-    setTimeout(() => {
-      setCurrent(idx);
-      setVisible(true);
-    }, 350);
+    setTimeout(() => { setCurrent(idx); setVisible(true); }, 350);
   }, [items.length]);
 
   const next = useCallback(() => goTo((current + 1) % items.length), [current, items.length, goTo]);
   const prev = useCallback(() => goTo((current - 1 + items.length) % items.length), [current, items.length, goTo]);
-
-  const resetTimer = () => {
-    clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setCurrent(c => {
-        const n = (c + 1) % items.length;
-        setVisible(false);
-        setTimeout(() => { setCurrent(n); setVisible(true); }, 350);
-        return c; // stays same until timeout runs
-      });
-    }, 5000);
-  };
 
   useEffect(() => {
     if (items.length < 2) return;
     timerRef.current = setInterval(next, 5000);
     return () => clearInterval(timerRef.current);
   }, [items.length, next]);
+
+  // Clamp current index if items shrink after failures
+  useEffect(() => {
+    if (items.length > 0 && current >= items.length) setCurrent(0);
+  }, [items.length, current]);
 
   if (!items.length) return null;
 
@@ -64,17 +57,29 @@ function FeaturedPoojaSlider({ poojas }) {
   const imgSrc   = pooja.image_url
     ? (pooja.image_url.startsWith('http') ? pooja.image_url : `${BASE_URL}${pooja.image_url}`)
     : null;
+  const showGrad = !imgSrc;
 
   return (
     <section className={s.pSlider}>
-      {/* Background layer — crossfade */}
+      {/* Background gradient layer — shown when no image or image fails */}
       <div
-        className={`${s.pSliderBg} ${imgSrc ? '' : s[gradClass]} ${visible ? s.pSliderBgVisible : s.pSliderBgHidden}`}
-        style={imgSrc ? { backgroundImage: `url(${imgSrc})` } : {}}
+        className={`${s.pSliderBg} ${showGrad ? s[gradClass] : ''} ${visible ? s.pSliderBgVisible : s.pSliderBgHidden}`}
       />
 
+      {/* Background image — removed from rotation permanently if it fails */}
+      {imgSrc && (
+        <img
+          key={imgSrc}
+          src={imgSrc}
+          alt=""
+          aria-hidden="true"
+          className={`${s.pSliderBgImg} ${visible ? s.pSliderBgVisible : s.pSliderBgHidden}`}
+          onError={() => setFailedIds(prev => new Set([...prev, pooja.id]))}
+        />
+      )}
+
       {/* Decorative elements — shown only on gradient (no-image) slides */}
-      {!imgSrc && (
+      {showGrad && (
         <div className={s.pSliderDecor} aria-hidden="true">
           {/* Mandala rings */}
           <div className={s.pSliderRing1} />
@@ -96,7 +101,7 @@ function FeaturedPoojaSlider({ poojas }) {
       <div className={s.pSliderCounter}>{current + 1} / {items.length}</div>
 
       {/* Content — re-key on current to trigger animation */}
-      <div className="container" style={{ position: 'relative', zIndex: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
+      <div className={`container ${s.pSliderContainer}`}>
         <div key={current} className={s.pSliderText}>
           {pooja.category_name && (
             <span className={s.pSliderCat}>{pooja.category_name}</span>
@@ -197,24 +202,67 @@ function FestivalBanner({ name, imageUrl }) {
   );
 }
 
+const SITE = 'https://pujari.mydashboard.site';
+
 const HOME_SCHEMA = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'WebPage',
-      '@id': 'https://pojjari.com/#webpage',
-      'url': 'https://pojjari.com/',
+      '@id': `${SITE}/#webpage`,
+      'url': `${SITE}/`,
       'name': 'पूजारी - घरी पूजा, मनासारखी',
       'description': 'महाराष्ट्रातील सर्वोत्तम ऑनलाइन पूजा बुकिंग सेवा',
       'inLanguage': 'mr',
-      'isPartOf': { '@id': 'https://pojjari.com/#website' },
+      'isPartOf': { '@id': `${SITE}/#website` },
     },
     {
       '@type': 'LocalBusiness',
-      '@id': 'https://pojjari.com/#business',
+      '@id': `${SITE}/#business`,
       'name': 'पूजारी',
-      'telephone': '+919561903219',
-      'url': 'https://pojjari.com/',
+      'alternateName': 'Pojjari Puja Booking',
+      'description': 'महाराष्ट्रातील सर्वोत्तम ऑनलाइन पूजा बुकिंग सेवा. अनुभवी पुजारी घरी बोलवा.',
+      'url': `${SITE}/`,
+      'telephone': '+91-9561903219',
+      'email': 'support@pojjari.com',
+      'image': `${SITE}/og-image.jpg`,
+      'logo': `${SITE}/logo.webp`,
+      'address': {
+        '@type': 'PostalAddress',
+        'addressLocality': 'Pune',
+        'addressRegion': 'Maharashtra',
+        'addressCountry': 'IN',
+        'postalCode': '411001',
+      },
+      'geo': {
+        '@type': 'GeoCoordinates',
+        'latitude': 18.5204,
+        'longitude': 73.8567,
+      },
+      'areaServed': {
+        '@type': 'State',
+        'name': 'Maharashtra',
+        'containedInPlace': { '@type': 'Country', 'name': 'India' },
+      },
+      'priceRange': '₹₹',
+      'openingHoursSpecification': {
+        '@type': 'OpeningHoursSpecification',
+        'dayOfWeek': ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+        'opens': '06:00',
+        'closes': '20:00',
+      },
+      'serviceType': 'Puja Booking Service',
+      'hasOfferCatalog': {
+        '@type': 'OfferCatalog',
+        'name': 'पूजा सेवा',
+        'itemListElement': [
+          { '@type': 'Offer', 'itemOffered': { '@type': 'Service', 'name': 'सत्यनारायण पूजा' } },
+          { '@type': 'Offer', 'itemOffered': { '@type': 'Service', 'name': 'गृहप्रवेश पूजा' } },
+          { '@type': 'Offer', 'itemOffered': { '@type': 'Service', 'name': 'दशक्रिया विधी' } },
+          { '@type': 'Offer', 'itemOffered': { '@type': 'Service', 'name': 'रुद्राभिषेक' } },
+          { '@type': 'Offer', 'itemOffered': { '@type': 'Service', 'name': 'नवग्रह हवन' } },
+        ]
+      },
       'aggregateRating': {
         '@type': 'AggregateRating',
         'ratingValue': '4.8',
@@ -240,7 +288,17 @@ const HOME_SCHEMA = {
           '@type': 'Question',
           'name': 'कोणत्या पूजा बुक करता येतात?',
           'acceptedAnswer': { '@type': 'Answer', 'text': 'सत्यनारायण पूजा, गृहप्रवेश, दशक्रिया विधी, रुद्राभिषेक, नवग्रह हवन, लक्ष्मी पूजन, गणपती स्थापना व इतर सर्व पूजा बुक करता येतात.' }
-        }
+        },
+        {
+          '@type': 'Question',
+          'name': 'पूजेसाठी किती वेळ आधी बुकिंग करावे?',
+          'acceptedAnswer': { '@type': 'Answer', 'text': 'शक्यतो २-३ दिवस आधी बुकिंग करणे उत्तम. तात्काळ बुकिंगसाठी आमच्या WhatsApp वर संपर्क करा: +91-9561903219.' }
+        },
+        {
+          '@type': 'Question',
+          'name': 'पूजेची साहित्य (सामग्री) कोण आणते?',
+          'acceptedAnswer': { '@type': 'Answer', 'text': 'बुकिंग पूर्ण झाल्यावर पुजारी संपूर्ण साहित्याची यादी पाठवतात. तुम्ही स्वतः आणू शकता किंवा पुजारी सोबत आणू शकतात — हे बुकिंगच्या वेळी ठरवता येते.' }
+        },
       ]
     }
   ]
@@ -623,7 +681,7 @@ function HeroSlider({ sliders }) {
     : `${BASE_URL}${slide.image_url}`;
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[50%] border-[5px] border-white/60 bg-gradient-to-b from-amber-50 to-orange-100/60 shadow-[0_20px_60px_rgba(139,37,0,0.22)]">
+    <div className="relative h-full w-full bg-gradient-to-b from-amber-50 to-orange-100/60">
       {/* Image */}
       <img
         src={slideImg}
@@ -671,6 +729,17 @@ export default function Home() {
   const [imgBroken,      setImgBroken]      = useState(false);
   const [searchCategory, setSearchCategory] = useState('');
   const [liveReviews,    setLiveReviews]    = useState([]);
+  const [heroBgIdx,      setHeroBgIdx]      = useState(0);
+  // Dual-layer crossfade: layer A and B, alternate which is "active" (visible)
+  const [bgLayers,       setBgLayers]       = useState({ a: null, b: null, front: 'a' });
+  const lastBgSrcRef = useRef(null);
+
+  // Cycle hero background index every 7s
+  useEffect(() => {
+    if (featured.length < 2) return;
+    const t = setInterval(() => setHeroBgIdx(i => (i + 1) % featured.length), 7000);
+    return () => clearInterval(t);
+  }, [featured.length]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -689,9 +758,13 @@ export default function Home() {
       })
       .catch(() => {}); // silent fallback to defaults
 
-    // Load featured poojas
-    poojaAPI.getPoojas({ featured: true, limit: 8 })
-      .then(r => setFeatured(r.data.data.poojas || []))
+    // Load featured poojas — only those with images go into the slider
+    poojaAPI.getPoojas({ featured: true, limit: 20 })
+      .then(r => {
+        const all = r.data.data.poojas || [];
+        const withImages = all.filter(p => p.image_url && p.image_url.trim() !== '');
+        setFeatured(withImages);
+      })
       .catch(() => setFeatured([]))
       .finally(() => setLoading(false));
 
@@ -705,10 +778,27 @@ export default function Home() {
   const toAbs = (p) => !p ? null : p.startsWith('http') ? p : `${BASE_URL}${p}`;
 
   // hero right panel image — festival image takes priority when active
-  const festImgSrc = toAbs(festival_image_url);
-  const heroSrc    = festImgSrc || toAbs(content.hero_image) || '/ganpati.png';
-  const hasSlider  = sliders.length > 0;
-  const bgSrc      = festImgSrc || toAbs(content.bg_image) || toAbs(content.hero_image) || null;
+  const festImgSrc    = toAbs(festival_image_url);
+  const heroSrc       = festImgSrc || toAbs(content.hero_image) || '/ganpati.png';
+  const hasSlider     = sliders.length > 0;
+  // Hero background: admin bg_image > festival image > featured pooja image (cycling)
+  const heroBgFeatured = featured.length > 0 ? toAbs(featured[heroBgIdx]?.image_url) : null;
+  const bgSrc         = festImgSrc || toAbs(content.bg_image) || toAbs(content.hero_image) || heroBgFeatured;
+
+  // Crossfade: preload new bgSrc then swap layers — no blank flash between images
+  useEffect(() => {
+    if (!bgSrc || bgSrc === lastBgSrcRef.current) return;
+    lastBgSrcRef.current = bgSrc;
+    const img = new window.Image();
+    img.onload = () => {
+      setBgLayers(prev => {
+        const next = prev.front === 'a' ? 'b' : 'a';
+        return { ...prev, [next]: bgSrc, front: next };
+      });
+    };
+    img.onerror = () => {};
+    img.src = bgSrc;
+  }, [bgSrc]);
 
   return (
     <div className="min-h-screen bg-theme-cream">
@@ -726,15 +816,22 @@ export default function Home() {
             §1  HERO
         ════════════════════════════════════════════════════ */}
         <section className={`relative overflow-hidden ${s.heroBg}`}>
-          {/* Faint background image — bg_image from admin */}
-          {bgSrc && (
-            <img
-              src={bgSrc}
-              alt=""
-              aria-hidden="true"
-              className={s.heroBgImage}
-              onError={e => { e.currentTarget.style.display = 'none'; }}
+          {/* Hero background — dual-layer crossfade, no flash */}
+          {bgLayers.a && (
+            <img src={bgLayers.a} alt="" aria-hidden="true"
+              className={`${s.heroBgLayer} ${bgLayers.front === 'a' ? s.heroBgFront : s.heroBgBack}`}
+              onError={e => { e.currentTarget.style.opacity = '0'; }}
             />
+          )}
+          {bgLayers.b && (
+            <img src={bgLayers.b} alt="" aria-hidden="true"
+              className={`${s.heroBgLayer} ${bgLayers.front === 'b' ? s.heroBgFront : s.heroBgBack}`}
+              onError={e => { e.currentTarget.style.opacity = '0'; }}
+            />
+          )}
+          {/* Gradient overlay — always present once any image loaded */}
+          {(bgLayers.a || bgLayers.b) && (
+            <div className={s.heroBgOverlay} aria-hidden="true" />
           )}
           <span className={s.omWatermark} aria-hidden="true">ॐ</span>
           <div className="pointer-events-none absolute -right-56 -top-56 h-[600px] w-[600px] rounded-full bg-saffron-400/10 blur-3xl" />
@@ -742,7 +839,7 @@ export default function Home() {
 
           <div className="container relative z-10">
             {/* Mobile: 1-col text only; lg: 2-col with image */}
-            <div className="grid grid-cols-1 items-center gap-8 py-12 lg:min-h-[84vh] lg:grid-cols-2 lg:gap-10 lg:py-16">
+            <div className="grid grid-cols-1 items-center gap-8 py-12 lg:min-h-[92vh] lg:grid-cols-2 lg:gap-10 lg:py-16">
 
               {/* LEFT: dynamic text */}
               <div className="flex flex-col gap-5 sm:gap-7">
@@ -754,7 +851,7 @@ export default function Home() {
                   </span>
                 </div>
 
-                <h1 className="font-display text-3xl font-bold leading-[1.48] text-maroon-700 sm:text-4xl lg:text-[3rem] xl:text-[3.2rem]" style={{lineHeight:'1.48'}}>
+                <h1 className="font-display text-3xl font-bold leading-[1.48] text-maroon-700 sm:text-4xl lg:text-[3.5rem] xl:text-[3.8rem]" style={{lineHeight:'1.42'}}>
                   {content.title.split('विश्वासार्ह').map((part, i, arr) => (
                     <span key={i}>
                       {part}
@@ -769,11 +866,12 @@ export default function Home() {
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                   <Link to="/pooja"
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-6 py-3.5 font-devanagari text-sm font-bold text-white shadow-saffron transition-all duration-200 hover:-translate-y-1 hover:from-saffron-600 hover:to-saffron-700 hover:shadow-saffron-xl sm:w-auto sm:gap-2.5 sm:px-8 sm:py-4 sm:text-base">
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-6 py-3.5 font-devanagari text-sm font-bold text-white transition-all duration-200 hover:-translate-y-1 hover:from-saffron-600 hover:to-saffron-700 sm:w-auto sm:gap-2.5 sm:px-8 sm:py-4 sm:text-base"
+                    style={{ boxShadow: '0 6px 24px rgba(180,60,0,0.55), 0 2px 8px rgba(180,60,0,0.30)' }}>
                     🪔 {content.button_text_1}
                   </Link>
                   <Link to="/about"
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-saffron-500/55 bg-white/75 px-6 py-3.5 font-devanagari text-sm font-bold text-saffron-600 backdrop-blur-sm transition-all duration-200 hover:border-saffron-500 hover:bg-white sm:w-auto sm:px-8 sm:py-4 sm:text-base">
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-saffron-500/70 bg-white/92 px-6 py-3.5 font-devanagari text-sm font-bold text-saffron-700 backdrop-blur-sm transition-all duration-200 hover:border-saffron-600 hover:bg-white sm:w-auto sm:px-8 sm:py-4 sm:text-base">
                     {content.button_text_2}
                   </Link>
                 </div>
@@ -812,43 +910,55 @@ export default function Home() {
                     <span key={t} className="font-devanagari text-xs font-semibold text-maroon-700/55 sm:text-sm">{t}</span>
                   ))}
                 </div>
+
+                {/* Mobile-only hero image — shown below trust tags */}
+                <div className="relative mt-2 h-[210px] overflow-hidden rounded-[20px] md:hidden">
+                  {hasSlider ? (
+                    <HeroSlider sliders={sliders} />
+                  ) : !imgBroken ? (
+                    <img
+                      src={heroSrc}
+                      alt="पूजारी — ऑनलाइन पूजा बुकिंग"
+                      className="h-full w-full object-cover object-top"
+                      onError={() => setImgBroken(true)}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-amber-50 to-orange-100">
+                      <span className={`font-display text-[5rem] leading-none ${s.omFallback}`}>ॐ</span>
+                    </div>
+                  )}
+                  <div className="pointer-events-none absolute inset-0 rounded-[20px] ring-2 ring-saffron-500/20" />
+                </div>
               </div>
 
-              {/* RIGHT: image / slider — hidden on mobile, scales up on md/lg */}
-              <div className="hidden md:flex items-center justify-center">
-                <div className="relative flex h-[340px] w-[340px] items-center justify-center lg:h-[440px] lg:w-[440px] xl:h-[480px] xl:w-[480px]">
+              {/* RIGHT: Premium image panel — hidden on mobile */}
+              <div className="hidden md:flex items-center justify-end">
+                <div className={s.premiumHeroRight}>
+                  {/* Ambient glow */}
+                  <div className={s.premiumGlow} aria-hidden="true" />
 
-                  <div className={`absolute inset-0 rounded-full ${s.mandalaRing}`} />
-                  <div className={`absolute h-[278px] w-[278px] rounded-full lg:h-[360px] lg:w-[360px] xl:h-[394px] xl:w-[394px] ${s.mandalaRingInner}`} />
-                  <div className={`absolute h-[270px] w-[270px] rounded-full lg:h-[350px] lg:w-[350px] xl:h-[383px] xl:w-[383px] ${s.imageGlow}`} />
-                  <div className="absolute h-[235px] w-[235px] rounded-full lg:h-[305px] lg:w-[305px] xl:h-[334px] xl:w-[334px] border border-saffron-500/15" />
-
-                  {/* Image frame */}
-                  <div className="relative z-10 h-[214px] w-[196px] overflow-hidden rounded-[50%] lg:h-[276px] lg:w-[254px] xl:h-[302px] xl:w-[278px]">
+                  {/* Core image frame */}
+                  <div className={s.premiumImgFrame}>
                     {hasSlider ? (
                       <HeroSlider sliders={sliders} />
                     ) : !imgBroken ? (
-                      <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[50%] border-[5px] border-white/60 bg-gradient-to-b from-amber-50 to-orange-100/60 shadow-[0_20px_60px_rgba(139,37,0,0.22)]">
-                        <img
-                          src={heroSrc}
-                          alt="श्री गणेश — पूजारी पूजा बुकिंग सेवा"
-                          className="h-full w-full object-cover object-top"
-                          fetchpriority="high"
-                          onError={() => setImgBroken(true)}
-                        />
-                      </div>
+                      <img
+                        src={heroSrc}
+                        alt="पूजारी — ऑनलाइन पूजा बुकिंग"
+                        className="h-full w-full object-cover object-top"
+                        fetchpriority="high"
+                        onError={() => setImgBroken(true)}
+                      />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-[50%] border-[5px] border-white/60 bg-gradient-to-b from-amber-50 to-orange-100/60">
-                        <div className="flex flex-col items-center gap-3 text-center">
-                          <span className={`font-display text-[4.5rem] leading-none lg:text-[5.5rem] ${s.omFallback}`}>ॐ</span>
-                          <span className="font-display text-xs font-bold text-saffron-700 lg:text-sm">श्री गणेशाय नमः</span>
-                        </div>
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-b from-amber-50 to-orange-100">
+                        <span className={`font-display text-[8rem] leading-none ${s.omFallback}`}>ॐ</span>
                       </div>
                     )}
+                    <div className={s.premiumImgOverlay} aria-hidden="true" />
                   </div>
 
-                  {/* Floating cards — only on lg+ to prevent overflow */}
-                  <div className={`${s.floatCard} absolute -right-2 top-[10%] z-20 hidden lg:flex min-w-[140px] items-center gap-3 rounded-2xl border border-amber-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}>
+                  {/* Floating stat cards — only on lg+ */}
+                  <div className={`${s.floatCard} ${s.premiumStat1} hidden lg:flex min-w-[140px] items-center gap-3`}>
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 text-lg">⭐</div>
                     <div>
                       <p className="font-display text-sm font-bold leading-tight text-maroon-700">4.8 रेटिंग</p>
@@ -856,8 +966,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className={`${s.floatCard} absolute -left-6 top-[38%] z-20 hidden lg:flex min-w-[144px] items-center gap-3 rounded-2xl border border-orange-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}
-                    style={{ animationDelay: '1.5s' }}>
+                  <div className={`${s.floatCard} ${s.premiumStat2} hidden lg:flex min-w-[144px] items-center gap-3`} style={{ animationDelay: '1.5s' }}>
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-orange-50 text-lg">🙏</div>
                     <div>
                       <p className="font-display text-sm font-bold leading-tight text-maroon-700">500+ पुजारी</p>
@@ -865,8 +974,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className={`${s.floatCard} absolute -right-4 bottom-[10%] z-20 hidden lg:flex min-w-[148px] items-center gap-3 rounded-2xl border border-red-100 bg-white px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.12)]`}
-                    style={{ animationDelay: '3s' }}>
+                  <div className={`${s.floatCard} ${s.premiumStat3} hidden lg:flex min-w-[148px] items-center gap-3`} style={{ animationDelay: '3s' }}>
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-red-50 text-lg">📍</div>
                     <div>
                       <p className="font-display text-sm font-bold leading-tight text-maroon-700">महाराष्ट्र सेवा</p>
@@ -874,8 +982,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <span className="absolute right-[22%] top-[7%] h-2.5 w-2.5 rounded-full bg-gold-500 shadow-[0_0_12px_rgba(255,193,7,0.75)]" />
-                  <span className="absolute bottom-[7%] left-[20%] h-2 w-2 rounded-full bg-saffron-400 shadow-[0_0_10px_rgba(255,122,0,0.65)]" />
+                  <span className="absolute right-[15%] top-[7%] h-3 w-3 rounded-full bg-gold-500 shadow-[0_0_16px_rgba(255,193,7,0.85)]" />
+                  <span className="absolute bottom-[7%] left-[10%] h-2 w-2 rounded-full bg-saffron-400 shadow-[0_0_12px_rgba(255,122,0,0.75)]" />
                 </div>
               </div>
             </div>
@@ -910,6 +1018,23 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* ════════════════════════════════════════════════════
+            §1.9  FEATURED POOJAS — Visual spotlight (full-width)
+        ════════════════════════════════════════════════════ */}
+        {loading ? (
+          <div className="page-loader" style={{ height: 400 }}><div className="spinner" /></div>
+        ) : featured.length > 0 ? (
+          <section>
+            <FeaturedPoojaSlider poojas={featured} />
+            <div className={s.featuredViewAll}>
+              <Link to="/pooja"
+                className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-10 py-4 font-devanagari text-base font-bold text-white shadow-saffron transition-all duration-200 hover:-translate-y-0.5 hover:shadow-saffron-xl">
+                सर्व पूजा पहा →
+              </Link>
+            </div>
+          </section>
+        ) : null}
 
         {/* ════════════════════════════════════════════════════
             §2  QUICK ACTIONS
@@ -1108,32 +1233,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ════════════════════════════════════════════════════
-            §8  POPULAR POOJAS — Full-width animated slider
-        ════════════════════════════════════════════════════ */}
-        <section>
-          {/* Section heading above slider */}
-          <div className="bg-theme-cream-dark/65 py-10">
-            <div className="container">
-              <SectionHeading title="लोकप्रिय पूजा" sub="सर्वाधिक बुक केल्या जाणाऱ्या पूजा — Slide करून पहा" />
-            </div>
-          </div>
-
-          {/* Full-width slider */}
-          {loading ? (
-            <div className="page-loader" style={{ height: 300 }}><div className="spinner" /></div>
-          ) : (
-            <FeaturedPoojaSlider poojas={featured.length > 0 ? featured : MOCK_POOJAS} />
-          )}
-
-          {/* View all link below slider */}
-          <div className="bg-theme-cream-dark/65 py-8 flex justify-center">
-            <Link to="/pooja"
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-saffron-500 to-saffron-600 px-10 py-4 font-devanagari text-base font-bold text-white shadow-saffron transition-all duration-200 hover:-translate-y-0.5 hover:shadow-saffron-xl">
-              सर्व पूजा पहा →
-            </Link>
-          </div>
-        </section>
+        {/* §8 Popular Poojas slider moved to §1.9 (right after stats strip) */}
 
         {/* ════════════════════════════════════════════════════
             §8.5  NEARBY PUJARIS

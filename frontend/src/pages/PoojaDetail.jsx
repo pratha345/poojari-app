@@ -105,12 +105,12 @@ function buildPoojaSchema(pooja) {
           {
             '@type': 'Question',
             'name': `${pooja.name_mr} घरी होऊ शकते का?`,
-            'acceptedAnswer': { '@type': 'Answer', 'text': `होय, पूजारी ॲपचे अनुभवी पुजारी संपूर्ण साहित्यासह आपल्या घरी येऊन ${pooja.name_mr} करतात. महाराष्ट्रातील सर्व प्रमुख शहरांत सेवा उपलब्ध.` },
+            'acceptedAnswer': { '@type': 'Answer', 'text': `होय, पूजारीचे अनुभवी पुजारी संपूर्ण साहित्यासह आपल्या घरी येऊन ${pooja.name_mr} करतात. महाराष्ट्रातील सर्व प्रमुख शहरांत सेवा उपलब्ध.` },
           },
           {
             '@type': 'Question',
             'name': `${pooja.name_mr} कधी करावी?`,
-            'acceptedAnswer': { '@type': 'Answer', 'text': `${pooja.name_mr} शुभ मुहूर्तावर करणे उत्तम. पूजारी ॲपवर बुकिंग केल्यावर पुजारी तुम्हाला मुहूर्त सांगतात.` },
+            'acceptedAnswer': { '@type': 'Answer', 'text': `${pooja.name_mr} शुभ मुहूर्तावर करणे उत्तम. पूजारी वेबसाइटवर बुकिंग केल्यावर पुजारी तुम्हाला मुहूर्त सांगतात.` },
           },
         ],
       },

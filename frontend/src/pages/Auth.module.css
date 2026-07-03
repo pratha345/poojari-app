@@ -62,6 +62,9 @@
   padding: 0 12px; font-size: 13px; color: var(--text-muted);
 }
 
+.googleWrap { display: flex; justify-content: center; margin-bottom: 8px; }
+.googleWrap > div { width: 100% !important; }
+
 .switchLink { text-align: center; font-size: 14px; color: var(--text-muted); margin-top: 10px; }
 .switchLink a { color: var(--primary); font-weight: 600; }
 

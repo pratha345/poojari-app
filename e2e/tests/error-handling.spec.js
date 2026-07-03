@@ -1,7 +1,7 @@
 // e2e/tests/error-handling.spec.js — E2E Error Handling Tests (Part 8)
 const { test, expect } = require('@playwright/test');
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.API_BASE_URL || 'http://localhost:5000/api';
 
 // ═══════════════════════════════════════════════════════════════════
 // PART 8A: App Behaviour When API is Down
@@ -26,7 +26,7 @@ test.describe('Error Handling: API Failure Simulation', () => {
     page.on('pageerror', err => jsErrors.push(err.message));
 
     // Abort all backend API calls (scope to backend port — avoids matching Vite module URLs)
-    await page.route('http://localhost:5000/api/**', route => route.abort('failed'));
+    await page.route(`${API_URL}/**`, route => route.abort('failed'));
 
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded', { timeout: 8000 });
@@ -55,7 +55,7 @@ test.describe('Error Handling: API Failure Simulation', () => {
 
   test('Login page renders without API', async ({ page }) => {
     // Use full backend URL to avoid matching Vite module paths (/src/api/...)
-    await page.route('http://localhost:5000/api/**', route => route.abort('failed'));
+    await page.route(`${API_URL}/**`, route => route.abort('failed'));
     await page.goto('/login');
     // Wait for React to fully mount
     await page.waitForSelector('input', { timeout: 8000 });

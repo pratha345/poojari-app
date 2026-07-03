@@ -124,9 +124,8 @@ export default function ManagePujaris({ initialTab = 'approved' }) {
     setApprovedLoading(true);
     adminAPI.getApprovedPujaris({ sort, page, limit: PAGE_SIZE, search: searchQ })
       .then(r => {
-        const d = r.data.data;
-        setApproved(d.rows || []);
-        setTotal(d.total || 0);
+        setApproved(r.data.data || []);
+        setTotal(r.data.pagination?.total || 0);
       })
       .catch(() => toast.error('मंजूर पुजारी यादी मिळवता आली नाही.'))
       .finally(() => setApprovedLoading(false));

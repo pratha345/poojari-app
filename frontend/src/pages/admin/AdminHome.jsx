@@ -182,7 +182,7 @@ export default function AdminHome() {
           {/* Page Header */}
           <div className={styles.pageHeader}>
             <h1 className={styles.pageTitle}>🏠 होमपेज संपादक</h1>
-            <Link to="/admin" className={styles.adminBadge} style={{ textDecoration: 'none' }}>← डॅशबोर्ड</Link>
+            <Link to="/admin/report" className={styles.adminBadge} style={{ textDecoration: 'none' }}>← अहवाल</Link>
           </div>
 
           {/* ── Hero Content Form ────────────────────────────────── */}
@@ -254,7 +254,7 @@ export default function AdminHome() {
                   ))}
                 </div>
                 <p style={{ margin: '8px 0 0', fontSize: 11, color: '#aaa' }}>
-                  उदा: "५,०००+" किंवा "500+" — homepage वर hero खाली दिसेल
+                  उदा: "५,०००+" किंवा "500+" — homepage वर hero section च्या खाली stats strip मध्ये दिसेल
                 </p>
               </div>
 
@@ -272,7 +272,8 @@ export default function AdminHome() {
 
               {/* Hero Image Upload */}
               <div className={styles.formGroup} style={{ marginBottom: '1.5rem' }}>
-                <label className={styles.label}>हिरो इमेज</label>
+                <label className={styles.label}>🖼️ हिरो इमेज <span style={{fontWeight:400,fontSize:12,color:'#888'}}>(उजव्या बाजूचे decorative image — fallback)</span></label>
+                <p style={{ margin: '0 0 12px', fontSize: 12, color: '#888' }}>Desktop hero च्या उजव्या panel मध्ये हे दिसते. जर खाली Slider images असतील तर त्या priority मध्ये येतात.</p>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.5rem', flexWrap: 'wrap' }}>
                   {previewImg && (
                     <div style={{ position: 'relative' }}>
@@ -307,11 +308,24 @@ export default function AdminHome() {
                 </div>
               </div>
 
+              {/* Auto featured-pooja background info */}
+              <div style={{ marginBottom: '1.25rem', padding: '14px 18px', background: 'linear-gradient(135deg,#e8f5e9,#f1f8e9)', borderRadius: 10, border: '1.5px solid #a5d6a7', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>🔄</span>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 13, color: '#2e7d32' }}>Hero Background — Auto Featured Pooja Cycling</p>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#388e3c', lineHeight: 1.6 }}>
+                    Homepage च्या hero background मध्ये आता <strong>featured पूजा इमेज आपोआप बदलत राहतात</strong> (दर ७ सेकंदांनी). <br />
+                    खाली custom background इमेज upload केल्यास ती <strong>सर्वात जास्त प्राधान्य</strong> मिळेल आणि cycling बंद होईल.
+                    Manage Poojas → पूजेला "featured" केल्यावर ती आपोआप background मध्ये येते.
+                  </p>
+                </div>
+              </div>
+
               {/* Background Image Upload */}
               <div className={styles.formGroup} style={{ marginBottom: '1.5rem', background: '#faf6f0', borderRadius: 10, padding: '1.25rem', border: '1px solid #f0dfc0' }}>
-                <label className={styles.label} style={{ marginBottom: 4 }}>🌅 Background इमेज</label>
+                <label className={styles.label} style={{ marginBottom: 4 }}>🌅 Custom Background इमेज (optional override)</label>
                 <p style={{ fontSize: 12, color: '#888', marginBottom: 14 }}>
-                  गणपती / ॐ / मंदिराचा फोटो upload करा — homepage च्या background मध्ये <strong>खूप faint</strong> दिसेल
+                  येथे इमेज upload केल्यास ती hero background मध्ये <strong>0.75 opacity</strong> + gradient overlay सह दिसेल आणि auto-cycling बंद होईल. सणासुदीचे फोटो, मंदिराचे फोटो इ. साठी उपयुक्त.
                 </p>
 
                 <input ref={bgFileRef} type="file" accept="image/*" style={{ display: 'none' }}
@@ -384,7 +398,12 @@ export default function AdminHome() {
 
           {/* ── Slider Management ─────────────────────────────────── */}
           <div className={styles.card}>
-            <h2 className={styles.sectionTitle} style={{ marginBottom: '1.5rem' }}>🖼️ इमेज स्लाइडर</h2>
+            <h2 className={styles.sectionTitle} style={{ marginBottom: '0.5rem' }}>🖼️ Hero उजवा पॅनल — Slider Images</h2>
+            <div style={{ marginBottom: '1.5rem', padding: '12px 16px', background: '#fff8e1', borderRadius: 8, border: '1px solid #ffe082', fontSize: 13, color: '#6d4c41', lineHeight: 1.7 }}>
+              <strong>📌 हे कशासाठी आहे?</strong><br />
+              येथे upload केलेल्या images desktop hero च्या <strong>उजव्या बाजूच्या decorative frame</strong> मध्ये आणि mobile वर hero image म्हणून slideshow मध्ये दिसतात.<br />
+              <span style={{color:'#388e3c',fontWeight:600}}>★ Featured Poojas Slider</span> (homepage च्या खालच्या भागात): ते <strong>Manage Poojas</strong> मधून पूजेला "Featured" केल्यावर आपोआप येते — वेगळे manage करावे लागत नाही.
+            </div>
 
             {/* Add new slider */}
             <form onSubmit={handleAddSlider} style={{ marginBottom: '2rem', padding: '1.25rem', background: '#faf6f0', borderRadius: 10, border: '1px dashed #E07B2A' }}>

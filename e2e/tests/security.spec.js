@@ -1,7 +1,7 @@
 // e2e/tests/security.spec.js — Security E2E Tests (Part 2)
 const { test, expect } = require('@playwright/test');
 
-const API_URL  = 'http://localhost:5000/api';
+const API_URL  = process.env.API_BASE_URL || 'http://localhost:5000/api';
 const APP_URL  = 'http://localhost:5173';
 
 // ── API Helper ────────────────────────────────────────────────────

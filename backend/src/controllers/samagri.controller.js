@@ -3,11 +3,24 @@ const pool = require('../config/db');
 exports.getByPooja = async (req, res) => {
   try {
     const { pooja_id } = req.params;
+    const tenantId     = req.tenantId || 1;
+
+    // Tenant override → global fallback
+    if (tenantId > 1) {
+      const [tenantRows] = await pool.query(
+        'SELECT * FROM tenant_samagri_config WHERE tenant_id = ? AND pooja_id = ? ORDER BY sort_order',
+        [tenantId, pooja_id]
+      );
+      if (tenantRows.length > 0) {
+        return res.json({ success: true, data: tenantRows, source: 'tenant' });
+      }
+    }
+
     const [rows] = await pool.query(
       'SELECT * FROM samagri_items WHERE pooja_id = ? ORDER BY sort_order',
       [pooja_id]
     );
-    res.json({ success: true, data: rows });
+    res.json({ success: true, data: rows, source: 'global' });
   } catch (err) {
     console.error('getByPooja error:', err);
     res.status(500).json({ success: false, message: 'साहित्य मिळवता आली नाही.' });

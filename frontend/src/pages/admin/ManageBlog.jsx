@@ -18,9 +18,12 @@ import s from './ManageBlog.module.css';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
 
 const CATEGORIES = [
-  'पूजा मार्गदर्शन', 'सण-उत्सव', 'मुहूर्त', 'पंचांग',
-  'ज्योतिष', 'वास्तू', 'मंत्र-स्तोत्र', 'ऑनलाइन पूजा',
-  'वैज्ञानिक दृष्टिकोन',
+  'पूजा मार्गदर्शन',
+  'सण-उत्सव',
+  'धर्म-अध्यात्म',
+  'संस्कार',
+  'ज्योतिष',
+  'तीर्थक्षेत्र',
 ];
 
 const EMPTY = {
@@ -261,6 +264,7 @@ export default function ManageBlog() {
   const [saving,       setSaving]       = useState(false);
   const [deleting,     setDeleting]     = useState(null);
   const [quickImgId,   setQuickImgId]   = useState(null); // inline img upload
+  const [filterCat,    setFilterCat]    = useState('');   // category filter for table
   const quickInputRef  = useRef(null);
 
   // Quick image upload directly from table row
@@ -603,8 +607,27 @@ export default function ManageBlog() {
             POSTS TABLE
         ══════════════════════════════════════════════════════ */}
         <div className={s.tableSection}>
+          {/* Category filter pills */}
+          <div className={s.catFilterRow}>
+            <button
+              className={`${s.catPill} ${filterCat === '' ? s.catPillActive : ''}`}
+              onClick={() => setFilterCat('')}
+            >सर्व</button>
+            {CATEGORIES.map(c => (
+              <button
+                key={c}
+                className={`${s.catPill} ${filterCat === c ? s.catPillActive : ''}`}
+                onClick={() => setFilterCat(filterCat === c ? '' : c)}
+              >{c}</button>
+            ))}
+          </div>
+
           <div className={s.tableMeta}>
-            <span className={s.tableCount}>एकूण {posts.length} लेख</span>
+            <span className={s.tableCount}>
+              {filterCat
+                ? `${posts.filter(p => p.category === filterCat).length} लेख — ${filterCat}`
+                : `एकूण ${posts.length} लेख`}
+            </span>
             <span className={s.tablePub}>
               ✅ {posts.filter(p => p.is_published).length} प्रकाशित &nbsp;
               📝 {posts.filter(p => !p.is_published).length} मसुदा
@@ -634,7 +657,7 @@ export default function ManageBlog() {
                   </tr>
                 </thead>
                 <tbody>
-                  {posts.map(post => {
+                  {(filterCat ? posts.filter(p => p.category === filterCat) : posts).map(post => {
                     const imgSrc = post.image_url
                       ? (post.image_url.startsWith('http') ? post.image_url : `${BASE_URL}${post.image_url}`)
                       : null;

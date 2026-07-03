@@ -90,9 +90,14 @@ export default function PujariRegister() {
     if (phone.length < 10) { toast.error('वैध १० अंकी फोन नंबर टाका.'); return; }
     setOtpLoading(true);
     try {
-      await authAPI.sendOtp(phone);
+      const res = await authAPI.sendOtp(phone);
       setOtpSent(true);
-      toast.success('OTP पाठवला! 📱');
+      const devOtp = res.data?.data?.dev_otp;
+      if (devOtp) {
+        toast.success(`देव OTP: ${devOtp} (चाचणीसाठी)`, { duration: 15000, icon: '📱' });
+      } else {
+        toast.success('OTP पाठवला! 📱');
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'OTP पाठवताना त्रुटी.');
     } finally { setOtpLoading(false); }
@@ -152,7 +157,7 @@ export default function PujariRegister() {
         if (val !== null && val !== '') fd.append(key, val);
       });
       await pujariAPI.register(fd);
-      toast.success('नोंदणी अर्ज पाठवला! आमची टीम तपासणी करेल, मंजुरीनंतर SMS येईल. 🙏');
+      toast.success('नोंदणी अर्ज पाठवला! आमची टीम तपासणी करेल, मंजूरीनंतर SMS येईल. 🙏');
       navigate('/');
     } catch (err) {
       toast.error(err.response?.data?.message || 'नोंदणी करताना त्रुटी झाली.');
@@ -192,12 +197,15 @@ export default function PujariRegister() {
 
             {/* RIGHT — pujari image */}
             <div className={styles.heroRight}>
-              <img
-                src="/pujari-hero.png"
-                alt="पुजारी सेवा"
-                className={styles.heroImg}
-                onError={e => { e.target.style.display = 'none'; }}
-              />
+              <picture>
+                <source srcSet="/pujari-hero.webp" type="image/webp" />
+                <img
+                  src="/pujari-hero.png"
+                  alt="पुजारी सेवा"
+                  className={styles.heroImg}
+                  onError={e => { e.target.style.display = 'none'; }}
+                />
+              </picture>
             </div>
 
           </div>
@@ -481,7 +489,7 @@ export default function PujariRegister() {
                   }
                 </button>
                 <p className={styles.submitNote}>
-                  🔒 आपली माहिती सुरक्षित आहे • मंजुरीनंतर SMS येईल
+                  🔒 आपली माहिती सुरक्षित आहे • मंजूरीनंतर SMS येईल
                 </p>
               </div>
             </form>
@@ -514,7 +522,7 @@ export default function PujariRegister() {
                   {[
                     'अर्ज सादर करा',
                     'आमची टीम तपासणी करेल',
-                    'मंजुरी मिळाल्यावर SMS येईल',
+                    'मंजूरी मिळाल्यावर SMS येईल',
                     'Dashboard वर login करा',
                     'बुकिंग मिळवणे सुरू करा!',
                   ].map((step, i) => (

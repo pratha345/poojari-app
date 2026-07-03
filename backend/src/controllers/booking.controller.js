@@ -3,6 +3,7 @@ const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 const { success, error } = require('../utils/response.util');
 const { notifyAdminNewBooking } = require('../services/notificationService');
+const { delCache, delCachePattern } = require('../utils/redis');
 
 // Generate short booking code
 const genCode = () => 'POJ' + Date.now().toString(36).toUpperCase().slice(-6);
@@ -148,8 +149,8 @@ exports.submitReview = async (req, res) => {
       return error(res, 'पूर्ण झालेली बुकिंग सापडली नाही.', 404);
 
     await pool.query(
-      `INSERT INTO reviews (booking_id, user_id, pujari_id, pooja_id, rating, comment)
-       VALUES (?,?,?,?,?,?)`,
+      `INSERT INTO reviews (booking_id, user_id, pujari_id, pooja_id, rating, comment, is_approved)
+       VALUES (?,?,?,?,?,?,TRUE)`,
       [booking_id, user_id, booking[0].pujari_id, booking[0].pooja_id, rating, comment]
     );
 
@@ -161,6 +162,12 @@ exports.submitReview = async (req, res) => {
        WHERE id = ?`,
       [booking[0].pujari_id, booking[0].pujari_id, booking[0].pujari_id]
     );
+
+    // Invalidate pujari review caches so fresh data shows immediately
+    await Promise.all([
+      delCache(`pujari:reviews:${booking[0].pujari_id}`),
+      delCachePattern('pujari:top-reviews:*'),
+    ]);
 
     return success(res, {}, 'अभिप्राय पाठवला. धन्यवाद! 🙏', 201);
   } catch (err) {

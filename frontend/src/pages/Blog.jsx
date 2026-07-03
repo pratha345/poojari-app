@@ -17,22 +17,14 @@ function toBlogImgUrl(url) {
   return `${API_BASE}${url}`;                   // prepend backend base
 }
 
-// Category → accent color map
+// Category → accent color map (6 fixed categories)
 const CAT_COLOR = {
-  'पूजा मार्गदर्शन':  '#E07B2A',
-  'सण-उत्सव':         '#C62828',
-  'ज्योतिष':          '#7B1FA2',
-  'संस्कार':          '#4527A0',
-  'वास्तू':           '#1565C0',
-  'ऑनलाइन पूजा':     '#00838F',
-  'पंचांग':           '#F57F17',
-  'व्रत':             '#AD1457',
-  'धर्म-अध्यात्म':   '#5D4037',
-  'तीर्थक्षेत्र':    '#1B5E20',
-  'मुहूर्त':          '#BF360C',
-  'विवाह मार्गदर्शन': '#006064',
-  'मंत्र':            '#37474F',
-  'राशीफल':           '#283593',
+  'पूजा मार्गदर्शन': '#E07B2A',
+  'सण-उत्सव':        '#C62828',
+  'धर्म-अध्यात्म':  '#5D4037',
+  'संस्कार':         '#4527A0',
+  'ज्योतिष':         '#7B1FA2',
+  'तीर्थक्षेत्र':   '#1B5E20',
 };
 
 function BlogCard({ post }) {
@@ -74,11 +66,14 @@ function BlogCard({ post }) {
         {/* ── Top row: logo + category ── */}
         <div className={styles.cardHeroTop}>
           <div className={styles.cardLogo}>
-            <img
-              src="/logo.png"
-              alt="Poojaris"
-              className={styles.cardLogoImg}
-            />
+            <picture>
+              <source srcSet="/logo.webp" type="image/webp" />
+              <img
+                src="/logo.png"
+                alt="Poojaris"
+                className={styles.cardLogoImg}
+              />
+            </picture>
           </div>
           <span className={styles.cardCat} style={{ background: accent }}>
             {post.category}

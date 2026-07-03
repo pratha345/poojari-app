@@ -200,6 +200,38 @@
 
 /* ── Table Section ────────────────────────────────────────────── */
 .tableSection { }
+
+/* Category filter pills */
+.catFilterRow {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       8px;
+  margin-bottom: 14px;
+}
+.catPill {
+  padding:       5px 14px;
+  border-radius: 20px;
+  border:        1.5px solid var(--border);
+  background:    #fff;
+  color:         var(--text-muted);
+  font-size:     13px;
+  font-weight:   500;
+  cursor:        pointer;
+  transition:    all 0.15s;
+  white-space:   nowrap;
+}
+.catPill:hover {
+  border-color: var(--primary);
+  color:        var(--primary);
+  background:   rgba(200,100,20,0.06);
+}
+.catPillActive {
+  background:   var(--primary) !important;
+  border-color: var(--primary) !important;
+  color:        #fff !important;
+  font-weight:  600;
+}
+
 .tableMeta {
   display:         flex;
   align-items:     center;

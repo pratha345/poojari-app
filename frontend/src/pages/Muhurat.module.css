@@ -1,5 +1,5 @@
 /* Muhurat.module.css — reference-matched design */
-.page { background: #f0ece6; min-height: 100vh; padding-bottom: 80px; }
+.page { background: var(--cream-dark); min-height: 100vh; padding-bottom: 80px; }
 
 /* ══ HERO (dark space) ══════════════════════════════════════════════ */
 .hero {
@@ -31,7 +31,7 @@
 .heroInner  { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; position: relative; z-index: 2; }
 .heroLeft   { display: flex; align-items: center; gap: 14px; }
 .heroIcon   { font-size: 2rem; }
-.heroTitle  { font-family: 'Noto Serif Devanagari', serif; font-size: clamp(1.2rem, 3vw, 1.7rem); font-weight: 800; color: #ffffff; margin: 0 0 3px; }
+.heroTitle  { font-family: 'Noto Serif Devanagari', serif; font-size: clamp(1.2rem, 3vw, 1.7rem); font-weight: 800; color: var(--white); margin: 0 0 3px; }
 .heroSub    { font-family: 'Noto Serif Devanagari', serif; font-size: 0.8rem; color: rgba(255,255,255,0.6); margin: 0; }
 
 /* ── Controls bar (white pill inside hero) ── */
@@ -39,7 +39,7 @@
   display: flex;
   align-items: center;
   gap: 0;
-  background: #fff;
+  background: var(--white);
   border-radius: 10px;
   margin: 0 0 20px;
   overflow: hidden;
@@ -50,28 +50,28 @@
 .controlItem {
   display: flex; align-items: center; gap: 8px;
   flex: 1; padding: 12px 16px;
-  border-right: 1px solid #e8e0d8;
+  border-right: 1px solid var(--border);
   position: relative;
 }
 .controlItem:last-of-type { border-right: none; }
-.controlIcon { font-size: 1rem; color: #888; flex-shrink: 0; }
+.controlIcon { font-size: 1rem; color: var(--text-muted); flex-shrink: 0; }
 .controlInput {
   flex: 1; border: none; outline: none; background: transparent;
-  font-size: 0.88rem; color: #1a0800;
+  font-size: 0.88rem; color: var(--text);
   font-family: 'Noto Serif Devanagari', serif;
 }
 .controlInput[type="date"] { font-family: inherit; }
-.controlInput::placeholder { color: #bbb; }
+.controlInput::placeholder { color: var(--border); }
 
 .dropList {
   position: absolute; top: calc(100% + 2px); left: 0; right: 0;
-  background: #fff; border-radius: 10px;
+  background: var(--white); border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   list-style: none; padding: 4px 0; margin: 0;
   z-index: 200; max-height: 220px; overflow-y: auto;
 }
-.dropItem { padding: 9px 16px; font-family: 'Noto Serif Devanagari', serif; font-size: 0.88rem; color: #1a0800; cursor: pointer; }
-.dropItem:hover, .dropItemActive { background: #fff3e0; }
+.dropItem { padding: 9px 16px; font-family: 'Noto Serif Devanagari', serif; font-size: 0.88rem; color: var(--text); cursor: pointer; }
+.dropItem:hover, .dropItemActive { background: var(--cream); }
 
 .timeToggle {
   display: flex; align-items: center;
@@ -83,16 +83,16 @@
   font-family: 'Noto Serif Devanagari', serif;
   background: transparent; color: rgba(255,255,255,0.6);
 }
-.timeBtnActive { background: #c04a00; color: #fff; }
+.timeBtnActive { background: var(--primary); color: var(--white); }
 
 .gpsBtn {
   display: flex; align-items: center; gap: 6px;
   padding: 12px 16px; border: none; cursor: pointer;
-  background: transparent; color: #888; font-size: 0.82rem;
-  transition: all 0.2s; border-left: 1px solid #e8e0d8;
+  background: transparent; color: var(--text-muted); font-size: 0.82rem;
+  transition: all 0.2s; border-left: 1px solid var(--border);
   font-family: inherit; white-space: nowrap;
 }
-.gpsBtn:hover { background: #fff8f0; color: #c04a00; }
+.gpsBtn:hover { background: var(--cream); color: var(--primary); }
 .gpsBtn:disabled { opacity: 0.5; cursor: default; }
 
 /* ── Live clock ── */
@@ -141,7 +141,7 @@
 .statSunset .statLabel, .statNight .statLabel { color: rgba(255,255,255,0.55); }
 .statValue {
   font-family: 'Noto Serif Devanagari', serif;
-  font-size: 1.25rem; font-weight: 800; color: #1a0800;
+  font-size: 1.25rem; font-weight: 800; color: var(--text);
 }
 .statSunset .statValue  { color: #fb923c; }
 .statNight  .statValue  { color: #93c5fd; }
@@ -156,7 +156,7 @@
 }
 .activeBannerLeft  { display: flex; align-items: center; gap: 10px; }
 .activeDot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; animation: pulseDot 1.2s ease-in-out infinite; }
-.activeLabel { font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; font-weight: 600; color: #5a3a2a; }
+.activeLabel { font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); }
 .activeIcon  { font-size: 1.2rem; }
 .activeName  { font-family: 'Noto Serif Devanagari', serif; font-size: 1.05rem; font-weight: 800; }
 .activeBannerRight { display: flex; align-items: center; gap: 10px; }
@@ -166,12 +166,12 @@
 /* ══ TABS ══════════════════════════════════════════════════════════ */
 .tabs { display: flex; gap: 8px; margin: 20px 0 20px; padding-top: 4px; }
 .tab  {
-  padding: 9px 22px; border-radius: 22px; border: 1.5px solid #d6c4b0;
-  background: #fff; font-family: 'Noto Serif Devanagari', serif;
-  font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #7a3000; transition: all 0.2s;
+  padding: 9px 22px; border-radius: 22px; border: 1.5px solid var(--border);
+  background: var(--white); font-family: 'Noto Serif Devanagari', serif;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: all 0.2s;
 }
-.tab:hover   { border-color: #c04a00; }
-.tabActive   { background: #1a0845 !important; color: #fff !important; border-color: #1a0845 !important; }
+.tab:hover   { border-color: var(--primary); }
+.tabActive   { background: var(--secondary) !important; color: var(--white) !important; border-color: var(--secondary) !important; }
 
 /* ══ CHOGHADIYA — 2 column sections ════════════════════════════════ */
 .chogWrap { }
@@ -184,7 +184,7 @@
 @media (max-width: 768px) { .chogColumns { grid-template-columns: 1fr; } }
 
 .chogCol {
-  background: #fff;
+  background: var(--white);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 16px rgba(0,0,0,0.07);
@@ -193,11 +193,11 @@
 .chogColHead {
   display: flex; align-items: center; gap: 10px;
   padding: 14px 16px;
-  border-bottom: 1px solid #f0e8df;
+  border-bottom: 1px solid var(--border);
 }
 .chogColIcon  { font-size: 1.4rem; }
-.chogColTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 1rem; font-weight: 800; color: #1a0800; margin: 0 0 2px; }
-.chogColSub   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.68rem; color: #9a7a6a; margin: 0; }
+.chogColTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 1rem; font-weight: 800; color: var(--text); margin: 0 0 2px; }
+.chogColSub   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.68rem; color: var(--text-muted); margin: 0; }
 
 /* Cards: 2×4 grid within each column */
 .chogGrid {
@@ -291,10 +291,10 @@
 .occasionsWrap { }
 .occasionsSub  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.88rem; color: #7a3000; margin: 0 0 14px; }
 .occasionsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
-.occasionCard  { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1.5px solid #f0e8df; }
+.occasionCard  { background: var(--white); border-radius: 14px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1.5px solid var(--border); }
 .occasionHeader{ display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .occasionIcon  { font-size: 1.5rem; }
-.occasionTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 0.95rem; font-weight: 800; color: #1a0800; margin: 0; }
+.occasionTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0; }
 .occasionSlots { display: flex; flex-direction: column; gap: 6px; }
 .noSlot        { font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; color: #bbb; }
 .slot          { display: flex; justify-content: space-between; align-items: center; border: 1.5px solid; border-radius: 8px; padding: 6px 10px; font-family: 'Noto Serif Devanagari', serif; font-size: 0.78rem; font-weight: 600; }
@@ -302,17 +302,17 @@
 
 /* ══ LOADER ═══════════════════════════════════════════════════════ */
 .loader  { display: flex; justify-content: center; padding: 48px 0; }
-.spinner { width: 36px; height: 36px; border: 4px solid #e0d4c8; border-top-color: #c04a00; border-radius: 50%; animation: spin 0.8s linear infinite; }
+.spinner { width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ══ CTA ══════════════════════════════════════════════════════════ */
 .cta      { margin-top: 32px; }
-.ctaInner { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: linear-gradient(135deg, #7a1e00, #c04a00); border-radius: 18px; padding: 22px 28px; }
+.ctaInner { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: linear-gradient(135deg, var(--secondary), var(--primary)); border-radius: 18px; padding: 22px 28px; }
 .ctaIcon  { font-size: 2rem; }
-.ctaTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0 0 4px; }
+.ctaTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 1.05rem; font-weight: 800; color: var(--white); margin: 0 0 4px; }
 .ctaSub   { font-family: 'Noto Serif Devanagari', serif; font-size: 0.8rem; color: rgba(255,255,255,0.75); margin: 0; }
-.ctaBtn   { display: inline-block; margin-left: auto; padding: 11px 22px; background: #fff; color: #7a1e00; border-radius: 12px; font-family: 'Noto Serif Devanagari', serif; font-weight: 800; font-size: 0.88rem; text-decoration: none; white-space: nowrap; transition: all 0.2s; }
-.ctaBtn:hover { background: #fff8f0; transform: translateY(-1px); }
+.ctaBtn   { display: inline-block; margin-left: auto; padding: 11px 22px; background: var(--white); color: var(--secondary); border-radius: 12px; font-family: 'Noto Serif Devanagari', serif; font-weight: 800; font-size: 0.88rem; text-decoration: none; white-space: nowrap; transition: all 0.2s; }
+.ctaBtn:hover { background: var(--cream); transform: translateY(-1px); }
 
 /* panchangLink in hero */
 .panchangLinkHero {

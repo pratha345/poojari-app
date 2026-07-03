@@ -67,6 +67,8 @@ export default function AdminReport() {
   const [loading, setLoading] = useState(true);
   const [year,    setYear]    = useState(new Date().getFullYear().toString());
   const [month,   setMonth]   = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate,   setToDate]   = useState('');
 
   const load = () => {
     setLoading(true);
@@ -128,6 +130,12 @@ export default function AdminReport() {
             <p className={s.subtitle}>बुकिंग, उत्पन्न आणि पुजारी कामगिरीचा संपूर्ण तपशील</p>
           </div>
           <div className={s.filters}>
+            <input type="date" className={s.sel} value={fromDate}
+              onChange={e => setFromDate(e.target.value)}
+              title="तारखेपासून" style={{ padding: '6px 8px' }} />
+            <input type="date" className={s.sel} value={toDate}
+              onChange={e => setToDate(e.target.value)}
+              title="तारखेपर्यंत" style={{ padding: '6px 8px' }} />
             <select className={s.sel} value={year}
               onChange={e => { setYear(e.target.value); setMonth(''); }}>
               <option value="">सर्व वर्षे</option>
@@ -145,6 +153,7 @@ export default function AdminReport() {
             {(month || year !== new Date().getFullYear().toString()) && (
               <button className={s.resetBtn} onClick={() => {
                 setYear(new Date().getFullYear().toString()); setMonth('');
+                setFromDate(''); setToDate('');
               }}>✕ Reset</button>
             )}
           </div>

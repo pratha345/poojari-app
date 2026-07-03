@@ -15,7 +15,7 @@ export default function AdminLogin() {
 
   // Already logged in → redirect to appropriate page
   if (isAdmin || isSuperAdmin) {
-    navigate('/admin/dashboard', { replace: true });
+    navigate('/admin/report', { replace: true });
     return null;
   }
   if (isAbhyasak) {
@@ -44,7 +44,7 @@ export default function AdminLogin() {
       if (user.role === 'abhyasak') {
         navigate('/admin/blog', { replace: true });
       } else {
-        navigate('/admin/dashboard', { replace: true });
+        navigate('/admin/report', { replace: true });
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'लॉगिन करताना त्रुटी झाली.');

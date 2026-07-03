@@ -367,10 +367,10 @@
 
 .answerText {
   padding: 20px 24px;
-  font-size: 15px;
-  line-height: 1.8;
+  font-size: 17px;
+  line-height: 2;
   color: #1f2937;
-  font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', 'Mangal', serif;
 }
 
 .answerText p { margin: 0 0 10px; }
@@ -379,8 +379,8 @@
 .answerSection {
   font-weight: 700;
   color: #5b21b6;
-  font-size: 14px;
-  margin: 16px 0 6px !important;
+  font-size: 15px;
+  margin: 18px 0 8px !important;
   padding-bottom: 4px;
   border-bottom: 1px solid #ede9fe;
 }
@@ -439,14 +439,13 @@
 }
 
 .sourceText {
-  padding: 0 14px 12px;
-  font-size: 13px;
-  line-height: 1.7;
+  padding: 10px 14px 14px;
+  font-size: 15px;
+  line-height: 1.9;
   color: #374151;
   margin: 0;
-  font-family: 'Noto Sans Devanagari', 'Mangal', sans-serif;
+  font-family: 'Noto Serif Devanagari', 'Noto Sans Devanagari', 'Mangal', serif;
   border-top: 1px solid #ede9fe;
-  padding-top: 10px;
 }
 
 /* ── Empty State ─────────────────────────────────────────────────────────── */
@@ -513,13 +512,77 @@
   to   { transform: rotate(360deg); }
 }
 
+/* ── Source card body + full page ───────────────────────────────────────── */
+.sourceBody {
+  padding: 0 14px 14px;
+}
+
+.loadFullBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 14px;
+  background: #f3f0ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.loadFullBtn:hover:not(:disabled) { background: #ede9fe; }
+.loadFullBtn:disabled { opacity: 0.6; cursor: default; }
+
+.fullPageSection {
+  margin-top: 14px;
+  border-top: 2px dashed #ddd6fe;
+  padding-top: 12px;
+}
+.fullPageDivider {
+  text-align: center;
+  font-size: 12px;
+  color: #7c3aed;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.fullPageText {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Noto Sans Devanagari', 'Mangal', monospace;
+  font-size: 14px;
+  line-height: 2;
+  color: #1e1b4b;
+  background: #faf5ff;
+  border-radius: 8px;
+  padding: 14px 16px;
+  max-height: 500px;
+  overflow-y: auto;
+  border: 1px solid #e9d5ff;
+}
+
+/* ── Wikipedia link ──────────────────────────────────────────────────────── */
+.wikiLink {
+  font-size: 12px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #eff6ff;
+}
+.wikiLink:hover { background: #dbeafe; }
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .page      { padding: 0 0 40px; }
   .header    { padding: 20px 20px; gap: 12px; margin-bottom: 16px; }
   .title     { font-size: 20px; }
   .subtitle  { font-size: 13px; }
-  .answerText { padding: 14px 16px; font-size: 15px; }
+  .answerText { padding: 14px 16px; font-size: 16px; }
   .statusRight { flex: 0 0 120px; }
 }
 @media (max-width: 640px) {
@@ -530,5 +593,5 @@
   .samples { display: none; }
   .statusBar { flex-direction: column; gap: 8px; }
   .statusRight { flex: 0 0 auto; width: 100%; }
-  .answerText { padding: 12px 14px; font-size: 15px; }
+  .answerText { padding: 12px 14px; font-size: 15px; line-height: 1.9; }
 }

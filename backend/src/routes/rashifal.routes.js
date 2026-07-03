@@ -33,4 +33,31 @@ router.get('/weekly/:rashiId', async (req, res) => {
   }
 });
 
+// Also accept /:rashiId/tomorrow and /:rashiId/weekly (test format)
+router.get('/:rashiId/tomorrow', async (req, res) => {
+  try {
+    const rashiId = parseInt(req.params.rashiId);
+    if (isNaN(rashiId) || rashiId < 0 || rashiId > 11)
+      return res.status(400).json({ success: false, message: 'अवैध राशी ID.' });
+    const data = await getTomorrowPrediction(rashiId);
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('rashifal/:rashiId/tomorrow error:', err.message);
+    res.status(500).json({ success: false, message: 'भविष्य मिळवता आले नाही.' });
+  }
+});
+
+router.get('/:rashiId/weekly', async (req, res) => {
+  try {
+    const rashiId = parseInt(req.params.rashiId);
+    if (isNaN(rashiId) || rashiId < 0 || rashiId > 11)
+      return res.status(400).json({ success: false, message: 'अवैध राशी ID.' });
+    const data = await getWeeklyPrediction(rashiId);
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('rashifal/:rashiId/weekly error:', err.message);
+    res.status(500).json({ success: false, message: 'साप्ताहिक भविष्य मिळवता आले नाही.' });
+  }
+});
+
 module.exports = router;

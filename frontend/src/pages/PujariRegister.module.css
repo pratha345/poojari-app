@@ -1,22 +1,22 @@
 /* PujariRegister.module.css — Full redesign */
 
 /* ── Page ────────────────────────────────────────────────────── */
-.main { background: #fdf6ec; padding: 0 0 64px; min-height: 100vh; }
+.main { background: var(--cream); padding: 0 0 64px; min-height: 100vh; }
 
 /* ── OTP Verification ─────────────────────────────────────────── */
 .otpSendBtn {
   width: 100%;
   padding: 12px 20px;
-  background: #fff3e0;
-  border: 2px solid #e07b2a;
+  background: var(--cream);
+  border: 2px solid var(--primary);
   border-radius: 10px;
-  color: #b85e15;
+  color: var(--primary-dark);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
-.otpSendBtn:hover:not(:disabled) { background: #e07b2a; color: #fff; }
+.otpSendBtn:hover:not(:disabled) { background: var(--primary); color: var(--white); }
 .otpSendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .otpInputRow {
@@ -69,7 +69,7 @@
   font-weight: 600;
   margin-bottom: 10px;
   padding: 10px;
-  background: #fff3e0;
+  background: var(--cream);
   border-radius: 8px;
 }
 
@@ -81,7 +81,7 @@
 
 /* ── Hero Banner ─────────────────────────────────────────────── */
 .hero {
-  background: linear-gradient(135deg, #5c1200 0%, #9b3400 40%, #c04a00 72%, #e07b2a 100%);
+  background: linear-gradient(135deg, var(--secondary) 0%, var(--primary-dark) 40%, var(--primary) 72%, var(--primary) 100%);
   position: relative;
   overflow: hidden;
   min-height: 160px;
@@ -229,7 +229,7 @@
 
 .section {
   background: #fff;
-  border: 1.5px solid #f0e4d4;
+  border: 1.5px solid var(--border);
   border-radius: 16px;
   padding: 28px 28px 24px;
   box-shadow: 0 2px 16px rgba(122,30,0,0.06);
@@ -240,31 +240,31 @@
   content: '';
   position: absolute; top: 0; left: 0;
   width: 4px; height: 100%;
-  background: linear-gradient(to bottom, #e07b2a, #c04a00);
+  background: linear-gradient(to bottom, var(--primary), var(--primary));
   border-radius: 4px 0 0 4px;
 }
 
 .sectionTitle {
   font-family: var(--font-display);
   font-size: 1.05rem; font-weight: 700;
-  color: #7a1e00;
+  color: var(--secondary);
   margin-bottom: 22px;
   padding-bottom: 12px;
-  border-bottom: 1.5px solid #f5e8d8;
+  border-bottom: 1.5px solid var(--border);
   display: flex; align-items: center; gap: 8px;
 }
 
 /* ── Photo Upload ────────────────────────────────────────────── */
 .photoSection {
   display: flex; align-items: center; gap: 24px; margin-bottom: 24px;
-  padding: 16px; background: #fdf8f3; border-radius: 12px;
-  border: 1.5px dashed #e0bda0;
+  padding: 16px; background: var(--cream); border-radius: 12px;
+  border: 1.5px dashed var(--border);
 }
 .photoWrap { position: relative; flex-shrink: 0; cursor: pointer; }
 .photoPreview {
   width: 100px; height: 100px; border-radius: 50%;
   background: linear-gradient(135deg, #fdf0e0, #f5d9b8);
-  border: 3px solid #e07b2a;
+  border: 3px solid var(--primary);
   display: flex; align-items: center; justify-content: center;
   font-size: 40px; overflow: hidden;
   box-shadow: 0 4px 16px rgba(192,74,0,0.2);
@@ -275,22 +275,22 @@
 .photoOverlay {
   position: absolute; bottom: 2px; right: 2px;
   width: 28px; height: 28px; border-radius: 50%;
-  background: #e07b2a; border: 2px solid #fff;
+  background: var(--primary); border: 2px solid #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; cursor: pointer;
 }
 .photoInfo { flex: 1; }
-.photoInfo strong { display: block; font-size: 14px; color: #3a1800; margin-bottom: 4px; }
-.photoInfo p { font-size: 12px; color: #9a7060; line-height: 1.5; margin: 0; }
+.photoInfo strong { display: block; font-size: 14px; color: var(--brown); margin-bottom: 4px; }
+.photoInfo p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0; }
 .photoBtn {
   display: inline-flex; align-items: center; gap: 6px;
   margin-top: 10px; padding: 8px 16px;
-  background: #fff; border: 1.5px solid #e07b2a;
-  border-radius: 8px; color: #c04a00; font-size: 13px;
+  background: #fff; border: 1.5px solid var(--primary);
+  border-radius: 8px; color: var(--primary); font-size: 13px;
   font-weight: 600; cursor: pointer; font-family: var(--font-body);
   transition: all 0.18s;
 }
-.photoBtn:hover { background: #c04a00; color: #fff; }
+.photoBtn:hover { background: var(--primary); color: #fff; }
 
 /* ── Grid ────────────────────────────────────────────────────── */
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -300,27 +300,27 @@
 .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
 .field:last-child { margin-bottom: 0; }
 .label {
-  font-size: 13px; font-weight: 700; color: #5a2800;
+  font-size: 13px; font-weight: 700; color: var(--brown);
   display: flex; align-items: center; gap: 4px;
 }
-.req { color: #c04a00; }
+.req { color: var(--primary); }
 
 .input, .select, .textarea {
   width: 100%; padding: 10px 14px;
-  border: 1.5px solid #e8d4c4;
+  border: 1.5px solid var(--border);
   border-radius: 9px;
-  font-size: 14px; color: #1a0800;
-  background: #fdfaf8;
+  font-size: 14px; color: var(--text);
+  background: var(--cream);
   font-family: var(--font-body);
   outline: none; box-sizing: border-box;
   transition: border-color 0.18s, box-shadow 0.18s;
 }
 .input:focus, .select:focus, .textarea:focus {
-  border-color: #c04a00;
+  border-color: var(--primary);
   background: #fff;
   box-shadow: 0 0 0 3px rgba(192,74,0,0.10);
 }
-.input::placeholder, .textarea::placeholder { color: #c0a090; }
+.input::placeholder, .textarea::placeholder { color: var(--text-muted); }
 .textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
 .select { appearance: none; cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c04a00' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
@@ -333,19 +333,19 @@
 .phoneCode { width: 150px; flex-shrink: 0; }
 
 /* ── Chips ───────────────────────────────────────────────────── */
-.hint { font-size: 13px; color: #9a7060; margin-bottom: 12px; }
+.hint { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
 .chipGrid { display: flex; flex-wrap: wrap; gap: 9px; }
 .chip {
-  padding: 7px 16px; border: 1.5px solid #e8d4c4;
+  padding: 7px 16px; border: 1.5px solid var(--border);
   border-radius: 30px; font-size: 13px;
   font-family: var(--font-body);
-  background: #fdfaf8; color: #7a4020;
+  background: var(--cream); color: var(--text-muted);
   cursor: pointer; transition: all 0.16s;
   display: flex; align-items: center; gap: 5px;
 }
-.chip:hover { border-color: #c04a00; color: #c04a00; background: #fff8f4; }
+.chip:hover { border-color: var(--primary); color: var(--primary); background: var(--cream); }
 .chipActive {
-  background: linear-gradient(135deg, #7a1e00, #c04a00) !important;
+  background: linear-gradient(135deg, var(--secondary), var(--primary)) !important;
   border-color: transparent !important;
   color: #fff !important;
   font-weight: 600;
@@ -357,7 +357,7 @@
 .submitWrap { margin-top: 4px; }
 .submitBtn {
   width: 100%; padding: 15px 24px;
-  background: linear-gradient(135deg, #7a1e00, #c04a00, #e07b2a);
+  background: linear-gradient(135deg, var(--secondary), var(--primary), var(--primary));
   background-size: 200% 100%;
   border: none; border-radius: 12px;
   color: #fff; font-size: 16px; font-weight: 700;
@@ -374,7 +374,7 @@
 }
 .submitBtn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 .submitNote {
-  text-align: center; font-size: 12px; color: #9a7060;
+  text-align: center; font-size: 12px; color: var(--text-muted);
   margin-top: 10px;
 }
 
@@ -382,15 +382,15 @@
 .sidebar { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 90px; }
 
 .benefitCard {
-  background: #fff; border: 1.5px solid #f0e4d4;
+  background: #fff; border: 1.5px solid var(--border);
   border-radius: 16px; padding: 24px;
   box-shadow: 0 2px 16px rgba(122,30,0,0.06);
 }
 .benefitCard h3 {
   font-family: var(--font-display); font-size: 1rem;
-  color: #7a1e00; margin-bottom: 18px;
+  color: var(--secondary); margin-bottom: 18px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #e07b2a;
+  border-bottom: 2px solid var(--primary);
   display: flex; align-items: center; gap: 8px;
 }
 .benefit {
@@ -403,11 +403,11 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 18px; flex-shrink: 0;
 }
-.benefit strong { display: block; font-size: 13px; color: #3a1800; margin-bottom: 2px; }
-.benefit p { font-size: 12px; color: #9a7060; margin: 0; line-height: 1.4; }
+.benefit strong { display: block; font-size: 13px; color: var(--brown); margin-bottom: 2px; }
+.benefit p { font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4; }
 
 .processCard {
-  background: linear-gradient(135deg, #7a1e00, #c04a00);
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
   border-radius: 16px; padding: 24px;
   box-shadow: 0 4px 20px rgba(122,30,0,0.25);
 }

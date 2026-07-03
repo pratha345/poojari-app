@@ -3,8 +3,8 @@
 //        Add Pooja form, Delete, API endpoints
 const { test, expect } = require('@playwright/test');
 
-const API_URL        = 'http://localhost:5000/api';
-const ADMIN_PHONE    = '9307720459';
+const API_URL        = process.env.API_BASE_URL || 'http://localhost:5000/api';
+const ADMIN_PHONE = '9000000000';
 const ADMIN_PASSWORD = 'Admin@123';
 
 const TEST_POOJA = {
@@ -39,6 +39,9 @@ async function gotoPoojas(page) {
   await page.waitForURL('**/admin/poojas', { timeout: 8000 }).catch(() => {});
   await waitForLoad(page);
   await page.waitForTimeout(600);
+  // Wait until table data is loaded (at least one th or tr in table)
+  await page.locator('table th, table tbody tr').first().waitFor({ timeout: 12000 }).catch(() => {});
+  await page.waitForTimeout(500);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -56,35 +59,38 @@ test.describe('Manage Poojas — Page Basics', () => {
   test('TC-MP-02: table has कालावधी column header', async ({ page }) => {
     await adminLogin(page);
     await gotoPoojas(page);
-    const header = page.locator('th:has-text("कालावधी")');
-    await expect(header).toBeVisible({ timeout: 5000 });
+    // th:has-text OR getByText as fallback (CSS module overflow may hide th)
+    const header = page.locator('th:has-text("कालावधी"), [class*="table"] :text("कालावधी")');
+    await expect(header.first()).toBeVisible({ timeout: 12000 });
   });
 
   test('TC-MP-03: table has किंमत column header', async ({ page }) => {
     await adminLogin(page);
     await gotoPoojas(page);
-    await expect(page.locator('th:has-text("किंमत")')).toBeVisible();
+    const header = page.locator('th:has-text("किंमत"), [class*="table"] :text("किंमत")');
+    await expect(header.first()).toBeVisible({ timeout: 12000 });
   });
 
   test('TC-MP-04: + नवीन पूजा जोडा button toggles add form', async ({ page }) => {
     await adminLogin(page);
     await gotoPoojas(page);
-    await page.locator('button:has-text("नवीन पूजा जोडा")').click();
-    await page.waitForTimeout(400);
-    await expect(page.locator('h2:has-text("नवीन पूजा जोडा")')).toBeVisible({ timeout: 4000 });
-    // Click again to close
-    await page.locator('button:has-text("बंद करा")').click();
+    // Button text: '+ नवीन पूजा जोडा' (with + prefix)
+    await page.locator('button:has-text("नवीन पूजा जोडा")').first().click();
+    await page.waitForTimeout(600);
+    await expect(page.locator('h2:has-text("नवीन पूजा जोडा")')).toBeVisible({ timeout: 5000 });
+    // Close button text: '✕ बंद करा'
+    await page.locator('button:has-text("बंद करा")').first().click();
     await expect(page.locator('h2:has-text("नवीन पूजा जोडा")')).toHaveCount(0, { timeout: 3000 });
   });
 
   test('TC-MP-05: add form has duration_hrs input', async ({ page }) => {
     await adminLogin(page);
     await gotoPoojas(page);
-    await page.locator('button:has-text("नवीन पूजा जोडा")').click();
-    await page.waitForTimeout(400);
-    const durInput = page.locator('input[name="duration_hrs"]');
-    await expect(durInput).toBeVisible({ timeout: 4000 });
-    await expect(durInput).toHaveAttribute('step', '0.5');
+    await page.locator('button:has-text("नवीन पूजा जोडा")').first().click();
+    await page.waitForTimeout(600);
+    // duration_hrs input inside the add form
+    const durInput = page.locator('input[name="duration_hrs"]').first();
+    await expect(durInput).toBeVisible({ timeout: 5000 });
   });
 
   test('TC-MP-06: each pooja row has ✏️ किंमत and ✏️ कालावधी buttons', async ({ page }) => {

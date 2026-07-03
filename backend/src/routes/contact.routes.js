@@ -2,8 +2,9 @@
 const router = require('express').Router();
 const pool   = require('../config/db');
 const { success, error } = require('../utils/response.util');
+const { contactLimiter } = require('../middleware/security.middleware');
 
-router.post('/', async (req, res) => {
+router.post('/', contactLimiter, async (req, res) => {
   try {
     const { name, email, phone, subject, message } = req.body;
     if (!name || !message) return error(res, 'नाव आणि संदेश आवश्यक आहे.', 400);

@@ -1,5 +1,5 @@
 // src/pages/admin/AdminLayout.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import s from './AdminLayout.module.css';
@@ -13,52 +13,94 @@ import {
   FaUsers, FaChartPie,
   FaRightFromBracket, FaUser,
   FaShieldHalved, FaAngleLeft, FaAngleRight,
-  FaArrowUpRightFromSquare, FaOm, FaBars, FaXmark,
+  FaArrowUpRightFromSquare, FaOm, FaBars, FaXmark, FaBookOpen,
+  FaStar,
 } from 'react-icons/fa6';
 import { FaHandsPraying as FaLogo } from 'react-icons/fa6';
+import { tenantConfigAPI } from '../../api/index.js';
 
+// Nav with optional `feature` key — items with feature key are shown/hidden
+// based on tenant feature flags fetched from /api/tenant-config/features
 const NAV_ADMIN = [
   { section: 'आढावा' },
-  { to: '/admin/dashboard',     icon: FaGauge,        label: 'डॅशबोर्ड'        },
   { to: '/admin/report',        icon: FaChartColumn,  label: 'अहवाल'            },
 
   { section: 'पुजारी' },
-  { to: '/admin/pujaris',       icon: FaUserCheck,    label: 'पुजारी व्यवस्थापन' },
-  { to: '/admin/bookings',      icon: FaCalendarCheck,label: 'बुकिंग्ज'          },
+  { to: '/admin/pujaris',        icon: FaUserCheck,    label: 'पुजारी व्यवस्थापन', feature: 'pujariBookings' },
+  { to: '/admin/bookings',       icon: FaCalendarCheck,label: 'बुकिंग्ज',           feature: 'pujariBookings' },
+  { to: '/admin/consultations',  icon: FaStar,         label: '🔮 सल्लामसलत',      feature: 'consultations'  },
 
   { section: 'सेवा' },
-  { to: '/admin/poojas',        icon: FaHandsPraying, label: 'पूजा व्यवस्थापन'  },
-  { to: '/admin/halls',         icon: FaBuilding,     label: 'हॉल व्यवस्थापन'   },
-  { to: '/admin/samagri',       icon: FaBoxOpen,      label: 'साहित्य यादी'     },
+  { to: '/admin/poojas',   icon: FaHandsPraying, label: 'पूजा व्यवस्थापन', feature: 'poojaManagement' },
+  { to: '/admin/halls',    icon: FaBuilding,     label: 'हॉल व्यवस्थापन',  feature: 'halls'           },
+  { to: '/admin/samagri',  icon: FaBoxOpen,      label: 'साहित्य यादी',    feature: 'poojaManagement' },
+
+  { section: 'Franchise Config' },
+  { to: '/admin/tenant/puja-config',    icon: FaHandsPraying, label: '🏷️ पूजा किंमत',   feature: 'franchiseConfig' },
+  { to: '/admin/tenant/samagri-config', icon: FaBoxOpen,      label: '🛒 माझी साहित्य',  feature: 'franchiseConfig' },
+  { to: '/admin/tenant/pujaris',        icon: FaUsers,        label: '👨‍⚕️ माझे पुजारी',   feature: 'franchiseConfig' },
 
   { section: 'वेबसाइट' },
-  { to: '/admin/home',          icon: FaHouseChimney, label: 'मुखपृष्ठ'         },
-  { to: '/admin/theme',         icon: FaPalette,      label: 'थीम सेटिंग्ज'    },
-  { to: '/admin/kundali-milan', icon: FaInfinity,     label: 'कुंडली मिलान'    },
-  { to: '/admin/janam-patrika', icon: FaScroll,       label: 'जन्म पत्रिका'    },
-  { to: '/admin/blog',          icon: FaNewspaper,    label: 'ब्लॉग'             },
+  { to: '/admin/home',          icon: FaHouseChimney, label: 'मुखपृष्ठ',         feature: 'websiteHome' },
+  { to: '/admin/theme',         icon: FaPalette,      label: 'थीम सेटिंग्ज',    feature: 'theme'       },
+  { to: '/admin/kundali-milan', icon: FaInfinity,     label: 'कुंडली मिलान',    feature: 'kundali'     },
+  { to: '/admin/janam-patrika', icon: FaScroll,       label: 'जन्म पत्रिका',    feature: 'kundali'     },
+  { to: '/admin/blog',          icon: FaNewspaper,    label: 'ब्लॉग',            feature: 'blog'        },
 
   { section: 'धर्मग्रंथ' },
-  { to: '/admin/dharmasindhu',  icon: FaOm,            label: 'धर्मसिंधु शंका' },
+  { to: '/admin/dharmasindhu',   icon: FaOm,       label: 'धर्मसिंधु शंका', feature: 'dharmasindhu' },
+  { to: '/admin/granth-library', icon: FaBookOpen, label: 'ग्रंथ संग्रह',   feature: 'granth'       },
 
   { section: 'टीम' },
-  { to: '/admin/abhyasak',      icon: FaGraduationCap, label: 'अभ्यासक'         },
-  { to: '/admin/reviews',       icon: FaComments,      label: 'अभिप्राय'        },
-  { to: '/admin/tickets',       icon: FaTicket,        label: 'Support Tickets' },
+  { to: '/admin/abhyasak', icon: FaGraduationCap, label: 'अभ्यासक',         feature: 'teamSection' },
+  { to: '/admin/reviews',  icon: FaComments,      label: 'अभिप्राय',        feature: 'teamSection' },
+  { to: '/admin/tickets',  icon: FaTicket,        label: 'Support Tickets', feature: 'teamSection' },
 
-  { to: '/admin/upgrade-plan',  icon: FaCrown,         label: 'योजना सुधारणा', highlight: true },
+  { to: '/admin/upgrade-plan', icon: FaCrown, label: 'योजना सुधारणा', highlight: true },
 ];
 
 const NAV_ABHYASAK = [
   { to: '/admin/blog', icon: FaNewspaper, label: 'ब्लॉग लिहा' },
 ];
 
+// Super admin sees everything — includes tenant management + all franchise features
 const NAV_SUPER = [
-  { section: 'सुपर अॅडमिन' },
-  { to: '/admin/dashboard',    icon: FaGauge,     label: 'डॅशबोर्ड'        },
+  { section: 'Super Admin' },
+  { to: '/admin/report',       icon: FaChartColumn, label: 'अहवाल'          },
   { to: '/superadmin/tenants', icon: FaBuilding,  label: 'टेनंट्स'         },
   { to: '/superadmin/users',   icon: FaUsers,     label: 'सर्व वापरकर्ते'  },
   { to: '/superadmin/revenue', icon: FaChartPie,  label: 'महसूल'           },
+
+  { section: 'पुजारी' },
+  { to: '/admin/pujaris',        icon: FaUserCheck,    label: 'पुजारी व्यवस्थापन' },
+  { to: '/admin/bookings',       icon: FaCalendarCheck,label: 'बुकिंग्ज'          },
+  { to: '/admin/consultations',  icon: FaStar,         label: '🔮 सल्लामसलत'     },
+
+  { section: 'सेवा' },
+  { to: '/admin/poojas',              icon: FaHandsPraying, label: 'पूजा व्यवस्थापन'    },
+  { to: '/admin/halls',               icon: FaBuilding,     label: 'हॉल व्यवस्थापन'     },
+  { to: '/admin/samagri',             icon: FaBoxOpen,      label: 'साहित्य यादी'       },
+
+  { section: 'Franchise Config' },
+  { to: '/admin/tenant/puja-config',    icon: FaHandsPraying, label: '🏷️ पूजा किंमत'   },
+  { to: '/admin/tenant/samagri-config', icon: FaBoxOpen,      label: '🛒 माझी साहित्य' },
+  { to: '/admin/tenant/pujaris',        icon: FaUsers,        label: '👨‍⚕️ माझे पुजारी'  },
+
+  { section: 'वेबसाइट' },
+  { to: '/admin/home',          icon: FaHouseChimney, label: 'मुखपृष्ठ'      },
+  { to: '/admin/theme',         icon: FaPalette,      label: 'थीम सेटिंग्ज' },
+  { to: '/admin/kundali-milan', icon: FaInfinity,     label: 'कुंडली मिलान' },
+  { to: '/admin/janam-patrika', icon: FaScroll,       label: 'जन्म पत्रिका' },
+  { to: '/admin/blog',          icon: FaNewspaper,    label: 'ब्लॉग'         },
+
+  { section: 'धर्मग्रंथ' },
+  { to: '/admin/dharmasindhu',   icon: FaOm,       label: 'धर्मसिंधु शंका' },
+  { to: '/admin/granth-library', icon: FaBookOpen, label: 'ग्रंथ संग्रह'   },
+
+  { section: 'टीम' },
+  { to: '/admin/abhyasak',      icon: FaGraduationCap, label: 'अभ्यासक'         },
+  { to: '/admin/reviews',       icon: FaComments,      label: 'अभिप्राय'        },
+  { to: '/admin/tickets',       icon: FaTicket,        label: 'Support Tickets' },
 ];
 
 export default function AdminLayout({ children }) {
@@ -66,10 +108,37 @@ export default function AdminLayout({ children }) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [features, setFeatures] = useState(null); // null = loading
 
-  const nav = isSuperAdmin ? NAV_SUPER : isAbhyasak ? NAV_ABHYASAK : NAV_ADMIN;
-  const roleLabel = isSuperAdmin ? 'सुपर अॅडमिन' : isAbhyasak ? 'अभ्यासक' : 'अॅडमिन';
-  const currentLabel = nav.filter(n => n.to).find(n => location.pathname.startsWith(n.to))?.label || 'अॅडमिन';
+  useEffect(() => {
+    if (user && (user.role === 'admin' || isSuperAdmin)) {
+      tenantConfigAPI.getFeatures()
+        .then(r => setFeatures(r.data.data || {}))
+        .catch(() => setFeatures({}));
+    }
+  }, [user]);
+
+  const isVisible = (item) => {
+    if (!item.feature) return true;
+    if (isSuperAdmin) return true;
+    if (features === null) return false; // hide while loading
+    return features[item.feature] === true;
+  };
+
+  const rawNav = isSuperAdmin ? NAV_SUPER : isAbhyasak ? NAV_ABHYASAK : NAV_ADMIN;
+
+  // Filter nav: remove feature-hidden items, then strip orphan section headers
+  const nav = (() => {
+    const filtered = rawNav.filter(item => item.section || isVisible(item));
+    return filtered.filter((item, i) => {
+      if (!item.section) return true;
+      const next = filtered[i + 1];
+      return next && !next.section;
+    });
+  })();
+
+  const roleLabel = isSuperAdmin ? 'Super Admin' : isAbhyasak ? 'अभ्यासक' : 'Admin';
+  const currentLabel = nav.filter(n => n.to).find(n => location.pathname.startsWith(n.to))?.label || 'Admin';
 
   const handleLogout = () => { logout(); navigate('/login'); };
   const closeMobile = () => setMobileOpen(false);
@@ -110,7 +179,7 @@ export default function AdminLayout({ children }) {
           {!collapsed && (
             <>
               <div className={s.profileMeta}>
-                <span className={s.profileName}>{user?.name || 'अॅडमिन'}</span>
+                <span className={s.profileName}>{user?.name || 'Admin'}</span>
                 <span className={s.profileRole}>{roleLabel}</span>
               </div>
               <div className={s.onlineDot} title="ऑनलाइन" />
@@ -121,7 +190,7 @@ export default function AdminLayout({ children }) {
         {/* Super admin badge */}
         {isSuperAdmin && !collapsed && (
           <div className={s.roleBadge}>
-            <FaShieldHalved /> सुपर अॅडमिन मोड
+            <FaShieldHalved /> Super Admin मोड
           </div>
         )}
 

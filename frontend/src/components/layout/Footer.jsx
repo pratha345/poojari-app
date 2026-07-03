@@ -23,11 +23,14 @@ export default function Footer() {
           {/* ── Brand ── */}
           <div className={styles.brand}>
             <div className={styles.logoWrap}>
-              <img
-                src="/logo.png"
-                alt="Poojaris — For All Poojas"
-                className={styles.footerLogo}
-              />
+              <picture>
+                <source srcSet="/logo.webp" type="image/webp" />
+                <img
+                  src="/logo.png"
+                  alt="Poojaris — For All Poojas"
+                  className={styles.footerLogo}
+                />
+              </picture>
             </div>
             <p>महाराष्ट्रातील सर्वोत्तम पूजा बुकिंग सेवा. विश्वासू पुजारी, वेळेवर सेवा, आणि पारंपरिक विधी.</p>
             <div className={styles.social}>

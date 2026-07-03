@@ -1,6 +1,10 @@
 // src/controllers/pujari.controller.js
 const pool = require('../config/db');
 const { success, error } = require('../utils/response.util');
+const { getCache, setCache, delCache } = require('../utils/redis');
+
+const TOP_REVIEWS_TTL  = 10 * 60; // 10 min
+const PUB_REVIEWS_TTL  = 5  * 60; // 5 min
 
 const resolveImageUrl = (url) => {
   if (!url) return null;
@@ -100,7 +104,7 @@ exports.register = async (req, res) => {
         [coords.lat, coords.lng, pujari_id]).catch(() => {});
     });
 
-    return success(res, { pujari_id }, 'पुजारी नोंदणी यशस्वी! मंजुरीसाठी प्रतीक्षा करा.', 201);
+    return success(res, { pujari_id }, 'पुजारी नोंदणी यशस्वी! मंजूरीसाठी प्रतीक्षा करा.', 201);
   } catch (err) {
     console.error(err);
     return error(res, 'नोंदणी करताना त्रुटी झाली.');
@@ -111,17 +115,32 @@ exports.register = async (req, res) => {
 exports.getMyProfile = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT pp.*, GROUP_CONCAT(pc.name_mr) AS specialization_names
+      `SELECT pp.*, GROUP_CONCAT(pc.name_mr) AS specialization_names,
+              t.features AS tenant_features
        FROM pujari_profiles pp
        LEFT JOIN pujari_specializations ps ON pp.id = ps.pujari_id
        LEFT JOIN pooja_categories pc ON ps.category_id = pc.id
+       LEFT JOIN tenants t ON t.id = pp.tenant_id
        WHERE pp.user_id = ?
        GROUP BY pp.id`,
       [req.user.id]
     );
     if (!rows.length) return error(res, 'प्रोफाईल सापडली नाही.', 404);
     const p = rows[0];
-    return success(res, { ...p, photo_url: resolveImageUrl(p.photo_url), certificate_url: resolveImageUrl(p.certificate_url) });
+    let whatsapp_enabled = false;
+    try {
+      const tf = p.tenant_features
+        ? (typeof p.tenant_features === 'string' ? JSON.parse(p.tenant_features) : p.tenant_features)
+        : {};
+      whatsapp_enabled = tf.whatsapp === true;
+    } catch {}
+    delete p.tenant_features;
+    return success(res, {
+      ...p,
+      photo_url: resolveImageUrl(p.photo_url),
+      certificate_url: resolveImageUrl(p.certificate_url),
+      whatsapp_enabled,
+    });
   } catch (err) {
     return error(res, 'प्रोफाईल मिळवताना त्रुटी झाली.');
   }
@@ -204,6 +223,57 @@ exports.getMyBookings = async (req, res) => {
     return success(res, bookings);
   } catch (err) {
     return error(res, 'बुकिंग मिळवताना त्रुटी झाली.');
+  }
+};
+
+// ── WhatsApp Unassigned Requests (pujari can self-accept) ────
+exports.getWhatsappRequests = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT b.id, b.booking_code, b.booking_date, b.booking_time,
+              b.address, b.city, b.total_amount, b.special_notes,
+              b.status, b.source, b.created_at,
+              p.name_mr AS pooja_name, p.name_en AS pooja_name_en,
+              u.name AS user_name, u.phone AS user_phone
+       FROM bookings b
+       JOIN poojas p ON b.pooja_id = p.id
+       JOIN users  u ON b.user_id  = u.id
+       WHERE b.pujari_id IS NULL
+         AND b.source = 'whatsapp'
+         AND b.status NOT IN ('cancelled')
+       ORDER BY b.created_at DESC
+       LIMIT 50`
+    );
+    return success(res, rows);
+  } catch (err) {
+    return error(res, 'WhatsApp विनंती मिळवताना त्रुटी झाली.');
+  }
+};
+
+exports.acceptWhatsappBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [pujari] = await pool.query(
+      'SELECT id FROM pujari_profiles WHERE user_id = ? AND status = "approved"', [req.user.id]
+    );
+    if (!pujari.length) return error(res, 'प्रोफाईल सापडली नाही.', 404);
+
+    const [[booking]] = await pool.query(
+      'SELECT id FROM bookings WHERE id = ? AND pujari_id IS NULL AND source = "whatsapp"', [id]
+    );
+    if (!booking) return error(res, 'बुकिंग उपलब्ध नाही (आधीच कोणी स्वीकारली असेल).', 409);
+
+    await pool.query(
+      'UPDATE bookings SET pujari_id = ? WHERE id = ? AND pujari_id IS NULL',
+      [pujari[0].id, id]
+    );
+    await pool.query(
+      'UPDATE pujari_profiles SET total_bookings = total_bookings + 1 WHERE id = ?',
+      [pujari[0].id]
+    );
+    return success(res, {}, 'बुकिंग स्वीकारली! ✅');
+  } catch (err) {
+    return error(res, 'बुकिंग स्वीकारताना त्रुटी झाली.');
   }
 };
 
@@ -416,6 +486,10 @@ exports.getPublicProfile = async (req, res) => {
 exports.getTopReviews = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 6;
+    const cacheKey = `pujari:top-reviews:${limit}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return success(res, cached);
+
     const [reviews] = await pool.query(
       `SELECT r.id, r.rating, r.comment, r.created_at,
               u.name        AS user_name,
@@ -434,6 +508,7 @@ exports.getTopReviews = async (req, res) => {
        LIMIT ?`,
       [limit]
     );
+    await setCache(cacheKey, reviews, TOP_REVIEWS_TTL);
     return success(res, reviews);
   } catch (err) {
     return error(res, 'अभिप्राय मिळवताना त्रुटी झाली.');
@@ -444,6 +519,10 @@ exports.getTopReviews = async (req, res) => {
 exports.getPublicReviews = async (req, res) => {
   try {
     const { id } = req.params;
+    const cacheKey = `pujari:reviews:${id}`;
+    const cached = await getCache(cacheKey);
+    if (cached) return success(res, cached);
+
     const [reviews] = await pool.query(
       `SELECT r.id, r.rating, r.comment, r.created_at,
               u.name AS user_name,
@@ -455,6 +534,7 @@ exports.getPublicReviews = async (req, res) => {
        ORDER BY r.created_at DESC`,
       [id]
     );
+    await setCache(cacheKey, reviews, PUB_REVIEWS_TTL);
     return success(res, reviews);
   } catch (err) {
     return error(res, 'अभिप्राय मिळवताना त्रुटी झाली.');

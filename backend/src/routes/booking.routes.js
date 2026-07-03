@@ -2,8 +2,9 @@
 const router = require('express').Router();
 const ctrl   = require('../controllers/booking.controller');
 const { authenticate } = require('../middleware/auth.middleware');
+const { bookingLimiter } = require('../middleware/security.middleware');
 
-router.post('/',                  authenticate, ctrl.createBooking);
+router.post('/',                  authenticate, bookingLimiter, ctrl.createBooking);
 router.get('/my',                 authenticate, ctrl.getMyBookings);
 router.get('/:code',              authenticate, ctrl.getBookingByCode);
 router.put('/:id/cancel',         authenticate, ctrl.cancelBooking);

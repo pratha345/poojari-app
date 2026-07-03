@@ -22,8 +22,10 @@ router.put('/profile',             authenticate, multer({ storage }).single('pho
 router.post('/availability',       authenticate, ctrl.setAvailability);
 router.get('/my-services',         authenticate, ctrl.getMyPoojaServices);
 router.post('/my-services',        authenticate, ctrl.saveMyPoojaServices);
-router.get('/bookings',            authenticate, ctrl.getMyBookings);
-router.put('/bookings/:id/respond',authenticate, ctrl.respondToBooking);
+router.get('/bookings',                      authenticate, ctrl.getMyBookings);
+router.put('/bookings/:id/respond',          authenticate, ctrl.respondToBooking);
+router.get('/whatsapp-requests',             authenticate, ctrl.getWhatsappRequests);
+router.put('/whatsapp-requests/:id/accept',  authenticate, ctrl.acceptWhatsappBooking);
 router.get('/nearby',              ctrl.getNearbyPujaris);
 router.post('/geocode-all',        authenticate, async (req, res) => {
   if (req.user?.role !== 'admin' && req.user?.role !== 'super_admin')

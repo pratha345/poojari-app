@@ -1,0 +1,224 @@
+%----------------------------------------------------------------------------------------
+% Prathamesh Paranjape — Modern Professional Resume
+% Overleaf: New Project → Blank → Paste → Compile → Download PDF
+%----------------------------------------------------------------------------------------
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{geometry}
+\usepackage{fontawesome5}
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+%---------- PAGE GEOMETRY ----------
+\geometry{
+  top=0.45in,
+  bottom=0.45in,
+  left=0.55in,
+  right=0.55in,
+  footskip=0.1in
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\tabcolsep}{0in}
+
+%---------- COLORS ----------
+\definecolor{primary}{HTML}{1A56DB}
+\definecolor{darkgray}{HTML}{2D2D2D}
+\definecolor{medgray}{HTML}{555555}
+
+%---------- SECTION STYLE ----------
+\titleformat{\section}{
+  \vspace{-6pt}\color{primary}\raggedright\normalsize\bfseries
+}{}{0em}{\MakeUppercase}[{\color{primary}\vspace{1pt}\hrule height 1pt}\vspace{-4pt}]
+
+%---------- CUSTOM COMMANDS ----------
+\newcommand{\cvitem}[1]{
+  \item\small{\color{darkgray}#1}\vspace{0pt}
+}
+
+\newcommand{\jobheading}[4]{
+  \vspace{2pt}
+  \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+    \textbf{\color{darkgray}#1} \small\textit{\color{medgray} $\cdot$ #3} & \small\color{medgray}#2 \\
+    \small\color{medgray}\textit{#4} & \\
+  \end{tabular*}\vspace{-4pt}
+}
+
+\newcommand{\projectheading}[3]{
+  \vspace{4pt}
+  \noindent\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+    \textbf{\color{darkgray}#1} & \small\color{primary}#3 \\[-2pt]
+    \small\textit{\color{medgray}#2} & \\
+  \end{tabular*}\vspace{-6pt}
+}
+
+\newcommand{\cvlist}{\begin{itemize}[leftmargin=0.20in, rightmargin=0in, topsep=4pt, itemsep=3pt, parsep=0pt]}
+\newcommand{\cvlistend}{\end{itemize}\vspace{3pt}}
+
+%========================================================================================
+\begin{document}
+%========================================================================================
+
+%---------- HEADER ----------
+\begin{center}
+  {\fontsize{26}{28}\selectfont\bfseries\color{darkgray} Prathamesh Paranjape}
+
+  \vspace{5pt}
+  \footnotesize\color{medgray}
+  \faPhone\ \textbf{+91-9561903219}
+  \enspace\textbullet\enspace
+  \faEnvelope\ \href{mailto:paranjapeprathamesh85@gmail.com}{paranjapeprathamesh85@gmail.com}
+  \enspace\textbullet\enspace
+  \faGithub\ \href{https://github.com/prathameshvp2001}{github.com/prathameshvp2001}
+  \enspace\textbullet\enspace
+  \faMapMarker\ Mumbai, Maharashtra
+
+  \vspace{3pt}
+  \color{primary}\hrule height 2pt
+\end{center}
+
+\vspace{-2pt}
+
+%---------- SUMMARY ----------
+\section{Professional Summary}
+\vspace{2pt}
+\small\color{darkgray}
+Full-Stack Software Developer and \textbf{Oracle Cloud Certified DevOps Professional} with \textbf{1.5+ years} of production experience building scalable web applications, REST APIs, and cloud-deployed \textbf{SaaS platforms}. Shipped a live multi-tenant booking platform (\textit{pujari.mydashboard.site}) with \textbf{160+ REST API endpoints}, Redis caching, Razorpay payments, real-time Socket.IO, and \textbf{450+ automated E2E tests} (Playwright). Hands-on expertise in \textbf{Node.js, React.js, MySQL, Docker, and GitHub Actions CI/CD}. Oracle certified in DevOps, AI Foundations, and APEX Cloud Development.
+
+\vspace{2pt}
+
+%---------- SKILLS ----------
+\section{Technical Skills}
+\vspace{5pt}
+\small\color{darkgray}\setlength{\parskip}{5pt}
+
+\noindent\textbf{\color{primary}Backend:} Node.js, Express.js, TypeScript, REST API Design, JWT Authentication, bcrypt, Socket.IO, Web Push Notifications, Nodemailer
+
+\noindent\textbf{\color{primary}Frontend:} React.js, Vite, JavaScript (ES6+), HTML5, CSS3
+
+\noindent\textbf{\color{primary}Databases:} MySQL, Oracle Database, Redis (ioredis, Cache Invalidation, TTL Management), SQL Optimization, Schema Design
+
+\noindent\textbf{\color{primary}DevOps:} Docker, GitHub Actions CI/CD, PM2, Nginx, Oracle Cloud Infrastructure (OCI), DigitalOcean, AWS, Linux (Ubuntu), Certbot SSL
+
+\noindent\textbf{\color{primary}Security:} Rate Limiting, Account Lockout, XSS Prevention, SQL Injection Protection, Helmet.js, CORS, HTTP Parameter Pollution (HPP)
+
+\noindent\textbf{\color{primary}APIs \& Integrations:} Razorpay, Google OAuth 2.0, Fast2SMS, Groq LLaMA 70B, Google Gemini AI, OpenStreetMap Nominatim
+
+\noindent\textbf{\color{primary}Testing \& Tools:} Playwright (E2E Testing), Jest, Supertest, Agile/Scrum, Git, GitHub, GitLab, Postman
+
+\setlength{\parskip}{0pt}
+\vspace{-2pt}
+
+%---------- EXPERIENCE ----------
+\section{Experience}
+
+\vspace{4pt}
+\jobheading{Protovec Technologies Pvt. Ltd.}{Dec 2023 -- Present}{Software Developer}{Andheri, Marol, Mumbai}
+
+\cvlist
+  \cvitem{Architected and shipped full-stack web applications using \textbf{Node.js, Express.js, and React.js} on cloud production environments with MySQL backend, serving real users daily.}
+  \cvitem{Designed and optimized \textbf{MySQL \& Oracle database schemas} with indexing strategies and query tuning, improving data retrieval performance for production workloads.}
+  \cvitem{Built secure REST APIs with \textbf{JWT authentication, RBAC, rate limiting, account lockout, XSS sanitization}, and Helmet.js CSP --- protecting endpoints from common attack vectors.}
+  \cvitem{Integrated \textbf{Redis caching (ioredis)} with namespace key strategy and TTL-based expiry, achieving \textbf{95\%+ cache hit rates} and significantly reducing MySQL query load.}
+  \cvitem{Deployed applications on \textbf{DigitalOcean \& OCI} with PM2 process management, Nginx reverse proxy, UFW firewall, and Certbot SSL --- maintaining stable production uptime.}
+  \cvitem{Authored \textbf{GitHub Actions CI/CD pipelines} automating test, build, and deploy with health check verification on every push to main branch.}
+  \cvitem{Worked in an \textbf{Agile environment} with sprint-based planning, iterative delivery, and collaborative code reviews via GitHub Pull Requests.}
+\cvlistend
+
+\vspace{-2pt}
+
+%---------- PROJECTS ----------
+\section{Projects}
+
+%--- POJJARI ---
+\projectheading{Pojjari --- Marathi Pooja Booking Platform}{Node.js, React.js, MySQL, Redis, Docker, Razorpay, Socket.IO, GitHub Actions CI/CD}{\faLink\ pujari.mydashboard.site}
+
+\cvlist
+  \cvitem{\textbf{Production SaaS platform} for booking traditional Hindu puja ceremonies with verified priests across Maharashtra --- \textbf{multi-tenant architecture} with subdomain-based city isolation.}
+  \cvitem{Designed \textbf{160+ REST API endpoints} covering auth, bookings, puja catalog, pujari management, admin panel, and AI features --- secured with layered rate limiting (200 req/IP/15 min), account lockout (5 failures = 30 min), and XSS/SQL injection protection.}
+  \cvitem{Integrated \textbf{Razorpay payment gateway} (HMAC SHA256 signature verification) and \textbf{Redis caching (ioredis)} with TTL-based namespace keys --- significantly reducing repeat MySQL queries on high-traffic endpoints.}
+  \cvitem{Built \textbf{real-time features} using Socket.IO (AI poster generation with WebSocket progress), integrated \textbf{Groq LLaMA 70B} for Marathi ritual steps, and \textbf{Google Gemini AI} for AI poster creation.}
+  \cvitem{Authored \textbf{GitHub Actions CI/CD} (test, build, deploy, health check), \textbf{Docker multi-stage containerization}, and a \textbf{Playwright E2E test suite with 450+ tests} across 17 test files covering all critical flows.}
+  \cvitem{Implemented \textbf{Multer + Sharp image pipeline} (WebP conversion at quality 82, EXIF stripping), \textbf{Google OAuth 2.0}, \textbf{Fast2SMS OTP}, Web Push (VAPID), and Nominatim geolocation with Haversine nearby pujari search.}
+\cvlistend
+
+%--- ROSSARI ---
+\projectheading{Rossari Industrial Management System}{MySQL, SQL Optimization, Oracle Cloud Infrastructure (OCI)}{}
+
+\cvlist
+  \cvitem{Built a centralized production monitoring platform with \textbf{RBAC}, department-level data isolation, and optimized MySQL schemas --- improving reporting query performance by \textbf{40\%}.}
+  \cvitem{Deployed on \textbf{Oracle Cloud Infrastructure (OCI)} with secure database access controls, automated backups, and role-based reporting modules.}
+\cvlistend
+
+%--- BLVL ---
+\projectheading{BLVL Data Monitoring Platform}{MySQL, SQL, Backend API Development, Cloud Hosting}{}
+
+\cvlist
+  \cvitem{Built a cloud-hosted real-time data monitoring solution with \textbf{optimized SQL queries}, connection pooling, and efficient indexing strategies for fast dashboard data retrieval.}
+  \cvitem{Designed backend API layer with role-based data access, ensuring data integrity and consistent availability for operational monitoring workflows.}
+\cvlistend
+
+%--- CIGRATE ---
+\projectheading{CigRate Stock Management System}{MySQL, SQL, Inventory Management, Database Design}{}
+
+\cvlist
+  \cvitem{Developed a database-centric inventory and sales management platform with \textbf{normalized relational schemas} (ACID-compliant), real-time stock tracking, and automated low-stock alert triggers.}
+  \cvitem{Built sales reporting modules with aggregated MySQL queries, providing actionable business insights through tabular dashboards.}
+\cvlistend
+
+\vspace{2pt}
+
+%---------- KEY STRENGTHS ----------
+\section{Key Strengths}
+\vspace{5pt}
+\small\color{darkgray}\setlength{\parskip}{4pt}
+
+\noindent\textbf{\color{primary}Architecture:} Multi-tenant SaaS design, REST API security hardening, Redis caching strategy, relational schema optimization
+
+\noindent\textbf{\color{primary}Delivery:} Full deployment lifecycle (code to production), GitHub Actions CI/CD, Docker containerization, Agile/Scrum
+
+\noindent\textbf{\color{primary}Integrations:} AI/LLM (Groq, Gemini), payment gateways (Razorpay), real-time (Socket.IO), geolocation, E2E test automation
+
+\setlength{\parskip}{0pt}
+\vspace{0pt}
+
+%---------- CERTIFICATIONS ----------
+\section{Certifications}
+\vspace{4pt}
+\small
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+  \color{darkgray}\textbf{Oracle Cloud Infrastructure 2025 Certified DevOps Professional} \color{medgray}$|$ Oracle & \color{medgray}2025 \\[3pt]
+  \color{darkgray}\textbf{Oracle APEX Cloud Developer Certified Professional} \color{medgray}$|$ Oracle & \color{medgray}2025 \\[3pt]
+  \color{darkgray}\textbf{Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate} \color{medgray}$|$ Oracle & \color{medgray}2025 \\
+\end{tabular*}
+
+\vspace{2pt}
+
+%---------- EDUCATION ----------
+\section{Education}
+\vspace{4pt}
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+  \textbf{\color{darkgray}Hope Foundation's F.A.M.T} \small\color{medgray}$|$ Bachelor of Engineering --- Information Technology & \small\color{medgray}Jul 2019 -- Jun 2023 \\
+  \small\color{medgray}Ratnagiri, Maharashtra & \small\color{primary}\textbf{CGPA: 8.64 / 10.0} \\
+\end{tabular*}
+\vspace{4pt}
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+  \textbf{\color{darkgray}Sahajeevan Shikshan Sanstha} \small\color{medgray}$|$ Information Technology --- HSC (MSBSHSE) & \small\color{medgray}Jun 2017 -- May 2019 \\
+  \small\color{medgray}Khed, Maharashtra & \small\color{medgray}Percentage: 58\% \\
+\end{tabular*}
+
+\end{document}

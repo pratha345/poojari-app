@@ -1,14 +1,32 @@
 // src/controllers/dharmasindhu.controller.js
-// Dharmasindhu शंका समाधान — FULLTEXT search + Groq Chat AI
+// Dharmasindhu शंका समाधान — RAG (semantic) + FULLTEXT fallback + Wikipedia + Groq
 const pool = require('../config/db');
 const { success, error }               = require('../utils/response.util');
 const { getCache, setCache }           = require('../utils/redis');
 const crypto                           = require('crypto');
 
-const DS_TTL = 24 * 60 * 60; // 24 hours — same question gives same answer
-
+const DS_TTL     = 24 * 60 * 60;
 const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions';
-const CHAT_MODEL = 'llama-3.3-70b-versatile';
+const CHAT_MODEL = 'llama-3.1-8b-instant'; // 500k TPD limit vs 100k for 70b
+const RAG_URL    = process.env.RAG_SERVICE_URL || 'http://localhost:8765';
+
+// ── RAG microservice call (semantic search + Wikipedia) ───────────────────────
+async function searchWithRAG(question) {
+  try {
+    const resp = await fetch(`${RAG_URL}/search`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ question, n_results: 5 }),
+      signal:  AbortSignal.timeout(8000),
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (!data.ds_chunks?.length && !data.wiki_chunks?.length) return null;
+    return data;
+  } catch {
+    return null; // RAG not running → FULLTEXT fallback kicks in
+  }
+}
 
 // ── OCR Progress Status ───────────────────────────────────────────────────────
 exports.getStatus = async (req, res) => {
@@ -30,7 +48,7 @@ exports.getStatus = async (req, res) => {
   }
 };
 
-// ── Step 1: Extract Marathi search keywords from any language query ───────────
+// ── Step 1: Extract expanded Marathi keywords + related terms ────────────────
 async function extractMarathiKeywords(question, apiKey) {
   try {
     const resp = await fetch(GROQ_URL, {
@@ -38,21 +56,28 @@ async function extractMarathiKeywords(question, apiKey) {
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model:       CHAT_MODEL,
-        max_tokens:  80,
+        max_tokens:  120,
         temperature: 0,
         messages: [{
           role: 'user',
-          content: `Convert the following question into 4-6 Marathi search keywords that would appear in a Dharmasindhu religious text (the text is in Marathi/Sanskrit Devanagari script).
+          content: `You are a dharmashastra scholar. Extract Marathi/Sanskrit search keywords from this question to search the Dharmasindhu text.
 
 Rules:
-- Return ONLY Marathi/Sanskrit words in Devanagari script
-- Comma separated, no explanation
-- Focus on nouns and ritual terms
-- If question is in English/Hinglish, translate to Marathi equivalents
-- Examples: "shraddha" → "श्राद्ध", "marriage muhurat" → "विवाह, मुहूर्त, लग्न", "ganpati puja" → "गणपती, पूजा, गणेश"
+- Return ONLY Devanagari script words, comma separated, no explanation
+- Include the main topic + ALL SPECIFIC RELATED TERMS that would appear in the dharmashastra text
+- For nakshatra questions: include individual nakshatra names in that group
+- For ritual questions: include ritual steps, objects, related terms
+- Maximum 8 keywords
+
+Examples:
+"पंचक नक्षत्र" → "पंचक, धनिष्ठा, शतभिषा, शततारका, रेवती, पूर्वाभाद्रपदा, उत्तराभाद्रपदा"
+"त्रिपाद नक्षत्र" → "त्रिपाद, पूर्ववसु, उत्तराषाढा, कृत्तिका, उत्तरा, विशाखा"
+"विवाह मुहूर्त" → "विवाह, मुहूर्त, लग्न, पाणिग्रहण, वर, वधू"
+"गणपती पूजा" → "गणपती, गणेश, पूजा, षोडशोपचार, मोदक, दूर्वा"
+"shraddha" → "श्राद्ध, पिंडदान, तर्पण, पितृ"
+"ganpati puja" → "गणपती, गणेश, पूजा, षोडशोपचार"
 
 Question: "${question}"
-
 Keywords:`,
         }],
       }),
@@ -60,7 +85,6 @@ Keywords:`,
     if (!resp.ok) return null;
     const data = await resp.json();
     const raw  = data.choices?.[0]?.message?.content?.trim() || '';
-    // Clean up — extract only Devanagari words
     return raw.replace(/[a-zA-Z\[\]\(\)]/g, '').replace(/,+/g, ',').trim();
   } catch (_) {
     return null;
@@ -136,97 +160,121 @@ exports.ask = async (req, res) => {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) return error(res, 'GROQ_API_KEY set नाही.', 500);
 
-    // Check cache first — same question always produces same answer
-    const qHash   = crypto.createHash('md5').update(question.trim().toLowerCase()).digest('hex');
-    const dsKey   = `ds:ask:${qHash}`;
-    const cached  = await getCache(dsKey);
+    // Cache — same question gives same answer
+    const qHash  = crypto.createHash('md5').update(question.trim().toLowerCase()).digest('hex');
+    const dsKey  = `ds:ask:${qHash}`;
+    const cached = await getCache(dsKey);
     if (cached) return success(res, cached);
 
-    // ── 1. Check if we have any content ──────────────────────────
     const [[{ total }]] = await pool.query('SELECT COUNT(*) AS total FROM dharmasindhu_content');
 
-    // ── 2. Parallel: keyword extraction + (if no content, skip search) ───
-    // Run keyword extraction in parallel with nothing (fast ~500ms)
-    const marathiKeywords = total > 0
-      ? await extractMarathiKeywords(question, apiKey)
-      : null;
+    // ── 1. Parallel: RAG semantic search + keyword extraction ─────
+    const [ragResult, searchKeywords] = await Promise.all([
+      total > 0 ? searchWithRAG(question) : Promise.resolve(null),
+      extractMarathiKeywords(question, apiKey),
+    ]);
 
-    // ── 3. Multi-strategy search ──────────────────────────────────
-    let sources = [];
-    if (total > 0) {
-      sources = await searchDharmasindhu(marathiKeywords, question);
+    // ── 2. FULLTEXT search with expanded keywords (ALWAYS, not just fallback) ─
+    let ftSources = [];
+    if (total > 0 && searchKeywords) {
+      const ftRows = await searchDharmasindhu(searchKeywords, question);
+      ftSources = ftRows.map(r => ({
+        content: r.content,
+        page_no: r.page_no,
+        score:   r.score || 0.4,
+      }));
     }
 
-    // ── 4. Build context from top passages ────────────────────────
-    const context = sources.length
-      ? sources
-          .map(r => {
-            const snippet = r.content.length > 700
-              ? r.content.substring(0, 700) + '...'
-              : r.content;
-            return `[पान ${r.page_no}]:\n${snippet}`;
-          })
-          .join('\n\n---\n\n')
+    // ── 3. Merge RAG + FULLTEXT (RAG first for relevance, FULLTEXT adds unique pages) ─
+    const ragDS      = ragResult?.ds_chunks || [];
+    const ragPageNos = new Set(ragDS.map(r => r.page_no));
+    const ftExtras   = ftSources.filter(r => !ragPageNos.has(r.page_no));
+
+    let dsSources   = [...ragDS, ...ftExtras].slice(0, 8);
+    let wikiSources = ragResult?.wiki_chunks || [];
+    const usedRAG   = ragResult !== null;
+
+    // ── 3. Build context ──────────────────────────────────────────
+    const dsContext = dsSources.length
+      ? dsSources.slice(0, 5).map(r => {
+          const snippet = r.content.length > 450 ? r.content.substring(0, 450) + '...' : r.content;
+          return `[DS:पान ${r.page_no}]:\n${snippet}`;
+        }).join('\n\n---\n\n')
       : null;
 
-    // ── 4. Groq Chat — AI answer in Marathi with Sanskrit translation ────
-    const systemPrompt = context
-      ? `You are a scholar of the Dharmasindhu text (Bapu Shastri Moghe, Marathi translation, 1886). Answer the question using ONLY the passages from Dharmasindhu provided below.
+    const wikiContext = wikiSources.length
+      ? `=== Wikipedia ===\n` + wikiSources.map(w => {
+          // Find lines that contain main question noun (first noun-like word >= 3 chars)
+          const stopWords = new Set(['म्हणजे', 'काय', 'कसे', 'केव्हा', 'कधी', 'कोण', 'काय?', 'कसा', 'ते', 'किती']);
+          const qWords = question.trim().split(/\s+/).filter(x => x.length >= 2);
+          const mainTopic = qWords.find(x => x.length >= 3 && !stopWords.has(x)) || qWords[0];
 
-Answer format (in this exact order):
+          const lines = w.content.split('\n').filter(s => s.trim().length > 15);
+          // Lines with mainTopic (highest relevance)
+          const withTopic = lines.filter(s => s.includes(mainTopic));
+          // If we found topiclines, use top 3; else fallback to first 2 lines
+          const chosen = withTopic.length > 0 ? withTopic.slice(0, 3) : lines.slice(0, 2);
+          return `[WIKI:${w.title}]:\n${chosen.join('\n')}`;
+        }).join('\n\n---\n\n')
+      : null;
+
+    const fullContext = [dsContext, wikiContext].filter(Boolean).join('\n\n═══\n\n');
+
+    // ── 4. Groq answer ────────────────────────────────────────────
+    const systemPrompt = fullContext
+      ? `You are a Dharmasindhu scholar. Answer the question using ONLY the provided passages.
+
+STRICT RULES:
+1. NEVER invent, expand, or paraphrase beyond what is literally in the passages
+2. [DS:पान X] = Dharmasindhu page X text. [WIKI:Title] = Wikipedia article text.
+3. In **📖 धर्मसिंधु सांगतो:** — quote ONLY from [DS:पान X] sections. Do NOT use Wikipedia content here.
+4. If the WIKI section has a direct definition, quote it in **🌐 Wikipedia सांगतो:**
+5. NEVER label Wikipedia content as if it came from Dharmasindhu pages.
+6. NEVER say "माहिती नाही" — use Wikipedia or general knowledge if DS passages don't contain the answer.
+7. Keep answer under 250 words total.
+
+FORMAT:
 
 **📖 धर्मसिंधु सांगतो:**
-(Quote the relevant Sanskrit or old Marathi passage exactly as it appears in the excerpt)
+(Direct quote from [DS:पान X] that is relevant, or write "[सामान्य धर्मज्ञान]" if DS pages don't cover this)
+
+**🌐 Wikipedia सांगतो:** (only if wiki passages exist AND are relevant)
+(Direct quote from [WIKI:Title])
 
 **🔤 मराठी अनुवाद:**
-(Translate the above into clear, simple modern Marathi)
+(Simple Marathi explanation in your own words — 2-3 sentences)
 
 **✅ सारांश:**
-(2-3 line practical summary in simple Marathi that anyone can understand)
+(Key facts in Marathi — bullet points if multiple items)
 
 **🇬🇧 English Summary:**
-(Same summary in plain English — 2-3 lines)
+(2-3 plain English sentences)
 
-**📌 संदर्भ:** (page number from excerpt)
+**📌 संदर्भ:** (list the source pages/wiki articles used)
 
-Rules:
-- Use ONLY what is in the provided passages — do not add outside knowledge
-- If the passages don't contain the answer, say so clearly in Marathi
-- Keep total answer under 250 words
-- English section must always be present
-
-Dharmasindhu passages:
-${context}`
-      : `You are a scholar of the Dharmasindhu text (Kashinath Upadhyaya, Sanskrit original; Bapu Shastri Moghe, Marathi translation 1886).
-
-Answer the question based on Dharmasindhu knowledge.
-
-Answer format:
+PASSAGES:
+${fullContext}`
+      : `You are a scholar of the Dharmasindhu text (Kashinath Upadhyaya, Sanskrit; Bapu Shastri Moghe, Marathi 1886).
 
 **📖 धर्मसिंधु सांगतो:**
-(Relevant Sanskrit rule or verse from Dharmasindhu)
+(Relevant verse or rule)
 
 **🔤 मराठी अनुवाद:**
-(Translation in simple modern Marathi)
+(Simple modern Marathi)
 
 **✅ सारांश:**
-(Practical, direct answer in Marathi)
+(Direct answer in Marathi)
 
 **🇬🇧 English Summary:**
-(Same answer in plain English — 2-3 lines)
+(Plain English, 2-3 lines)
 
-(Note: OCR of Dharmasindhu is still in progress. This answer is based on general knowledge of the text.)`;
+(Note: Answer based on general knowledge of the text.)`;
 
     const groqRes = await fetch(GROQ_URL, {
       method:  'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type':  'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model:       CHAT_MODEL,
-        temperature: 0.3,
-        max_tokens:  1200,
+        model: CHAT_MODEL, temperature: 0.3, max_tokens: 1200,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user',   content: question },
@@ -235,23 +283,28 @@ Answer format:
     });
 
     if (!groqRes.ok) {
-      const errText = await groqRes.text();
-      console.error('Groq error:', errText);
+      console.error('Groq error:', await groqRes.text());
       return error(res, 'AI सेवा उपलब्ध नाही. नंतर प्रयत्न करा.', 503);
     }
 
     const groqData = await groqRes.json();
     const answer   = groqData.choices?.[0]?.message?.content?.trim() || 'उत्तर मिळाले नाही.';
 
-    // ── 5. Return answer + source passages ───────────────────────
+    // ── 5. Respond ────────────────────────────────────────────────
     const dsData = {
       answer,
-      sources: sources.map(r => ({
+      sources: dsSources.map(r => ({
         page_no: r.page_no,
-        excerpt: r.content.substring(0, 300) + (r.content.length > 300 ? '...' : ''),
+        excerpt: r.content.substring(0, 1200) + (r.content.length > 1200 ? '...' : ''),
       })),
-      has_db_content: total > 0,
-      search_keywords: marathiKeywords || null,
+      wiki_sources: wikiSources.map(w => ({
+        title:   w.title,
+        url:     w.url,
+        excerpt: w.content.substring(0, 200) + (w.content.length > 200 ? '...' : ''),
+      })),
+      has_db_content:  total > 0,
+      search_mode:     usedRAG && ftSources.length > 0 ? 'hybrid' : usedRAG ? 'semantic' : 'fulltext',
+      search_keywords: searchKeywords || null,
     };
     await setCache(dsKey, dsData, DS_TTL);
     return success(res, dsData);

@@ -9,8 +9,8 @@ const isAdmin = (req, res, next) => {
   return res.status(403).json({ success: false, message: 'Access denied' });
 };
 
-// User routes
-router.post('/',              authenticate, ctrl.createTicket);
+// User routes — POST is public (guests can submit tickets without login)
+router.post('/',              ctrl.createTicket);
 router.get('/my',             authenticate, ctrl.getMyTickets);
 router.get('/open-count',     authenticate, ctrl.getOpenCount);
 router.get('/:id',            authenticate, ctrl.getTicket);

@@ -6,16 +6,7 @@ const router  = express.Router();
 const { getPanchang } = require('../services/panchangService');
 const pool    = require('../config/db');
 
-/**
- * GET /api/panchang
- * Query params:
- *   date  - YYYY-MM-DD  (default: today)
- *   time  - HH:MM local time (optional; defaults to sunrise epoch)
- *   lat   - latitude    (default: 18.52 — Pune)
- *   lon   - longitude   (default: 73.86 — Pune)
- *   tz    - timezone offset in minutes (default: 330 — IST UTC+5:30)
- */
-router.get('/', async (req, res) => {
+async function handlePanchang(req, res) {
   try {
     let { date, time, lat, lon, tz } = req.query;
 
@@ -63,6 +54,16 @@ router.get('/', async (req, res) => {
       message: 'पंचांग माहिती मिळवण्यात त्रुटी झाली. कृपया पुन्हा प्रयत्न करा.',
     });
   }
+}
+
+// GET /api/panchang?date=YYYY-MM-DD (frontend uses this)
+router.get('/', handlePanchang);
+
+// GET /api/panchang/YYYY-MM-DD (tests use this)
+router.get('/:date', (req, res) => {
+  req.query.date = req.params.date;
+  if (req.query.lat === undefined && req.params.lat) req.query.lat = req.params.lat;
+  return handlePanchang(req, res);
 });
 
 // ── POST /api/panchang/rate ────────────────────────────────────

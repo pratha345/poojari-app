@@ -286,6 +286,8 @@ export default function Rashifal() {
                   <img
                     src={r.img} alt={r.name}
                     className={styles.rashiImg}
+                    loading={r.id < 6 ? 'eager' : 'lazy'}
+                    fetchpriority={r.id < 3 ? 'high' : 'auto'}
                     onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling.style.display = 'inline'; }}
                   />
                   <span className={styles.rashiSymbolFallback}>{r.symbol}</span>

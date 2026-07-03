@@ -47,7 +47,7 @@ export default function ManageBookings() {
   // Load approved pujaris once for the dropdown
   useEffect(() => {
     adminAPI.getApprovedPujaris({ limit: 500 })
-      .then(r => setPujaris(r.data.data?.rows || []))
+      .then(r => setPujaris(r.data.data || []))
       .catch(() => {});
   }, []);
 
@@ -110,19 +110,18 @@ export default function ManageBookings() {
         <h1 className={styles.pageTitle}>📋 बुकिंग व्यवस्थापन</h1>
 
         <div className={styles.filters}>
-          {[
-            { key: 'pending',   label: '⏳ प्रतीक्षेत' },
-            { key: 'confirmed', label: '✅ पुष्टी'      },
-            { key: 'completed', label: '🪔 पूर्ण'       },
-            { key: 'cancelled', label: '❌ रद्द'         },
-            { key: 'all',       label: 'सर्व'            },
-          ].map(f => (
-            <button
-              key={f.key}
-              className={`${styles.filterBtn} ${filter === f.key ? styles.filterActive : ''}`}
-              onClick={() => setFilter(f.key)}
-            >{f.label}</button>
-          ))}
+          <select
+            className={styles.filterBtn}
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+            style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', cursor: 'pointer' }}
+          >
+            <option value="pending">⏳ प्रतीक्षेत</option>
+            <option value="confirmed">✅ पुष्टी</option>
+            <option value="completed">🪔 पूर्ण</option>
+            <option value="cancelled">❌ रद्द</option>
+            <option value="all">सर्व</option>
+          </select>
         </div>
 
         {loading ? (

@@ -1,40 +1,65 @@
 // src/context/LanguageContext.jsx — MR / HI / EN language selector
-// MR and EN use the built-in T[] dictionary; HI uses Google Translate cookie
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const LanguageContext = createContext({ lang: 'mr', setLang: () => {}, toggleLang: () => {} });
 
-// Read current translation language from googtrans cookie
-function getCookieLang() {
-  const m = document.cookie.match(/googtrans=\/(?:mr|auto)\/([a-z]+)/);
-  if (m && m[1] !== 'mr') return m[1];
-  return null;
-}
-
 // Set or clear the googtrans cookie (Google Translate reads this on page load)
 function setGoogTransCookie(targetLang) {
-  const host    = window.location.hostname;
+  const host   = window.location.hostname;
   const cleared = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/';
   const future  = 'expires=Fri, 01 Jan 2100 00:00:00 UTC; path=/';
 
-  if (targetLang === 'mr') {
-    document.cookie = `googtrans=; ${cleared}`;
-    document.cookie = `googtrans=; ${cleared}; domain=${host}`;
-    document.cookie = `googtrans=; ${cleared}; domain=.${host}`;
-  } else {
+  // Build all domain variants to clear
+  const domains = [host];
+  const parts = host.split('.');
+  for (let i = 0; i < parts.length; i++) {
+    const d = parts.slice(i).join('.');
+    if (d) { domains.push(d); domains.push('.' + d); }
+  }
+
+  // Clear all variants
+  for (const d of domains) {
+    document.cookie = `googtrans=; ${cleared}; domain=${d}`;
+  }
+  document.cookie = `googtrans=; ${cleared}`;
+
+  if (targetLang !== 'mr') {
     const val = `/mr/${targetLang}`;
     document.cookie = `googtrans=${val}; ${future}`;
-    document.cookie = `googtrans=${val}; ${future}; domain=${host}`;
+    for (const d of domains) {
+      document.cookie = `googtrans=${val}; ${future}; domain=${d}`;
+    }
   }
 }
 
 export function LanguageProvider({ children }) {
+  // Use localStorage as single source of truth — cookie is only for Google Translate trigger
   const [lang, setLangState] = useState(() => {
-    // Cookie takes priority — reflects what Google Translate actually loaded
-    const cookieLang = getCookieLang();
-    if (cookieLang) return cookieLang;
     return localStorage.getItem('pojjari_lang') || 'mr';
   });
+
+  // For non-Marathi: intercept React Router's pushState so every SPA navigation
+  // triggers a full page reload — Google Translate needs this to re-translate new content
+  useEffect(() => {
+    if (lang === 'mr') return;
+
+    const origPush    = history.pushState.bind(history);
+    const origReplace = history.replaceState.bind(history);
+
+    history.pushState = (...args) => {
+      origPush(...args);
+      window.location.reload();
+    };
+    history.replaceState = (...args) => {
+      origReplace(...args);
+      window.location.reload();
+    };
+
+    return () => {
+      history.pushState    = origPush;
+      history.replaceState = origReplace;
+    };
+  }, [lang]);
 
   const setLang = (targetLang) => {
     if (targetLang === lang) return;

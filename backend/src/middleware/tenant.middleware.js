@@ -73,7 +73,9 @@ const attachTenant = (req, res, next) => {
 
   if (req.user.role === 'super_admin') {
     const headerTenantId = req.headers['x-tenant-id'];
-    req.tenantId = headerTenantId ? parseInt(headerTenantId) : null;
+    // Super admin can pass X-Tenant-ID to operate in a specific tenant.
+    // Falls back to their own tenant_id (or 1) so franchise-config routes work.
+    req.tenantId = headerTenantId ? parseInt(headerTenantId) : (req.user.tenant_id || 1);
   } else {
     req.tenantId = req.user.tenant_id || 1;
   }

@@ -22,30 +22,45 @@ const OCCASIONS = [
   { icon: '💡', label: 'दिवाळी पूजा', type: 'search',   value: 'दिवाळी'        },
 ];
 
+const SITE = 'https://pujari.mydashboard.site';
+
 function buildSchema(poojas, category, activeCategory) {
   const base = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     'name': activeCategory ? `${activeCategory.name_mr} | पूजारी` : 'सर्व पूजा सेवा | पूजारी',
-    'description': 'महाराष्ट्रातील सर्व पूजा सेवा ऑनलाइन बुक करा.',
-    'url': category ? `https://pojjari.com/pooja/${category}` : 'https://pojjari.com/pooja',
+    'description': 'महाराष्ट्रातील सर्व पूजा सेवा ऑनलाइन बुक करा. सत्यनारायण, गृहप्रवेश, हवन, दशक्रिया आणि इतर सर्व पूजा.',
+    'url': category ? `${SITE}/pooja/${category}` : `${SITE}/pooja`,
     'breadcrumb': {
       '@type': 'BreadcrumbList',
       'itemListElement': [
-        { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': 'https://pojjari.com/' },
-        { '@type': 'ListItem', 'position': 2, 'name': 'पूजा',        'item': 'https://pojjari.com/pooja' },
-        ...(activeCategory ? [{ '@type': 'ListItem', 'position': 3, 'name': activeCategory.name_mr, 'item': `https://pojjari.com/pooja/${category}` }] : []),
+        { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': `${SITE}/` },
+        { '@type': 'ListItem', 'position': 2, 'name': 'पूजा',        'item': `${SITE}/pooja` },
+        ...(activeCategory ? [{ '@type': 'ListItem', 'position': 3, 'name': activeCategory.name_mr, 'item': `${SITE}/pooja/${category}` }] : []),
       ],
     },
   };
   if (poojas.length > 0) {
     base['mainEntity'] = {
       '@type': 'ItemList',
+      'numberOfItems': poojas.length,
       'itemListElement': poojas.slice(0, 10).map((p, i) => ({
         '@type': 'ListItem',
         'position': i + 1,
         'name': p.name_mr,
-        'url': `https://pojjari.com/vidhi/${p.slug}`,
+        'url': `${SITE}/vidhi/${p.slug}`,
+        'item': {
+          '@type': 'Service',
+          'name': p.name_mr,
+          'url': `${SITE}/vidhi/${p.slug}`,
+          'offers': {
+            '@type': 'Offer',
+            'price': p.price,
+            'priceCurrency': 'INR',
+            'availability': 'https://schema.org/InStock',
+          },
+          ...(p.avg_rating ? { 'aggregateRating': { '@type': 'AggregateRating', 'ratingValue': p.avg_rating, 'bestRating': 5 } } : {}),
+        }
       })),
     };
   }

@@ -3,6 +3,7 @@ const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
 const pool    = require('../config/db');
 const { success, error } = require('../utils/response.util');
+const { recordFailedLogin, clearFailedLogin } = require('../middleware/security.middleware');
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -16,6 +17,7 @@ const signToken = (user) =>
 const safeUser = (u) => ({
   id: u.id, name: u.name, phone: u.phone,
   email: u.email, role: u.role, tenant_id: u.tenant_id || null,
+  photo_url: u.photo_url || null,
 });
 
 // ── Register ──────────────────────────────────────────────────
@@ -62,14 +64,19 @@ exports.login = async (req, res) => {
     const [rows] = await pool.query(
       'SELECT * FROM users WHERE (phone = ? OR email = ?) AND is_active = TRUE', [phone, phone]
     );
-    if (!rows.length)
+    if (!rows.length) {
+      recordFailedLogin(phone, req.ip); // Track failed attempt
       return error(res, 'फोन नंबर किंवा पासवर्ड चुकीचा आहे.', 401);
+    }
 
     const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    if (!isMatch) {
+      recordFailedLogin(phone, req.ip); // Track failed attempt
       return error(res, 'फोन नंबर किंवा पासवर्ड चुकीचा आहे.', 401);
+    }
 
+    clearFailedLogin(phone, req.ip); // Success — reset counter
     const token = signToken(user);
     return success(res, { token, user: safeUser(user) }, 'लॉगिन यशस्वी! 🙏');
   } catch (err) {
@@ -122,7 +129,9 @@ exports.sendOtp = async (req, res) => {
       console.log(`[DEV] OTP for ${cleanPhone}: ${otp}`);
     }
 
-    return success(res, { phone }, 'OTP पाठवला आहे.');
+    // In dev mode (no SMS key), include OTP in response so it can be tested
+    const devOtp = !apiKey ? otp : undefined;
+    return success(res, { phone: cleanPhone, ...(devOtp && { dev_otp: devOtp }) }, 'OTP पाठवला आहे.');
   } catch (err) {
     return error(res, 'OTP पाठवताना त्रुटी झाली.');
   }
@@ -136,9 +145,12 @@ exports.verifyOtp = async (req, res) => {
     if (name && HTML_TAG_RE.test(String(name)))
       return error(res, 'नाव अवैध आहे. HTML टॅग वापरू नका.', 400);
 
+    // Normalize phone: strip all non-digits and remove leading 91 prefix
+    const cleanPhone = String(phone).replace(/\D/g, '').replace(/^91(\d{10})$/, '$1');
+
     const [rows] = await pool.query(
       'SELECT * FROM users WHERE phone = ? AND otp_code = ? AND otp_expiry > NOW()',
-      [phone, otp]
+      [cleanPhone, otp]
     );
     if (!rows.length) return error(res, 'OTP चुकीचा किंवा कालबाह्य झाला आहे.', 400);
 
@@ -196,6 +208,53 @@ exports.resetPassword = async (req, res) => {
     return success(res, {}, 'पासवर्ड यशस्वीरित्या बदलला! आता लॉगिन करा. 🎉');
   } catch (err) {
     return error(res, 'पासवर्ड रीसेट करताना त्रुटी झाली.');
+  }
+};
+
+// ── Google OAuth ──────────────────────────────────────────────
+exports.googleAuth = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) return error(res, 'Google credential आवश्यक आहे.', 400);
+
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const { sub: google_id, name, email, picture: photo_url } = ticket.getPayload();
+
+    const tid = req.tenantId || 1;
+
+    const [rows] = await pool.query(
+      'SELECT * FROM users WHERE google_id = ? OR (email = ? AND email IS NOT NULL) LIMIT 1',
+      [google_id, email || '']
+    );
+
+    let user;
+    if (rows.length) {
+      user = rows[0];
+      if (!user.google_id || !user.photo_url) {
+        await pool.query(
+          'UPDATE users SET google_id = COALESCE(google_id, ?), photo_url = COALESCE(photo_url, ?) WHERE id = ?',
+          [google_id, photo_url || null, user.id]
+        );
+      }
+    } else {
+      const [result] = await pool.query(
+        'INSERT INTO users (tenant_id, name, email, google_id, photo_url, is_verified, role) VALUES (?,?,?,?,?,TRUE,"user")',
+        [tid, name, email || null, google_id, photo_url || null]
+      );
+      user = { id: result.insertId, name, email: email || null, role: 'user', tenant_id: tid };
+    }
+
+    const token = signToken(user);
+    return success(res, { token, user: safeUser(user) }, `स्वागत आहे, ${user.name || name}! 🙏`);
+  } catch (err) {
+    console.error('[Google Auth]', err.message);
+    return error(res, 'Google लॉगिन करताना त्रुटी झाली.');
   }
 };
 

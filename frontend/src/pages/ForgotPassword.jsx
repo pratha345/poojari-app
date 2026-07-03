@@ -1,4 +1,5 @@
 // src/pages/ForgotPassword.jsx
+import SEOHead from '../components/SEOHead';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';

@@ -69,9 +69,10 @@ exports.createTenant = async (req, res) => {
     if (exists) return error(res, 'हे slug आधीच वापरले आहे.', 400);
 
     // Create tenant
+    const features = req.body.features || null;
     const [tenantResult] = await conn.query(
-      'INSERT INTO tenants (name, slug, domain, plan) VALUES (?,?,?,?)',
-      [name, slug, domain || null, plan || 'trial']
+      'INSERT INTO tenants (name, slug, domain, plan, features) VALUES (?,?,?,?,?)',
+      [name, slug, domain || null, plan || 'trial', features ? JSON.stringify(features) : null]
     );
     const tenantId = tenantResult.insertId;
 
@@ -104,7 +105,7 @@ exports.createTenant = async (req, res) => {
 exports.updateTenant = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, domain, plan, is_active, logo_url, city, phone, contact_name } = req.body;
+    const { name, domain, plan, is_active, logo_url, city, phone, contact_name, features } = req.body;
 
     await pool.query(
       `UPDATE tenants SET
@@ -115,9 +116,11 @@ exports.updateTenant = async (req, res) => {
          logo_url     = COALESCE(?, logo_url),
          city         = COALESCE(?, city),
          phone        = COALESCE(?, phone),
-         contact_name = COALESCE(?, contact_name)
+         contact_name = COALESCE(?, contact_name),
+         features     = COALESCE(?, features)
        WHERE id = ?`,
-      [name, domain, plan, is_active, logo_url, city, phone, contact_name, id]
+      [name, domain, plan, is_active, logo_url, city, phone, contact_name,
+       features !== undefined ? JSON.stringify(features) : null, id]
     );
     return success(res, {}, 'Tenant अपडेट केला.');
   } catch (err) {

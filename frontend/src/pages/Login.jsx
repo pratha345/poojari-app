@@ -1,7 +1,9 @@
 // src/pages/Login.jsx
+import SEOHead from '../components/SEOHead';
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { GoogleLogin } from '@react-oauth/google';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { authAPI } from '../api/index.js';
@@ -22,7 +24,7 @@ export default function Login() {
 
   const doRedirect = (user) => {
     if (user.role === 'super_admin' || user.role === 'admin') {
-      navigate('/admin/dashboard', { replace: true });
+      navigate('/admin/report', { replace: true });
     } else if (user.role === 'pujari') {
       navigate('/pujari-dashboard', { replace: true });
     } else {
@@ -47,23 +49,30 @@ export default function Login() {
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!form.phone) { toast.error('फोन नंबर टाका.'); return; }
+    const cleanPhone = form.phone.replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) { toast.error('वैध १० अंकी फोन नंबर टाका.'); return; }
     setLoading(true);
     try {
-      await authAPI.sendOtp(form.phone);
-      toast.success('OTP पाठवला आहे!');
+      const res = await authAPI.sendOtp(cleanPhone);
       setStep(2);
+      const devOtp = res.data?.data?.dev_otp;
+      if (devOtp) {
+        toast.success(`देव OTP: ${devOtp} (चाचणीसाठी)`, { duration: 15000, icon: '📱' });
+      } else {
+        toast.success('OTP पाठवला आहे! फोनवर तपासा. 📱');
+      }
     } catch (err) {
-      toast.error('OTP पाठवताना त्रुटी झाली.');
+      toast.error(err.response?.data?.message || 'OTP पाठवताना त्रुटी झाली.');
     } finally { setLoading(false); }
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    if (!form.otp) { toast.error('OTP टाका.'); return; }
+    if (!form.otp || form.otp.length !== 6) { toast.error('6 अंकी OTP टाका.'); return; }
+    const cleanPhone = form.phone.replace(/\D/g, '');
     setLoading(true);
     try {
-      const res = await authAPI.verifyOtp({ phone: form.phone, otp: form.otp });
+      const res = await authAPI.verifyOtp({ phone: cleanPhone, otp: form.otp });
       const { token, user } = res.data.data;
       login(token, user);
       toast.success(`स्वागत आहे! 🙏`);
@@ -75,6 +84,7 @@ export default function Login() {
 
   return (
     <div>
+      <SEOHead title="Login | पूजारी" noindex={true} />
       <Header />
       <main className={styles.main}>
         <div className={styles.card}>
@@ -146,6 +156,32 @@ export default function Login() {
           )}
 
           <div className={styles.divider}><span>किंवा</span></div>
+
+          {/* Google Sign-In */}
+          <div className={styles.googleWrap}>
+            <GoogleLogin
+              onSuccess={async ({ credential }) => {
+                setLoading(true);
+                try {
+                  const res = await authAPI.googleAuth(credential);
+                  const { token, user } = res.data.data;
+                  login(token, user);
+                  toast.success(`स्वागत आहे, ${user.name}! 🙏`);
+                  doRedirect(user);
+                } catch (err) {
+                  toast.error(err.response?.data?.message || 'Google लॉगिन करताना त्रुटी झाली.');
+                } finally { setLoading(false); }
+              }}
+              onError={() => toast.error('Google लॉगिन रद्द झाले.')}
+              locale="mr"
+              text="signin_with"
+              shape="rectangular"
+              theme="outline"
+              width="100%"
+            />
+          </div>
+
+          <div className={styles.divider}><span>नवीन आहात?</span></div>
           <p className={styles.switchLink}>
             खाते नाही?{' '}
             <Link to="/register">येथे नोंदणी करा</Link>

@@ -112,14 +112,18 @@ exports.getPoojas = async (req, res) => {
 // ── Get Pooja by Slug ─────────────────────────────────────────
 exports.getPoojaBySlug = async (req, res) => {
   try {
-    const { slug } = req.params;
-    const slugKey  = `pooja:slug:${slug}`;
+    const { slug }   = req.params;
+    const tenantId   = req.tenantId || 1;
+    const isTenant   = tenantId > 1;
 
-    const cachedSlug = await getCache(slugKey);
-    if (cachedSlug) {
-      // Increment view count asynchronously — don't block response
-      pool.query('UPDATE poojas SET views = views + 1 WHERE slug = ?', [slug]).catch(() => {});
-      return success(res, cachedSlug);
+    // Cache only for default tenant (tenant-specific prices must not be cached globally)
+    if (!isTenant) {
+      const slugKey    = `pooja:slug:${slug}`;
+      const cachedSlug = await getCache(slugKey);
+      if (cachedSlug) {
+        pool.query('UPDATE poojas SET views = views + 1 WHERE slug = ?', [slug]).catch(() => {});
+        return success(res, cachedSlug);
+      }
     }
 
     const [rows] = await pool.query(
@@ -131,13 +135,38 @@ exports.getPoojaBySlug = async (req, res) => {
     );
     if (!rows.length) return error(res, 'पूजा सापडली नाही.', 404);
 
-    const pooja = rows[0];
+    const pooja = { ...rows[0] };
 
-    // Get samagri
-    const [samagri] = await pool.query(
-      'SELECT * FROM samagri_items WHERE pooja_id = ? ORDER BY sort_order',
-      [pooja.id]
-    );
+    // ── Tenant price override ──────────────────────────────────
+    if (isTenant) {
+      const [[cfg]] = await pool.query(
+        'SELECT custom_price, custom_samagri_price, is_enabled, custom_desc_mr FROM tenant_puja_config WHERE tenant_id = ? AND pooja_id = ?',
+        [tenantId, pooja.id]
+      );
+      if (cfg) {
+        if (cfg.is_enabled === 0) return error(res, 'ही पूजा या ठिकाणी उपलब्ध नाही.', 404);
+        if (cfg.custom_price        != null) pooja.price         = cfg.custom_price;
+        if (cfg.custom_samagri_price!= null) pooja.samagri_price = cfg.custom_samagri_price;
+        if (cfg.custom_desc_mr)              pooja.description    = cfg.custom_desc_mr;
+      }
+    }
+
+    // ── Samagri: tenant override → global fallback ─────────────
+    let samagri = [];
+    if (isTenant) {
+      const [tenantSamagri] = await pool.query(
+        'SELECT * FROM tenant_samagri_config WHERE tenant_id = ? AND pooja_id = ? ORDER BY sort_order',
+        [tenantId, pooja.id]
+      );
+      samagri = tenantSamagri.length > 0 ? tenantSamagri : [];
+    }
+    if (!samagri.length) {
+      const [globalSamagri] = await pool.query(
+        'SELECT * FROM samagri_items WHERE pooja_id = ? ORDER BY sort_order',
+        [pooja.id]
+      );
+      samagri = globalSamagri;
+    }
 
     // Get reviews
     const [reviews] = await pool.query(
@@ -148,13 +177,18 @@ exports.getPoojaBySlug = async (req, res) => {
       [pooja.id]
     );
 
-    // Increment view count
     await pool.query('UPDATE poojas SET views = views + 1 WHERE id = ?', [pooja.id]);
 
     const slugData = { ...pooja, image_url: resolveImageUrl(pooja.image_url), samagri, reviews };
-    await setCache(slugKey, slugData, SLUG_TTL);
+
+    // Cache only for default tenant
+    if (!isTenant) {
+      await setCache(`pooja:slug:${slug}`, slugData, SLUG_TTL);
+    }
+
     return success(res, slugData);
   } catch (err) {
+    console.error('getPoojaBySlug error:', err);
     return error(res, 'पूजा तपशील मिळवताना त्रुटी झाली.');
   }
 };
@@ -244,6 +278,15 @@ exports.getAllPoojas = async (req, res) => {
               c.name_mr AS category_name, c.slug AS category_slug
        FROM poojas p
        LEFT JOIN pooja_categories c ON p.category_id = c.id
+       WHERE (c.slug IS NULL OR (
+         c.slug NOT LIKE '%consultation%' AND
+         c.slug NOT LIKE '%jyotish%' AND
+         c.slug NOT LIKE '%salla%' AND
+         c.slug NOT LIKE '%kundali%'
+       ))
+       AND p.name_mr NOT LIKE '%सल्लामसलत%'
+       AND p.name_mr NOT LIKE '%कुंडली विरलेषण%'
+       AND p.name_mr NOT LIKE '%ज्योतिष%'
        ORDER BY c.sort_order, p.is_featured DESC, p.name_mr`
     );
     return success(res, resolveImages(rows));

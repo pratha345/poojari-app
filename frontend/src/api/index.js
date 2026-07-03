@@ -7,6 +7,7 @@ export const authAPI = {
   verifyOtp:       (data)  => api.post('/auth/verify-otp', data),
   forgotPassword:  (phone) => api.post('/auth/forgot-password', { phone }),
   resetPassword:   (data)  => api.post('/auth/reset-password', data),
+  googleAuth:      (credential) => api.post('/auth/google', { credential }),
   getMe:           ()      => api.get('/auth/me'),
 };
 
@@ -32,8 +33,10 @@ export const pujariAPI = {
   getMyProfile:    () => api.get('/pujari/profile'),
   updateProfile:   (data) => api.put('/pujari/profile', data),
   setAvailability: (dates) => api.post('/pujari/availability', { dates }),
-  getMyBookings:     (params) => api.get('/pujari/bookings', { params }),
-  respondBooking:    (id, data) => api.put(`/pujari/bookings/${id}/respond`, data),
+  getMyBookings:          (params) => api.get('/pujari/bookings', { params }),
+  respondBooking:         (id, data) => api.put(`/pujari/bookings/${id}/respond`, data),
+  getWhatsappRequests:    () => api.get('/pujari/whatsapp-requests'),
+  acceptWhatsappBooking:  (id) => api.put(`/pujari/whatsapp-requests/${id}/accept`),
   getMyServices:     () => api.get('/pujari/my-services'),
   saveMyServices:    (services) => api.post('/pujari/my-services', { services }),
   getNearbyPujaris:(params) => api.get('/pujari/nearby', { params }),
@@ -78,6 +81,12 @@ export const adminAPI = {
   getAbhyasakUsers: ()     => api.get('/admin/abhyasak'),
   createAbhyasak:   (data) => api.post('/admin/abhyasak', data),
   deleteAbhyasak:   (id)   => api.delete(`/admin/abhyasak/${id}`),
+  getConsultations:             (params) => api.get('/admin/consultations', { params }),
+  updateConsultationNote:       (id, note) => api.put(`/admin/consultations/${id}/note`, { note }),
+  getConsultationServices:      ()         => api.get('/admin/consultation-services'),
+  createConsultationService:    (data)     => api.post('/admin/consultation-services', data),
+  updateConsultationService:    (id, data) => api.put(`/admin/consultation-services/${id}`, data),
+  toggleConsultationService:    (id)       => api.patch(`/admin/consultation-services/${id}/toggle`),
 };
 
 // src/api/contact.api.js
@@ -236,6 +245,27 @@ export const subscriptionAPI = {
 
 export const chatAPI = {
   send: (message, history) => api.post('/chat', { message, history }),
+};
+
+// ── Tenant Config API (franchise admin) ───────────────────────
+export const tenantConfigAPI = {
+  // Features
+  getFeatures:      ()              => api.get('/tenant-config/features'),
+  // Dashboard
+  getDashboard:     ()              => api.get('/tenant-config/dashboard'),
+  // Puja config
+  getPujaConfig:    ()              => api.get('/tenant-config/puja'),
+  upsertPujaConfig: (poojaId, data) => api.put(`/tenant-config/puja/${poojaId}`, data),
+  deletePujaConfig: (poojaId)       => api.delete(`/tenant-config/puja/${poojaId}`),
+  // Samagri config
+  getSamagriConfig: (poojaId)       => api.get(`/tenant-config/samagri/${poojaId}`),
+  saveSamagriConfig:(poojaId, items)=> api.put(`/tenant-config/samagri/${poojaId}`, { items }),
+  resetSamagriConfig:(poojaId)      => api.delete(`/tenant-config/samagri/${poojaId}`),
+  // Pujaris
+  getPujaris:       ()              => api.get('/tenant-config/pujaris'),
+  createPujari:     (data)          => api.post('/tenant-config/pujaris/create', data),
+  assignPujari:     (pujari_id)     => api.post('/tenant-config/pujaris', { pujari_id }),
+  removePujari:     (pujariId)      => api.delete(`/tenant-config/pujaris/${pujariId}`),
 };
 
 // ── Ticket API ────────────────────────────────────────────────

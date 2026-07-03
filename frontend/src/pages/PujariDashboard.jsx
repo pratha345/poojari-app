@@ -15,11 +15,14 @@ const STATUS_LABELS = {
 };
 
 export default function PujariDashboard() {
-  const [profile,  setProfile]  = useState(null);
-  const [bookings, setBookings] = useState([]);
-  const [tab,      setTab]      = useState('bookings');
-  const [filter,   setFilter]   = useState('pending');
-  const [loading,  setLoading]  = useState(true);
+  const [profile,      setProfile]      = useState(null);
+  const [bookings,     setBookings]     = useState([]);
+  const [waRequests,   setWaRequests]   = useState([]);
+  const [tab,          setTab]          = useState('bookings');
+  const [filter,       setFilter]       = useState('pending');
+  const [loading,      setLoading]      = useState(true);
+  const [waLoading,    setWaLoading]    = useState(false);
+  const [accepting,    setAccepting]    = useState(null);
 
   useEffect(() => {
     pujariAPI.getMyProfile()
@@ -36,12 +39,35 @@ export default function PujariDashboard() {
       .finally(() => setLoading(false));
   }, [filter]);
 
+  const loadWaRequests = () => {
+    setWaLoading(true);
+    pujariAPI.getWhatsappRequests()
+      .then(r => setWaRequests(r.data.data || []))
+      .catch(() => setWaRequests([]))
+      .finally(() => setWaLoading(false));
+  };
+
+  useEffect(() => {
+    if (tab === 'whatsapp') loadWaRequests();
+  }, [tab]);
+
   const handleRespond = async (id, action, reason = '') => {
     try {
       await pujariAPI.respondBooking(id, { action, reason });
       toast.success(action === 'confirm' ? 'बुकिंग स्वीकारली! 🙏' : 'बुकिंग नाकारली.');
       setBookings(bs => bs.filter(b => b.id !== id));
     } catch { toast.error('प्रतिसाद देताना त्रुटी झाली.'); }
+  };
+
+  const handleAcceptWA = async (id) => {
+    setAccepting(id);
+    try {
+      await pujariAPI.acceptWhatsappBooking(id);
+      toast.success('WhatsApp बुकिंग स्वीकारली! 🙏');
+      setWaRequests(rs => rs.filter(r => r.id !== id));
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'स्वीकारताना त्रुटी झाली.');
+    } finally { setAccepting(null); }
   };
 
   const statusIcon = (status) => ({
@@ -72,7 +98,7 @@ export default function PujariDashboard() {
                   </p>
                   <span className={`badge badge-${profile.status === 'approved' ? 'success' : profile.status === 'pending' ? 'warning' : 'danger'}`}>
                     {statusIcon(profile.status)}&nbsp;
-                    {profile.status === 'approved' ? 'मंजूर' : profile.status === 'pending' ? 'मंजुरीसाठी प्रतीक्षा' : 'नाकारले'}
+                    {profile.status === 'approved' ? 'मंजूर' : profile.status === 'pending' ? 'मंजूरीसाठी प्रतीक्षा' : 'नाकारले'}
                   </span>
                 </div>
               </div>
@@ -86,17 +112,18 @@ export default function PujariDashboard() {
 
           {profile?.status !== 'approved' && (
             <div className={styles.pendingAlert}>
-              ⏳ आपली नोंदणी मंजुरीसाठी प्रतीक्षेत आहे. मंजुरीनंतर बुकिंग मिळण्यास सुरुवात होईल.
+              ⏳ आपली नोंदणी मंजूरीसाठी प्रतीक्षेत आहे. मंजूरीनंतर बुकिंग मिळण्यास सुरुवात होईल.
             </div>
           )}
 
           {/* Tabs */}
           <div className={styles.tabs}>
             {[
-              { key: 'bookings',     label: '📋 बुकिंग्ज'     },
-              { key: 'services',     label: '🪔 माझ्या पूजा'  },
-              { key: 'availability', label: '🗓️ उपलब्धता'    },
-              { key: 'profile',      label: '👤 प्रोफाईल'      },
+              { key: 'bookings',     label: '📋 बुकिंग्ज'          },
+              ...(profile?.whatsapp_enabled ? [{ key: 'whatsapp', label: '📱 WhatsApp विनंती' }] : []),
+              { key: 'services',     label: '🪔 माझ्या पूजा'       },
+              { key: 'availability', label: '🗓️ उपलब्धता'         },
+              { key: 'profile',      label: '👤 प्रोफाईल'           },
             ].map(t => (
               <button
                 key={t.key}
@@ -175,6 +202,61 @@ export default function PujariDashboard() {
                       </div>
                     );
                   })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* WHATSAPP TAB */}
+          {tab === 'whatsapp' && profile?.whatsapp_enabled && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <h2 style={{ fontWeight: 700, fontSize: 18 }}>📱 WhatsApp बुकिंग विनंती</h2>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={loadWaRequests}
+                  disabled={waLoading}
+                >
+                  {waLoading ? '⏳' : '🔄 रिफ्रेश'}
+                </button>
+              </div>
+              {waLoading ? (
+                <div className="page-loader"><div className="spinner"/></div>
+              ) : waRequests.length === 0 ? (
+                <div className={styles.empty}>
+                  <span>📱</span>
+                  <p>कोणतीही WhatsApp विनंती नाही.</p>
+                </div>
+              ) : (
+                <div className={styles.bookingList}>
+                  {waRequests.map(b => (
+                    <div key={b.id} className={styles.bookingCard}>
+                      <div className={styles.bookingHeader}>
+                        <span className="badge badge-warning" style={{ background: '#25D366', color: '#fff' }}>📱 WhatsApp</span>
+                        <span className={styles.bookingCode}>#{b.booking_code || b.id}</span>
+                      </div>
+                      <h3 className={styles.poojaName}>{b.pooja_name || 'पूजा'}</h3>
+                      <div className={styles.bookingMeta}>
+                        <span>👤 {b.user_name || b.customer_name || '—'}</span>
+                        <span>📞 {b.user_phone || b.phone || '—'}</span>
+                        {b.booking_date && <span>📅 {new Date(b.booking_date).toLocaleDateString('mr-IN')}</span>}
+                        {b.booking_time && <span>🕐 {b.booking_time?.slice(0, 5)}</span>}
+                      </div>
+                      {b.address && <div className={styles.bookingAddress}>📍 {b.address}</div>}
+                      <div className={styles.bookingFooter}>
+                        {b.total_amount > 0 && (
+                          <span className={styles.bookingAmt}>₹{Number(b.total_amount).toLocaleString('mr-IN')}</span>
+                        )}
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => handleAcceptWA(b.id)}
+                          disabled={accepting === b.id}
+                        >
+                          {accepting === b.id ? '⏳...' : '✅ स्वीकारा'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

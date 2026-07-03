@@ -228,9 +228,14 @@ export default function BookPujari() {
     if (phone.length < 10) { toast.error('वैध १० अंकी फोन नंबर टाका.'); return; }
     setOtpLoading(true);
     try {
-      await authAPI.sendOtp(phone);
+      const res = await authAPI.sendOtp(phone);
       setOtpSent(true);
-      toast.success('OTP पाठवला! 📱');
+      const devOtp = res.data?.data?.dev_otp;
+      if (devOtp) {
+        toast.success(`देव OTP: ${devOtp} (चाचणीसाठी)`, { duration: 15000, icon: '📱' });
+      } else {
+        toast.success('OTP पाठवला! 📱');
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'OTP पाठवताना त्रुटी.');
     } finally { setOtpLoading(false); }
@@ -524,7 +529,7 @@ export default function BookPujari() {
                           <input
                             autoFocus
                             type="text"
-                            placeholder="🔍 पूजा शोधा... (Marathi / English)"
+                            placeholder="🔍 पूजा शोधा... (मराठी / इंग्रजी)"
                             value={poojaSearch}
                             onChange={e => setPoojaSearch(e.target.value)}
                             style={{
@@ -597,7 +602,7 @@ export default function BookPujari() {
                     <div style={{ display: 'flex', gap: 12 }}>
                       {[
                         { val: 'offline', label: '🏠 घरी (Offline)', desc: 'पुजारी घरी येतात' },
-                        { val: 'online',  label: '💻 ऑनलाईन',        desc: 'व्हिडिओ कॉलवर' },
+                        { val: 'online',  label: '💻 ऑनलाइन',        desc: 'व्हिडिओ कॉलवर' },
                       ].map(opt => (
                         <label key={opt.val} style={{
                           flex: 1, cursor: 'pointer', borderRadius: 12,
@@ -796,7 +801,7 @@ export default function BookPujari() {
                         ['📅 तारीख',    form.booking_date],
                         ['⏰ वेळ',      TIMES.find(t => t.value === form.booking_time)?.label || form.booking_time],
                         ['📦 सामग्री',  form.samagri ? '✅ हो' : '❌ नाही'],
-                        ['🏠 पद्धत',   form.mode === 'online' ? 'ऑनलाईन' : 'घरी'],
+                        ['🏠 पद्धत',   form.mode === 'online' ? 'ऑनलाइन' : 'घरी'],
                         ...(selectedPooja?.price ? [['💰 एकूण किंमत', `₹${(
                           form.samagri
                             ? Number(selectedPooja.price) + Number(selectedPooja.samagri_price || 0)

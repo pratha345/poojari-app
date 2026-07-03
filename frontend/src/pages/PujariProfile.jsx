@@ -3,8 +3,45 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import SEOHead from '../components/SEOHead';
 import { pujariAPI } from '../api/index.js';
 import styles from './PujariProfile.module.css';
+
+function buildPujariSchema(profile, reviews) {
+  const BASE = 'https://pujari.mydashboard.site';
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': `${BASE}/pujari/${profile.id}`,
+        'name': profile.name,
+        'jobTitle': 'पुजारी (Hindu Priest)',
+        'url': `${BASE}/pujari/${profile.id}`,
+        'image': profile.photo_url ? `${BASE}${profile.photo_url}` : undefined,
+        'worksFor': { '@type': 'Organization', 'name': 'पूजारी', 'url': BASE },
+        'areaServed': { '@type': 'City', 'name': profile.city || 'Maharashtra' },
+        'knowsAbout': 'Hindu Puja Rituals, Marathi Traditions, Vedic Ceremonies',
+        ...(profile.rating ? {
+          'aggregateRating': {
+            '@type': 'AggregateRating',
+            'ratingValue': profile.rating,
+            'bestRating': 5,
+            'reviewCount': profile.total_bookings || reviews.length || 1,
+          }
+        } : {}),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': 'मुख्यपृष्ठ', 'item': `${BASE}/` },
+          { '@type': 'ListItem', 'position': 2, 'name': 'पुजारी', 'item': `${BASE}/pujari/${profile.id}` },
+          { '@type': 'ListItem', 'position': 3, 'name': profile.name, 'item': `${BASE}/pujari/${profile.id}` },
+        ],
+      },
+    ]
+  };
+}
 
 function StarRating({ rating, size = 16 }) {
   return (
@@ -67,11 +104,22 @@ export default function PujariProfile() {
   );
 
   const languages     = (() => { try { return JSON.parse(profile.languages || '[]'); } catch { return []; } })();
+  const city          = profile.city || 'महाराष्ट्र';
+  const rating        = profile.rating ? `⭐ ${Number(profile.rating).toFixed(1)} रेटिंग` : '';
+  const seoTitle      = `${profile.name} — ${city} पुजारी ${rating} | पूजारी`;
+  const seoDesc       = `${profile.name} — ${city} मधील अनुभवी पुजारी. ${rating}. घरी पूजा बुकिंगसाठी उपलब्ध. सत्यनारायण, गृहप्रवेश, हवन व इतर सर्व पूजा करतात.`.slice(0, 160);
   const specializations = (profile.specializations || '').split(',').map(s => s.trim()).filter(Boolean);
   const pastPujas     = profile.past_pujas || [];
 
   return (
     <div>
+      <SEOHead
+        title={seoTitle}
+        description={seoDesc}
+        keywords={`${profile.name}, ${city} पुजारी, pandit ${city}, पूजा बुकिंग ${city}, book pujari ${city}`}
+        canonical={`/pujari/${profile.id}`}
+        schema={buildPujariSchema(profile, reviews)}
+      />
       <Header />
       <main className={styles.main}>
         <div className="container">

@@ -6,6 +6,8 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import SEOHead from '../components/SEOHead';
 import { poojaAPI, bookingAPI, authAPI } from '../api/index.js';
+import { useAuth } from '../context/AuthContext';
+import styles from './Booking.module.css';
 
 const loadRazorpay = () =>
   new Promise((resolve) => {
@@ -16,8 +18,6 @@ const loadRazorpay = () =>
     s.onerror = () => resolve(false);
     document.body.appendChild(s);
   });
-import { useAuth } from '../context/AuthContext';
-import styles from './Booking.module.css';
 
 const TIMES = [
   '०६:०० पूर्वाह्न','०७:०० पूर्वाह्न','०८:०० पूर्वाह्न',
@@ -132,12 +132,18 @@ export default function Booking() {
 
   // ── OTP handlers ──────────────────────────────────────────────
   const handleSendOtp = async () => {
-    if (!otpPhone || otpPhone.length < 10) { toast.error('वैध फोन नंबर टाका.'); return; }
+    const cleanPhone = otpPhone.replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) { toast.error('वैध १० अंकी फोन नंबर टाका.'); return; }
     setOtpLoading(true);
     try {
-      await authAPI.sendOtp(otpPhone);
+      const res = await authAPI.sendOtp(cleanPhone);
       setOtpSent(true);
-      toast.success('OTP पाठवला! फोनवर तपासा.');
+      const devOtp = res.data?.data?.dev_otp;
+      if (devOtp) {
+        toast.success(`देव OTP: ${devOtp} (चाचणीसाठी)`, { duration: 15000, icon: '📱' });
+      } else {
+        toast.success('OTP पाठवला! फोनवर तपासा. 📱');
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'OTP पाठवताना त्रुटी.');
     } finally { setOtpLoading(false); }
@@ -145,9 +151,10 @@ export default function Booking() {
 
   const handleVerifyOtp = async () => {
     if (!otpCode || otpCode.length !== 6) { toast.error('6 अंकी OTP टाका.'); return; }
+    const cleanPhone = otpPhone.replace(/\D/g, '');
     setOtpLoading(true);
     try {
-      const res = await authAPI.verifyOtp({ phone: otpPhone, otp: otpCode, name: otpName || undefined });
+      const res = await authAPI.verifyOtp({ phone: cleanPhone, otp: otpCode, name: otpName || undefined });
       login(res.data.data.token, res.data.data.user);
       toast.success('OTP पडताळणी यशस्वी! 🙏');
       setStep(1);

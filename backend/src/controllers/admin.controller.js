@@ -55,6 +55,8 @@ exports.respondToPujari = async (req, res) => {
   try {
     const { id } = req.params;
     const { action, reason } = req.body;
+    if (!['approve', 'reject'].includes(action))
+      return res.status(400).json({ success: false, message: 'action "approve" किंवा "reject" असणे आवश्यक आहे.' });
     const status = action === 'approve' ? 'approved' : 'rejected';
 
     // Ensure pujari belongs to this tenant
@@ -234,6 +236,8 @@ exports.approveReview = async (req, res) => {
   try {
     const { id } = req.params;
     const tf = tenantFilter(req);
+    const [[existing]] = await pool.query(`SELECT id FROM reviews WHERE id=? AND ${tf}`, [id]);
+    if (!existing) return res.status(404).json({ success: false, message: 'अभिप्राय सापडला नाही.' });
     await pool.query(`UPDATE reviews SET is_approved=TRUE WHERE id=? AND ${tf}`, [id]);
     return success(res, {}, 'अभिप्राय मंजूर केला.');
   } catch (err) {
@@ -332,7 +336,7 @@ exports.getApprovedPujaris = async (req, res) => {
        LIMIT ? OFFSET ?`,
       [...params, parseInt(limit), offset]
     );
-    return success(res, { rows, total, page: parseInt(page), limit: parseInt(limit) });
+    return res.json({ success: true, data: rows, pagination: { total, page: parseInt(page), limit: parseInt(limit) } });
   } catch (err) {
     return error(res, 'डेटा मिळवताना त्रुटी झाली.');
   }
@@ -558,5 +562,138 @@ exports.deleteAbhyasak = async (req, res) => {
     return success(res, {}, 'अभ्यासक काढला.');
   } catch (err) {
     return error(res, 'अभ्यासक काढताना त्रुटी झाली.');
+  }
+};
+
+// ── Consultation Management ───────────────────────────────────
+exports.getConsultations = async (req, res) => {
+  try {
+    const tf     = tenantFilter(req, 'b');
+    const { status } = req.query;
+
+    // Consultation pooja IDs: 94=Phone, 95=Home, 96=Full Kundali
+    const consultIds = [94, 95, 96];
+
+    let where = `b.pooja_id IN (${consultIds.join(',')}) AND ${tf}`;
+    if (status && status !== 'all') where += ` AND b.status = ${pool.escape(status)}`;
+
+    const [rows] = await pool.query(`
+      SELECT
+        b.id, b.booking_code, b.pooja_id, b.booking_date, b.booking_time,
+        b.address, b.total_amount, b.status, b.payment_status,
+        b.special_notes, b.admin_notes, b.created_at,
+        u.name  AS user_name,  u.phone AS user_phone,
+        p.name_mr AS pooja_name
+      FROM bookings b
+      JOIN users  u ON u.id = b.user_id
+      JOIN poojas p ON p.id = b.pooja_id
+      WHERE ${where}
+      ORDER BY b.created_at DESC
+      LIMIT 200
+    `);
+
+    return success(res, rows);
+  } catch (err) {
+    console.error('[Consult] getConsultations error:', err.message);
+    return error(res, 'सल्लामसलत डेटा लोड करताना त्रुटी.');
+  }
+};
+
+exports.updateConsultationNote = async (req, res) => {
+  try {
+    const { id }   = req.params;
+    const { note } = req.body;
+    const tf       = tenantFilter(req, 'b');
+
+    // Verify it's a consultation booking
+    const [[booking]] = await pool.query(
+      `SELECT id FROM bookings b WHERE b.id = ? AND b.pooja_id IN (94,95,96) AND ${tf}`,
+      [id]
+    );
+    if (!booking) return error(res, 'सल्लामसलत सापडली नाही.', 404);
+
+    await pool.query(
+      'UPDATE bookings SET admin_notes = ? WHERE id = ?',
+      [note, id]
+    );
+    return success(res, {}, 'नोट जतन केली.');
+  } catch (err) {
+    return error(res, 'नोट जतन करताना त्रुटी.');
+  }
+};
+
+// ── Consultation Services (Parameterized) ────────────────────
+const CONSULT_CATEGORY_SLUG = 'jyotish-consultation';
+
+exports.getConsultationServices = async (req, res) => {
+  try {
+    const [[cat]] = await pool.query(
+      `SELECT id FROM pooja_categories WHERE slug = ?`, [CONSULT_CATEGORY_SLUG]
+    );
+    if (!cat) return success(res, []);
+
+    const [rows] = await pool.query(
+      `SELECT id, name_mr, name_en, short_desc, price, samagri_price, duration_hrs, is_active
+       FROM poojas WHERE category_id = ? ORDER BY price ASC`,
+      [cat.id]
+    );
+    return success(res, rows);
+  } catch (err) {
+    return error(res, 'सेवा लोड करताना त्रुटी.');
+  }
+};
+
+exports.createConsultationService = async (req, res) => {
+  try {
+    const { name_mr, name_en, short_desc, price, duration_hrs } = req.body;
+    if (!name_mr || !price) return error(res, 'नाव आणि किंमत आवश्यक आहे.', 400);
+
+    const [[cat]] = await pool.query(
+      `SELECT id FROM pooja_categories WHERE slug = ?`, [CONSULT_CATEGORY_SLUG]
+    );
+    if (!cat) return error(res, 'सल्लामसलत श्रेणी सापडली नाही.', 404);
+
+    const slug = `consult-${Date.now()}`;
+    const [result] = await pool.query(
+      `INSERT INTO poojas (category_id, name_mr, name_en, slug, short_desc, price, samagri_price, duration_hrs, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, 0, ?, 1)`,
+      [cat.id, name_mr, name_en || name_mr, slug, short_desc || '', price, duration_hrs || 1]
+    );
+    return success(res, { id: result.insertId }, 'सेवा जोडली.');
+  } catch (err) {
+    return error(res, 'सेवा जोडताना त्रुटी.');
+  }
+};
+
+exports.updateConsultationService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name_mr, name_en, short_desc, price, duration_hrs } = req.body;
+
+    const [[cat]] = await pool.query(
+      `SELECT id FROM pooja_categories WHERE slug = ?`, [CONSULT_CATEGORY_SLUG]
+    );
+    if (!cat) return error(res, 'श्रेणी सापडली नाही.', 404);
+
+    await pool.query(
+      `UPDATE poojas SET name_mr=?, name_en=?, short_desc=?, price=?, duration_hrs=?
+       WHERE id=? AND category_id=?`,
+      [name_mr, name_en || name_mr, short_desc || '', price, duration_hrs || 1, id, cat.id]
+    );
+    return success(res, {}, 'सेवा अद्यतनित केली.');
+  } catch (err) {
+    return error(res, 'सेवा अद्यतन करताना त्रुटी.');
+  }
+};
+
+exports.toggleConsultationService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [[row]] = await pool.query(`SELECT is_active FROM poojas WHERE id=?`, [id]);
+    if (!row) return error(res, 'सेवा सापडली नाही.', 404);
+    await pool.query(`UPDATE poojas SET is_active=? WHERE id=?`, [row.is_active ? 0 : 1, id]);
+    return success(res, { is_active: !row.is_active }, row.is_active ? 'सेवा बंद केली.' : 'सेवा सुरू केली.');
+  } catch (err) {
+    return error(res, 'त्रुटी झाली.');
   }
 };

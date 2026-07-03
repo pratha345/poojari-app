@@ -5,9 +5,10 @@ const hallCtrl  = require('../controllers/hall.controller');
 const { authenticate, authorize } = require('../middleware/auth.middleware');
 const { attachTenant } = require('../middleware/tenant.middleware');
 const { checkPlanExpiry } = require('../middleware/planExpiry.middleware');
+const { adminLimiter } = require('../middleware/security.middleware');
 
 // admin = tenant admin; super_admin also passes (authorize skips for super_admin)
-const admin = [authenticate, attachTenant, checkPlanExpiry, authorize('admin')];
+const admin = [adminLimiter, authenticate, attachTenant, checkPlanExpiry, authorize('admin')];
 
 // ── Push Notifications ─────────────────────────────────────────
 const pushService = require('../services/pushService');
@@ -42,6 +43,15 @@ router.get('/users',                       ...admin, ctrl.getAllUsers);
 router.get   ('/abhyasak',     ...admin, ctrl.getAbhyasakUsers);
 router.post  ('/abhyasak',     ...admin, ctrl.createAbhyasak);
 router.delete('/abhyasak/:id', ...admin, ctrl.deleteAbhyasak);
+
+// ── Consultation Management ────────────────────────────────────
+router.get ('/consultations',                    ...admin, ctrl.getConsultations);
+router.put ('/consultations/:id/note',           ...admin, ctrl.updateConsultationNote);
+// Consultation Services (parameterized)
+router.get ('/consultation-services',            ...admin, ctrl.getConsultationServices);
+router.post('/consultation-services',            ...admin, ctrl.createConsultationService);
+router.put ('/consultation-services/:id',        ...admin, ctrl.updateConsultationService);
+router.patch('/consultation-services/:id/toggle',...admin, ctrl.toggleConsultationService);
 
 // ── Hall Management ────────────────────────────────────────────
 router.get('/halls',         ...admin, hallCtrl.getAllHallsAdmin);

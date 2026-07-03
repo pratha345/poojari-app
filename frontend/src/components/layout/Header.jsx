@@ -214,11 +214,14 @@ export default function Header() {
 
           {/* Logo */}
           <Link to="/" className={styles.logo}>
-            <img
-              src="/logo.png"
-              alt="Poojaris — For All Poojas"
-              className={styles.logoImg}
-            />
+            <picture>
+              <source srcSet="/logo.webp" type="image/webp" />
+              <img
+                src="/logo.png"
+                alt="Poojaris — For All Poojas"
+                className={styles.logoImg}
+              />
+            </picture>
           </Link>
 
           {/* Desktop Nav Links — CENTER */}
@@ -280,7 +283,11 @@ export default function Header() {
                   className={styles.userBtn}
                   onClick={e => { e.stopPropagation(); setDropdownOpen(v => !v); }}
                 >
-                  <span className={styles.avatar}>{user.name?.[0] || '🙏'}</span>
+                  {user.photo_url ? (
+                    <img src={user.photo_url} alt={user.name} className={styles.avatarImg} referrerPolicy="no-referrer" />
+                  ) : (
+                    <span className={styles.avatar}>{user.name?.[0] || '🙏'}</span>
+                  )}
                   <span className={styles.userName}>{user.name?.split(' ')[0]}</span>
                   <span className={styles.chevron}>▾</span>
                 </button>

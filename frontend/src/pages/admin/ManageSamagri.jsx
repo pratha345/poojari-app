@@ -331,7 +331,7 @@ export default function ManageSamagri() {
               value={selPooja ? String(selPooja.id) : ''}
               onChange={handlePoojaChange}
               placeholder="📿 पूजा निवडा..."
-              searchPlaceholder="नाव टाइप करा... (Marathi / English)"
+              searchPlaceholder="नाव टाइप करा... (मराठी / इंग्रजी)"
               searchFn={q => poojas
                 .filter(p => phoneticSearch(q, p.name_mr))
                 .map(p => ({

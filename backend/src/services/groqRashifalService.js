@@ -38,6 +38,38 @@ function formatDateMR(isoDate) {
   return `${d.getUTCDate()} ${MONTHS_MR[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
+function fallbackTomorrow(rashiId) {
+  const name = RASHI_NAMES[rashiId];
+  return {
+    general: `${name} राशीसाठी उद्याचा दिवस सामान्य असेल. शांत राहा व नियोजनबद्ध काम करा.`,
+    love: 'कुटुंबाशी संवाद ठेवा. नातेसंबंध सुधारण्यास वेळ द्या.',
+    career: 'कामामध्ये लक्ष केंद्रित करा. नवीन संधी येण्याची शक्यता आहे.',
+    health: 'आहारावर लक्ष द्या. योग्य विश्रांती घ्या.',
+    guru: 'गुरूचा प्रभाव शुभ आहे. ज्ञान व शिक्षणात प्रगती होईल.',
+    shani: 'शनी मेहनतीचे फळ देतो. धैर्य ठेवा.',
+    sunEffect: 'सूर्य आत्मविश्वास वाढवतो. नेतृत्व गुणांचा फायदा होईल.',
+    tip: 'आज सकाळी देवपूजा करा व मनशांती मिळवा.',
+    score: 7, scoreLabel: 'चांगला', quality: 'good',
+  };
+}
+
+function fallbackWeekly(rashiId) {
+  const name = RASHI_NAMES[rashiId];
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(Date.now() + 330 * 60000 + i * 86400000);
+    return {
+      dayIndex: i,
+      general: `${name} राशीसाठी ${DAYS_MR[d.getUTCDay()]}चा दिवस सामान्य असेल.`,
+      tip: 'सकाळी प्रार्थना करा व दिवस सुरु करा.',
+      score: 6 + (i % 3), scoreLabel: 'चांगला', quality: 'good',
+      dayName: DAYS_MR[d.getUTCDay()],
+      dateNum: d.getUTCDate(),
+      monthName: MONTHS_MR[d.getUTCMonth()],
+      isToday: i === 0,
+    };
+  });
+}
+
 async function callGroq(prompt) {
   const res = await fetch(GROQ_API_URL, {
     method:  'POST',
@@ -97,9 +129,14 @@ async function getTomorrowPrediction(rashiId) {
 }
 quality फक्त: "best"(९-१०), "good"(७-८), "neutral"(५-६), "caution"(१-४)`;
 
-  const result = await callGroq(prompt);
-  cache.set(cacheKey, result);
-  return result;
+  try {
+    const result = await callGroq(prompt);
+    cache.set(cacheKey, result);
+    return result;
+  } catch (err) {
+    console.warn('Groq rashifal fallback (tomorrow):', err.message);
+    return fallbackTomorrow(rashiId);
+  }
 }
 
 // ── Get weekly prediction ──────────────────────────────────────
@@ -137,7 +174,15 @@ ${datesStr}
 ]
 quality फक्त: "best"(९-१०), "good"(७-८), "neutral"(५-६), "caution"(१-४)`;
 
-  const result = await callGroq(prompt);
+  let result;
+  try {
+    result = await callGroq(prompt);
+  } catch (err) {
+    console.warn('Groq rashifal fallback (weekly):', err.message);
+    const enriched = fallbackWeekly(rashiId);
+    cache.set(cacheKey, enriched);
+    return enriched;
+  }
   // Attach date info
   const enriched = result.map((item, i) => ({
     ...item,

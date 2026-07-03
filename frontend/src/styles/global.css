@@ -573,3 +573,23 @@ body { top: 0 !important; }
 /* Hide the floating "Translate" button Google sometimes adds */
 .VIpgJd-ZVi9od-aZ2wEe-OiiCO,
 .VIpgJd-ZVi9od-aZ2wEe { display: none !important; }
+
+/* ── Theme-aware utility overrides for Tailwind orange classes ─── */
+/* These ensure Tenant Config pages respond to theme changes         */
+.bg-orange-50  { background-color: var(--cream) !important; }
+.bg-orange-100 { background-color: var(--cream-dark) !important; }
+.bg-orange-500 { background-color: var(--primary) !important; }
+.bg-orange-600 { background-color: var(--primary-dark) !important; }
+.text-orange-500 { color: var(--primary) !important; }
+.text-orange-600 { color: var(--primary) !important; }
+.text-orange-700 { color: var(--primary-dark) !important; }
+.text-orange-800 { color: var(--secondary) !important; }
+.border-orange-200 { border-color: var(--border) !important; }
+.border-orange-300 { border-color: var(--primary-light) !important; }
+.border-orange-400 { border-color: var(--primary-light) !important; }
+.border-orange-500 { border-color: var(--primary) !important; }
+.hover\:bg-orange-50:hover  { background-color: var(--cream) !important; }
+.hover\:bg-orange-600:hover { background-color: var(--primary-dark) !important; }
+.hover\:text-orange-600:hover { color: var(--primary) !important; }
+.focus\:ring-orange-400:focus { --tw-ring-color: var(--primary) !important; }
+.accent-orange-500 { accent-color: var(--primary) !important; }

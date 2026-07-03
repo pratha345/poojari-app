@@ -1,0 +1,50 @@
+# ─── Environment Variables (NEVER commit real .env files) ───────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.staging
+backend/env
+
+# ─── Credentials ────────────────────────────────────────────────────────────
+CREDENTIALS.md
+
+# ─── Dependencies ────────────────────────────────────────────────────────────
+node_modules/
+
+# ─── Build Outputs ──────────────────────────────────────────────────────────
+dist/
+build/
+.next/
+.nuxt/
+
+# ─── Logs ───────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Uploads (user-generated content, not code) ─────────────────────────────
+uploads/
+backend/uploads/
+
+# ─── E2E Test Artifacts (generated, not source) ─────────────────────────────
+e2e/test-results/
+e2e/playwright-report/
+
+# ─── Claude Code settings (may contain bash history with secrets) ────────────
+.claude/settings.json
+.claude/settings.local.json
+
+# ─── OS / Editor ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ─── Runtime ─────────────────────────────────────────────────────────────────
+*.pid
+*.seed
+.pm2/
