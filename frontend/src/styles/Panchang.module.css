@@ -974,11 +974,29 @@
   .heroInner { flex-direction: column; align-items: flex-start; gap: 14px; }
   .darkToggle { align-self: flex-end; }
 
-  .controlRow { flex-direction: column; }
-  .controlGroup { min-width: unset; }
+  .controlRow { flex-direction: column; gap: 14px; }
+  .controlGroup {
+    min-width: unset;
+    background: var(--pg-bg);
+    border: 1px solid var(--pg-border);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .ctrlLabel { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; }
 
-  .dateBanner { flex-direction: column; align-items: flex-start; padding: 16px 18px; }
+  /* GPS button stays inline next to the district input instead of wrapping
+     to its own isolated row — the min-width on .searchDrop was forcing that
+     on narrow phones. */
+  .districtPickerRow { flex-wrap: nowrap; gap: 8px; }
+  .searchDrop { min-width: 0; flex: 1; }
+  .gpsBtn { width: 40px; height: 40px; font-size: 1rem; }
+
+  .dateBanner { flex-direction: column; align-items: stretch; padding: 16px 18px; gap: 12px; }
   .bannerDate { font-size: 1.25rem; }
+  .dateBannerLeft { gap: 10px; }
+  .dateBannerRight { gap: 8px; }
+  .tagPaksha, .tagMaas, .tagCity, .tagTime { padding: 5px 12px; font-size: 0.78rem; }
 
   .panchangGrid { grid-template-columns: repeat(2, 1fr); }
   .muhurtaGrid  { grid-template-columns: repeat(2, 1fr); }

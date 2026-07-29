@@ -213,6 +213,7 @@ function ImageUpload({ preview, existingUrl, onFile, onClear }) {
         accept="image/jpeg,image/jpg,image/png,image/webp"
         style={{ display: 'none' }}
         onChange={handleChange}
+        onClick={e => e.stopPropagation()}
       />
 
       {displaySrc ? (

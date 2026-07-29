@@ -123,6 +123,23 @@ function nowISTTime() {
   return `${h}:${m}`;
 }
 
+// Nearest Maharashtra district to a GPS point — Haversine great-circle distance
+// against each district's center lat/lon (DISTRICTS above), same approach as
+// the halls "nearby" search elsewhere in this codebase.
+function nearestDistrict(lat, lon) {
+  const toRad = d => (d * Math.PI) / 180;
+  let best = null, bestDist = Infinity;
+  for (const d of DISTRICTS) {
+    const dLat = toRad(d.lat - lat);
+    const dLon = toRad(d.lon - lon);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat)) * Math.cos(toRad(d.lat)) * Math.sin(dLon / 2) ** 2;
+    const dist = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (dist < bestDist) { bestDist = dist; best = d; }
+  }
+  return best;
+}
+
 function formatMR(dateStr) {
   if (!dateStr) return '';
   const [y, m, d] = dateStr.split('-');
@@ -394,22 +411,42 @@ export default function Panchang() {
   };
 
   // ── Geolocation ─────────────────────────────────────────────
+  // Shared by the manual GPS button AND the silent auto-detect-on-load below.
+  const applyGpsPosition = (gpsLat, gpsLon) => {
+    // Match to the nearest Maharashtra district so the label + calculation
+    // are consistent with manually selecting that same district from the
+    // dropdown (district-level panchang, not a raw personal GPS point).
+    const nearest = nearestDistrict(gpsLat, gpsLon);
+    const la = nearest ? nearest.lat : gpsLat.toFixed(4);
+    const lo = nearest ? nearest.lon : gpsLon.toFixed(4);
+    const label = nearest ? nearest.name : 'माझे स्थान';
+    setLat(la); setLon(lo);
+    setCityName(label); setQuery(label);
+    fetchPanchang(date, la, lo, time);
+  };
+
   const detectLocation = () => {
     if (!navigator.geolocation) { setError('ब्राउझर GPS समर्थित नाही.'); return; }
     setLocLoading(true);
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        const la = pos.coords.latitude.toFixed(4);
-        const lo = pos.coords.longitude.toFixed(4);
-        setLat(la); setLon(lo);
-        setCityName('माझे स्थान'); setQuery('माझे स्थान');
-        setLocLoading(false);
-        fetchPanchang(date, la, lo, time);
-      },
+      pos => { applyGpsPosition(pos.coords.latitude, pos.coords.longitude); setLocLoading(false); },
       () => { setError('स्थान मिळवता आले नाही.'); setLocLoading(false); },
       { timeout: 8000 }
     );
   };
+
+  // Auto-detect ONCE on page load — same district match, but silent
+  // (no error shown) if the user hasn't granted/denied location yet;
+  // पुणे stays as the default when permission isn't available.
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      pos => applyGpsPosition(pos.coords.latitude, pos.coords.longitude),
+      () => {},                 // denied/unavailable — keep default पुणे, no error shown
+      { timeout: 8000, maximumAge: 10 * 60 * 1000 }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Render ──────────────────────────────────────────────────
   return (

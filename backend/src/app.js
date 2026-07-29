@@ -153,6 +153,8 @@ app.use('/api/cities',     require('./routes/city.routes'));
 app.use('/api/chat',         require('./routes/chat.routes'));
 app.use('/api/tickets',      require('./routes/ticket.routes'));
 app.use('/api/dharmasindhu', require('./routes/dharmasindhu.routes'));
+
+app.use('/api/aarti',       require('./routes/aarti.routes'));
 app.use('/api/granth',      require('./routes/granth.routes'));
 
 // ── Health Check ──────────────────────────────────────────────

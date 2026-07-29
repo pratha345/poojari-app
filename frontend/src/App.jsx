@@ -104,7 +104,10 @@ const BookPujari      = lazy(() => import('./pages/BookPujari'));
 const OnlinePuja      = lazy(() => import('./pages/OnlinePuja'));
 const Blog            = lazy(() => import('./pages/Blog'));
 const BlogDetail      = lazy(() => import('./pages/BlogDetail'));
+const Aarti           = lazy(() => import('./pages/Aarti'));
+const AartiDetail     = lazy(() => import('./pages/AartiDetail'));
 const ManageBlog      = lazy(() => import('./pages/admin/ManageBlog'));
+const ManageAarti     = lazy(() => import('./pages/admin/ManageAarti'));
 const ManageAbhyasak  = lazy(() => import('./pages/admin/ManageAbhyasak'));
 const ManageReviews   = lazy(() => import('./pages/admin/ManageReviews'));
 const CitiesIndex     = lazy(() => import('./pages/CitiesIndex'));
@@ -197,6 +200,8 @@ export default function App() {
             <Route path="/online-puja"    element={<OnlinePuja />} />
             <Route path="/blog"           element={<Blog />} />
             <Route path="/blog/:slug"     element={<BlogDetail />} />
+            <Route path="/aarti"          element={<Aarti />} />
+            <Route path="/aarti/:slug"    element={<AartiDetail />} />
             <Route path="/cities"         element={<CitiesIndex />} />
             <Route path="/cities/:slug"   element={<CityPage />} />
             <Route path="/join"           element={<JoinPage />} />
@@ -232,6 +237,7 @@ export default function App() {
             <Route path="/admin/halls"          element={<AdminRoute><ManageHalls /></AdminRoute>} />
             <Route path="/admin/samagri"        element={<AdminRoute><ManageSamagri /></AdminRoute>} />
             <Route path="/admin/blog"           element={<BlogEditorRoute><ManageBlog /></BlogEditorRoute>} />
+            <Route path="/admin/aarti"          element={<BlogEditorRoute><ManageAarti /></BlogEditorRoute>} />
             <Route path="/admin/abhyasak"      element={<AdminRoute><ManageAbhyasak /></AdminRoute>} />
             <Route path="/admin/janam-patrika"  element={<AdminRoute><JanamPatrika /></AdminRoute>} />
             <Route path="/admin/reviews"        element={<AdminRoute><ManageReviews /></AdminRoute>} />

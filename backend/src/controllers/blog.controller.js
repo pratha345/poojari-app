@@ -27,7 +27,7 @@ exports.list = async (req, res) => {
     const [posts] = await pool.query(
       `SELECT id, title, slug, excerpt, image_url, author_name, category, tags, read_time, views, avg_rating, rating_count, created_at
        FROM blog_posts WHERE ${whereClause}
-       ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+       ORDER BY views DESC, created_at DESC LIMIT ? OFFSET ?`,
       [...params, parseInt(limit), offset]
     );
     const [[{ total }]] = await pool.query(

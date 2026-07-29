@@ -12,6 +12,7 @@
     "test:cover": "jest --coverage --forceExit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
     "astronomy-engine": "^2.1.19",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

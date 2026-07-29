@@ -1,0 +1,260 @@
+/* ManageAarti.module.css */
+
+.formCard {
+  background:    var(--card-bg, #fff);
+  border-radius: 12px;
+  padding:       20px;
+  margin-bottom: 24px;
+  box-shadow:    0 1px 6px rgba(0,0,0,0.08);
+}
+.formHead {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  margin-bottom:   16px;
+}
+.formHead h2 { font-size: 17px; }
+.closeBtn {
+  border: none; background: #eee; width: 30px; height: 30px;
+  border-radius: 50%; cursor: pointer; font-size: 14px;
+}
+
+/* ── OCR box ── */
+.ocrBox {
+  background:    #fdf7ec;
+  border:        1.5px dashed #E07B2A;
+  border-radius: 10px;
+  padding:       14px;
+  margin-bottom: 18px;
+}
+.modeTabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.modeTab, .modeTabActive {
+  border: 1px solid #E07B2A; border-radius: 8px; padding: 6px 14px;
+  font-size: 13px; cursor: pointer; background: transparent; color: #a1591a;
+}
+.modeTabActive { background: #E07B2A; color: #fff; }
+
+.pasteArea {
+  width:         100%;
+  padding:       10px 12px;
+  border:        1px solid #ddd;
+  border-radius: 8px;
+  font-size:     14px;
+  font-family:   inherit;
+  resize:        vertical;
+  outline:       none;
+}
+.pasteArea:focus { border-color: #E07B2A; }
+
+.ocrHead { font-size: 14px; margin-bottom: 4px; }
+.ocrHint { display: block; font-size: 12px; color: #8a6d3b; margin-top: 2px; font-weight: 400; }
+.ocrRow {
+  display:     flex;
+  align-items: center;
+  gap:         12px;
+  flex-wrap:   wrap;
+  margin-top:  10px;
+}
+.ocrInput { font-size: 13px; max-width: 100%; }
+.ocrPreviewWrap { position: relative; }
+.ocrPreview {
+  height: 72px; border-radius: 8px; border: 1px solid #ddd; display: block;
+}
+.ocrClear {
+  position: absolute; top: -8px; right: -8px;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: none; background: #c62828; color: #fff;
+  font-size: 11px; cursor: pointer; line-height: 1;
+}
+.ocrWarn { font-size: 12px; color: #a1591a; margin: 10px 0 0; }
+
+/* ── Featured image upload zone ── */
+.uploadZone {
+  border:        2px dashed #ddd;
+  border-radius: 10px;
+  background:    #fafafa;
+  cursor:        pointer;
+  transition:    border-color 0.2s, background 0.2s;
+  overflow:      hidden;
+  min-height:    140px;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+}
+.uploadZone:hover { border-color: #E07B2A; background: #fffaf4; }
+.uploadDrag       { border-color: #E07B2A; background: rgba(224,123,42,0.06); }
+
+.uploadPlaceholder {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            6px;
+  padding:        24px 16px;
+  text-align:     center;
+}
+.uploadIcon { font-size: 32px; opacity: 0.5; }
+.uploadText { font-size: 13px; font-weight: 600; color: #666; margin: 0; }
+.uploadHint { font-size: 11px; color: #aaa; margin: 0; }
+
+.previewWrap { position: relative; width: 100%; }
+.previewImg  { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+.previewOverlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.previewWrap:hover .previewOverlay { opacity: 1; }
+.changeImgBtn, .removeImgBtn {
+  padding: 8px 14px; border-radius: 8px; border: none;
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.changeImgBtn { background: #fff; color: #444; }
+.removeImgBtn { background: #c62828; color: #fff; }
+
+.newBadge, .existingBadge {
+  position: absolute; top: 8px; left: 8px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+}
+.newBadge      { background: #E07B2A; color: #fff; }
+.existingBadge { background: rgba(0,0,0,0.55); color: #fff; }
+
+/* List table thumbnail — click to upload/replace directly, no need to open the form */
+.thumbUpload {
+  position:   relative;
+  display:    block;
+  width:      48px; height: 48px;
+  cursor:     pointer;
+  border-radius: 7px;
+  overflow:   hidden;
+  flex-shrink: 0;
+}
+.thumbUpload:hover .thumbOverlay { opacity: 1; }
+.thumbUpload:hover .thumb        { filter: brightness(0.7); }
+
+.thumb {
+  width: 48px; height: 48px; border-radius: 7px; object-fit: cover;
+  display: block; border: 1px solid #eee; transition: filter 0.18s;
+}
+
+.thumbOverlay {
+  position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 16px; opacity: 0; transition: opacity 0.18s;
+  background: rgba(0,0,0,0.25); border-radius: 7px;
+}
+
+.thumbPlaceholderBtn {
+  width: 48px; height: 48px; border-radius: 7px;
+  background: #fafafa; border: 1px dashed #ddd;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px; font-size: 15px;
+}
+.thumbPlaceholderBtn small { font-size: 8px; font-weight: 600; color: #E07B2A; line-height: 1; }
+.thumbUpload:hover .thumbPlaceholderBtn { background: #fff3e8; border-color: #E07B2A; }
+
+.thumbSpinner {
+  width: 48px; height: 48px; border-radius: 7px; background: #fafafa;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid #eee; position: relative;
+}
+.thumbSpinner::after {
+  content: ''; width: 16px; height: 16px;
+  border: 2px solid #E07B2A; border-top-color: transparent;
+  border-radius: 50%; animation: aartiThumbSpin 0.7s linear infinite;
+}
+@keyframes aartiThumbSpin { to { transform: rotate(360deg); } }
+
+/* ── Fields ── */
+.grid2 {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   14px;
+}
+@media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.field span  { font-size: 13px; font-weight: 600; color: #444; }
+.field small { font-weight: 400; color: #999; }
+.field input, .field select, .field textarea {
+  padding:       9px 12px;
+  border:        1px solid #ddd;
+  border-radius: 8px;
+  font-size:     14px;
+  font-family:   inherit;
+  outline:       none;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: #E07B2A; }
+
+.lyricsArea {
+  font-family: var(--font-display, serif) !important;
+  font-size:   16px !important;
+  line-height: 1.9;
+}
+
+.pubRow {
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+  font-size:     14px;
+  margin-bottom: 16px;
+  cursor:        pointer;
+}
+
+.formActions { display: flex; gap: 12px; flex-wrap: wrap; }
+.botNote { font-size: 12px; color: #888; margin-top: 12px; }
+
+/* ── List ── */
+.starOn, .starOff {
+  border: none; background: transparent; cursor: pointer;
+  font-size: 20px; line-height: 1; padding: 4px 8px; border-radius: 6px;
+  transition: transform 0.15s;
+}
+.starOn  { filter: drop-shadow(0 1px 2px rgba(224,123,42,0.5)); }
+.starOff { opacity: 0.35; }
+.starOn:hover, .starOff:hover { transform: scale(1.25); opacity: 1; }
+
+.pubOn, .pubOff {
+  border: none; border-radius: 20px; padding: 4px 12px;
+  font-size: 12px; cursor: pointer; white-space: nowrap;
+}
+.pubOn  { background: #e7f6e9; color: #1B5E20; }
+.pubOff { background: #f5f5f5; color: #888; }
+
+.rowActions { white-space: nowrap; }
+.editBtn, .delBtn {
+  border: none; background: #f2f2f2; border-radius: 6px;
+  padding: 6px 10px; margin-right: 6px; cursor: pointer; font-size: 13px;
+}
+.delBtn:hover  { background: #fdecea; }
+.editBtn:hover { background: #fdf3e7; }
+
+/* ── Mobile (admin taking a phone photo of a printed book, right there) ───── */
+@media (max-width: 640px) {
+  .formCard { padding: 14px; border-radius: 10px; }
+  .formHead h2 { font-size: 15px; }
+
+  /* OCR box: stack, full-width — this is the primary mobile flow, not an afterthought */
+  .ocrBox { padding: 12px; }
+  .ocrRow { flex-direction: column; align-items: stretch; gap: 10px; }
+  .ocrInput { width: 100%; font-size: 14px; }
+  .ocrPreviewWrap { align-self: flex-start; }
+  .ocrRow button { width: 100%; padding: 13px; font-size: 15px; }
+
+  .modeTabs { gap: 6px; }
+  .modeTab, .modeTabActive { flex: 1; padding: 10px 6px; font-size: 13px; text-align: center; }
+  .pasteArea { font-size: 16px; padding: 11px 12px; }
+
+  /* Featured image zone: overlay buttons are always visible on touch (no hover) */
+  .uploadZone { min-height: 120px; }
+  .previewOverlay { opacity: 1; background: rgba(0,0,0,0.35); }
+  .changeImgBtn, .removeImgBtn { padding: 10px 12px; font-size: 13px; }
+
+  /* 16px floor on all text inputs — below this iOS Safari auto-zooms on focus */
+  .field input, .field select, .field textarea { font-size: 16px; padding: 11px 12px; }
+  .lyricsArea { font-size: 16px !important; }
+
+  .formActions { flex-direction: column; }
+  .formActions button { width: 100%; padding: 14px; font-size: 15px; }
+
+  .pubRow { font-size: 15px; }
+}

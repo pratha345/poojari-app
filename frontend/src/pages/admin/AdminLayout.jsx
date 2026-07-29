@@ -14,7 +14,7 @@ import {
   FaRightFromBracket, FaUser,
   FaShieldHalved, FaAngleLeft, FaAngleRight,
   FaArrowUpRightFromSquare, FaOm, FaBars, FaXmark, FaBookOpen,
-  FaStar,
+  FaStar, FaBell,
 } from 'react-icons/fa6';
 import { FaHandsPraying as FaLogo } from 'react-icons/fa6';
 import { tenantConfigAPI } from '../../api/index.js';
@@ -46,6 +46,7 @@ const NAV_ADMIN = [
   { to: '/admin/kundali-milan', icon: FaInfinity,     label: 'कुंडली मिलान',    feature: 'kundali'     },
   { to: '/admin/janam-patrika', icon: FaScroll,       label: 'जन्म पत्रिका',    feature: 'kundali'     },
   { to: '/admin/blog',          icon: FaNewspaper,    label: 'ब्लॉग',            feature: 'blog'        },
+  { to: '/admin/aarti',         icon: FaBell,         label: 'आरती संग्रह',      feature: 'blog'        },
 
   { section: 'धर्मग्रंथ' },
   { to: '/admin/dharmasindhu',   icon: FaOm,       label: 'धर्मसिंधु शंका', feature: 'dharmasindhu' },
@@ -60,7 +61,8 @@ const NAV_ADMIN = [
 ];
 
 const NAV_ABHYASAK = [
-  { to: '/admin/blog', icon: FaNewspaper, label: 'ब्लॉग लिहा' },
+  { to: '/admin/blog',  icon: FaNewspaper, label: 'ब्लॉग लिहा'   },
+  { to: '/admin/aarti', icon: FaBell,      label: 'आरती संग्रह' },
 ];
 
 // Super admin sees everything — includes tenant management + all franchise features
@@ -92,6 +94,7 @@ const NAV_SUPER = [
   { to: '/admin/kundali-milan', icon: FaInfinity,     label: 'कुंडली मिलान' },
   { to: '/admin/janam-patrika', icon: FaScroll,       label: 'जन्म पत्रिका' },
   { to: '/admin/blog',          icon: FaNewspaper,    label: 'ब्लॉग'         },
+  { to: '/admin/aarti',         icon: FaBell,         label: 'आरती संग्रह'  },
 
   { section: 'धर्मग्रंथ' },
   { to: '/admin/dharmasindhu',   icon: FaOm,       label: 'धर्मसिंधु शंका' },

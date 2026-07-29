@@ -1,6 +1,6 @@
 // src/components/layout/Header.jsx — Single-row clean navbar
 import { useState, useEffect, useRef } from 'react';
-import { FaHandsPraying, FaFire, FaLaptop, FaBuilding, FaOm, FaWandMagicSparkles, FaCalendarDays, FaBook, FaLocationDot, FaMagnifyingGlass } from 'react-icons/fa6';
+import { FaHandsPraying, FaFire, FaLaptop, FaBuilding, FaOm, FaWandMagicSparkles, FaCalendarDays, FaBook, FaLocationDot, FaMagnifyingGlass, FaBell } from 'react-icons/fa6';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
@@ -33,6 +33,7 @@ function buildNav(t) {
       ],
     },
     { to: '/blog',          icon: FaBook,        iconColor: '#8b5cf6', label: t.nav.blog   },
+    { to: '/aarti',         icon: FaBell,        iconColor: '#E07B2A', label: t.nav.aarti  },
     { to: '/book-pujari',   label: t.nav.bookPujari || 'पुजारी बुक करा', highlight: true },
     { to: '/pujari-nondni', label: t.nav.becomePujari          },
     { to: '/cities',        icon: FaLocationDot, iconColor: '#ef4444', label: t.nav.cities },
@@ -388,10 +389,37 @@ export default function Header() {
 
           <a href="tel:9561903219" className={styles.phoneLink}>📞 ९५६१९०३२१९</a>
 
+          {/* Mobile language switcher — desktop's .rightSection (which holds the
+              only other lang selector) is display:none on mobile, so this is the
+              sole way to change language on a phone */}
+          <div className={styles.mobileLangRow}>
+            <span className={styles.mobileLangLabel}>🌐 भाषा</span>
+            <div className={styles.mobileLangBtns}>
+              {[['mr','मराठी'],['hi','हिंदी'],['en','English']].map(([code,label]) => (
+                <button
+                  key={code}
+                  className={`${styles.mobileLangBtn} ${lang === code ? styles.mobileLangBtnActive : ''}`}
+                  onClick={() => setLang(code)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Mobile auth */}
           <div className={styles.mobileAuthSection}>
             {isAuthenticated ? (
               <>
+                <div className={styles.mobileUserCard}>
+                  <span className={styles.mobileUserAvatar}>{(user?.name || '?').trim().charAt(0).toUpperCase()}</span>
+                  <div className={styles.mobileUserInfo}>
+                    <div className={styles.mobileUserName}>{user?.name || 'वापरकर्ता'}</div>
+                    <div className={styles.mobileUserRole}>
+                      {isAdmin ? 'प्रशासक' : isPujari ? 'पुजारी' : user?.phone || ''}
+                    </div>
+                  </div>
+                </div>
                 {isAdmin  && <Link to="/admin"            className={styles.mobileAuthLink} onClick={closeAll}>⚙️ {t.nav.admin}</Link>}
                 {isPujari && <Link to="/pujari-dashboard" className={styles.mobileAuthLink} onClick={closeAll}>🗓️ {t.nav.dashboard}</Link>}
                 <Link to="/my-bookings" className={styles.mobileAuthLink} onClick={closeAll}>📋 {t.nav.myBookings}</Link>

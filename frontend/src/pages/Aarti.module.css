@@ -1,0 +1,327 @@
+/* Aarti.module.css */
+
+.pageHeader {
+  background: linear-gradient(135deg, var(--secondary) 0%, #5a2500 100%);
+  padding:    14px 0 12px;
+  color:      #fff;
+}
+.breadcrumb {
+  display:       flex;
+  gap:           6px;
+  align-items:   center;
+  font-size:     12px;
+  color:         rgba(255,255,255,0.65);
+  margin-bottom: 8px;
+}
+.breadcrumb a { color: var(--gold-light); }
+
+.headerRow {
+  display:     flex;
+  align-items: center;
+  gap:         24px;
+  flex-wrap:   wrap;
+}
+.headerLeft { flex: 1; min-width: 0; }
+
+.pageTitle {
+  font-family:   var(--font-display);
+  font-size:     clamp(1.3rem, 2.5vw, 1.6rem);
+  color:         #fff;
+  margin-bottom: 3px;
+}
+.pageSub {
+  font-size: 13px;
+  color:     rgba(255,255,255,0.75);
+  margin:    0;
+}
+
+.searchForm { display: flex; gap: 8px; flex-shrink: 0; width: 320px; max-width: 100%; }
+.searchInput {
+  flex:          1;
+  min-width:     0;   /* prevent flex child from forcing overflow on narrow screens */
+  padding:       9px 14px;
+  border:        none;
+  border-radius: var(--radius-xl);
+  font-size:     13px;
+  outline:       none;
+}
+.searchBtn { white-space: nowrap; }
+
+.layout {
+  display:               grid;
+  grid-template-columns: 260px 1fr;
+  gap:                   28px;
+  padding:               28px 0 60px;
+}
+@media (max-width: 900px) {
+  .layout  { grid-template-columns: 1fr; }
+  .sidebar { order: -1; }        /* श्रेणी आधी — blog/pooja सारखंच */
+  .sideCtaBox { display: none; } /* पूजा CTA फक्त desktop sidebar मध्ये */
+}
+
+.sidebar { display: flex; flex-direction: column; gap: 16px; }
+.sideCard {
+  background:    var(--card-bg, #fff);
+  border-radius: var(--radius-lg, 12px);
+  padding:       16px;
+  box-shadow:    0 1px 4px rgba(0,0,0,0.06);
+}
+.sideTitle {
+  font-size:     14px;
+  font-weight:   700;
+  margin-bottom: 10px;
+  color:         var(--text-primary, #222);
+}
+.catBtn {
+  display:       flex;
+  justify-content: space-between;
+  align-items:   center;
+  width:         100%;
+  padding:       8px 10px;
+  border:        none;
+  background:    transparent;
+  border-radius: 8px;
+  font-size:     13px;
+  cursor:        pointer;
+  text-align:    left;
+  color:         var(--text-secondary, #555);
+}
+.catBtn:hover  { background: rgba(224,123,42,0.08); }
+.catActive     { background: rgba(224,123,42,0.15); color: var(--secondary); font-weight: 600; }
+.catBtn span   { font-size: 11px; opacity: 0.7; }
+
+.sideCtaBox {
+  background:    linear-gradient(135deg, #FF8C00, #E07B2A);
+  border-radius: var(--radius-lg, 12px);
+  padding:       18px;
+  color:         #fff;
+  text-align:    center;
+}
+.sideCtaIcon { font-size: 26px; margin-bottom: 6px; }
+.sideCtaBox h3  { font-size: 15px; margin-bottom: 4px; }
+.sideCtaBox p   { font-size: 12px; opacity: 0.9; margin-bottom: 12px; }
+
+.main { min-height: 400px; }
+
+.activeFilter {
+  display:       flex;
+  gap:           8px;
+  align-items:   center;
+  flex-wrap:     wrap;
+  margin-bottom: 16px;
+}
+.filterTag {
+  background:    #eee;
+  padding:       4px 10px;
+  border-radius: 20px;
+  font-size:     12px;
+  display:       flex;
+  align-items:   center;
+  gap:           6px;
+}
+.filterTag button { border: none; background: none; cursor: pointer; }
+.resultCount { font-size: 13px; color: #777; }
+
+.grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap:                   18px;
+}
+
+/* ── आजचा सण banner ── */
+.festivalBanner {
+  display:       flex;
+  align-items:   center;
+  gap:           14px;
+  background:    linear-gradient(135deg, #fff7ec 0%, #ffe8cc 100%);
+  border:        1.5px solid #f0c58a;
+  border-left:   5px solid #E07B2A;
+  border-radius: 12px;
+  padding:       12px 18px;
+  margin-bottom: 20px;
+}
+.festivalIcon { font-size: 34px; line-height: 1; }
+.festivalBanner strong { font-size: 15.5px; color: #7a3b00; display: block; }
+.festivalBanner p { font-size: 12.5px; color: #a1591a; margin: 2px 0 0; }
+
+/* ── तुमच्या पूजेसाठी — booking-based recommendations ── */
+.recoSection {
+  background:    linear-gradient(180deg, #fffbf2 0%, #fff 100%);
+  border:        1.5px solid #ecd9a0;
+  border-radius: 14px;
+  padding:       18px;
+  margin-bottom: 26px;
+  box-shadow:    0 2px 14px rgba(190,140,20,0.10);
+}
+.recoTitle {
+  font-family: var(--font-display, serif);
+  font-size:   19px;
+  color:       #7a4a00;
+  margin:      0 0 2px;
+}
+.recoSub { font-size: 12.5px; color: #a07830; margin: 0 0 14px; }
+
+/* ══════════════════════════════════════════════════
+   AARTI CARD — Magazine style (same system as blog cards)
+══════════════════════════════════════════════════ */
+.card {
+  background:     #fff;
+  border-radius:  var(--radius-lg, 14px);
+  overflow:       hidden;
+  display:        flex;
+  flex-direction: column;
+  box-shadow:     0 2px 12px rgba(139,37,0,0.08);
+  border:         1.5px solid rgba(224,123,42,0.12);
+  transition:     transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card:hover {
+  transform:    translateY(-6px);
+  box-shadow:   0 20px 48px rgba(139,37,0,0.18);
+  border-color: var(--primary, #E07B2A);
+}
+
+/* ── Hero: uploaded image OR deity-colored decorative gradient ── */
+.cardHero {
+  display:      block;
+  position:     relative;
+  overflow:     hidden;
+  aspect-ratio: 4 / 3;
+  flex-shrink:  0;
+  background:   linear-gradient(135deg, #3d1a00 0%, #6b2d00 50%, #a04400 100%);
+  cursor:       pointer;
+}
+
+.cardHeroImg {
+  position:   absolute;
+  inset:      0;
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+  object-position: center;
+  opacity:    0.72;
+  transition: transform 0.55s ease, opacity 0.3s ease;
+  display:    block;
+}
+.card:hover .cardHeroImg { transform: scale(1.06); opacity: 0.80; }
+
+/* No-image fallback — deity accent gradient + big glyph watermark */
+.cardHeroBg {
+  position: absolute;
+  inset:    0;
+  background:
+    radial-gradient(ellipse at 30% 40%, color-mix(in srgb, var(--deity-color) 40%, transparent) 0%, transparent 65%),
+    radial-gradient(ellipse at 80% 70%, rgba(255,193,7,0.12) 0%, transparent 50%),
+    linear-gradient(145deg, #2a0d00 0%, #4a1800 40%, #6b2800 70%, #3d1200 100%);
+}
+/* Legibility overlays */
+.cardHeroOverlay { position: absolute; inset: 0; background: rgba(20,5,0,0.28); z-index: 1; }
+.cardHeroGrad {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom,
+    rgba(20,5,0,0.65) 0%, rgba(20,5,0,0) 38%, rgba(20,5,0,0) 50%, rgba(20,5,0,0.82) 100%);
+}
+
+/* ── Top row: logo chip + deity badge ── */
+.cardHeroTop {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px 0;
+}
+.cardLogo {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.93);
+  backdrop-filter: blur(8px);
+  border-radius: 8px; padding: 5px 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+}
+.cardLogoImg { height: 26px; width: auto; display: block; object-fit: contain; }
+
+.cardDeity {
+  color:          #fff;
+  padding:        3px 11px;
+  border-radius:  20px;
+  font-size:      10.5px;
+  font-weight:    800;
+  letter-spacing: 0.4px;
+  box-shadow:     0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ── Bottom: featured/occasion/views meta + title over image ── */
+.cardHeroBottom {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
+  padding: 0 14px 14px;
+}
+.cardMetaImg {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  font-size: 12px; color: rgba(255,255,255,0.78);
+  margin-bottom: 6px;
+}
+.cardFeatured {
+  font-size: 10px; font-weight: 800; color: #3d1a00;
+  background: #ffd54f; border-radius: 20px; padding: 2px 9px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.cardTitleImg {
+  font-family: var(--font-display, serif);
+  font-size:   clamp(14px, 2vw, 16.5px);
+  line-height: 1.35;
+  color:       #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.55);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Slim body: read CTA ── */
+.cardBody { padding: 12px 16px 14px; }
+.cardReadMore {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent, #E07B2A);
+  text-decoration: none;
+  transition: gap 0.2s ease;
+}
+.cardReadMore:hover { gap: 9px; }
+
+.skeleton {
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  min-height: 280px;   /* magazine cards are hero-sized — match while loading */
+  border: none;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.empty {
+  text-align: center;
+  padding:    60px 20px;
+  color:      #888;
+}
+.empty span { font-size: 40px; display: block; margin-bottom: 10px; }
+.empty h3   { margin-bottom: 6px; color: #444; }
+.empty p    { margin-bottom: 16px; font-size: 13px; }
+
+/* ── Mobile (phone in hand, one-thumb use) ─────────────────────────────────── */
+@media (max-width: 640px) {
+  .pageHeader { padding: 12px 0 10px; }
+  .headerRow { flex-direction: column; align-items: stretch; gap: 10px; }
+  .pageTitle { font-size: 1.25rem; white-space: normal; }
+  .searchForm { width: 100%; }
+  .searchInput { font-size: 16px; padding: 11px 14px; }  /* 16px = iOS won't auto-zoom on focus */
+  .searchBtn { padding: 11px 16px; }
+
+  .layout { padding: 18px 0 40px; gap: 18px; }
+
+  .grid { grid-template-columns: 1fr; gap: 14px; }
+  .cardHero { aspect-ratio: 16 / 9; }   /* shorter hero on mobile — more cards per screen */
+  .cardTitleImg { font-size: 16px; }
+
+  .catBtn { padding: 12px 10px; font-size: 14px; }        /* bigger tap target */
+  .sideCtaBox .btn { padding: 12px; }
+
+  .festivalBanner { padding: 10px 14px; gap: 10px; }
+  .festivalIcon { font-size: 28px; }
+  .recoSection { padding: 14px; }
+}

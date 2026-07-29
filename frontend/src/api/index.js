@@ -213,6 +213,28 @@ export const blogAPI = {
   remove:        (id)     => api.delete(`/blog/admin/${id}`),
 };
 
+// src/api/aarti.api.js
+export const aartiAPI = {
+  list:          (params)  => api.get('/aarti',            { params }),
+  getBySlug:     (slug)    => api.get(`/aarti/${slug}`),
+  categories:    ()        => api.get('/aarti/categories'),
+  recommended:   ()        => api.get('/aarti/recommended'),
+  // admin
+  adminList:     ()        => api.get('/aarti/admin/all'),
+  ocr:           (fd)      => api.post('/aarti/admin/ocr', fd, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 60000 }),
+  cleanText:     (raw_text)=> api.post('/aarti/admin/clean-text', { raw_text }, { timeout: 60000 }),
+  create:        (fd)      => api.post('/aarti/admin', fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  update:        (id, fd)  => api.put(`/aarti/admin/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  uploadImage:   (id, file) => {
+    const fd = new FormData();
+    fd.append('image', file);
+    return api.patch(`/aarti/admin/${id}/image`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+  },
+  togglePublish: (id)      => api.patch(`/aarti/admin/${id}/publish`),
+  toggleFeatured:(id)      => api.patch(`/aarti/admin/${id}/featured`),
+  remove:        (id)      => api.delete(`/aarti/admin/${id}`),
+};
+
 // src/api/rashifal.api.js
 export const rashifalAPI = {
   getTomorrow: (rashiId) => api.get(`/rashifal/tomorrow/${rashiId}`),

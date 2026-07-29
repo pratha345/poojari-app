@@ -2,7 +2,7 @@
 // Groq API — उद्या + आठवडा राशिभविष्य (Marathi)
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL        = 'llama-3.3-70b-versatile';
+const MODEL        = 'openai/gpt-oss-120b'; // migrated: llama-3.3-70b-versatile decommissioned 2026-08-16
 
 // ── Simple in-memory cache ─────────────────────────────────────
 // key: "tomorrow-{rashiId}-{YYYY-MM-DD}"  or "weekly-{rashiId}-{weekKey}"

@@ -7,6 +7,7 @@ import Footer from '../components/layout/Footer';
 import SEOHead from '../components/SEOHead';
 import { authAPI, poojaAPI, pujariAPI, bookingAPI } from '../api/index.js';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 import { getImageUrl } from '../utils/index.js';
 import { FaStar, FaLocationDot, FaWhatsapp, FaCircleCheck, FaShieldHalved, FaCalendarCheck, FaHandsPraying } from 'react-icons/fa6';
 
@@ -223,6 +224,18 @@ export default function BookPujari() {
     if (isAuthenticated && user?.phone) setOtpPhone(user.phone);
   }, [isAuthenticated, user]);
 
+  const handleGoogleAuth = async (credential) => {
+    setOtpLoading(true);
+    try {
+      const res = await authAPI.googleAuth(credential);
+      login(res.data.data.token, res.data.data.user);
+      toast.success(`स्वागत आहे, ${res.data.data.user.name}! 🙏`);
+      setStep(1);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Google लॉगिन करताना त्रुटी झाली.');
+    } finally { setOtpLoading(false); }
+  };
+
   const handleSendOtp = async () => {
     const phone = otpPhone.trim().replace(/\D/g, '');
     if (phone.length < 10) { toast.error('वैध १० अंकी फोन नंबर टाका.'); return; }
@@ -416,13 +429,33 @@ export default function BookPujari() {
               {step === 0 && (
                 <div style={card}>
                   <div style={sectionHeader}>
-                    <div style={iconCircle('#fff8f0', '#b35c00')}>📱</div>
+                    <div style={iconCircle('#fff8f0', '#b35c00')}>🔐</div>
                     <div>
-                      <h2 style={cardH2}>मोबाईल सत्यापन</h2>
-                      <p style={cardSub}>बुकिंगसाठी आपला मोबाईल नंबर सत्यापित करा</p>
+                      <h2 style={cardH2}>पडताळणी</h2>
+                      <p style={cardSub}>Google खात्याने एका क्लिकवर पुढे चला — OTP ची गरज नाही</p>
                     </div>
                   </div>
                   <div style={divider} />
+
+                  {/* Google — one click, no OTP. NOTE: deliberately NOT using
+                      useOneTap — its automatic prompt renders an invisible
+                      full-page "select account" iframe that steals clicks
+                      from the OTP/password fields below it, silently breaking
+                      the fallback login (confirmed via Playwright testing). */}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+                    <GoogleLogin
+                      text="continue_with"
+                      size="large"
+                      locale="mr"
+                      onSuccess={({ credential }) => handleGoogleAuth(credential)}
+                      onError={() => toast.error('Google लॉगिन रद्द झाले.')}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0 16px' }}>
+                    <div style={{ flex: 1, height: 1, background: '#e8e0d5' }} />
+                    <span style={{ fontSize: 12.5, color: '#888' }}>किंवा फोन OTP ने</span>
+                    <div style={{ flex: 1, height: 1, background: '#e8e0d5' }} />
+                  </div>
 
                   <div style={field}>
                     <label style={labelStyle}>पूर्ण नाव</label>

@@ -7,6 +7,7 @@ import Footer from '../components/layout/Footer';
 import SEOHead from '../components/SEOHead';
 import { poojaAPI, bookingAPI, authAPI } from '../api/index.js';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 import styles from './Booking.module.css';
 
 const loadRazorpay = () =>
@@ -130,6 +131,19 @@ export default function Booking() {
     } finally { setPayLoading(false); }
   };
 
+  // ── Google sign-in (primary — browser's logged-in account, no OTP needed) ──
+  const handleGoogleAuth = async (credential) => {
+    setOtpLoading(true);
+    try {
+      const res = await authAPI.googleAuth(credential);
+      login(res.data.data.token, res.data.data.user);
+      toast.success(`स्वागत आहे, ${res.data.data.user.name}! 🙏`);
+      setStep(1);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Google लॉगिन करताना त्रुटी झाली.');
+    } finally { setOtpLoading(false); }
+  };
+
   // ── OTP handlers ──────────────────────────────────────────────
   const handleSendOtp = async () => {
     const cleanPhone = otpPhone.replace(/\D/g, '');
@@ -234,10 +248,33 @@ export default function Booking() {
               {/* ── Step 0: Phone OTP (not logged in) ── */}
               {step === 0 && (
                 <div className={styles.card}>
-                  <h2 className={styles.cardTitle}>📱 फोन नंबर पडताळणी</h2>
-                  <p style={{ color: 'var(--text-muted)', marginBottom: 20, fontSize: 14 }}>
-                    बुकिंग करण्यासाठी OTP पडताळणी आवश्यक आहे. नाव व फोन नंबर टाका.
+                  <h2 className={styles.cardTitle}>🔐 पडताळणी</h2>
+                  <p style={{ color: 'var(--text-muted)', marginBottom: 16, fontSize: 14 }}>
+                    Google खात्याने एका क्लिकवर पुढे चला — OTP ची गरज नाही.
                   </p>
+
+                  {/* Google — one click, no OTP. NOTE: deliberately NOT using
+                      useOneTap here — its automatic prompt renders an
+                      invisible full-page "select account" iframe that steals
+                      clicks from the OTP/password fields below it, silently
+                      breaking the fallback login (confirmed via Playwright:
+                      the account-select iframe's hit-box extended over the
+                      submit button even though its visible card was elsewhere). */}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+                    <GoogleLogin
+                      text="continue_with"
+                      size="large"
+                      locale="mr"
+                      onSuccess={({ credential }) => handleGoogleAuth(credential)}
+                      onError={() => toast.error('Google लॉगिन रद्द झाले.')}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0 16px' }}>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border, #e5dcd0)' }} />
+                    <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>किंवा फोन OTP ने</span>
+                    <div style={{ flex: 1, height: 1, background: 'var(--border, #e5dcd0)' }} />
+                  </div>
 
                   <div className="form-group">
                     <label>नाव (पर्यायी)</label>

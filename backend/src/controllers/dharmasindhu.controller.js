@@ -5,18 +5,39 @@ const { success, error }               = require('../utils/response.util');
 const { getCache, setCache }           = require('../utils/redis');
 const crypto                           = require('crypto');
 
-const DS_TTL     = 24 * 60 * 60;
-const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions';
-const CHAT_MODEL = 'llama-3.1-8b-instant'; // 500k TPD limit vs 100k for 70b
-const RAG_URL    = process.env.RAG_SERVICE_URL || 'http://localhost:8765';
+const DS_TTL       = 24 * 60 * 60;
+const GROQ_URL     = 'https://api.groq.com/openai/v1/chat/completions';
+const CHAT_MODEL   = 'llama-3.1-8b-instant';   // keywords + rerank (cheap, fast)
+const ANSWER_MODEL = 'openai/gpt-oss-120b';    // final scholar answer — 8b mangles Marathi + strict format
+const RAG_URL      = process.env.RAG_SERVICE_URL || 'http://localhost:8765';
 
-// ── RAG microservice call (semantic search + Wikipedia) ───────────────────────
+// If the model ran out of tokens mid-sentence, trim back to the last complete
+// sentence instead of showing a half-word to the user.
+function finishSentence(s) {
+  if (!s) return s;
+  const t = s.trim();
+  if (/[।॥.!?)\]*_🙏✅]$/u.test(t)) return t;
+  const idx = Math.max(
+    t.lastIndexOf('।'), t.lastIndexOf('॥'), t.lastIndexOf('.'),
+    t.lastIndexOf('!'), t.lastIndexOf('?'),
+  );
+  if (idx > t.length * 0.4) return t.slice(0, idx + 1).trim();
+  return t;
+}
+
+// Cache key must survive punctuation/whitespace differences —
+// "श्राद्ध कधी करावे" and "श्राद्ध कधी करावे?" are the same question.
+function normalizeQuestion(q) {
+  return q.trim().toLowerCase().replace(/[^\w\sऀ-ॿ]/g, '').replace(/\s+/g, ' ');
+}
+
+// ── RAG microservice call (semantic search; wiki fetched separately when needed) ─
 async function searchWithRAG(question) {
   try {
     const resp = await fetch(`${RAG_URL}/search`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ question, n_results: 5 }),
+      body:    JSON.stringify({ question, n_results: 5, include_wiki: false }),
       signal:  AbortSignal.timeout(8000),
     });
     if (!resp.ok) return null;
@@ -26,6 +47,57 @@ async function searchWithRAG(question) {
   } catch {
     return null; // RAG not running → FULLTEXT fallback kicks in
   }
+}
+
+// ── Targeted Wikipedia fetch — uses extracted keywords, only when DS is weak ──
+async function fetchWikiTargeted(searchKeywords, question) {
+  try {
+    // Extracted keywords beat raw question words for article-title matching
+    const kw    = (searchKeywords || '').split(',').map(s => s.trim()).filter(Boolean);
+    const query = kw.length ? kw.slice(0, 2).join(' ') : question.trim().split(/\s+/).slice(0, 2).join(' ');
+    const resp = await fetch(`${RAG_URL}/wiki`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ query }),
+      signal:  AbortSignal.timeout(8000),
+    });
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    return data.wiki_chunks || [];
+  } catch { return []; }
+}
+
+// ── Groq re-rank merged candidates (fail-open to original order) ──────────────
+async function rerankSources(question, sources, topK, apiKey) {
+  if (sources.length <= topK) return sources;
+  try {
+    const list = sources.map((r, i) => `[${i}] (पान ${r.page_no}) ${r.content.slice(0, 120)}`).join('\n');
+    const resp = await fetch(GROQ_URL, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: CHAT_MODEL, temperature: 0, max_tokens: 40,
+        messages: [
+          { role: 'system', content: 'You rank Dharmasindhu text passages by relevance to a Marathi dharmashastra question. Reply ONLY a JSON array of passage indices, most relevant first.' },
+          { role: 'user',   content: `Question: ${question}\n\nPassages:\n${list}\n\nReturn the ${topK} most relevant indices as a JSON array.` },
+        ],
+      }),
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!resp.ok) return sources.slice(0, topK);
+    const data = await resp.json();
+    const m = (data.choices?.[0]?.message?.content || '').match(/\[[\d,\s]*\]/);
+    if (m) {
+      const idx = JSON.parse(m[0]).filter(n => Number.isInteger(n) && n >= 0 && n < sources.length);
+      if (idx.length) {
+        const seen = new Set(idx);
+        const ordered = [...idx];
+        sources.forEach((_, i) => { if (!seen.has(i) && ordered.length < topK) ordered.push(i); });
+        return ordered.slice(0, topK).map(i => sources[i]);
+      }
+    }
+  } catch {}
+  return sources.slice(0, topK);
 }
 
 // ── OCR Progress Status ───────────────────────────────────────────────────────
@@ -160,9 +232,9 @@ exports.ask = async (req, res) => {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) return error(res, 'GROQ_API_KEY set नाही.', 500);
 
-    // Cache — same question gives same answer
-    const qHash  = crypto.createHash('md5').update(question.trim().toLowerCase()).digest('hex');
-    const dsKey  = `ds:ask:${qHash}`;
+    // Cache — same question gives same answer (punctuation-insensitive key)
+    const qHash  = crypto.createHash('md5').update(normalizeQuestion(question)).digest('hex');
+    const dsKey  = `ds:ask:v2:${qHash}`;
     const cached = await getCache(dsKey);
     if (cached) return success(res, cached);
 
@@ -185,19 +257,26 @@ exports.ask = async (req, res) => {
       }));
     }
 
-    // ── 3. Merge RAG + FULLTEXT (RAG first for relevance, FULLTEXT adds unique pages) ─
+    // ── 3. Merge RAG + FULLTEXT, then LLM re-rank across both sources ─────────
     const ragDS      = ragResult?.ds_chunks || [];
     const ragPageNos = new Set(ragDS.map(r => r.page_no));
     const ftExtras   = ftSources.filter(r => !ragPageNos.has(r.page_no));
 
-    let dsSources   = [...ragDS, ...ftExtras].slice(0, 8);
-    let wikiSources = ragResult?.wiki_chunks || [];
-    const usedRAG   = ragResult !== null;
+    let dsSources = [...ragDS, ...ftExtras].slice(0, 10);
+    dsSources     = await rerankSources(question, dsSources, 6, apiKey);
+    const usedRAG = ragResult !== null;
 
-    // ── 3. Build context ──────────────────────────────────────────
+    // Wikipedia फक्त DS कमजोर असेल तेव्हाच — DS strong असताना wiki = latency + off-topic धोका.
+    // Extracted keywords ने शोध (प्रश्नाच्या पहिल्या शब्दांपेक्षा खूप चांगला title match).
+    let wikiSources = [];
+    if (dsSources.length < 3) {
+      wikiSources = await fetchWikiTargeted(searchKeywords, question);
+    }
+
+    // ── 3b. Build context — पूर्ण उतारे (450 chars मध्ये वचन तुटायचं) ──────────
     const dsContext = dsSources.length
-      ? dsSources.slice(0, 5).map(r => {
-          const snippet = r.content.length > 450 ? r.content.substring(0, 450) + '...' : r.content;
+      ? dsSources.slice(0, 6).map(r => {
+          const snippet = r.content.length > 1100 ? r.content.substring(0, 1100) + '...' : r.content;
           return `[DS:पान ${r.page_no}]:\n${snippet}`;
         }).join('\n\n---\n\n')
       : null;
@@ -225,24 +304,28 @@ exports.ask = async (req, res) => {
       ? `You are a Dharmasindhu scholar. Answer the question using ONLY the provided passages.
 
 STRICT RULES:
-1. NEVER invent, expand, or paraphrase beyond what is literally in the passages
-2. [DS:पान X] = Dharmasindhu page X text. [WIKI:Title] = Wikipedia article text.
-3. In **📖 धर्मसिंधु सांगतो:** — quote ONLY from [DS:पान X] sections. Do NOT use Wikipedia content here.
-4. If the WIKI section has a direct definition, quote it in **🌐 Wikipedia सांगतो:**
-5. NEVER label Wikipedia content as if it came from Dharmasindhu pages.
-6. NEVER say "माहिती नाही" — use Wikipedia or general knowledge if DS passages don't contain the answer.
-7. Keep answer under 250 words total.
+1. [DS:पान X] = Dharmasindhu page X text. [WIKI:Title] = Wikipedia article text.
+2. In **📖 धर्मसिंधु सांगतो:** quote ONLY text that literally appears in [DS:पान X] passages, with page numbers.
+   If the DS passages do NOT directly cover the question, that section MUST say exactly:
+   "[या पानांमध्ये थेट उल्लेख नाही — सामान्य धर्मशास्त्र ज्ञानावर आधारित]"
+   and then you may answer from general dharmashastra knowledge in the LATER sections only.
+3. NEVER attribute general knowledge or Wikipedia content to a DS page number.
+4. If WIKI passages exist and are relevant, quote them ONLY in **🌐 Wikipedia सांगतो:**
+5. NEVER simply reply "माहिती नाही" — the fallback in rule 2 always applies.
+6. Answer in शुद्ध मराठी, देवनागरी लिपीत. Sanskrit verses: original + simple Marathi meaning.
+7. Keep answer under 300 words. End with COMPLETE sentences — never cut a sentence midway.
+8. **मराठी अनुवाद विभागाचा नियम (महत्त्वाचे):** धर्मसिंधु मूळ 1886 सालच्या जुन्या, संस्कृतमिश्रित मराठीत आहे (उदा. विनियोग, अतिदेश, उपोषण, गोचरप्रकरण, षड्वर्ग असे शब्द). वरील **📖 धर्मसिंधु सांगतो** मध्ये तो मूळ शब्दशः उतारा तसाच राहू द्या — पण **🔤 मराठी अनुवाद** मध्ये तो उतारा जसाच्या तसा पुन्हा लिहू नका. त्यातला प्रत्येक जुना/संस्कृत शब्द आजच्या साध्या, बोलीभाषेतील मराठीत समजावून सांगा — जणू आजच्या तरुण पिढीला (ज्यांना संस्कृत येत नाही) समजावून सांगत आहात. जर WIKI परिच्छेद उपलब्ध असतील, त्यांचा वापर या स्पष्टीकरणाला दुजोरा द्यायला करा.
 
 FORMAT:
 
-**📖 धर्मसिंधु सांगतो:**
-(Direct quote from [DS:पान X] that is relevant, or write "[सामान्य धर्मज्ञान]" if DS pages don't cover this)
+**📖 धर्मसिंधु सांगतो:** (पान X, Y)
+(Direct quote/close paraphrase from [DS:पान X] — or the exact fallback line from rule 2)
 
 **🌐 Wikipedia सांगतो:** (only if wiki passages exist AND are relevant)
 (Direct quote from [WIKI:Title])
 
 **🔤 मराठी अनुवाद:**
-(Simple Marathi explanation in your own words — 2-3 sentences)
+(वरचा जुना/संस्कृतमिश्रित उतारा — शब्दागणिक, साध्या आजच्या मराठीत उलगडून सांगा; कठीण शब्दांचा अर्थ द्या. 3-5 वाक्ये.)
 
 **✅ सारांश:**
 (Key facts in Marathi — bullet points if multiple items)
@@ -260,7 +343,7 @@ ${fullContext}`
 (Relevant verse or rule)
 
 **🔤 मराठी अनुवाद:**
-(Simple modern Marathi)
+(वरील जुना/संस्कृतमिश्रित मजकूर आजच्या साध्या, बोलीभाषेतील मराठीत समजावून सांगा — कठीण/संस्कृत शब्दांचा सोपा अर्थ द्या, जुने शब्द जसेच्या तसे पुन्हा लिहू नका.)
 
 **✅ सारांश:**
 (Direct answer in Marathi)
@@ -274,7 +357,9 @@ ${fullContext}`
       method:  'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: CHAT_MODEL, temperature: 0.3, max_tokens: 1200,
+        // ANSWER_MODEL (120b): 8b was mangling tithi names + strict format; Devanagari
+        // needs ~2000 tokens for the full 300-word structured answer
+        model: ANSWER_MODEL, temperature: 0.3, max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user',   content: question },
@@ -288,7 +373,7 @@ ${fullContext}`
     }
 
     const groqData = await groqRes.json();
-    const answer   = groqData.choices?.[0]?.message?.content?.trim() || 'उत्तर मिळाले नाही.';
+    const answer   = finishSentence(groqData.choices?.[0]?.message?.content?.trim()) || 'उत्तर मिळाले नाही.';
 
     // ── 5. Respond ────────────────────────────────────────────────
     const dsData = {
