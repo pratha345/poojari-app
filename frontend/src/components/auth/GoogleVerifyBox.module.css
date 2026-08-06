@@ -1,0 +1,56 @@
+.box {
+  position: relative;
+  background: linear-gradient(160deg, #fffdf8, #fff6e6);
+  border: 1.5px solid #ffd699;
+  border-radius: 16px;
+  padding: 22px 16px 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.badge {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, #b35c00, #e07b2a);
+  color: #fff; font-size: 11px; font-weight: 700;
+  padding: 4px 14px; border-radius: 20px; letter-spacing: 0.2px;
+  white-space: nowrap; box-shadow: 0 2px 8px rgba(179,92,0,0.3);
+}
+
+.googleSlot {
+  position: relative;
+  display: flex; justify-content: center;
+  min-height: 44px;
+  margin-bottom: 12px;
+}
+
+.googleReal { width: 100%; transition: opacity 0.25s ease; }
+
+/* Skeleton — approximates the real Google button's shape so there's no
+   layout jump when the real (iframe-rendered) button replaces it */
+.skeleton {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: #fff; border: 1px solid #e5dcd0; border-radius: 6px;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+.skeletonDot { width: 18px; height: 18px; border-radius: 50%; background: #eee0cc; }
+.skeletonBar { width: 120px; height: 12px; border-radius: 6px; background: #eee0cc; }
+@keyframes shimmer {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+/* Contrast-checked against the box's cream background (~5:1) — the earlier
+   lighter tan (#a17739) was borderline for small 12px text */
+.trust {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: 4px 12px; margin-top: 12px;
+  font-size: 12px; font-weight: 700; color: #7a5518;
+}
+.trustDot { opacity: 0.6; }
+
+.socialProof {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px dashed #eecf9c;
+  font-size: 12px; font-weight: 600; color: #b35c00;
+}

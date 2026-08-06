@@ -7,7 +7,8 @@ import Footer from '../components/layout/Footer';
 import SEOHead from '../components/SEOHead';
 import { authAPI, poojaAPI, pujariAPI, bookingAPI } from '../api/index.js';
 import { useAuth } from '../context/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
+import GoogleVerifyBox from '../components/auth/GoogleVerifyBox';
+import ManualToggle from '../components/auth/ManualToggle';
 import { getImageUrl } from '../utils/index.js';
 import { FaStar, FaLocationDot, FaWhatsapp, FaCircleCheck, FaShieldHalved, FaCalendarCheck, FaHandsPraying } from 'react-icons/fa6';
 
@@ -171,6 +172,11 @@ export default function BookPujari() {
   const [otpCode,    setOtpCode]    = useState('');
   const [otpSent,    setOtpSent]    = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
+  // Phone/OTP fields start HIDDEN — Google leads with useOneTap (see
+  // Login.jsx / Booking.jsx for the full root-cause note on why hiding the
+  // manual form is what makes useOneTap safe here).
+  const [showOtpForm, setShowOtpForm] = useState(false);
+  const [otpError,    setOtpError]    = useState('');
   const [whatsapp,   setWhatsapp]   = useState(true);
 
   // Pooja search dropdown
@@ -257,15 +263,24 @@ export default function BookPujari() {
   const handleVerifyOtp = async () => {
     if (!otpCode || otpCode.length !== 6) { toast.error('6 अंकी OTP टाका.'); return; }
     setOtpLoading(true);
+    setOtpError('');
     try {
       const res = await authAPI.verifyOtp({ phone: otpPhone, otp: otpCode, name: otpName || undefined });
       login(res.data.data.token, res.data.data.user);
       toast.success('OTP पडताळणी यशस्वी! 🙏');
       setStep(1);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'OTP चुकीचा आहे.');
+      const msg = err.response?.data?.message || 'OTP चुकीचा आहे.';
+      setOtpError(msg);
+      toast.error(msg);
     } finally { setOtpLoading(false); }
   };
+
+  // Auto-submit once all 6 digits are in — one less tap for the user.
+  useEffect(() => {
+    if (otpSent && otpCode.length === 6 && !otpLoading) handleVerifyOtp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otpCode, otpSent]);
 
   const detectLocation = () => {
     if (!navigator.geolocation) { toast.error('जिओलोकेशन उपलब्ध नाही.'); return; }
@@ -429,28 +444,30 @@ export default function BookPujari() {
               {step === 0 && (
                 <div style={card}>
                   <div style={sectionHeader}>
-                    <div style={iconCircle('#fff8f0', '#b35c00')}>🔐</div>
+                    <div style={iconCircle('linear-gradient(135deg,#fff3e0,#ffe0b2)', '#b35c00')}>
+                      <FaShieldHalved style={{ color: '#b35c00', fontSize: 18 }} />
+                    </div>
                     <div>
                       <h2 style={cardH2}>पडताळणी</h2>
-                      <p style={cardSub}>Google खात्याने एका क्लिकवर पुढे चला — OTP ची गरज नाही</p>
+                      <p style={cardSub}>सुरक्षित व जलद — फक्त काही सेकंदात पुढे चला</p>
                     </div>
                   </div>
                   <div style={divider} />
 
-                  {/* Google — one click, no OTP. NOTE: deliberately NOT using
-                      useOneTap — its automatic prompt renders an invisible
-                      full-page "select account" iframe that steals clicks
-                      from the OTP/password fields below it, silently breaking
-                      the fallback login (confirmed via Playwright testing). */}
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-                    <GoogleLogin
-                      text="continue_with"
-                      size="large"
-                      locale="mr"
-                      onSuccess={({ credential }) => handleGoogleAuth(credential)}
-                      onError={() => toast.error('Google लॉगिन रद्द झाले.')}
-                    />
-                  </div>
+                  {/* Google — one click, no OTP. useOneTap enabled: the OTP
+                      form below stays hidden until explicitly requested (or
+                      Google fails), so there's no other dense clickable UI
+                      for the account-chooser's invisible overlay to block. */}
+                  <GoogleVerifyBox
+                    onSuccess={({ credential }) => handleGoogleAuth(credential)}
+                    onError={() => { toast.error('Google लॉगिन रद्द झाले.'); setShowOtpForm(true); }}
+                  />
+
+                  <ManualToggle
+                    show={showOtpForm}
+                    onShow={() => setShowOtpForm(true)}
+                    label="फोन नंबर / OTP ने पुढे चला"
+                  >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0 16px' }}>
                     <div style={{ flex: 1, height: 1, background: '#e8e0d5' }} />
                     <span style={{ fontSize: 12.5, color: '#888' }}>किंवा फोन OTP ने</span>
@@ -469,7 +486,7 @@ export default function BookPujari() {
                       <div style={{ display: 'flex', alignItems: 'center', padding: '0 14px', background: '#f9f9f9', border: '1px solid #e0e0e0', borderRadius: 10, fontSize: 14, gap: 6, flexShrink: 0 }}>
                         🇮🇳 <span style={{ fontWeight: 600 }}>+91</span>
                       </div>
-                      <input className="form-control" type="tel" maxLength={10}
+                      <input className="form-control" type="tel" inputMode="numeric" pattern="[0-9]*" maxLength={10}
                         placeholder="१० अंकी नंबर" value={otpPhone}
                         onChange={e => setOtpPhone(e.target.value.replace(/\D/g, ''))}
                         style={{ ...inputStyle, flex: 1 }} />
@@ -490,12 +507,13 @@ export default function BookPujari() {
                     <>
                       <div style={field}>
                         <label style={labelStyle}>6 अंकी OTP <span style={{ color: '#e53935' }}>*</span></label>
-                        <input className="form-control" type="text" maxLength={6} placeholder="• • • • • •"
-                          value={otpCode} onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                          style={{ ...inputStyle, textAlign: 'center', letterSpacing: 12, fontSize: 22, fontWeight: 700 }} />
+                        <input className="form-control" type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} placeholder="• • • • • •"
+                          value={otpCode} onChange={e => { setOtpCode(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
+                          style={{ ...inputStyle, textAlign: 'center', letterSpacing: 12, fontSize: 22, fontWeight: 700, borderColor: otpError ? '#e53935' : undefined }} />
+                        {otpError && <p style={{ color: '#e53935', fontSize: 12.5, fontWeight: 600, margin: '6px 0 0' }}>⚠️ {otpError}</p>}
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
                           <small style={{ color: '#888' }}>{otpPhone} वर OTP पाठवला</small>
-                          <small style={{ color: '#b35c00', cursor: 'pointer', fontWeight: 600 }} onClick={() => setOtpSent(false)}>नंबर बदला</small>
+                          <small style={{ color: '#b35c00', cursor: 'pointer', fontWeight: 600 }} onClick={() => { setOtpSent(false); setOtpError(''); }}>नंबर बदला</small>
                         </div>
                       </div>
                       <button className="btn btn-primary" style={primaryBtn} onClick={handleVerifyOtp} disabled={otpLoading}>
@@ -507,6 +525,7 @@ export default function BookPujari() {
                       </p>
                     </>
                   )}
+                  </ManualToggle>
 
                   <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#888' }}>
                     आधीच खाते आहे?{' '}

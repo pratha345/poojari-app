@@ -212,7 +212,12 @@ export default function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* ── User Protected ────────────────────────────── */}
-            <Route path="/booking/:slug"   element={<PrivateRoute><Booking /></PrivateRoute>} />
+            {/* NOT wrapped in PrivateRoute (like /book-pujari below) — Booking.jsx
+                has its own guest "Step 0" Google/OTP verification for exactly
+                this case; PrivateRoute here was bouncing every guest straight
+                to /login before that step ever got a chance to render, making
+                it permanently unreachable dead code. */}
+            <Route path="/booking/:slug"   element={<Booking />} />
             <Route path="/my-bookings"     element={<PrivateRoute><BookingHistory /></PrivateRoute>} />
             <Route path="/my-tickets"      element={<PrivateRoute><MyTickets /></PrivateRoute>} />
             <Route path="/my-tickets/:id"  element={<PrivateRoute><MyTickets /></PrivateRoute>} />

@@ -7,7 +7,9 @@ import Footer from '../components/layout/Footer';
 import SEOHead from '../components/SEOHead';
 import { poojaAPI, bookingAPI, authAPI } from '../api/index.js';
 import { useAuth } from '../context/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
+import { FaShieldHalved } from 'react-icons/fa6';
+import GoogleVerifyBox from '../components/auth/GoogleVerifyBox';
+import ManualToggle from '../components/auth/ManualToggle';
 import styles from './Booking.module.css';
 
 const loadRazorpay = () =>
@@ -63,6 +65,12 @@ export default function Booking() {
   const [otpCode,     setOtpCode]     = useState('');
   const [otpSent,     setOtpSent]     = useState(false);
   const [otpLoading,  setOtpLoading]  = useState(false);
+  const [otpError,    setOtpError]    = useState('');
+  // Phone/OTP fields start HIDDEN — Google leads with useOneTap. Hiding the
+  // manual form removes the competing clickable UI that useOneTap's invisible
+  // account-chooser overlay used to silently block clicks on (see Login.jsx
+  // for the full root-cause note) — same fix pattern applied there.
+  const [showOtpForm, setShowOtpForm] = useState(false);
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -167,15 +175,24 @@ export default function Booking() {
     if (!otpCode || otpCode.length !== 6) { toast.error('6 अंकी OTP टाका.'); return; }
     const cleanPhone = otpPhone.replace(/\D/g, '');
     setOtpLoading(true);
+    setOtpError('');
     try {
       const res = await authAPI.verifyOtp({ phone: cleanPhone, otp: otpCode, name: otpName || undefined });
       login(res.data.data.token, res.data.data.user);
       toast.success('OTP पडताळणी यशस्वी! 🙏');
       setStep(1);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'OTP चुकीचा आहे.');
+      const msg = err.response?.data?.message || 'OTP चुकीचा आहे.';
+      setOtpError(msg);
+      toast.error(msg);
     } finally { setOtpLoading(false); }
   };
+
+  // Auto-submit once all 6 digits are in — one less tap for the user.
+  useEffect(() => {
+    if (otpSent && otpCode.length === 6 && !otpLoading) handleVerifyOtp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otpCode, otpSent]);
 
   const handleSubmit = async () => {
     if (!form.booking_date || !form.booking_time || !form.address || !form.city) {
@@ -248,28 +265,36 @@ export default function Booking() {
               {/* ── Step 0: Phone OTP (not logged in) ── */}
               {step === 0 && (
                 <div className={styles.card}>
-                  <h2 className={styles.cardTitle}>🔐 पडताळणी</h2>
-                  <p style={{ color: 'var(--text-muted)', marginBottom: 16, fontSize: 14 }}>
-                    Google खात्याने एका क्लिकवर पुढे चला — OTP ची गरज नाही.
-                  </p>
-
-                  {/* Google — one click, no OTP. NOTE: deliberately NOT using
-                      useOneTap here — its automatic prompt renders an
-                      invisible full-page "select account" iframe that steals
-                      clicks from the OTP/password fields below it, silently
-                      breaking the fallback login (confirmed via Playwright:
-                      the account-select iframe's hit-box extended over the
-                      submit button even though its visible card was elsewhere). */}
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-                    <GoogleLogin
-                      text="continue_with"
-                      size="large"
-                      locale="mr"
-                      onSuccess={({ credential }) => handleGoogleAuth(credential)}
-                      onError={() => toast.error('Google लॉगिन रद्द झाले.')}
-                    />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+                    <div style={{
+                      width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
+                      background: 'linear-gradient(135deg,#fff3e0,#ffe0b2)',
+                      border: '1.5px solid #b35c0030',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+                    }}><FaShieldHalved style={{ color: '#b35c00' }} /></div>
+                    <div>
+                      <h2 className={styles.cardTitle} style={{ margin: 0 }}>पडताळणी</h2>
+                      <p style={{ color: 'var(--text-muted)', margin: '2px 0 0', fontSize: 13.5 }}>
+                        सुरक्षित व जलद — फक्त काही सेकंदात पुढे चला
+                      </p>
+                    </div>
                   </div>
+                  <div style={{ height: 1, background: 'var(--border, #f5ece0)', margin: '16px 0 18px' }} />
 
+                  {/* Google — one click, no OTP. useOneTap enabled: the OTP
+                      form below stays hidden until explicitly requested (or
+                      Google fails), so there's no other dense clickable UI
+                      for the account-chooser's invisible overlay to block. */}
+                  <GoogleVerifyBox
+                    onSuccess={({ credential }) => handleGoogleAuth(credential)}
+                    onError={() => { toast.error('Google लॉगिन रद्द झाले.'); setShowOtpForm(true); }}
+                  />
+
+                  <ManualToggle
+                    show={showOtpForm}
+                    onShow={() => setShowOtpForm(true)}
+                    label="फोन नंबर / OTP ने पुढे चला"
+                  >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '4px 0 16px' }}>
                     <div style={{ flex: 1, height: 1, background: 'var(--border, #e5dcd0)' }} />
                     <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>किंवा फोन OTP ने</span>
@@ -289,7 +314,7 @@ export default function Booking() {
                   <div className="form-group">
                     <label>फोन नंबर *</label>
                     <input
-                      type="tel" className="form-control"
+                      type="tel" inputMode="numeric" pattern="[0-9]*" className="form-control"
                       placeholder="10 अंकी फोन नंबर"
                       maxLength={10}
                       value={otpPhone} onChange={e => setOtpPhone(e.target.value.replace(/\D/g, ''))}
@@ -309,17 +334,18 @@ export default function Booking() {
                       <div className="form-group" style={{ marginTop: 16 }}>
                         <label>6 अंकी OTP *</label>
                         <input
-                          type="text" className="form-control"
+                          type="text" inputMode="numeric" pattern="[0-9]*" className="form-control"
                           placeholder="OTP टाका"
                           maxLength={6}
-                          value={otpCode} onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                          style={{ letterSpacing: 8, fontSize: 20, textAlign: 'center' }}
+                          value={otpCode} onChange={e => { setOtpCode(e.target.value.replace(/\D/g, '')); setOtpError(''); }}
+                          style={{ letterSpacing: 8, fontSize: 20, textAlign: 'center', borderColor: otpError ? '#e53935' : undefined }}
                         />
+                        {otpError && <p style={{ color: '#e53935', fontSize: 12.5, fontWeight: 600, margin: '6px 0 0' }}>⚠️ {otpError}</p>}
                         <small style={{ color: 'var(--text-muted)' }}>
                           {otpPhone} वर OTP पाठवला. &nbsp;
                           <span
                             style={{ color: 'var(--primary)', cursor: 'pointer' }}
-                            onClick={() => { setOtpSent(false); setOtpCode(''); }}
+                            onClick={() => { setOtpSent(false); setOtpCode(''); setOtpError(''); }}
                           >बदला</span>
                         </small>
                       </div>
@@ -331,6 +357,7 @@ export default function Booking() {
                       </button>
                     </>
                   )}
+                  </ManualToggle>
 
                   <div style={{ textAlign: 'center', marginTop: 16, fontSize: 13, color: 'var(--text-muted)' }}>
                     आधीच खाते आहे?{' '}
