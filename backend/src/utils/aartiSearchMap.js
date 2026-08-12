@@ -1,9 +1,16 @@
 'use strict';
-// aartiSearchMap.js — lets English/Hinglish typing find Marathi (Devanagari) aartis.
-// All aarti titles/lyrics are pure Devanagari, so a plain SQL LIKE never matches
-// an English query like "ganpati". This maps common English/Hinglish spellings
-// (deity names, saint names, common alt-spellings) to their Marathi equivalents;
-// the controller ORs in a LIKE per resolved term alongside the raw search.
+// aartiSearchMap.js — lets English/Hinglish typing AND natural Marathi typing
+// find Devanagari aartis. Two distinct gaps this closes:
+//  1. English/Hinglish query ("ganpati") never substring-matches Devanagari
+//     content at all.
+//  2. Even a Marathi query can miss — Sanskrit-origin words change STEM (not
+//     just suffix) in vocative/oblique case, which devotional titles use
+//     constantly: हनुमान (nom.) vs हनुमंताची (title's genitive), दुर्गा (nom.)
+//     vs दुर्गे (title's vocative "दुर्गे दुर्घट भारी"), गीता vs गीते. A plain
+//     substring LIKE cannot bridge a stem change, only a suffix addition —
+//     confirmed empirically: सर्च "हनुमान"/"महादेव"/"दुर्गा"/"गीता" all
+//     returned ZERO results despite matching aartis existing.
+// The controller ORs in a LIKE per resolved term alongside the raw search.
 // Self-maintaining: no per-aarti manual tagging needed, works for future aartis too.
 const KEYWORD_MAP = {
   ganpati: ['गणपती', 'गणेश'], ganesh: ['गणेश', 'गणपती'], ganesha: ['गणेश', 'गणपती'],
@@ -45,7 +52,28 @@ const KEYWORD_MAP = {
   aarti: ['आरती'], arti: ['आरती'], aarati: ['आरती'], stotra: ['स्तोत्र'], stotram: ['स्तोत्र'],
 };
 
+// Marathi (Devanagari) query word → other Devanagari forms actually found in
+// aarti titles/lyrics. Covers Sanskrit tatsama stem-changes in vocative/
+// genitive case (हनुमान→हनुमंत, दुर्गा→दुर्गे, गीता→गीते) and common colloquial
+// deity aliases (बाप्पा, शंभू, आई) that devotees search by but that don't
+// literally appear as the formal name in the text.
+const MARATHI_SYNONYM_MAP = {
+  हनुमान: ['हनुमंत', 'मारुती'], मारुती: ['हनुमंत', 'हनुमान'], हनुमंत: ['हनुमान', 'मारुती'],
+  बाप्पा: ['गणपती', 'गणेश'], गणपती: ['गणेश', 'बाप्पा'], गणेश: ['गणपती'],
+  महादेव: ['शिव', 'शंकर'], शंभू: ['शिव', 'शंकर'], शिव: ['शंकर', 'महादेव'], शंकर: ['शिव', 'महादेव'],
+  दुर्गा: ['दुर्गे', 'देवी'], दुर्गे: ['दुर्गा', 'देवी'], अंबा: ['अंबे', 'देवी'], अंबे: ['अंबा', 'देवी'],
+  नवरात्र: ['देवी', 'दुर्गे'], नवरात्रोत्सव: ['देवी', 'दुर्गे'], नवरात्री: ['देवी', 'दुर्गे'],
+  आई: ['देवी', 'माते'], माते: ['देवी', 'आई'],
+  गीता: ['गीते', 'भगवद्गीता'], गीते: ['गीता'],
+  विठोबा: ['विठ्ठल', 'पांडुरंग'], विठ्ठल: ['विठोबा', 'पांडुरंग'], पांडुरंग: ['विठ्ठल', 'विठोबा'],
+  पंढरीनाथ: ['विठ्ठल', 'पांडुरंग'], विठाई: ['विठ्ठल'],
+  दत्तगुरू: ['दत्त', 'दत्तात्रेय'], दत्तात्रय: ['दत्तात्रेय', 'दत्त'],
+  ज्ञानदेव: ['ज्ञानेश्वर'], माऊली: ['ज्ञानेश्वर', 'विठ्ठल'],
+  भगवती: ['देवी'], जगदंबा: ['देवी', 'अंबा'],
+};
+
 const KEYS = Object.keys(KEYWORD_MAP);
+const DEVANAGARI_RE = /[ऀ-ॿ]/;
 
 // Standard edit-distance DP — small strings (<20 chars) and a ~80-key dictionary,
 // so a full O(n*m) per key per query word is negligible per request.
@@ -62,17 +90,28 @@ function levenshtein(a, b) {
   return dp[a.length][b.length];
 }
 
-// Splits an English query into words, resolves each against KEYWORD_MAP, returns
-// a deduped list of Marathi terms to also search for. Devanagari input passes
-// through untouched by the caller (this function is only invoked for it too,
-// but Devanagari words simply won't match any key so nothing extra is added).
-// Three match tiers, cheapest first: exact key → prefix (truncated typing, e.g.
-// "ganpat") → fuzzy edit-distance (real typos/misremembered spelling, e.g.
-// "satyanaran" for "satyanarayan" — missing letters, not just a shorter word).
+// Splits a query into words (Devanagari-preserving — the old version's
+// `[^a-z\s]` strip silently reduced any Marathi query to nothing before it
+// reached the matching logic, which is why Devanagari search terms never
+// got resolved at all). Each word is resolved against the English keyword
+// map (for Latin-script words) or the Marathi synonym map (for Devanagari
+// words), returning a deduped list of extra Devanagari terms to also search.
+// Three match tiers for English words, cheapest first: exact key → prefix
+// (truncated typing, e.g. "ganpat") → fuzzy edit-distance (real typos, e.g.
+// "satyanaran" for "satyanarayan"). Marathi words use exact-match only
+// (fuzzy edit-distance on Devanagari conjuncts is unreliable — a single
+// matra difference isn't "close" the way a dropped Latin letter is).
 function resolveEnglishTerms(query) {
-  const words = query.toLowerCase().replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(Boolean);
+  const words = query.split(/\s+/).map(w => w.trim()).filter(Boolean);
   const terms = new Set();
-  for (const w of words) {
+  for (const raw of words) {
+    if (DEVANAGARI_RE.test(raw)) {
+      const hit = MARATHI_SYNONYM_MAP[raw];
+      if (hit) hit.forEach(t => terms.add(t));
+      continue;
+    }
+
+    const w = raw.toLowerCase().replace(/[^a-z]/g, '');
     if (w.length < 3) continue;   // too short to fuzzy-match safely
 
     if (KEYWORD_MAP[w]) { KEYWORD_MAP[w].forEach(t => terms.add(t)); continue; }

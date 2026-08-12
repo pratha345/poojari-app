@@ -13,6 +13,19 @@ const CAT_TTL  = 10 * 60;   // 10 min
 const LIST_TTL = 5  * 60;   // 5 min
 const SLUG_TTL = 10 * 60;   // 10 min
 
+// Traditional pooja sequence, NOT alphabetical/count order — गणपतीला
+// अग्रपूजेचा मान (worshipped first in any Hindu ritual), सामान्य last since
+// those are generic closing prayers/mantras, not tied to one deity. Used for
+// BOTH the sidebar (categories endpoint) and the default browsing grid
+// (list endpoint) so they show the same sequence — previously the sidebar
+// sorted by count DESC while the grid sorted alphabetically, two different
+// orders that made the category grouping feel arbitrary/inconsistent.
+const CATEGORY_ORDER = [
+  'गणपती', 'देवी', 'शिव', 'विष्णु', 'विठ्ठल-पांडुरंग', 'राम', 'कृष्ण',
+  'इतर देवता', 'संत आरत्या', 'सामान्य',
+];
+const CATEGORY_FIELD = `FIELD(deity_category, ${CATEGORY_ORDER.map(() => '?').join(',')})`;
+
 // ── Public: List published aartis (filter by deity, search) ──────────────────
 exports.list = async (req, res) => {
   try {
@@ -51,8 +64,8 @@ exports.list = async (req, res) => {
     const [rows] = await pool.query(
       `SELECT id, title, slug, deity_category, occasion, image_url, is_featured, views, created_at
        FROM aartis WHERE ${whereClause}
-       ORDER BY ${festOrder} is_featured DESC, deity_category ASC, title ASC LIMIT ? OFFSET ?`,
-      [...params, ...orderParams, parseInt(limit), offset]
+       ORDER BY ${festOrder} is_featured DESC, ${CATEGORY_FIELD} ASC, title ASC LIMIT ? OFFSET ?`,
+      [...params, ...orderParams, ...CATEGORY_ORDER, parseInt(limit), offset]
     );
     const [[{ total }]] = await pool.query(
       `SELECT COUNT(*) AS total FROM aartis WHERE ${whereClause}`, params
@@ -75,7 +88,8 @@ exports.categories = async (req, res) => {
 
     const [rows] = await pool.query(
       `SELECT deity_category, COUNT(*) AS count FROM aartis
-       WHERE is_published = 1 GROUP BY deity_category ORDER BY count DESC`
+       WHERE is_published = 1 GROUP BY deity_category ORDER BY ${CATEGORY_FIELD} ASC`,
+      CATEGORY_ORDER
     );
     await setCache(CAT_KEY, rows, CAT_TTL);
     return success(res, rows);
@@ -113,17 +127,22 @@ exports.getBySlug = async (req, res) => {
 // ── Public: Personalized recommendations from the user's pooja bookings ──────
 // "सत्यनारायण पूजा book केली → आरती विभागात सत्यनारायणाची आरती वर दिसावी."
 // Auth is OPTIONAL — without a (valid) token this just returns an empty list.
+// Order = match priority (first regex that hits wins) — kept in the sequence
+// the user asked for: सत्यनारायण → देवी/नवरात्र → शिव → विठ्ठल → दत्त → ...
+// "नवरात्र" added to the देवी trigger — a booking literally named "नवरात्र
+// पूजा" (not "देवी पूजा"/"दुर्गा पूजा") previously matched NOTHING, since
+// none of देवी|दुर्गा|अंबा|भवानी appear as substrings of "नवरात्र" itself.
 const POOJA_AARTI_KEYWORDS = [
-  [/सत्यनारायण/,            'om-jai-lakshmi-ramana-satyanarayan-aarti'],
-  [/गणपती|गणेश/,            'sukhkarta-dukhharta-ganpati-aarti'],
-  [/लक्ष्मी/,                'jai-devi-mahalakshmi-kolhapur-aarti'],
-  [/शिव|रुद्र|महादेव/,       'lavthavati-vikrala-shankar-aarti'],
-  [/देवी|दुर्गा|अंबा|भवानी/, 'durge-durghat-bhari-devi-aarti'],
-  [/विठ्ठल|पांडुरंग/,        'yuge-atthavis-vitevari-ubha-vitthal-aarti'],
-  [/हनुमान|मारुती/,          'satrane-uddane-hunkar-vadani-hanuman-aarti'],
-  [/दत्त/,                   'trigunatmak-traimurti-datta-aarti'],
-  [/राम/,                    'shriram-jairam-jay-jay-ram-aarti'],
-  [/कृष्ण|गोकुळ/,            'ovalu-aarti-madangopala-krishna'],
+  [/सत्यनारायण/,                          'om-jai-lakshmi-ramana-satyanarayan-aarti'],
+  [/देवी|दुर्गा|अंबा|भवानी|नवरात्र/,       'durge-durghat-bhari-devi-aarti'],
+  [/शिव|रुद्र|महादेव/,                    'lavthavati-vikrala-shankar-aarti'],
+  [/विठ्ठल|पांडुरंग/,                     'yuge-atthavis-vitevari-ubha-vitthal-aarti'],
+  [/दत्त/,                                'trigunatmak-traimurti-datta-aarti'],
+  [/गणपती|गणेश/,                          'sukhkarta-dukhharta-ganpati-aarti'],
+  [/लक्ष्मी/,                             'jai-devi-mahalakshmi-kolhapur-aarti'],
+  [/हनुमान|मारुती/,                       'satrane-uddane-hunkar-vadani-hanuman-aarti'],
+  [/राम/,                                 'shriram-jairam-jay-jay-ram-aarti'],
+  [/कृष्ण|गोकुळ/,                         'ovalu-aarti-madangopala-krishna'],
 ];
 
 exports.recommended = async (req, res) => {
