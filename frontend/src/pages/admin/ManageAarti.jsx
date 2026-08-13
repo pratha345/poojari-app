@@ -97,6 +97,12 @@ export default function ManageAarti() {
   const [saving,   setSaving]   = useState(false);
   const [deleting, setDeleting] = useState(null);
 
+  // Drag-and-drop reorder — only the rows from the top of the list down to
+  // wherever the item was dropped get a fresh sequential priority; rows
+  // below the drop point keep whatever ordering they already had.
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
   // Intake — two ways to fill the form without typing everything by hand:
   //   'photo' → OCR a picture of a printed/handwritten aarti
   //   'paste' → paste ANY raw text (WhatsApp forward, PDF copy, roman transliteration,
@@ -332,6 +338,44 @@ export default function ManageAarti() {
     } catch { toast.error('प्राधान्यक्रम सेट करता आला नाही.'); }
   };
 
+  const handleDragStart = (idx) => (e) => {
+    setDragIndex(idx);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+  const handleDragOver = (idx) => (e) => {
+    e.preventDefault();
+    if (idx !== dragOverIndex) setDragOverIndex(idx);
+  };
+  const handleDragEnd = () => { setDragIndex(null); setDragOverIndex(null); };
+
+  const handleDrop = (dropIdx) => async (e) => {
+    e.preventDefault();
+    const fromIdx = dragIndex;
+    handleDragEnd();
+    if (fromIdx === null || fromIdx === dropIdx) return;
+
+    // How many rows at the top already carry an explicit priority — that
+    // block stays a clean 1..N sequence matching whatever's now on screen.
+    let prioritizedCount = 0;
+    while (prioritizedCount < aartis.length && aartis[prioritizedCount].priority != null) prioritizedCount++;
+
+    const next = [...aartis];
+    const [moved] = next.splice(fromIdx, 1);
+    next.splice(dropIdx, 0, moved);
+
+    const affected = Math.max(dropIdx + 1, prioritizedCount);
+    const updates = next.slice(0, affected).map((a, i) => ({ id: a.id, priority: i + 1 }));
+    setAartis(next.map((a, i) => (i < affected ? { ...a, priority: i + 1 } : a)));
+
+    try {
+      await aartiAPI.reorder(updates);
+      toast.success('क्रम बदलला! ✅');
+    } catch {
+      toast.error('क्रम बदलता आला नाही — यादी परत लोड करत आहे.');
+      load();
+    }
+  };
+
   const handleDelete = async (id, title) => {
     if (!window.confirm(`"${title}" ही आरती कायमची काढायची आहे का?`)) return;
     setDeleting(id);
@@ -527,6 +571,7 @@ export default function ManageAarti() {
             <table className={adminStyles.table}>
               <thead>
                 <tr>
+                  <th title="ड्रॅग करून क्रम बदला"></th>
                   <th>इमेज</th>
                   <th>शीर्षक</th>
                   <th>देवता</th>
@@ -538,8 +583,22 @@ export default function ManageAarti() {
                 </tr>
               </thead>
               <tbody>
-                {aartis.map(a => (
-                  <tr key={a.id}>
+                {aartis.map((a, idx) => (
+                  <tr
+                    key={a.id}
+                    onDragOver={handleDragOver(idx)}
+                    onDrop={handleDrop(idx)}
+                    className={idx === dragOverIndex ? s.dragOverRow : ''}
+                  >
+                    <td>
+                      <span
+                        className={s.dragHandle}
+                        draggable
+                        onDragStart={handleDragStart(idx)}
+                        onDragEnd={handleDragEnd}
+                        title="ड्रॅग करून क्रम बदला"
+                      >⠿</span>
+                    </td>
                     <td>
                       <label className={s.thumbUpload} title="इमेज बदला / अपलोड करा">
                         <input
@@ -612,10 +671,11 @@ export default function ManageAarti() {
                   </tr>
                 ))}
                 {aartis.length === 0 && (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: 24 }}>अजून एकही आरती नाही.</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: 24 }}>अजून एकही आरती नाही.</td></tr>
                 )}
               </tbody>
             </table>
+            <p className={s.botNote}>⠿ धरून ड्रॅग करा — जितकं वर ओढाल, तितक्या वरच्या आरत्या नव्याने क्रमांकित होतील (खालच्या जैसे-थे राहतील).</p>
           </div>
         )}
       </div>

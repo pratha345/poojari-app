@@ -458,6 +458,31 @@ exports.updatePriority = async (req, res) => {
   }
 };
 
+// ── Admin: Bulk-set priority after a drag-and-drop reorder in the admin list —
+//    body: { items: [{id, priority}, ...] }. Only the rows the UI actually
+//    touched (the dragged item plus everything above its new position) are
+//    sent, so untouched rows keep whatever ordering they already had. ──
+exports.reorder = async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!Array.isArray(items) || items.length === 0)
+      return error(res, 'items यादी रिकामी आहे.', 400);
+    for (const it of items) {
+      if (!Number.isInteger(it?.id) || !Number.isInteger(it?.priority) || it.priority < 1)
+        return error(res, 'अवैध क्रम डेटा.', 400);
+    }
+
+    for (const { id, priority } of items) {
+      await pool.query('UPDATE aartis SET priority = ? WHERE id = ?', [priority, id]);
+    }
+    await delCachePattern('aarti:list:*');
+    return success(res, { updated: items.length }, 'क्रम बदलला.');
+  } catch (err) {
+    console.error('aarti.reorder error:', err);
+    return error(res, 'क्रम बदलताना त्रुटी झाली.');
+  }
+};
+
 // ── Admin: Toggle featured (लोकप्रिय — shown first on the public list) ────────
 exports.toggleFeatured = async (req, res) => {
   try {

@@ -233,6 +233,7 @@ export const aartiAPI = {
   togglePublish: (id)      => api.patch(`/aarti/admin/${id}/publish`),
   toggleFeatured:(id)      => api.patch(`/aarti/admin/${id}/featured`),
   updatePriority:(id, priority) => api.patch(`/aarti/admin/${id}/priority`, { priority }),
+  reorder:       (items) => api.patch(`/aarti/admin/reorder`, { items }),
   remove:        (id)      => api.delete(`/aarti/admin/${id}`),
 };
 
