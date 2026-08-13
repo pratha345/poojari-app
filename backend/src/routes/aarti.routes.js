@@ -46,6 +46,7 @@ router.put   ('/admin/:id',         ...aartiEditor, imgUpload.single('image'), w
 router.patch ('/admin/:id/image',   ...aartiEditor, imgUpload.single('image'), webpConvert, ctrl.updateImage);
 router.patch ('/admin/:id/publish', ...aartiEditor, ctrl.togglePublish);
 router.patch ('/admin/:id/featured', ...aartiEditor, ctrl.toggleFeatured);
+router.patch ('/admin/:id/priority', ...aartiEditor, ctrl.updatePriority);
 router.delete('/admin/:id',         ...admin,       ctrl.remove);
 
 module.exports = router;

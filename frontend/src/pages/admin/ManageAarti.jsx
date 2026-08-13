@@ -314,6 +314,24 @@ export default function ManageAarti() {
     } catch { toast.error('बदल करता आला नाही.'); }
   };
 
+  // Priority — lower number shows first across ALL categories, overriding
+  // the default order. Blank clears the override. Debounced-by-blur (not
+  // on every keystroke) so typing "12" doesn't fire a request after the "1".
+  const updatePriority = async (a, rawValue) => {
+    const value = rawValue.trim();
+    const priority = value === '' ? null : parseInt(value, 10);
+    if (priority !== null && (!Number.isInteger(priority) || priority < 1)) {
+      toast.error('प्राधान्यक्रम १ किंवा त्याहून मोठा आकडा असावा.');
+      return;
+    }
+    if (priority === (a.priority ?? null)) return;   // unchanged, skip the call
+    try {
+      await aartiAPI.updatePriority(a.id, priority);
+      setAartis(prev => prev.map(x => x.id === a.id ? { ...x, priority } : x));
+      toast.success(priority === null ? 'प्राधान्यक्रम काढला.' : `प्राधान्यक्रम #${priority} सेट केला.`);
+    } catch { toast.error('प्राधान्यक्रम सेट करता आला नाही.'); }
+  };
+
   const handleDelete = async (id, title) => {
     if (!window.confirm(`"${title}" ही आरती कायमची काढायची आहे का?`)) return;
     setDeleting(id);
@@ -514,6 +532,7 @@ export default function ManageAarti() {
                   <th>देवता</th>
                   <th>पाहिले</th>
                   <th>लोकप्रिय</th>
+                  <th title="कमी आकडा = आधी दिसेल, सर्व श्रेणींत">प्राधान्यक्रम</th>
                   <th>स्थिती</th>
                   <th>कृती</th>
                 </tr>
@@ -560,6 +579,18 @@ export default function ManageAarti() {
                       >
                         {a.is_featured ? '⭐' : '☆'}
                       </button>
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="—"
+                        defaultValue={a.priority ?? ''}
+                        className={s.priorityInput}
+                        title="कमी आकडा = आधी दिसेल (सर्व श्रेणींत). रिकामे ठेवल्यास नेहमीचा क्रम."
+                        onBlur={e => updatePriority(a, e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }}
+                      />
                     </td>
                     <td>
                       <button

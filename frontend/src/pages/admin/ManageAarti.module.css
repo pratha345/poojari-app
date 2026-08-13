@@ -213,6 +213,13 @@
 .starOff { opacity: 0.35; }
 .starOn:hover, .starOff:hover { transform: scale(1.25); opacity: 1; }
 
+.priorityInput {
+  width: 52px; padding: 5px 6px; text-align: center;
+  border: 1.5px solid #e0d5c5; border-radius: 6px; font-size: 13px;
+  font-family: inherit;
+}
+.priorityInput:focus { outline: none; border-color: var(--primary, #E07B2A); }
+
 .pubOn, .pubOff {
   border: none; border-radius: 20px; padding: 4px 12px;
   font-size: 12px; cursor: pointer; white-space: nowrap;
@@ -243,6 +250,8 @@
   .modeTabs { gap: 6px; }
   .modeTab, .modeTabActive { flex: 1; padding: 10px 6px; font-size: 13px; text-align: center; }
   .pasteArea { font-size: 16px; padding: 11px 12px; }
+
+  .priorityInput { font-size: 16px; width: 60px; }   /* 16px floor avoids iOS auto-zoom on focus */
 
   /* Featured image zone: overlay buttons are always visible on touch (no hover) */
   .uploadZone { min-height: 120px; }

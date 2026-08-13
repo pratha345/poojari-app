@@ -13,16 +13,17 @@ const CAT_TTL  = 10 * 60;   // 10 min
 const LIST_TTL = 5  * 60;   // 5 min
 const SLUG_TTL = 10 * 60;   // 10 min
 
-// Traditional pooja sequence, NOT alphabetical/count order — गणपतीला
-// अग्रपूजेचा मान (worshipped first in any Hindu ritual), सामान्य last since
-// those are generic closing prayers/mantras, not tied to one deity. Used for
-// BOTH the sidebar (categories endpoint) and the default browsing grid
-// (list endpoint) so they show the same sequence — previously the sidebar
-// sorted by count DESC while the grid sorted alphabetically, two different
-// orders that made the category grouping feel arbitrary/inconsistent.
+// Traditional pooja sequence, NOT alphabetical/count order — user-specified:
+// गणपती (अग्रपूजेचा मान) → शिव → विठ्ठल-पांडुरंग → देवी → विष्णु (सत्यनारायण) →
+// इतर देवता (दत्त) → राम → कृष्ण → संत आरत्या → सामान्य last (generic closing
+// prayers/mantras, not tied to one deity). Used for BOTH the sidebar
+// (categories endpoint) and the default browsing grid (list endpoint) so
+// they show the same sequence — previously the sidebar sorted by count DESC
+// while the grid sorted alphabetically, two different orders that made the
+// category grouping feel arbitrary/inconsistent.
 const CATEGORY_ORDER = [
-  'गणपती', 'देवी', 'शिव', 'विष्णु', 'विठ्ठल-पांडुरंग', 'राम', 'कृष्ण',
-  'इतर देवता', 'संत आरत्या', 'सामान्य',
+  'गणपती', 'शिव', 'विठ्ठल-पांडुरंग', 'देवी', 'विष्णु', 'इतर देवता',
+  'राम', 'कृष्ण', 'संत आरत्या', 'सामान्य',
 ];
 const CATEGORY_FIELD = `FIELD(deity_category, ${CATEGORY_ORDER.map(() => '?').join(',')})`;
 
@@ -36,7 +37,7 @@ exports.list = async (req, res) => {
     // during नवरात्र the देवी aartis, etc. — resolved from the panchang engine.
     const festival = await getTodayFestival().catch(() => null);
 
-    const listKey = `aarti:list:${JSON.stringify({ deity, search, page, limit, fd: festival?.deity || '' })}`;
+    const listKey = `aarti:list:v2:${JSON.stringify({ deity, search, page, limit, fd: festival?.deity || '' })}`;
     const cached = await getCache(listKey);
     if (cached) return success(res, cached);
 
@@ -61,10 +62,15 @@ exports.list = async (req, res) => {
     const festOrder  = festival ? '(deity_category = ?) DESC,' : '';
     const orderParams = festival ? [festival.deity] : [];
 
+    // Manual priority is a deliberate admin override — it must win outright,
+    // not just break ties within the festival-matched group. Earlier this
+    // sat AFTER festOrder, so during श्रावण (शिव auto-boosted all month) a
+    // priority-1 गणपती aarti still landed 6th, behind every शिव aarti —
+    // exactly backwards from what setting a priority is supposed to mean.
     const [rows] = await pool.query(
-      `SELECT id, title, slug, deity_category, occasion, image_url, is_featured, views, created_at
+      `SELECT id, title, slug, deity_category, occasion, image_url, is_featured, priority, views, created_at
        FROM aartis WHERE ${whereClause}
-       ORDER BY ${festOrder} is_featured DESC, ${CATEGORY_FIELD} ASC, title ASC LIMIT ? OFFSET ?`,
+       ORDER BY (priority IS NULL) ASC, priority ASC, ${festOrder} is_featured DESC, ${CATEGORY_FIELD} ASC, title ASC LIMIT ? OFFSET ?`,
       [...params, ...orderParams, ...CATEGORY_ORDER, parseInt(limit), offset]
     );
     const [[{ total }]] = await pool.query(
@@ -340,8 +346,8 @@ exports.textExtract = async (req, res) => {
 exports.adminList = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT id, title, slug, deity_category, image_url, is_published, is_featured, views, created_at
-       FROM aartis ORDER BY is_featured DESC, id DESC`
+      `SELECT id, title, slug, deity_category, image_url, is_published, is_featured, priority, views, created_at
+       FROM aartis ORDER BY (priority IS NULL) ASC, priority ASC, is_featured DESC, id DESC`
     );
     return success(res, rows);
   } catch (err) {
@@ -426,6 +432,29 @@ exports.updateImage = async (req, res) => {
   } catch (err) {
     console.error('aarti.updateImage error:', err);
     return error(res, 'इमेज अपलोड करताना त्रुटी झाली.');
+  }
+};
+
+// ── Admin: Set/clear manual display priority (lower number = shown first,
+//    across ALL categories — overrides the default category-sequence order;
+//    empty/null clears the override, falling back to is_featured+category) ──
+exports.updatePriority = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { priority } = req.body;
+    priority = (priority === '' || priority === null || priority === undefined) ? null : parseInt(priority, 10);
+    if (priority !== null && (!Number.isInteger(priority) || priority < 1))
+      return error(res, 'Priority ही १ किंवा त्याहून मोठी संख्या असावी.', 400);
+
+    const [[row]] = await pool.query('SELECT slug FROM aartis WHERE id = ?', [id]);
+    if (!row) return error(res, 'आरती सापडली नाही.', 404);
+
+    await pool.query('UPDATE aartis SET priority = ? WHERE id = ?', [priority, id]);
+    await Promise.all([delCachePattern('aarti:list:*'), delCache(`aarti:slug:${row.slug}`)]);
+    return success(res, { priority }, 'प्राधान्यक्रम अद्ययावत झाला.');
+  } catch (err) {
+    console.error('aarti.updatePriority error:', err);
+    return error(res, 'त्रुटी झाली.');
   }
 };
 
