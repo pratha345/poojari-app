@@ -4,8 +4,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title || '🔔 पूजारी', {
       body:    data.body  || 'नवीन बुकिंग आली!',
-      icon:    data.icon  || '/logo.png',
-      badge:   '/logo.png',
+      icon:    data.icon  || '/logo-icon.png',
+      badge:   '/logo-icon.png',
       vibrate: [200, 100, 200],
       data:    { url: data.url || '/admin/bookings' },
       actions: [

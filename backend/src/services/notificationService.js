@@ -128,7 +128,7 @@ exports.notifyAdminNewBooking = async ({ booking_code, pooja_name, booking_date,
     await pushService.sendPushToTenant(tenant_id, {
       title: '🔔 नवीन बुकिंग!',
       body:  `${pooja_name} | ${new Date(booking_date).toLocaleDateString('mr-IN')} | #${booking_code}`,
-      icon:  '/logo.png',
+      icon:  '/logo-icon.png',
       url:   '/admin/bookings',
     });
 
