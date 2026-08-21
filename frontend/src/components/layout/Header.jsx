@@ -213,12 +213,14 @@ export default function Header() {
       <div className={styles.mainNav}>
         <div className={`container ${styles.navInner}`}>
 
-          {/* Logo */}
+          {/* Logo — icon only here (not the full icon+wordmark lockup): this nav
+              row is already tight with 9 links + search + language + 2 buttons,
+              and the wide lockup was pushing लॉगिन off the right edge */}
           <Link to="/" className={styles.logo}>
             <picture>
-              <source srcSet="/logo.webp" type="image/webp" />
+              <source srcSet="/logo-icon.webp" type="image/webp" />
               <img
-                src="/logo.png"
+                src="/logo-icon.png"
                 alt="Poojaris — For All Poojas"
                 className={styles.logoImg}
               />
