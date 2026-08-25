@@ -573,7 +573,10 @@ export default function JanamPatrika() {
                     </div>
                     {showList && filteredDistricts.length > 0 && (
                       <ul className={s.distList}>
-                        {filteredDistricts.slice(0, 12).map(d => (
+                        {/* Was capped at 12 — Maharashtra alone has 36 districts, so
+                            anything past "Hingoli" (Pune, Nashik, Nagpur, Thane...)
+                            never showed. The list box already scrolls, so show all. */}
+                        {filteredDistricts.map(d => (
                           <li key={d.en} className={s.distItem}
                             onMouseDown={() => handleDistrictSelect(d)}>
                             <span className={s.distItemLeft}>
