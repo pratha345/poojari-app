@@ -9,6 +9,22 @@ const CAT_TTL  = 10 * 60;   // 10 min — categories change rarely
 const LIST_TTL = 5  * 60;   // 5 min  — list changes on publish/unpublish
 const SLUG_TTL = 10 * 60;   // 10 min — post content changes rarely
 
+// Follows blog_slug_redirects (old slug -> new slug) up to 3 hops to a published post.
+// The table is optional; without it this simply returns null.
+async function resolveSlugRedirect(slug) {
+  try {
+    let cur = slug;
+    for (let i = 0; i < 3; i++) {
+      const [[r]] = await pool.query('SELECT new_slug FROM blog_slug_redirects WHERE old_slug = ?', [cur]);
+      if (!r) return null;
+      cur = r.new_slug;
+      const [[p]] = await pool.query('SELECT id FROM blog_posts WHERE slug = ? AND is_published = 1', [cur]);
+      if (p) return cur;
+    }
+  } catch { /* table missing */ }
+  return null;
+}
+
 // ── Public: List published posts ──────────────────────────────
 exports.list = async (req, res) => {
   try {
@@ -83,7 +99,12 @@ exports.getBySlug = async (req, res) => {
     const [rows] = await pool.query(
       'SELECT * FROM blog_posts WHERE slug = ? AND is_published = 1', [slug]
     );
-    if (!rows.length) return error(res, 'लेख सापडला नाही.', 404);
+    if (!rows.length) {
+      // Old or merged URLs: point the client at the post that replaced them
+      const target = await resolveSlugRedirect(slug);
+      if (target) return success(res, { redirect_to: target });
+      return error(res, 'लेख सापडला नाही.', 404);
+    }
 
     // View increment
     const viewInc = Math.floor(Math.random() * 9) + 1;

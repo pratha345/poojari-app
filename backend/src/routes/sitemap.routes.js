@@ -75,7 +75,7 @@ router.get('/', async (req, res) => {
     );
 
     const [blogPosts] = await db.query(
-      'SELECT slug, updated_at, created_at FROM blog_posts WHERE is_published = 1 ORDER BY created_at DESC LIMIT 300'
+      'SELECT slug, updated_at, created_at FROM blog_posts WHERE is_published = 1 ORDER BY created_at DESC LIMIT 2000'
     ).catch(() => [[]]);
 
     const [pujaris] = await db.query(

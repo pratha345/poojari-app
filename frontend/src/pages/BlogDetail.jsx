@@ -1,6 +1,6 @@
 // src/pages/BlogDetail.jsx — Single blog post
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -78,6 +78,7 @@ function BlogRating({ slug, initialRating, initialCount, userRating }) {
 
 export default function BlogDetail() {
   const { slug }        = useParams();
+  const navigate        = useNavigate();
   const [post,       setPost]       = useState(null);
   const [related,    setRelated]    = useState([]);
   const [loading,    setLoading]    = useState(true);
@@ -88,6 +89,8 @@ export default function BlogDetail() {
     const sid = getSessionId();
     blogAPI.getBySlug(slug, sid)
       .then(r => {
+        // Old/merged blog URLs redirect to the post that replaced them
+        if (r.data.data.redirect_to) { navigate(`/blog/${r.data.data.redirect_to}`, { replace: true }); return; }
         setPost(r.data.data.post);
         setRelated(r.data.data.related || []);
         setUserRating(r.data.data.user_rating || null);
