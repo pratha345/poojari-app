@@ -81,5 +81,3 @@ Disallow: /
 # Dynamic sitemap (always fresh — from backend DB)
 Sitemap: https://pujari.mydashboard.site/sitemap.xml
 
-# Static fallback sitemap
-Sitemap: https://pujari.mydashboard.site/sitemap-static.xml
