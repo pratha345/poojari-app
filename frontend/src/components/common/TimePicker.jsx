@@ -12,6 +12,16 @@ function toXY(angleDeg, r) {
   return { x: CX + r * Math.cos(rad), y: CY + r * Math.sin(rad) };
 }
 
+// Show the chosen time in 12h form with AM/PM and part of day, so a birth
+// time saved as AM by mistake (e.g. 10:10 instead of 22:10) is easy to spot.
+function fmt12(v) {
+  const [h, m] = v.split(':').map(Number);
+  if (Number.isNaN(h)) return v;
+  const h12  = h % 12 === 0 ? 12 : h % 12;
+  const part = h < 4 ? 'पहाटे' : h < 12 ? 'सकाळी' : h < 16 ? 'दुपारी' : h < 20 ? 'संध्याकाळी' : 'रात्री';
+  return `${String(h12).padStart(2, '0')}:${String(m || 0).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'} · ${part}`;
+}
+
 export default function TimePicker({ value = '', onChange }) {
   const [open,   setOpen]   = useState(false);
   const [mode,   setMode]   = useState('hour');   // 'hour' | 'minute'
@@ -96,7 +106,7 @@ export default function TimePicker({ value = '', onChange }) {
       {/* Trigger input */}
       <div className={s.trigger} onClick={() => setOpen(true)}>
         <span className={s.clockIcon}>🕐</span>
-        <span className={s.triggerText}>{value || 'वेळ निवडा'}</span>
+        <span className={s.triggerText}>{value ? fmt12(value) : 'वेळ निवडा'}</span>
       </div>
 
       {/* Overlay */}
@@ -121,8 +131,8 @@ export default function TimePicker({ value = '', onChange }) {
                 {displayM}
               </span>
               <div className={s.ampmCol}>
-                <button type="button" className={`${s.ampmBtn} ${ampm === 'AM' ? s.ampmActive : ''}`} onClick={() => setAmpm('AM')}>AM</button>
-                <button type="button" className={`${s.ampmBtn} ${ampm === 'PM' ? s.ampmActive : ''}`} onClick={() => setAmpm('PM')}>PM</button>
+                <button type="button" className={`${s.ampmBtn} ${ampm === 'AM' ? s.ampmActive : ''}`} onClick={() => setAmpm('AM')}>AM<br/><small>सकाळ</small></button>
+                <button type="button" className={`${s.ampmBtn} ${ampm === 'PM' ? s.ampmActive : ''}`} onClick={() => setAmpm('PM')}>PM<br/><small>दुपार/रात्र</small></button>
               </div>
             </div>
 

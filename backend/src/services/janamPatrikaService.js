@@ -72,7 +72,7 @@ function getAllPlanets(utcDate) {
   const sid  = lon => Math.floor(norm(lon - ayan) / 30);
   const deg  = lon => +(norm(lon - ayan) % 30).toFixed(2);
 
-  const geoLon = body => Astro.Ecliptic(Astro.GeoVector(body, t, false)).elon;
+  const geoLon = body => Astro.Ecliptic(Astro.GeoVector(body, t, true)).elon;
   const moon   = Astro.EclipticGeoMoon(t);
   const rahuT  = rahuMeanLon(t);
 
@@ -109,28 +109,64 @@ function getLagna(utcDate, lat, lon) {
   return { tropical: +asc.toFixed(4), sidereal: +sidAsc.toFixed(4), rashiIdx, degree: +(sidAsc % 30).toFixed(2) };
 }
 
-function getPanchang(moonSid, sunSid, utcDate, lat, lon) {
+// Karana: 60 half-tithis per lunar month. #0 is Kimstughna, #1–56 cycle the
+// 7 movable karanas starting from Bava, #57–59 are Shakuni, Chatushpada, Naga.
+function karanaName(moonSun) {
+  const n = Math.floor(moonSun / 6);           // 0–59
+  if (n === 0) return KARANA[10];              // किंस्तुघ्न
+  if (n >= 57) return KARANA[7 + (n - 57)];    // शकुनि, चतुष्पाद, नाग
+  return KARANA[(n - 1) % 7];
+}
+
+const sunSidAt = t => {
+  const ut = t.date;
+  return norm(Astro.Ecliptic(Astro.GeoVector('Sun', t, true)).elon - lahiriAyanamsha(ut));
+};
+
+// Amanta lunar month (as used in Maharashtra): named from the Sun's sidereal
+// rashi at the new moon that begins it. Two new moons in one rashi → अधिक मास.
+function lunarMonth(utcDate) {
+  const t     = Astro.MakeTime(utcDate);
+  const start = Astro.SearchMoonPhase(0, t, -32);   // most recent new moon (search backward)
+  const next  = Astro.SearchMoonPhase(0, t, 32);
+  const r1 = Math.floor(sunSidAt(start) / 30);
+  const r2 = Math.floor(sunSidAt(next) / 30);
+  return { idx: r1, name: HIN_MAS[r1], adhik: r1 === r2 };
+}
+
+// Hindu vara runs sunrise to sunrise, so a birth before local sunrise
+// belongs to the previous weekday.
+function hinduVara(dob, utcDate, lat, lon, tzOffset = 330) {
+  const [y, mo, d] = dob.split('-').map(Number);
+  const civilDow   = new Date(Date.UTC(y, mo - 1, d)).getUTCDay();
+  const localMidnightUtc = new Date(Date.UTC(y, mo - 1, d) - tzOffset * 60000);
+  const obs     = new Astro.Observer(lat, lon, 0);
+  const sunrise = Astro.SearchRiseSet('Sun', obs, +1, Astro.MakeTime(localMidnightUtc), 1);
+  const before  = sunrise && utcDate < sunrise.date;
+  return { vara: VARA[(civilDow + (before ? 6 : 0)) % 7], sunrise: sunrise ? sunrise.date : null };
+}
+
+function getPanchang(moonSid, sunSid, utcDate, lat, lon, dob) {
   const moonSun   = norm(moonSid - sunSid);
   const tithiNum  = Math.floor(moonSun / 12) + 1;            // 1–30
   const paksha    = tithiNum <= 15 ? 'शुक्ल' : 'कृष्ण';
-  const tithiName = TITHI[(tithiNum - 1) % 15];
+  const tithiName = tithiNum === 30 ? 'अमावस्या' : TITHI[(tithiNum - 1) % 15];
 
   const yogaIdx   = Math.floor(norm(moonSid + sunSid) / (360 / 27));
   const yoga      = YOGA[yogaIdx];
+  const karana    = karanaName(moonSun);
 
-  const karanaNum = Math.floor(moonSun / 6);
-  const karana    = KARANA[karanaNum % 7];
+  const { vara, sunrise } = hinduVara(dob, utcDate, lat, lon);
 
-  const vara      = VARA[utcDate.getDay()];
+  const month     = lunarMonth(utcDate);
+  const mas       = (month.adhik ? 'अधिक ' : '') + month.name;
 
-  // Hindu month from Sun's sidereal rashi
-  const sunRashi  = Math.floor(sunSid / 30);
-  const mas       = HIN_MAS[sunRashi];
-
-  // Vikram Samvat
-  const yr        = utcDate.getFullYear();
-  const mo        = utcDate.getMonth() + 1;
-  const samvat    = yr + (mo >= 4 ? 57 : 56);
+  // Shaka year starts at Chaitra Shukla Pratipada (Gudi Padwa). Early in the
+  // Gregorian year, months before Chaitra still belong to the previous Shaka year.
+  const yr        = utcDate.getUTCFullYear();
+  const beforeNewYear = utcDate.getUTCMonth() <= 3 && month.idx >= 7 && month.idx <= 10;
+  const shaka     = yr - (beforeNewYear ? 79 : 78);
+  const samvat    = shaka + 135;                              // Vikram Samvat
 
   // Nakshatra details
   const nakSpan   = 360 / 27;
@@ -138,7 +174,7 @@ function getPanchang(moonSid, sunSid, utcDate, lat, lon) {
   const moonInNak = moonSid % nakSpan;
   const pada      = Math.floor(moonInNak / (nakSpan / 4)) + 1;
 
-  return { tithiNum, tithiName, paksha, yoga, karana, vara, mas, samvat, nakIdx, nakName: NAKSHATRA[nakIdx], pada };
+  return { tithiNum, tithiName, paksha, yoga, karana, vara, sunrise, mas, samvat, shaka, nakIdx, nakName: NAKSHATRA[nakIdx], pada };
 }
 
 function getDasha(nakIdx, moonSid, birthDate) {
@@ -183,14 +219,14 @@ function generateJanamPatrika({ name, dob, tob, place, lat, lon }) {
   const ayan     = lahiriAyanamsha(utcDate);
 
   const moon     = Astro.EclipticGeoMoon(t);
-  const sunTrop  = Astro.Ecliptic(Astro.GeoVector('Sun', t, false)).elon;
+  const sunTrop  = Astro.Ecliptic(Astro.GeoVector('Sun', t, true)).elon;
   const moonSid  = norm(moon.lon  - ayan);
   const sunSid   = norm(sunTrop   - ayan);
 
   const planets  = getAllPlanets(utcDate);
   const lagna    = getLagna(utcDate, lat, lon);
-  const panchang = getPanchang(moonSid, sunSid, utcDate, lat, lon);
-  const dasha    = getDasha(panchang.nakIdx, moonSid, dob);
+  const panchang = getPanchang(moonSid, sunSid, utcDate, lat, lon, dob);
+  const dasha    = getDasha(panchang.nakIdx, moonSid, utcDate);
 
   // Group planets by HOUSE (North Indian rotating chart, H1 = Lagna sign)
   const byHouse = {};
@@ -213,6 +249,7 @@ function generateJanamPatrika({ name, dob, tob, place, lat, lon }) {
       vara:     panchang.vara,
       mas:      panchang.mas,
       samvat:   panchang.samvat,
+      shaka:    panchang.shaka,
       paksha:   panchang.paksha,
       tithi:    `${panchang.tithiName} (${panchang.tithiNum})`,
       nakshatra:`${panchang.nakName} (${panchang.pada}. चरण)`,

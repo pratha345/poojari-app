@@ -7,6 +7,16 @@ import TimePicker from '../../components/common/TimePicker';
 import { INDIA_STATES, DEFAULT_STATE_IDX, DEFAULT_DISTRICT, filterDistricts } from '../../data/indiaDistricts.js';
 import s from './JanamPatrika.module.css';
 
+// "22:10" -> "10:10 PM (रात्री)" so a wrong AM/PM is obvious at a glance
+function fmtTob(tob) {
+  if (!tob) return '—';
+  const [h, m] = tob.split(':').map(Number);
+  if (Number.isNaN(h)) return tob;
+  const h12  = h % 12 === 0 ? 12 : h % 12;
+  const part = h < 4 ? 'पहाटे' : h < 12 ? 'सकाळी' : h < 16 ? 'दुपारी' : h < 20 ? 'संध्याकाळी' : 'रात्री';
+  return `${String(h12).padStart(2, '0')}:${String(m || 0).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'} (${part})`;
+}
+
 // North Indian chart — house 1 always top-center-left, clockwise
 // 4×4 grid: border = 12 houses, center 2×2 = OM
 const NI_GRID = [
@@ -85,6 +95,7 @@ function buildPrintHTML(data) {
 
   const panchangRows = [
     ['वार', panchang.vara],        ['विक्रम संवत', panchang.samvat],
+    ...(panchang.shaka ? [['शक संवत', panchang.shaka]] : []),
     ['हिंदू मास', panchang.mas],   ['पक्ष', panchang.paksha],
     ['तिथी', panchang.tithi],       ['नक्षत्र', panchang.nakshatra],
     ['राशी', panchang.rashi],       ['लग्न', panchang.lagna],
@@ -142,7 +153,7 @@ function buildPrintHTML(data) {
     </tr>
     <tr>
       <td style="font-weight:700;color:#7b341e;padding:3px 8px 3px 0;">जन्म वेळ</td>
-      <td style="padding:3px 8px 3px 0;">${info.tob || '—'}</td>
+      <td style="padding:3px 8px 3px 0;">${fmtTob(info.tob)}</td>
       <td style="font-weight:700;color:#7b341e;padding:3px 8px 3px 0;">जन्म स्थळ</td>
       <td style="padding:3px 0;">${info.place || '—'}</td>
     </tr>
@@ -234,7 +245,7 @@ function PatrikaPreview({ data, printRef }) {
           <tbody>
             <tr><td className={s.pLabel}>नाव</td><td className={s.pValue}>{info.name}</td>
                 <td className={s.pLabel}>जन्म तारीख</td><td className={s.pValue}>{info.dob}</td></tr>
-            <tr><td className={s.pLabel}>जन्म वेळ</td><td className={s.pValue}>{info.tob}</td>
+            <tr><td className={s.pLabel}>जन्म वेळ</td><td className={s.pValue}>{fmtTob(info.tob)}</td>
                 <td className={s.pLabel}>जन्म स्थळ</td><td className={s.pValue}>{info.place}</td></tr>
           </tbody>
         </table>
@@ -256,7 +267,8 @@ function PatrikaPreview({ data, printRef }) {
         <table className={s.pPanchTable}>
           <tbody>
             {[
-              ['वार', panchang.vara],        ['संवत', panchang.samvat],
+              ['वार', panchang.vara],        ['विक्रम संवत', panchang.samvat],
+              ...(panchang.shaka ? [['शक संवत', panchang.shaka]] : []),
               ['हिंदू मास', panchang.mas],   ['पक्ष', panchang.paksha],
               ['तिथी', panchang.tithi],       ['नक्षत्र', panchang.nakshatra],
               ['राशी', panchang.rashi],       ['लग्न', panchang.lagna],
