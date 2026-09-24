@@ -42,25 +42,24 @@
   background: var(--white);
   border-radius: 10px;
   margin: 0 0 20px;
-  overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   position: relative;
   z-index: 2;
 }
 .controlItem {
   display: flex; align-items: center; gap: 8px;
-  flex: 1; padding: 12px 16px;
+  flex: 1; min-width: 0; padding: 12px 16px;
   border-right: 1px solid var(--border);
   position: relative;
 }
 .controlItem:last-of-type { border-right: none; }
 .controlIcon { font-size: 1rem; color: var(--text-muted); flex-shrink: 0; }
 .controlInput {
-  flex: 1; border: none; outline: none; background: transparent;
+  flex: 1; min-width: 0; width: 100%; border: none; outline: none; background: transparent;
   font-size: 0.88rem; color: var(--text);
   font-family: 'Noto Serif Devanagari', serif;
 }
-.controlInput[type="date"] { font-family: inherit; }
+.controlInput[type="date"] { font-family: inherit; cursor: pointer; min-height: 22px; }
 .controlInput::placeholder { color: var(--border); }
 
 .dropList {
@@ -94,6 +93,19 @@
 }
 .gpsBtn:hover { background: var(--cream); color: var(--primary); }
 .gpsBtn:disabled { opacity: 0.5; cursor: default; }
+.gpsBtn { border-radius: 0 10px 10px 0; align-self: stretch; }
+
+/* Mobile: location on its own row, date + GPS below, so the date picker is never squeezed out */
+@media (max-width: 600px) {
+  .controlsBar { flex-wrap: wrap; }
+  .controlItem:first-child {
+    flex: 1 1 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .controlInput { font-size: 16px; } /* 16px stops iOS from zooming on focus */
+  .gpsBtn { border-radius: 0 0 10px 0; }
+}
 
 /* ── Live clock ── */
 .heroClock {

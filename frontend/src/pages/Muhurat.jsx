@@ -401,7 +401,8 @@ export default function Muhurat() {
               <span className={styles.controlIcon}>📅</span>
               <input type="date" className={styles.controlInput}
                 value={date} min="2020-01-01" max="2030-12-31"
-                onChange={e => setDate(e.target.value)} />
+                onChange={e => e.target.value && setDate(e.target.value)}
+                onClick={e => { try { e.currentTarget.showPicker?.(); } catch { /* unsupported */ } }} />
             </div>
 
             {/* GPS */}
