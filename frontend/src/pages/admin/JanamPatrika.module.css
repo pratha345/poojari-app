@@ -316,3 +316,13 @@
   .pTitle   { font-size: 1.2rem; }
   .pCharts  { grid-template-columns: 1fr; gap: 14px; }
 }
+
+/* Birth-star details grid */
+.pVarLine    { text-align: center; font-weight: 700; color: #7b341e; margin: 0 0 10px; }
+.pDetailGrid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #f0e0c0; }
+.pDetailCell { display: flex; gap: 10px; padding: 7px 4px; border-bottom: 1px solid #f0e0c0; font-size: 13.5px; }
+.pDetailKey  { font-weight: 700; color: #7b341e; min-width: 96px; }
+.pDetailVal  { color: #14532d; font-weight: 600; }
+.pDosh       { color: #b91c1c; }
+.pNote       { font-size: 12px; color: #7b341e; margin: 6px 0 0; }
+@media (max-width: 600px) { .pDetailGrid { grid-template-columns: 1fr; } }

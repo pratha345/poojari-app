@@ -59,6 +59,31 @@ const PLANETS = [
   { key:'ketu',    name:'केतू',   short:'के' },
 ];
 
+// Birth-star details (Avakahada chakra)
+const NAAM_AKSHAR = [
+  ['चू','चे','चो','ला'],['ली','लू','ले','लो'],['अ','ई','उ','ए'],['ओ','वा','वी','वू'],
+  ['वे','वो','का','की'],['कू','घ','ङ','छ'],['के','को','हा','ही'],['हू','हे','हो','डा'],
+  ['डी','डू','डे','डो'],['मा','मी','मू','मे'],['मो','टा','टी','टू'],['टे','टो','पा','पी'],
+  ['पू','ष','ण','ठ'],['पे','पो','रा','री'],['रू','रे','रो','ता'],['ती','तू','ते','तो'],
+  ['ना','नी','नू','ने'],['नो','या','यी','यू'],['ये','यो','भा','भी'],['भू','धा','फा','ढा'],
+  ['भे','भो','जा','जी'],['खी','खू','खे','खो'],['गा','गी','गु','गे'],['गो','सा','सी','सू'],
+  ['से','सो','दा','दी'],['दू','थ','झ','ञ'],['दे','दो','चा','ची'],
+];
+const RASHI_SYMBOL = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+const RASHI_SWAMI  = ['मंगळ','शुक्र','बुध','चंद्र','सूर्य','बुध','शुक्र','मंगळ','गुरु','शनि','शनि','गुरु'];
+// Varna by rashi element: fire=क्षत्रिय, earth=वैश्य, air=शूद्र, water=ब्राह्मण
+const VARNA_NAMES  = ['क्षत्रिय','वैश्य','शूद्र','ब्राह्मण'];
+const GANA_NAMES   = ['देव','मनुष्य','राक्षस'];
+const NAK_GANA     = [0,1,2,1,0,1,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
+const YONI_NAMES   = ['अश्व','गज','मेष','सर्प','श्वान','मार्जार','मूषक','गौ','महिष','व्याघ्र','मृग','वानर','नकुल','सिंह'];
+const NAK_YONI     = [0,1,2,3,3,4,5,2,5,6,6,7,8,9,8,9,10,10,4,11,12,11,13,0,13,7,1];
+const NADI_NAMES   = ['आद्य (वात)','मध्य (पित्त)','अन्त्य (कफ)'];
+const NAK_NADI     = [0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2,2,1,0,0,1,2];
+// Nakshatra paya: सुवर्ण Revati–Bharani, लोह Krittika–Mrigashira,
+// रजत Ardra–Anuradha, ताम्र Jyeshtha–Uttara Bhadrapada
+const PAYA_NAMES   = ['सुवर्ण','रजत','ताम्र','लोह'];
+const NAK_PAYA     = [0,0,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,0];
+
 // ── Calculations ───────────────────────────────────────────
 
 function rahuMeanLon(astroTime) {
@@ -136,12 +161,18 @@ function lunarMonth(utcDate) {
 
 // Hindu vara runs sunrise to sunrise, so a birth before local sunrise
 // belongs to the previous weekday.
+// Sunrise as Marathi panchangs define it: centre of the Sun's disc on the
+// horizon, with 34' of atmospheric refraction.
+function hinduSunrise(fromUtc, lat, lon) {
+  const obs = new Astro.Observer(lat, lon, 0);
+  return Astro.SearchAltitude('Sun', obs, +1, Astro.MakeTime(fromUtc), 1, -34 / 60);
+}
+
 function hinduVara(dob, utcDate, lat, lon, tzOffset = 330) {
   const [y, mo, d] = dob.split('-').map(Number);
   const civilDow   = new Date(Date.UTC(y, mo - 1, d)).getUTCDay();
   const localMidnightUtc = new Date(Date.UTC(y, mo - 1, d) - tzOffset * 60000);
-  const obs     = new Astro.Observer(lat, lon, 0);
-  const sunrise = Astro.SearchRiseSet('Sun', obs, +1, Astro.MakeTime(localMidnightUtc), 1);
+  const sunrise = hinduSunrise(localMidnightUtc, lat, lon);
   const before  = sunrise && utcDate < sunrise.date;
   return { vara: VARA[(civilDow + (before ? 6 : 0)) % 7], sunrise: sunrise ? sunrise.date : null };
 }
@@ -177,6 +208,31 @@ function getPanchang(moonSid, sunSid, utcDate, lat, lon, dob) {
   return { tithiNum, tithiName, paksha, yoga, karana, vara, sunrise, mas, samvat, shaka, nakIdx, nakName: NAKSHATRA[nakIdx], pada };
 }
 
+const dms = d => `${Math.floor(d)}°${String(Math.floor((d % 1) * 60)).padStart(2, '0')}'`;
+
+function yearsToYMD(yrs) {
+  const y  = Math.floor(yrs);
+  const mf = (yrs - y) * 12;
+  const m  = Math.floor(mf);
+  const d  = Math.floor((mf - m) * 30);
+  return { y, m, d, text: `${y} वर्षे ${m} महिने ${d} दिवस` };
+}
+
+// Ishtakal: time from sunrise to birth in ghati:pala:vipala (1 ghati = 24 min).
+// A birth before sunrise counts from the previous day's sunrise.
+function ishtakal(utcDate, sunriseDate, lat, lon) {
+  let sr = sunriseDate;
+  if (sr && utcDate < sr) {
+    const prev = hinduSunrise(new Date(sr.getTime() - 30 * 3600 * 1000), lat, lon);
+    if (prev) sr = prev.date;
+  }
+  if (!sr) return null;
+  const vip = Math.floor((utcDate - sr) / 400);                // 1 vipala = 0.4 s
+  const gh = Math.floor(vip / 3600), pa = Math.floor((vip % 3600) / 60), vi = vip % 60;
+  const p2 = n => String(n).padStart(2, '0');
+  return `${p2(gh)}:${p2(pa)}:${p2(vi)}`;
+}
+
 function getDasha(nakIdx, moonSid, birthDate) {
   const nakSpan      = 360 / 27;
   const moonInNak    = moonSid % nakSpan;
@@ -208,7 +264,7 @@ function getDasha(nakIdx, moonSid, birthDate) {
   const today     = new Date();
   const current   = sequence.find(d => new Date(d.start) <= today && today < new Date(d.end)) || sequence[0];
 
-  return { balance: { lord: DASHA_LORDS[lordIdx], years: remaining }, current, sequence };
+  return { balance: { lord: DASHA_LORDS[lordIdx], years: remaining, exactYears: totalYrs - elapsed }, current, sequence };
 }
 
 // ── Public API ─────────────────────────────────────────────
@@ -237,6 +293,38 @@ function generateJanamPatrika({ name, dob, tob, place, lat, lon }) {
   });
   byHouse[1] = ['ल', ...byHouse[1]]; // Lagna marker in H1
 
+  // Avakahada / birth-star details, laid out like a traditional Marathi kundali
+  const moonRashi = Math.floor(moonSid / 30);
+  const nakIdx    = panchang.nakIdx;
+  const akshar    = NAAM_AKSHAR[nakIdx][panchang.pada - 1];
+  const mars      = planets.find(p => p.key === 'mars');
+  const marsFromLagna = ((mars.rashiIdx - lagna.rashiIdx + 12) % 12) + 1;
+  const marsFromMoon  = ((mars.rashiIdx - moonRashi + 12) % 12) + 1;
+  const doshHouses    = [1, 2, 4, 7, 8, 12];
+  const hhmm = d => (d ? new Date(d.getTime() + 330 * 60000).toISOString().slice(11, 16) : '—');
+  const details = {
+    rashi:          `${RASHI_SYMBOL[moonRashi]} ${RASHI[moonRashi]}`,
+    naamAkshar:     akshar,
+    lagna:          `${RASHI_SYMBOL[lagna.rashiIdx]} ${RASHI[lagna.rashiIdx]} ${dms(lagna.degree)}`,
+    dashaBhogya:    `${dasha.balance.lord} ${yearsToYMD(dasha.balance.exactYears).text}`,
+    mangalDosh:     doshHouses.includes(marsFromLagna),
+    mangalDoshNote: `मंगळ लग्नापासून ${marsFromLagna} व्या आणि चंद्रापासून ${marsFromMoon} व्या स्थानी`,
+    tithi:          `${panchang.tithiName}, ${panchang.paksha}`,
+    nakshatraPad:   `${panchang.nakName} ${panchang.pada} (${akshar})`,
+    yoga:           panchang.yoga,
+    karana:         panchang.karana,
+    ishtakal:       ishtakal(utcDate, panchang.sunrise, lat, lon),
+    sunrise:        hhmm(panchang.sunrise),
+    varMasShaka:    `${panchang.vara}, ${panchang.mas}, ${panchang.shaka} शक संवत`,
+    rashiSwami:     RASHI_SWAMI[moonRashi],
+    nakshatraSwami: DASHA_LORDS[NAK_LORD[nakIdx]],
+    paya:           PAYA_NAMES[NAK_PAYA[nakIdx]],
+    yoni:           YONI_NAMES[NAK_YONI[nakIdx]],
+    gana:           GANA_NAMES[NAK_GANA[nakIdx]],
+    nadi:           NADI_NAMES[NAK_NADI[nakIdx]],
+    varna:          VARNA_NAMES[moonRashi % 4],
+  };
+
   // Also keep byRashi for Rashi chart (South Indian fixed)
   const byRashi = {};
   for (let i = 0; i < 12; i++) byRashi[i] = [];
@@ -254,10 +342,11 @@ function generateJanamPatrika({ name, dob, tob, place, lat, lon }) {
       tithi:    `${panchang.tithiName} (${panchang.tithiNum})`,
       nakshatra:`${panchang.nakName} (${panchang.pada}. चरण)`,
       rashi:    RASHI[Math.floor(moonSid / 30)],
-      lagna:    `${RASHI[lagna.rashiIdx]} ${lagna.degree}°`,
+      lagna:    `${RASHI[lagna.rashiIdx]} ${dms(lagna.degree)}`,
       yoga:     panchang.yoga,
       karana:   panchang.karana,
     },
+    details,
     lagna,
     planets,
     byHouse,

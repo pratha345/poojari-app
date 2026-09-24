@@ -8,6 +8,22 @@ import { INDIA_STATES, DEFAULT_STATE_IDX, DEFAULT_DISTRICT, filterDistricts } fr
 import s from './JanamPatrika.module.css';
 
 // "22:10" -> "10:10 PM (रात्री)" so a wrong AM/PM is obvious at a glance
+// Birth-star summary rows, in the order a traditional Marathi kundali shows them
+function detailRows(d) {
+  if (!d) return [];
+  return [
+    ['राशी', d.rashi],                 ['नाम अक्षर', d.naamAkshar],
+    ['लग्न', d.lagna],                 ['दशा भोग्य', d.dashaBhogya],
+    ['तिथी', d.tithi],                 ['नक्षत्र, पद', d.nakshatraPad],
+    ['योग', d.yoga],                   ['करण', d.karana],
+    ['इष्टकाल', d.ishtakal],           ['सूर्योदय', d.sunrise],
+    ['राशी स्वामी', d.rashiSwami],     ['नक्षत्र स्वामी', d.nakshatraSwami],
+    ['नक्षत्र पाया', d.paya],          ['योनी', d.yoni],
+    ['गण', d.gana],                    ['नाडी', d.nadi],
+    ['वर्ण', d.varna],                 ['मंगळ दोष', d.mangalDosh ? 'आहे ✓' : 'नाही'],
+  ];
+}
+
 function fmtTob(tob) {
   if (!tob) return '—';
   const [h, m] = tob.split(':').map(Number);
@@ -159,6 +175,18 @@ function buildPrintHTML(data) {
     </tr>
   </table>
 
+  ${data.details ? `
+  <div class="sec-title">⭐ जन्म तपशील</div>
+  <div style="text-align:center;font-weight:700;color:#7b341e;margin:2px 0 6px;">${data.details.varMasShaka}</div>
+  <table style="width:100%;font-size:10pt;border-collapse:collapse;">
+    ${(() => { const r = detailRows(data.details); let h = '';
+      for (let i = 0; i < r.length; i += 2) {
+        const c = ([k, v]) => `<td style="font-weight:700;color:#7b341e;padding:4px 8px 4px 0;border-bottom:1px solid #f0e0c0;width:18%;">${k}</td><td style="padding:4px 8px 4px 0;border-bottom:1px solid #f0e0c0;width:32%;">${v ?? '—'}</td>`;
+        h += `<tr>${c(r[i])}${r[i + 1] ? c(r[i + 1]) : '<td></td><td></td>'}</tr>`;
+      } return h; })()}
+  </table>
+  <div style="font-size:8.5pt;color:#7b341e;margin-top:3px;">${data.details.mangalDoshNote}</div>` : ''}
+
   <!-- Charts -->
   <div class="sec-title">🔮 कुंडली चार्ट</div>
   <div class="charts-row">
@@ -188,7 +216,7 @@ function buildPrintHTML(data) {
     <div style="flex:1.4;">
       <div class="sec-title">⏳ विमशोत्तरी दशा</div>
       <div style="font-size:9.5pt;margin-bottom:5px;padding:5px 8px;background:#fff3cd;border-left:3px solid #f59e0b;">
-        जन्म दशा: <b>${dasha.balance.lord}</b> — शिल्लक: <b>${dasha.balance.years} वर्षे</b>
+        जन्म दशा: <b>${dasha.balance.lord}</b> — शिल्लक: <b>${data.details ? data.details.dashaBhogya.replace(/^\S+\s/, '') : dasha.balance.years + ' वर्षे'}</b>
       </div>
       <table style="width:100%;font-size:9pt;">
         <thead><tr style="background:#7b341e;color:#fff;"><th style="padding:4px 8px;text-align:left;">महादशा</th><th style="padding:4px 8px;text-align:left;">वर्षे</th><th style="padding:4px 8px;text-align:left;">प्रारंभ</th><th style="padding:4px 8px;text-align:left;">समाप्ती</th></tr></thead>
@@ -250,6 +278,23 @@ function PatrikaPreview({ data, printRef }) {
           </tbody>
         </table>
       </div>
+
+      {/* Birth-star details */}
+      {data.details && (
+        <div className={s.pSection}>
+          <h3 className={s.pSectionTitle}>⭐ जन्म तपशील</h3>
+          <p className={s.pVarLine}>{data.details.varMasShaka}</p>
+          <div className={s.pDetailGrid}>
+            {detailRows(data.details).map(([k, v]) => (
+              <div key={k} className={s.pDetailCell}>
+                <span className={s.pDetailKey}>{k}</span>
+                <span className={`${s.pDetailVal} ${k === 'मंगळ दोष' && data.details.mangalDosh ? s.pDosh : ''}`}>{v ?? '—'}</span>
+              </div>
+            ))}
+          </div>
+          <p className={s.pNote}>{data.details.mangalDoshNote}</p>
+        </div>
+      )}
 
       {/* Kundali Charts — North Indian style */}
       <div className={s.pCharts}>

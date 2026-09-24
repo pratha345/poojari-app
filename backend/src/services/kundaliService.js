@@ -160,7 +160,10 @@ const PLANET_FRIEND = [
 ];
 
 // ── 6. Gana — Nakshatra → Gana (0=Deva,1=Manav,2=Rakshasa)
-const GANA = [0,1,2,1,0,1,0,0,2,2,1,0,0,2,0,2,0,2,2,1,1,0,2,0,1,0,0];
+// Deva: Ashwini, Mrigashira, Punarvasu, Pushya, Hasta, Swati, Anuradha, Shravana, Revati
+// Manushya: Bharani, Rohini, Ardra, P/U Phalguni, P/U Ashadha, P/U Bhadrapada
+// Rakshasa: Krittika, Ashlesha, Magha, Chitra, Vishakha, Jyeshtha, Mula, Dhanishta, Shatabhisha
+const GANA = [0,1,2,1,0,1,0,0,2,2,1,1,0,2,0,2,0,2,2,1,1,0,2,2,1,1,0];
 const GANA_NAMES = ['देव','मानव','राक्षस'];
 // Score matrix [boy_gana][girl_gana]
 const GANA_MATRIX = [[6,5,1],[5,6,0],[0,0,6]];
