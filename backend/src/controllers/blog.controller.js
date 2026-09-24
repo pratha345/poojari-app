@@ -2,6 +2,7 @@
 const pool = require('../config/db');
 const { success, error } = require('../utils/response.util');
 const { getCache, setCache, delCache, delCachePattern } = require('../utils/redis');
+const { getTodaySeasonContext, seasonOrderSql } = require('../services/blogSeasonService');
 
 const CAT_KEY  = 'blog:categories';
 const CAT_TTL  = 10 * 60;   // 10 min — categories change rarely
@@ -14,7 +15,10 @@ exports.list = async (req, res) => {
     const { category, search, page = 1, limit = 9 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    const listKey = `blog:list:${JSON.stringify({ category, search, page, limit })}`;
+    // Festival-aware ordering: blogs for the ongoing/upcoming festival (e.g. shraddha
+    // during Pitrupaksha) and the current Hindu month come first. Search keeps plain order.
+    const season = search ? null : await getTodaySeasonContext();
+    const listKey = `blog:list:${JSON.stringify({ category, search, page, limit, day: season && season.date })}`;
     const cached = await getCache(listKey);
     if (cached) return success(res, cached);
 
@@ -24,17 +28,24 @@ exports.list = async (req, res) => {
     if (search)   { where.push('(title LIKE ? OR excerpt LIKE ?)'); params.push(`%${search}%`, `%${search}%`); }
     const whereClause = where.join(' AND ');
 
+    const so = season ? seasonOrderSql(season) : { score: '0', label: 'NULL', params: [], labelParams: [] };
     const [posts] = await pool.query(
-      `SELECT id, title, slug, excerpt, image_url, author_name, category, tags, read_time, views, avg_rating, rating_count, created_at
+      `SELECT id, title, slug, excerpt, image_url, author_name, category, tags, read_time, views, avg_rating, rating_count, created_at,
+              ${so.label} AS season_label
        FROM blog_posts WHERE ${whereClause}
-       ORDER BY views DESC, created_at DESC LIMIT ? OFFSET ?`,
-      [...params, parseInt(limit), offset]
+       ORDER BY ${so.score} DESC, views DESC, created_at DESC LIMIT ? OFFSET ?`,
+      [...so.labelParams, ...params, ...so.params, parseInt(limit), offset]
     );
     const [[{ total }]] = await pool.query(
       `SELECT COUNT(*) AS total FROM blog_posts WHERE ${whereClause}`, params
     );
 
-    const data = { posts, total, page: parseInt(page), limit: parseInt(limit) };
+    const data = {
+      posts, total, page: parseInt(page), limit: parseInt(limit),
+      season: season && season.seasons.length
+        ? season.seasons.map(s => ({ name: s.name, icon: s.icon, days_away: s.daysAway }))
+        : [],
+    };
     await setCache(listKey, data, LIST_TTL);
     return success(res, data);
   } catch (err) {

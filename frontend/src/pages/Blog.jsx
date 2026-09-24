@@ -59,6 +59,11 @@ function BlogCard({ post }) {
           />
         )}
 
+        {/* ── Festival badge for in-season posts ── */}
+        {post.season_label && (
+          <span className={styles.seasonBadge}>{post.season_label} विशेष</span>
+        )}
+
         {/* ── Gradient overlays ── */}
         <div className={styles.cardHeroOverlay} />
         <div className={styles.cardHeroGrad} />
@@ -126,6 +131,7 @@ export default function Blog() {
   const [posts,      setPosts]      = useState([]);
   const [categories, setCategories] = useState([]);
   const [total,      setTotal]      = useState(0);
+  const [season,     setSeason]     = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [searchInput, setSearchInput] = useState(currentQ);
   const postsRef = useRef(null);
@@ -141,6 +147,7 @@ export default function Blog() {
       const r = await blogAPI.list(params);
       setPosts(r.data.data.posts || []);
       setTotal(r.data.data.total || 0);
+      setSeason(r.data.data.season || []);
     } catch {
       setPosts([]);
     } finally {
@@ -271,6 +278,18 @@ export default function Blog() {
                 {currentCat && <span className={styles.filterTag}>{currentCat} ✕ <button onClick={() => setFilter('')} /></span>}
                 {currentQ   && <span className={styles.filterTag}>"{currentQ}" ✕ <button onClick={() => { setSearchInput(''); setSearchParams(currentCat ? { category: currentCat } : {}); }} /></span>}
                 <span className={styles.resultCount}>{total} लेख सापडले</span>
+              </div>
+            )}
+
+            {/* Current / upcoming festival: its posts are listed first */}
+            {!currentQ && season.length > 0 && (
+              <div className={styles.seasonBar}>
+                {season.slice(0, 3).map(f => (
+                  <span key={f.name} className={styles.seasonChip}>
+                    {f.icon} {f.name}{f.days_away > 0 ? ` · ${f.days_away} दिवसांत` : ' · सध्या सुरू'}
+                  </span>
+                ))}
+                <span className={styles.seasonNote}>या सणांचे लेख आधी दाखवले आहेत</span>
               </div>
             )}
 
