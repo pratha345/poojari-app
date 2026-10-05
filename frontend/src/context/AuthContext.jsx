@@ -1,5 +1,6 @@
 // src/context/AuthContext.jsx
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { SESSION_EXPIRED_EVENT } from '../api/axios';
 
 const AuthContext = createContext(null);
 
@@ -8,6 +9,14 @@ export const AuthProvider = ({ children }) => {
     try { return JSON.parse(localStorage.getItem('pojjari_user')); }
     catch { return null; }
   });
+
+  // The API layer clears an expired token and fires this event; reflect it in state so
+  // the header shows "login" and protected routes redirect, without a hard page reload.
+  useEffect(() => {
+    const onExpired = () => setUser(null);
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
+  }, []);
 
   const login = (token, userData) => {
     localStorage.setItem('pojjari_token', token);

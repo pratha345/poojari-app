@@ -13,14 +13,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 globally
+// Handle 401 globally: the stored token is expired or invalid, so drop the session.
+// Do not redirect here. Public pages (home, blog, panchang, ...) should keep working
+// for a logged-out visitor; the route guards in App.jsx send users to the right login
+// page when the page they are on actually requires login.
+export const SESSION_EXPIRED_EVENT = 'pojjari:session-expired';
+
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && !window.location.pathname.includes('/login')) {
+    if (err.response?.status === 401 && localStorage.getItem('pojjari_token')) {
       localStorage.removeItem('pojjari_token');
       localStorage.removeItem('pojjari_user');
-      window.location.href = '/login';
+      window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
     }
     return Promise.reject(err);
   }
