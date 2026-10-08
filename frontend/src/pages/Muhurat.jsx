@@ -91,87 +91,60 @@ const DAYS_MR   = ['रविवार','सोमवार','मंगळवा
 const MONTHS_MR = ['जानेवारी','फेब्रुवारी','मार्च','एप्रिल','मे','जून','जुलै','ऑगस्ट','सप्टेंबर','ऑक्टोबर','नोव्हेंबर','डिसेंबर'];
 
 // ── Helpers ──────────────────────────────────────────────────────────
+const IST_OFFSET_MS = 330 * 60000;
 function todayIST() {
-  return new Date(Date.now() + 330 * 60000).toISOString().split('T')[0];
+  return new Date(Date.now() + IST_OFFSET_MS).toISOString().split('T')[0];
 }
 function formatMR(dateStr) {
   if (!dateStr) return '';
   const [y, m, d] = dateStr.split('-');
   return `${parseInt(d)} ${MONTHS_MR[parseInt(m) - 1]}, ${y}`;
 }
-function minsToTime(m) {
-  const total = ((m % 1440) + 1440) % 1440;
-  const hh = Math.floor(total / 60);
-  const mm = Math.floor(total % 60);
-  const ampm = hh < 12 ? 'AM' : 'PM';
-  const h12  = hh % 12 || 12;
-  return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
+// "6:29 AM" for an instant, in Indian time, rounded to the nearest minute
+function fmtIST(ms) {
+  const d  = new Date(Math.round(ms / 60000) * 60000 + IST_OFFSET_MS);
+  const hh = d.getUTCHours();
+  const mm = d.getUTCMinutes();
+  return `${hh % 12 || 12}:${String(mm).padStart(2, '0')} ${hh < 12 ? 'AM' : 'PM'}`;
 }
-function parseDisplayTime(t) {
-  // parse "6:04 AM" or "7:03 PM" → minutes since midnight
-  if (!t) return 0;
-  const parts = t.trim().split(' ');
-  const ampm  = parts[1] || 'AM';
-  const [hStr, mStr] = parts[0].split(':');
-  let h = parseInt(hStr);
-  const m = parseInt(mStr);
-  if (ampm === 'PM' && h !== 12) h += 12;
-  if (ampm === 'AM' && h === 12) h = 0;
-  return h * 60 + m;
+// weekday (0 = Sunday) of a YYYY-MM-DD date, independent of the browser's time zone
+function weekdayOf(dateStr) {
+  return new Date(dateStr + 'T00:00:00Z').getUTCDay();
 }
-function timeToMins(t) {
-  if (!t) return 0;
-  const [h, m] = t.split(':').map(Number);
-  return h * 60 + m;
+function prevDate(dateStr) {
+  return new Date(Date.parse(dateStr + 'T00:00:00Z') - 86400000).toISOString().split('T')[0];
 }
-function minsToHHMM(totalMins) {
-  const h = Math.floor(totalMins / 60);
-  const m = Math.floor(totalMins % 60);
-  return `${h}ता ${m}मि`;
+function durationMR(ms) {
+  const total = Math.round(ms / 60000);
+  return `${Math.floor(total / 60)}ता ${total % 60}मि`;
 }
 
-function buildChoghadiya(sunriseStr, sunsetStr, dateStr) {
-  const date    = new Date(dateStr + 'T00:00:00+05:30');
-  const dowIdx  = date.getDay();
-  const sunrise = timeToMins(sunriseStr);
-  const sunset  = timeToMins(sunsetStr);
-  const nextSunrise = sunset + (sunrise + 1440 - sunset);
-  const dayPeriod   = (sunset - sunrise) / 8;
-  const nightPeriod = (nextSunrise - sunset) / 8;
-
-  const day = DAY_CHOG[dowIdx].map((name, i) => ({
-    name, ...CHOG_META[name],
-    start: minsToTime(sunrise + i * dayPeriod),
-    end:   minsToTime(sunrise + (i + 1) * dayPeriod),
-    startMins: sunrise + i * dayPeriod,
-    endMins:   sunrise + (i + 1) * dayPeriod,
-  }));
-  const night = NIGHT_CHOG[dowIdx].map((name, i) => ({
-    name, ...CHOG_META[name],
-    start: minsToTime(sunset + i * nightPeriod),
-    end:   minsToTime(sunset + (i + 1) * nightPeriod),
-    startMins: sunset + i * nightPeriod,
-    endMins:   sunset + (i + 1) * nightPeriod,
-  }));
-  return { day, night };
+// Day = sunrise → sunset, night = sunset → next sunrise, each split into 8 equal parts.
+// Works on exact instants from the API so the slots carry no minute-rounding drift.
+function buildChoghadiya(pd, dateStr) {
+  const rise     = Date.parse(pd.sunriseAt);
+  const set      = Date.parse(pd.sunsetAt);
+  const nextRise = Date.parse(pd.nextSunriseAt);
+  const dow      = weekdayOf(dateStr);
+  const slots = (names, from, to) => names.map((name, i) => {
+    const len = (to - from) / 8;
+    const startMs = from + i * len, endMs = from + (i + 1) * len;
+    return { name, ...CHOG_META[name], start: fmtIST(startMs), end: fmtIST(endMs), startMs, endMs };
+  });
+  return { day: slots(DAY_CHOG[dow], rise, set), night: slots(NIGHT_CHOG[dow], set, nextRise) };
 }
 
-function getActiveSlot(chog, nowMins) {
-  const all = [...chog.day, ...chog.night];
-  for (const c of all) {
-    let s = parseDisplayTime(c.start);
-    let e = parseDisplayTime(c.end);
-    if (e < s) e += 1440;
-    if (nowMins >= s && nowMins < e) return c;
+const isSlotActive = (slot, nowMs) => nowMs >= slot.startMs && nowMs < slot.endMs;
+
+// Between midnight and sunrise the running choghadiya belongs to the previous day's night,
+// so the previous day's table is checked as well.
+function getActiveSlot(nowMs, ...tables) {
+  for (const t of tables) {
+    if (!t) continue;
+    const hit = [...t.day, ...t.night].find(c => isSlotActive(c, nowMs));
+    if (hit) return hit;
   }
   return null;
-}
-
-function isSlotActive(slot, nowMins) {
-  let s = parseDisplayTime(slot.start);
-  let e = parseDisplayTime(slot.end);
-  if (e < s) e += 1440;
-  return nowMins >= s && nowMins < e;
 }
 
 // ── Component ────────────────────────────────────────────────────────
@@ -183,6 +156,7 @@ export default function Muhurat() {
   const [locLoading, setLocLoading] = useState(false);
   const [panData,    setPanData]    = useState(null);
   const [chog,       setChog]       = useState(null);
+  const [prevChog,   setPrevChog]   = useState(null);
   const [loading,    setLoading]    = useState(false);
   const [tab,        setTab]        = useState('choghadiya');
   const [nowTime,    setNowTime]    = useState(new Date());
@@ -230,7 +204,13 @@ export default function Muhurat() {
       const res = await panchangAPI.get({ date: d, lat: la, lon: lo });
       const pd  = res.data.data;
       setPanData(pd);
-      if (pd.sunrise && pd.sunset) setChog(buildChoghadiya(pd.sunrise, pd.sunset, d));
+      setChog(pd.sunriseAt && pd.sunsetAt && pd.nextSunriseAt ? buildChoghadiya(pd, d) : null);
+      // before today's sunrise, "now" is still in yesterday's night choghadiya
+      setPrevChog(null);
+      if (d === todayIST() && pd.sunriseAt && Date.now() < Date.parse(pd.sunriseAt)) {
+        const pd2 = (await panchangAPI.get({ date: prevDate(d), lat: la, lon: lo })).data.data;
+        if (pd2.sunriseAt && pd2.sunsetAt && pd2.nextSunriseAt) setPrevChog(buildChoghadiya(pd2, prevDate(d)));
+      }
     } catch { /* silent */ }
     finally { setLoading(false); }
   }, []);
@@ -320,22 +300,21 @@ export default function Muhurat() {
     );
   };
 
-  const dateObj = new Date(date + 'T00:00:00+05:30');
-  const dayMR   = DAYS_MR[dateObj.getDay()];
+  const dayMR   = DAYS_MR[weekdayOf(date)];
   const isToday = date === todayIST();
-  const nowMins = nowTime.getHours() * 60 + nowTime.getMinutes();
-  const activeSlot = chog && isToday ? getActiveSlot(chog, nowMins) : null;
+  const nowMs   = nowTime.getTime();
+  const activeSlot = isToday ? getActiveSlot(nowMs, chog, prevChog) : null;
 
   // duration
-  const dayDuration = panData
-    ? minsToHHMM(timeToMins(panData.sunset) - timeToMins(panData.sunrise))
+  const dayDuration = panData?.sunriseAt
+    ? durationMR(Date.parse(panData.sunsetAt) - Date.parse(panData.sunriseAt))
     : null;
-  const nightDuration = panData
-    ? minsToHHMM((timeToMins(panData.sunrise) + 1440) - timeToMins(panData.sunset))
+  const nightDuration = panData?.nextSunriseAt
+    ? durationMR(Date.parse(panData.nextSunriseAt) - Date.parse(panData.sunsetAt))
     : null;
 
   // live clock display
-  const liveTime = nowTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  const liveTime = nowTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
 
   return (
     <div className={styles.page}>
@@ -487,7 +466,7 @@ export default function Muhurat() {
                 </div>
                 <div className={styles.chogGrid}>
                   {chog.day.map((c, i) => {
-                    const active = isToday && isSlotActive(c, nowMins);
+                    const active = isToday && isSlotActive(c, nowMs);
                     return (
                       <div key={i}
                         className={`${styles.chogCard} ${active ? styles.chogCardActive : ''} ${c.quality === 'bad' ? styles.chogCardBad : ''}`}
@@ -520,7 +499,7 @@ export default function Muhurat() {
                 </div>
                 <div className={styles.chogGrid}>
                   {chog.night.map((c, i) => {
-                    const active = isToday && isSlotActive(c, nowMins);
+                    const active = isToday && isSlotActive(c, nowMs);
                     return (
                       <div key={i}
                         className={`${styles.chogCard} ${active ? styles.chogCardActive : ''} ${c.quality === 'bad' ? styles.chogCardBad : ''}`}

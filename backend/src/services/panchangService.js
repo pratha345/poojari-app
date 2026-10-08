@@ -1,7 +1,7 @@
 // src/services/panchangService.js — Production-grade Panchang calculation (Amanta / Drik standard)
 'use strict';
 
-const SunCalc = require('suncalc');
+const { getSunTimes } = require('../utils/sunTimes');
 
 // ── Cache ────────────────────────────────────────────────────────
 const _cache = new Map();
@@ -216,8 +216,9 @@ const YAMAGANDA_SEG = [3, 2, 1, 0, 5, 4, 6];
 
 // ── Time helpers ─────────────────────────────────────────────────
 
+// HH:MM local time, rounded to the nearest minute
 function fmtTime(date, tzOffsetMins) {
-  const local = new Date(date.getTime() + tzOffsetMins * 60000);
+  const local = new Date(Math.round(date.getTime() / 60000) * 60000 + tzOffsetMins * 60000);
   return `${String(local.getUTCHours()).padStart(2,'0')}:${String(local.getUTCMinutes()).padStart(2,'0')}`;
 }
 
@@ -467,12 +468,13 @@ async function getPanchang(dateStr, lat, lon, tzOffset, timeStr) {
 
   const [y, mo, d] = dateStr.split('-').map(Number);
 
-  // ── Sunrise / Sunset (SunCalc) ───────────────────────────────
-  // Always computed at civil-day noon so we have muhurta times.
-  const refDate  = new Date(Date.UTC(y, mo - 1, d, 12, 0, 0));
-  const sunTimes = SunCalc.getTimes(refDate, lat, lon);
+  // ── Sunrise / Sunset (NOAA algorithm, upper limb + refraction) ──
+  const sunTimes = getSunTimes(y, mo, d, lat, lon);
   const riseDate = sunTimes.sunrise;
   const setDate  = sunTimes.sunset;
+  // next morning's sunrise closes tonight's choghadiya / night muhurtas
+  const nextDay       = new Date(Date.UTC(y, mo - 1, d + 1));
+  const nextRiseDate  = getSunTimes(nextDay.getUTCFullYear(), nextDay.getUTCMonth() + 1, nextDay.getUTCDate(), lat, lon).sunrise;
 
   const sunriseStr = (riseDate && !isNaN(riseDate)) ? fmtTime(riseDate, tzOffset) : '--';
   const sunsetStr  = (setDate  && !isNaN(setDate))  ? fmtTime(setDate,  tzOffset) : '--';
@@ -588,6 +590,10 @@ async function getPanchang(dateStr, lat, lon, tzOffset, timeStr) {
     lagnaDegs,
     sunrise:      sunriseStr,
     sunset:       sunsetStr,
+    // exact instants (ISO, UTC) so clients can divide the day without rounding drift
+    sunriseAt:     riseDate ? riseDate.toISOString() : null,
+    sunsetAt:      setDate ? setDate.toISOString() : null,
+    nextSunriseAt: nextRiseDate ? nextRiseDate.toISOString() : null,
     rahuKaal,
     gulikaKaal,
     yamaganda,
