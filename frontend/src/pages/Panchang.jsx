@@ -694,7 +694,7 @@ export default function Panchang() {
                 काळ / मुहूर्त
               </h2>
               <div className={styles.muhurtaGrid}>
-                <MuhurtaBlock icon="🙏" label="अभिजित मुहूर्त" range={data.abhijitMuhurat} bad={false} />
+                <MuhurtaBlock icon="🙏" label={data.abhijitMuhurat?.avoid ? 'अभिजित मुहूर्त (बुधवारी वर्ज्य)' : 'अभिजित मुहूर्त'} range={data.abhijitMuhurat} bad={!!data.abhijitMuhurat?.avoid} />
                 <MuhurtaBlock icon="🔴" label="राहु काळ"       range={data.rahuKaal}       bad={true}  />
                 <MuhurtaBlock icon="⚫" label="गुळिक काळ"      range={data.gulikaKaal}     bad={true}  />
                 <MuhurtaBlock icon="🟡" label="यमगंड"           range={data.yamaganda}      bad={true}  />

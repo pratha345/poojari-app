@@ -210,9 +210,13 @@ const MAAS = [
 
 const PAKSHA        = ['शुक्ल पक्ष', 'कृष्ण पक्ष'];
 const VAR           = ['रविवार','सोमवार','मंगळवार','बुधवार','गुरुवार','शुक्रवार','शनिवार'];
-const RAHU_SEG      = [7, 1, 6, 4, 5, 2, 3];
+// Which eighth of the daytime (0 = first, from sunrise) each falls in, Sunday..Saturday.
+// Rahu: Mon 2nd, Sat 3rd, Fri 4th, Wed 5th, Thu 6th, Tue 7th, Sun 8th.
+// Yamaganda: Thu 1st, Wed 2nd, Tue 3rd, Mon 4th, Sun 5th, Sat 6th, Fri 7th.
+// Gulika: Sat 1st, Fri 2nd, Thu 3rd, Wed 4th, Tue 5th, Mon 6th, Sun 7th.
+const RAHU_SEG      = [7, 1, 6, 4, 5, 3, 2];
 const GULIKA_SEG    = [6, 5, 4, 3, 2, 1, 0];
-const YAMAGANDA_SEG = [3, 2, 1, 0, 5, 4, 6];
+const YAMAGANDA_SEG = [4, 3, 2, 1, 0, 6, 5];
 
 // ── Time helpers ─────────────────────────────────────────────────
 
@@ -549,10 +553,12 @@ async function getPanchang(dateStr, lat, lon, tzOffset, timeStr) {
     rahuKaal       = makeRange(riseDate, setDate, RAHU_SEG[weekDay],      tzOffset);
     gulikaKaal     = makeRange(riseDate, setDate, GULIKA_SEG[weekDay],    tzOffset);
     yamaganda      = makeRange(riseDate, setDate, YAMAGANDA_SEG[weekDay], tzOffset);
-    const solarNoon = new Date((riseDate.getTime() + setDate.getTime()) / 2);
+    // Abhijit = 8th of the 15 daytime muhurtas; traditionally not used on Wednesday
+    const muhurtaMs = (setDate.getTime() - riseDate.getTime()) / 15;
     abhijitMuhurat  = {
-      start: fmtTime(new Date(solarNoon.getTime() - 24 * 60000), tzOffset),
-      end:   fmtTime(new Date(solarNoon.getTime() + 24 * 60000), tzOffset),
+      start: fmtTime(new Date(riseDate.getTime() + 7 * muhurtaMs), tzOffset),
+      end:   fmtTime(new Date(riseDate.getTime() + 8 * muhurtaMs), tzOffset),
+      avoid: weekDay === 3,
     };
   }
 
@@ -570,9 +576,11 @@ async function getPanchang(dateStr, lat, lon, tzOffset, timeStr) {
   const yogaIdx             = YOGAS.indexOf(yoga);
   const shubhMuhurat = inauspiciousYogaIdx.includes(yogaIdx)
     ? 'आज योग अशुभ आहे. महत्त्वाची कामे टाळा.'
-    : abhijitMuhurat
+    : abhijitMuhurat && !abhijitMuhurat.avoid
       ? `अभिजित मुहूर्त (${abhijitMuhurat.start} – ${abhijitMuhurat.end}) आज शुभ आहे.`
-      : 'सूर्योदयाची वेळ आज शुभ मुहूर्त आहे.';
+      : abhijitMuhurat?.avoid
+        ? 'बुधवारी अभिजित मुहूर्त वर्ज्य मानतात. अमृत, शुभ किंवा लाभ चौघडियाची वेळ निवडा.'
+        : 'सूर्योदयाची वेळ आज शुभ मुहूर्त आहे.';
 
   const result = {
     date:         dateStr,

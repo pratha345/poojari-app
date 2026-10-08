@@ -42,10 +42,10 @@ const OCCASIONS = [
   { icon: '🏠', label: 'गृहप्रवेश',    good: ['अमृत','शुभ','लाभ'] },
   { icon: '🚗', label: 'वाहन खरेदी',  good: ['अमृत','शुभ','लाभ','चर'] },
   { icon: '💼', label: 'व्यापार सुरू', good: ['अमृत','लाभ','शुभ'] },
-  { icon: '👶', label: 'नामकरण',       good: ['अमृत','शुभ'] },
-  { icon: '✂️', label: 'मुंडन',        good: ['अमृत','शुभ','लाभ'] },
-  { icon: '🍚', label: 'अन्नप्राशन',   good: ['अमृत','शुभ'] },
-  { icon: '🏗️', label: 'भूमिपूजन',    good: ['अमृत','शुभ','लाभ'] },
+  { icon: '👶', label: 'नामकरण',       good: ['अमृत','शुभ'],       dayOnly: true },
+  { icon: '✂️', label: 'मुंडन',        good: ['अमृत','शुभ','लाभ'], dayOnly: true },
+  { icon: '🍚', label: 'अन्नप्राशन',   good: ['अमृत','शुभ'],       dayOnly: true },
+  { icon: '🏗️', label: 'भूमिपूजन',    good: ['अमृत','शुभ','लाभ'], dayOnly: true },
 ];
 
 const DISTRICTS = [
@@ -60,20 +60,20 @@ const DISTRICTS = [
   { name: 'सातारा',        eng: 'satara',                     lat: '17.6805', lon: '74.0183' },
   { name: 'सांगली',        eng: 'sangli',                     lat: '16.8524', lon: '74.5815' },
   { name: 'कोल्हापूर',     eng: 'kolhapur',                   lat: '16.6975', lon: '74.2282' },
-  { name: 'सोलापूर',       eng: 'solapur',                    lat: '17.6805', lon: '75.9064' },
+  { name: 'सोलापूर',       eng: 'solapur',                    lat: '17.6599', lon: '75.9064' },
   { name: 'नाशिक',        eng: 'nashik',                     lat: '20.0059', lon: '73.7898' },
   { name: 'धुळे',          eng: 'dhule',                      lat: '20.9042', lon: '74.7749' },
   { name: 'नंदुरबार',      eng: 'nandurbar',                  lat: '21.3667', lon: '74.2333' },
   { name: 'जळगाव',        eng: 'jalgaon',                    lat: '21.0077', lon: '75.5626' },
-  { name: 'अहमदनगर',      eng: 'ahmednagar',                 lat: '19.0950', lon: '74.7493' },
-  { name: 'औरंगाबाद',     eng: 'aurangabad',                 lat: '19.8762', lon: '75.3433' },
+  { name: 'अहिल्यानगर',    eng: 'ahilyanagar ahmednagar अहमदनगर', lat: '19.0950', lon: '74.7493' },
+  { name: 'छत्रपती संभाजीनगर', eng: 'chhatrapati sambhajinagar aurangabad औरंगाबाद', lat: '19.8762', lon: '75.3433' },
   { name: 'जालना',         eng: 'jalna',                      lat: '19.8415', lon: '75.8816' },
   { name: 'बीड',           eng: 'beed',                       lat: '18.9893', lon: '75.7602' },
   { name: 'लातूर',         eng: 'latur',                      lat: '18.4088', lon: '76.5604' },
-  { name: 'उस्मानाबाद',    eng: 'osmanabad',                  lat: '18.1860', lon: '76.0388' },
-  { name: 'नांदेड',        eng: 'nanded',                     lat: '19.1383', lon: '77.2985' },
+  { name: 'धाराशिव',       eng: 'dharashiv osmanabad उस्मानाबाद', lat: '18.1860', lon: '76.0388' },
+  { name: 'नांदेड',        eng: 'nanded',                     lat: '19.1383', lon: '77.3210' },
   { name: 'परभणी',         eng: 'parbhani',                   lat: '19.2704', lon: '76.6076' },
-  { name: 'हिंगोली',       eng: 'hingoli',                    lat: '19.7177', lon: '77.1548' },
+  { name: 'हिंगोली',       eng: 'hingoli',                    lat: '19.7173', lon: '77.1487' },
   { name: 'नागपूर',        eng: 'nagpur',                     lat: '21.1458', lon: '79.0882' },
   { name: 'वर्धा',         eng: 'wardha',                     lat: '20.7453', lon: '78.5966' },
   { name: 'यवतमाळ',       eng: 'yavatmal',                   lat: '20.3888', lon: '78.1204' },
@@ -113,6 +113,12 @@ function weekdayOf(dateStr) {
 }
 function prevDate(dateStr) {
   return new Date(Date.parse(dateStr + 'T00:00:00Z') - 86400000).toISOString().split('T')[0];
+}
+// "13:51" (API, IST) → "1:51 PM", the format used everywhere on this page
+function to12h(hhmm) {
+  if (!hhmm || !hhmm.includes(':')) return hhmm || '—';
+  const [h, m] = hhmm.split(':').map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
 }
 function durationMR(ms) {
   const total = Math.round(ms / 60000);
@@ -245,8 +251,10 @@ export default function Muhurat() {
             });
             if (found) break;
           }
+          // times are now for the GPS position, so the label must not stay "पुणे"
           if (found) { selectDistrict(found); }
-        } catch { /* keep default Pune */ }
+          else { const label = candidates[0] || 'माझे स्थान'; setCityName(label); setQuery(label); }
+        } catch { setCityName('माझे स्थान'); setQuery('माझे स्थान'); }
       },
       () => { /* permission denied — keep default Pune */ },
       { timeout: 8000 }
@@ -312,6 +320,10 @@ export default function Muhurat() {
   const nightDuration = panData?.nextSunriseAt
     ? durationMR(Date.parse(panData.nextSunriseAt) - Date.parse(panData.sunsetAt))
     : null;
+
+  // Rahu kaal as instants (API gives IST HH:MM for the selected date)
+  const istMs = (hhmm) => Date.parse(`${date}T${hhmm}:00+05:30`);
+  const rahuMs = panData?.rahuKaal ? [istMs(panData.rahuKaal.start), istMs(panData.rahuKaal.end)] : null;
 
   // live clock display
   const liveTime = nowTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
@@ -396,12 +408,12 @@ export default function Muhurat() {
               <div className={`${styles.statCard} ${styles.statSunrise}`}>
                 <span className={styles.statIcon}>🌅</span>
                 <span className={styles.statLabel}>SUNRISE</span>
-                <span className={styles.statValue}>{panData.sunrise}</span>
+                <span className={styles.statValue}>{to12h(panData.sunrise)}</span>
               </div>
               <div className={`${styles.statCard} ${styles.statSunset}`}>
                 <span className={styles.statIcon}>🌇</span>
                 <span className={styles.statLabel}>SUNSET</span>
-                <span className={styles.statValue}>{panData.sunset}</span>
+                <span className={styles.statValue}>{to12h(panData.sunset)}</span>
               </div>
               <div className={`${styles.statCard} ${styles.statDay}`}>
                 <span className={styles.statIcon}>☀️</span>
@@ -542,17 +554,30 @@ export default function Muhurat() {
                     { label: 'राहु काळ',   range: panData.rahuKaal,   icon: '🔴' },
                     { label: 'गुळिक काळ',  range: panData.gulikaKaal, icon: '⚫' },
                     { label: 'यमगंड',      range: panData.yamaganda,  icon: '🟡' },
-                    panData.abhijitMuhurat && { label: 'अभिजित मुहूर्त ✨', range: panData.abhijitMuhurat, icon: '✨' },
                   ].filter(Boolean).map(b => b.range && (
                     <div key={b.label} className={styles.badCard}>
                       <span className={styles.badIcon}>{b.icon}</span>
                       <div>
                         <span className={styles.badLabel}>{b.label}</span>
-                        <span className={styles.badTime}>{b.range.start} – {b.range.end}</span>
+                        <span className={styles.badTime}>{to12h(b.range.start)} – {to12h(b.range.end)}</span>
                       </div>
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {panData?.abhijitMuhurat && (
+              <div className={`${styles.badTimes} ${styles.goodTimes}`}>
+                <h3 className={styles.badTimesTitle}>✨ अभिजित मुहूर्त</h3>
+                <span className={styles.badTime}>
+                  {to12h(panData.abhijitMuhurat.start)} – {to12h(panData.abhijitMuhurat.end)}
+                </span>
+                <p className={styles.goodNote}>
+                  {panData.abhijitMuhurat.avoid
+                    ? 'बुधवारी अभिजित मुहूर्त वर्ज्य मानतात.'
+                    : 'दिवसाच्या १५ मुहूर्तांपैकी आठवा — दुपारचा शुभ काळ.'}
+                </p>
               </div>
             )}
           </div>
@@ -561,12 +586,15 @@ export default function Muhurat() {
         {/* ══ OCCASIONS TAB ═════════════════════════════════════════════ */}
         {!loading && tab === 'occasions' && chog && (
           <div className={styles.occasionsWrap}>
-            <p className={styles.occasionsSub}>शुभ चौघडिया काळातील वेळा निवडणे महत्त्वाच्या प्रसंगांसाठी उत्तम.</p>
+            <p className={styles.occasionsSub}>
+              खालील वेळा फक्त चौघडियावर आधारित आहेत; राहु काळ येणारा भाग वगळा. विवाह, गृहप्रवेश व संस्कारांसाठी
+              तिथी-नक्षत्र पाहून काढलेला पूर्ण मुहूर्त पुजारी/पंचांगातून निश्चित करावा.
+            </p>
             <div className={styles.occasionsGrid}>
               {OCCASIONS.map(occ => {
                 const goodSlots = [
                   ...chog.day.filter(c => occ.good.includes(c.name)),
-                  ...chog.night.filter(c => occ.good.includes(c.name)),
+                  ...(occ.dayOnly ? [] : chog.night.filter(c => occ.good.includes(c.name))),
                 ];
                 return (
                   <div key={occ.label} className={styles.occasionCard}>
@@ -581,7 +609,12 @@ export default function Muhurat() {
                             <div key={i} className={styles.slot}
                               style={{ borderColor: s.color, background: s.bg }}>
                               <span style={{ color: s.color }}>{s.icon} {s.name}</span>
-                              <span className={styles.slotTime}>{s.start} – {s.end}</span>
+                              <span className={styles.slotTime}>
+                                {s.start} – {s.end}
+                                {rahuMs && s.startMs < rahuMs[1] && s.endMs > rahuMs[0] && (
+                                  <span className={styles.slotWarn}> · राहु काळ {to12h(panData.rahuKaal.start)}–{to12h(panData.rahuKaal.end)} वगळा</span>
+                                )}
+                              </span>
                             </div>
                           ))
                       }
