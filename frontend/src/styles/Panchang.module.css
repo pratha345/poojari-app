@@ -1137,4 +1137,22 @@
   .niNum   { font-size: 0.72rem; }
   .niPlanets { font-size: 0.62rem; }
 }
-.niPlanets span { font-size: inherit; text-shadow: none; }
+
+.niPlanets { flex-wrap: wrap; justify-content: center; max-width: 92px; margin-top: 2px; }
+.niTag {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  padding: 3px 6px 4px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.niTagLagna { background: #2e7d32; }
+.niTagSun   { background: #e65100; }
+.niTagMoon  { background: #1565c0; }
+@media (max-width: 480px) {
+  .niTag     { font-size: 0.62rem; padding: 2px 4px 3px; }
+  .niPlanets { max-width: 64px; gap: 2px; }
+}

@@ -244,9 +244,9 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, dark }) {
               <img src={RASHI_IMG[rashi]} alt={rashi} className={styles.niImg} loading="lazy" width="26" height="26" />
               {(h === 1 || isSun || isMoon) && (
                 <span className={styles.niPlanets}>
-                  {h === 1 && <span className={styles.planetLagna} title="लग्न">ल</span>}
-                  {isSun  && <span className={styles.planetSun}  title="सूर्य">सू</span>}
-                  {isMoon && <span className={styles.planetMoon} title="चंद्र">चं</span>}
+                  {h === 1 && <span className={`${styles.niTag} ${styles.niTagLagna}`}>लग्न</span>}
+                  {isSun  && <span className={`${styles.niTag} ${styles.niTagSun}`}>सूर्य</span>}
+                  {isMoon && <span className={`${styles.niTag} ${styles.niTagMoon}`}>चंद्र</span>}
                 </span>
               )}
             </div>
