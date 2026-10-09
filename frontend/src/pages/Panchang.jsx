@@ -9,6 +9,9 @@ import SEOHead from '../components/SEOHead';
 import { panchangAPI } from '../api/index.js';
 import { getSessionId } from '../utils/session.js';
 import styles from '../styles/Panchang.module.css';
+import { RASHIS } from '../data/rashifalData';
+
+const RASHI_IMG = Object.fromEntries(RASHIS.map(r => [r.name, r.img]));
 
 function buildPanchangSchema(dateStr) {
   const d = dateStr || new Date().toISOString().split('T')[0];
@@ -243,7 +246,9 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, dark }) {
             >
               <span className={styles.houseNum}>{h.num}</span>
               <div className={styles.houseBody}>
-                <span className={styles.houseSymbol}>{h.symbol}</span>
+                <img src={RASHI_IMG[h.rashi]} alt="" className={styles.houseImg} loading="lazy" width="30" height="30"
+                  onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling.style.display = 'inline'; }} />
+                <span className={styles.houseSymbol} style={{ display: 'none' }}>{h.symbol}</span>
                 <span className={styles.houseRashi}>{h.rashi}</span>
               </div>
               {(isSun || isMoon || isLagna) && (
@@ -720,13 +725,14 @@ export default function Panchang() {
             <section className={styles.section}>
               <h2 className={styles.sectionHeading}>
                 <span className={styles.sectionIcon}>🔯</span>
-                उत्तर भारतीय कुंडली
+                राशी कुंडली (दक्षिण भारतीय पद्धत)
                 <span className={styles.sectionBadge}>ग्रह स्थिती</span>
               </h2>
               <p className={styles.kundaliDesc}>
                 खालील कुंडलीत <span className={styles.sunText}>☀ सूर्य</span>,{' '}
                 <span className={styles.moonText}>☽ चंद्र</span> आणि{' '}
                 <span className={styles.lagnaText}>↑ लग्न</span> यांच्या राशी दर्शविल्या आहेत.
+                या पद्धतीत राशी आपल्या जागी स्थिर असतात; कोपऱ्यातील आकडा हा राशीचा क्रमांक आहे.
                 वेळ बदलल्यास लग्न आपोआप बदलते.
               </p>
               <KundaliChart

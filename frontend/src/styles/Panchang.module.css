@@ -826,6 +826,13 @@
   align-items: center;
   gap: 2px;
 }
+.houseImg {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+}
 .houseSymbol {
   font-size: 1.2rem;
   line-height: 1;
@@ -1007,6 +1014,7 @@
   .kundaliWrap { max-width: 100%; }
   .houseRashi  { font-size: 0.7rem; }
   .houseSymbol { font-size: 1rem; }
+  .houseImg    { width: 24px; height: 24px; }
 }
 
 @media (max-width: 480px) {
@@ -1023,6 +1031,7 @@
 
   .houseRashi  { font-size: 0.6rem; }
   .houseSymbol { font-size: 0.85rem; }
+  .houseImg    { width: 20px; height: 20px; }
   .centerOm    { font-size: 1.4rem; }
   .centerTitle { font-size: 0.75rem; }
   .planetSun, .planetMoon { font-size: 0.8rem; }
