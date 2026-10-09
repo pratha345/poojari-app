@@ -2,6 +2,7 @@
 'use strict';
 
 const { getSunTimes } = require('../utils/sunTimes');
+const gochar = require('./gocharService');
 
 // ── Cache ────────────────────────────────────────────────────────
 const _cache = new Map();
@@ -614,6 +615,12 @@ async function getPanchang(dateStr, lat, lon, tzOffset, timeStr) {
     _moon_sun_diff:    moonSunDiff.toFixed(4),
     _lagna_tropical:   lagnaTropical.toFixed(2),
     _lagna_sidereal:   lagnaLong.toFixed(2),
+    // other grahas for the kundali (Sun, Moon and lagna are above)
+    grahas: ['Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'].map((key) => {
+      const r = gochar.rashiIdx(key, calcDate);
+      return { key, name: gochar.PLANETS[key].mr, rashi: gochar.RASHIS[r],
+               retro: !['Rahu', 'Ketu'].includes(key) && gochar.speed(key, calcDate) < 0 };
+    }),
     _calc_at:          calcDate.toISOString(),
   };
 

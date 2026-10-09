@@ -104,6 +104,8 @@ const NI_HOUSES = [
   { h: 10, x: 300, y: 200 }, { h: 11, x: 360, y: 100 }, { h: 12, x: 300, y: 40  },
 ];
 const RASHI_NAMES = RASHIS.map(r => r.name);
+// first-letter abbreviations used in printed patrikas
+const GRAHA_SHORT = { Mars: 'मं', Mercury: 'बु', Jupiter: 'गु', Venus: 'शु', Saturn: 'श', Rahu: 'रा', Ketu: 'के' };
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
@@ -217,7 +219,7 @@ function Skeleton() {
 }
 
 /* ── North Indian Kundali Chart ── */
-function KundaliChart({ suryaRashi, chandraRashi, lagna, dark }) {
+function KundaliChart({ suryaRashi, chandraRashi, lagna, grahas = [], dark }) {
   const lagnaIdx = Math.max(0, RASHI_NAMES.indexOf(lagna || suryaRashi));
   return (
     <div className={`${styles.kundaliWrap} ${dark ? styles.kundaliDark : ''}`}>
@@ -234,6 +236,7 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, dark }) {
           const rashi = RASHI_NAMES[rIdx];
           const isSun  = rashi === suryaRashi;
           const isMoon = rashi === chandraRashi;
+          const others = grahas.filter(g => g.rashi === rashi);
           return (
             <div key={h}
               className={`${styles.niHouse} ${h === 1 ? styles.niLagna : ''}`}
@@ -242,17 +245,26 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, dark }) {
             >
               <span className={styles.niNum}>{rIdx + 1}</span>
               <img src={RASHI_IMG[rashi]} alt={rashi} className={styles.niImg} loading="lazy" width="26" height="26" />
-              {(h === 1 || isSun || isMoon) && (
+              {(h === 1 || isSun || isMoon || others.length > 0) && (
                 <span className={styles.niPlanets}>
                   {h === 1 && <span className={`${styles.niTag} ${styles.niTagLagna}`}>लग्न</span>}
                   {isSun  && <span className={`${styles.niTag} ${styles.niTagSun}`}>सूर्य</span>}
                   {isMoon && <span className={`${styles.niTag} ${styles.niTagMoon}`}>चंद्र</span>}
+                  {others.map(g => (
+                    <span key={g.key} className={styles.niGraha} title={`${g.name}${g.retro ? ' (वक्री)' : ''}`}>
+                      {GRAHA_SHORT[g.key]}{g.retro && <sup>व</sup>}
+                    </span>
+                  ))}
                 </span>
               )}
             </div>
           );
         })}
       </div>
+
+      <p className={styles.niKey}>
+        मं = मंगळ · बु = बुध · गु = गुरू · शु = शुक्र · श = शनी · रा = राहू · के = केतू · <sup>व</sup> = वक्री
+      </p>
 
       {/* Rashi legend below chart */}
       <div className={styles.kundaliLegend}>
@@ -709,9 +721,9 @@ export default function Panchang() {
                 <span className={styles.sectionBadge}>ग्रह स्थिती</span>
               </h2>
               <p className={styles.kundaliDesc}>
-                खालील कुंडलीत <span className={styles.sunText}>☀ सूर्य</span>,{' '}
-                <span className={styles.moonText}>☽ चंद्र</span> आणि{' '}
-                <span className={styles.lagnaText}>↑ लग्न</span> यांच्या राशी दर्शविल्या आहेत.
+                खालील कुंडलीत निवडलेल्या वेळेचे <span className={styles.lagnaText}>लग्न</span>,{' '}
+                <span className={styles.sunText}>सूर्य</span>, <span className={styles.moonText}>चंद्र</span>{' '}
+                आणि इतर सात ग्रह त्यांच्या राशीत दर्शविले आहेत.
                 वरच्या मधल्या घरात लग्न (पहिले स्थान) असते आणि पुढील स्थाने उलट्या घड्याळाच्या दिशेने मोजली जातात;
                 प्रत्येक घरातील आकडा हा राशीचा क्रमांक आहे (१ = मेष … १२ = मीन). वेळ बदलल्यास लग्न आपोआप बदलते.
               </p>
@@ -719,6 +731,7 @@ export default function Panchang() {
                 suryaRashi={data.suryaRashi}
                 chandraRashi={data.chandraRashi}
                 lagna={data.lagna}
+                grahas={data.grahas}
                 dark={dark}
               />
             </section>

@@ -1156,3 +1156,35 @@
   .niTag     { font-size: 0.62rem; padding: 2px 4px 3px; }
   .niPlanets { max-width: 64px; gap: 2px; }
 }
+
+.niGraha {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #6d2c00;
+  background: #fde7c8;
+  border: 1px solid #e0b27a;
+  padding: 2px 5px 3px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.niGraha sup { font-size: 0.6em; margin-left: 1px; color: #b71c1c; }
+.niKey {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--kd-text);
+  margin: 10px auto 0;
+  max-width: 440px;
+}
+.niKey sup { color: #b71c1c; }
+.kundaliDark .niGraha { background: #3a2a14; color: #f5c06e; border-color: #8a6a3a; }
+@media (max-width: 480px) {
+  .niGraha { font-size: 0.62rem; padding: 1px 3px 2px; }
+  .niKey   { font-size: 0.7rem; }
+}
+
+/* absolutely positioned near the edge would otherwise shrink and stack the tags */
+.niHouse { width: max-content; max-width: 110px; }
+@media (max-width: 480px) { .niHouse { max-width: 78px; } }
