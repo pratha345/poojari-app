@@ -95,20 +95,15 @@ const DISTRICTS = [
 ];
 
 // North Indian Kundali: house number → { rashi (Marathi), col, row } in 4×4 grid
-const KUNDALI_HOUSES = [
-  { num: 12, rashi: 'मीन',     symbol: '♓', col: 1, row: 1, corner: true  },
-  { num:  1, rashi: 'मेष',     symbol: '♈', col: 2, row: 1, corner: false },
-  { num:  2, rashi: 'वृषभ',    symbol: '♉', col: 3, row: 1, corner: false },
-  { num:  3, rashi: 'मिथुन',   symbol: '♊', col: 4, row: 1, corner: true  },
-  { num: 11, rashi: 'कुंभ',    symbol: '♒', col: 1, row: 2, corner: false },
-  { num:  4, rashi: 'कर्क',    symbol: '♋', col: 4, row: 2, corner: false },
-  { num: 10, rashi: 'मकर',     symbol: '♑', col: 1, row: 3, corner: false },
-  { num:  5, rashi: 'सिंह',    symbol: '♌', col: 4, row: 3, corner: false },
-  { num:  9, rashi: 'धनु',     symbol: '♐', col: 1, row: 4, corner: true  },
-  { num:  8, rashi: 'वृश्चिक', symbol: '♏', col: 2, row: 4, corner: false },
-  { num:  7, rashi: 'तुला',    symbol: '♎', col: 3, row: 4, corner: false },
-  { num:  6, rashi: 'कन्या',   symbol: '♍', col: 4, row: 4, corner: true  },
+// North Indian (diamond) chart: houses are fixed, lagna is house 1 (top centre) and
+// houses run anti-clockwise. x / y = label position in a 400×400 box.
+const NI_HOUSES = [
+  { h: 1,  x: 200, y: 100 }, { h: 2,  x: 100, y: 40  }, { h: 3,  x: 40,  y: 100 },
+  { h: 4,  x: 100, y: 200 }, { h: 5,  x: 40,  y: 300 }, { h: 6,  x: 100, y: 360 },
+  { h: 7,  x: 200, y: 300 }, { h: 8,  x: 300, y: 360 }, { h: 9,  x: 360, y: 300 },
+  { h: 10, x: 300, y: 200 }, { h: 11, x: 360, y: 100 }, { h: 12, x: 300, y: 40  },
 ];
+const RASHI_NAMES = RASHIS.map(r => r.name);
 
 // ═══════════════════════════════════════════════════════════════
 // HELPERS
@@ -223,55 +218,40 @@ function Skeleton() {
 
 /* ── North Indian Kundali Chart ── */
 function KundaliChart({ suryaRashi, chandraRashi, lagna, dark }) {
+  const lagnaIdx = Math.max(0, RASHI_NAMES.indexOf(lagna || suryaRashi));
   return (
     <div className={`${styles.kundaliWrap} ${dark ? styles.kundaliDark : ''}`}>
-      <div className={styles.kundaliGrid}>
-        {KUNDALI_HOUSES.map(h => {
-          const isSun   = h.rashi === suryaRashi;
-          const isMoon  = h.rashi === chandraRashi;
-          const isLagna = h.rashi === lagna;
-          const isBoth  = isSun && isMoon;
+      <div className={styles.niChart} role="img"
+        aria-label={`कुंडली: लग्न ${lagna}, सूर्य ${suryaRashi}, चंद्र ${chandraRashi}`}>
+        <svg viewBox="0 0 400 400" className={styles.niLines} aria-hidden="true">
+          <rect x="1.5" y="1.5" width="397" height="397" />
+          <line x1="0" y1="0" x2="400" y2="400" />
+          <line x1="400" y1="0" x2="0" y2="400" />
+          <polygon points="200,0 400,200 200,400 0,200" />
+        </svg>
+        {NI_HOUSES.map(({ h, x, y }) => {
+          const rIdx  = (lagnaIdx + h - 1) % 12;
+          const rashi = RASHI_NAMES[rIdx];
+          const isSun  = rashi === suryaRashi;
+          const isMoon = rashi === chandraRashi;
           return (
-            <div
-              key={h.num}
-              className={[
-                styles.house,
-                h.corner  ? styles.houseCorner  : '',
-                isBoth    ? styles.houseBoth    : '',
-                isSun     ? styles.houseSun     : '',
-                isMoon    ? styles.houseMoon    : '',
-                isLagna   ? styles.houseLagna   : '',
-              ].filter(Boolean).join(' ')}
-              style={{ gridColumn: h.col, gridRow: h.row }}
+            <div key={h}
+              className={`${styles.niHouse} ${h === 1 ? styles.niLagna : ''}`}
+              style={{ left: `${x / 4}%`, top: `${y / 4}%` }}
+              title={`${h} वे स्थान — ${rashi}`}
             >
-              <span className={styles.houseNum}>{h.num}</span>
-              <div className={styles.houseBody}>
-                <img src={RASHI_IMG[h.rashi]} alt="" className={styles.houseImg} loading="lazy" width="30" height="30"
-                  onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling.style.display = 'inline'; }} />
-                <span className={styles.houseSymbol} style={{ display: 'none' }}>{h.symbol}</span>
-                <span className={styles.houseRashi}>{h.rashi}</span>
-              </div>
-              {(isSun || isMoon || isLagna) && (
-                <div className={styles.housePlanets}>
-                  {isSun   && <span className={styles.planetSun}  title="सूर्य">☀</span>}
-                  {isMoon  && <span className={styles.planetMoon} title="चंद्र">☽</span>}
-                  {isLagna && <span className={styles.planetLagna} title="लग्न">↑</span>}
-                </div>
+              <span className={styles.niNum}>{rIdx + 1}</span>
+              <img src={RASHI_IMG[rashi]} alt={rashi} className={styles.niImg} loading="lazy" width="26" height="26" />
+              {(h === 1 || isSun || isMoon) && (
+                <span className={styles.niPlanets}>
+                  {h === 1 && <span className={styles.planetLagna} title="लग्न">ल</span>}
+                  {isSun  && <span className={styles.planetSun}  title="सूर्य">सू</span>}
+                  {isMoon && <span className={styles.planetMoon} title="चंद्र">चं</span>}
+                </span>
               )}
             </div>
           );
         })}
-
-        {/* Center cell (spans col 2-3, row 2-3) */}
-        <div className={styles.houseCenter}>
-          <span className={styles.centerOm}>🕉</span>
-          <span className={styles.centerTitle}>कुंडली</span>
-          <div className={styles.centerLegend}>
-            <span className={styles.legendSun}>☀ सूर्य</span>
-            <span className={styles.legendMoon}>☽ चंद्र</span>
-            {lagna && <span className={styles.legendLagna}>↑ लग्न</span>}
-          </div>
-        </div>
       </div>
 
       {/* Rashi legend below chart */}
@@ -725,15 +705,15 @@ export default function Panchang() {
             <section className={styles.section}>
               <h2 className={styles.sectionHeading}>
                 <span className={styles.sectionIcon}>🔯</span>
-                राशी कुंडली (दक्षिण भारतीय पद्धत)
+                उत्तर भारतीय कुंडली
                 <span className={styles.sectionBadge}>ग्रह स्थिती</span>
               </h2>
               <p className={styles.kundaliDesc}>
                 खालील कुंडलीत <span className={styles.sunText}>☀ सूर्य</span>,{' '}
                 <span className={styles.moonText}>☽ चंद्र</span> आणि{' '}
                 <span className={styles.lagnaText}>↑ लग्न</span> यांच्या राशी दर्शविल्या आहेत.
-                या पद्धतीत राशी आपल्या जागी स्थिर असतात; कोपऱ्यातील आकडा हा राशीचा क्रमांक आहे.
-                वेळ बदलल्यास लग्न आपोआप बदलते.
+                वरच्या मधल्या घरात लग्न (पहिले स्थान) असते आणि पुढील स्थाने उलट्या घड्याळाच्या दिशेने मोजली जातात;
+                प्रत्येक घरातील आकडा हा राशीचा क्रमांक आहे (१ = मेष … १२ = मीन). वेळ बदलल्यास लग्न आपोआप बदलते.
               </p>
               <KundaliChart
                 suryaRashi={data.suryaRashi}
