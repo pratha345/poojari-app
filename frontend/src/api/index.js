@@ -241,6 +241,7 @@ export const aartiAPI = {
 export const rashifalAPI = {
   getTomorrow: (rashiId) => api.get(`/rashifal/tomorrow/${rashiId}`),
   getWeekly:   (rashiId) => api.get(`/rashifal/weekly/${rashiId}`),
+  getGochar:   (rashiId, period) => api.get(`/rashifal/gochar/${rashiId}`, { params: { period } }),
 };
 
 // src/api/superadmin.api.js

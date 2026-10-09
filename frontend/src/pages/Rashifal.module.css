@@ -369,3 +369,25 @@
 .infoTitle { font-family: 'Noto Serif Devanagari', serif; font-size: 0.95rem; font-weight: 700; color: #1565C0; margin: 0 0 6px; }
 .infoText  { font-family: 'Noto Serif Devanagari', serif; font-size: 0.84rem; line-height: 1.72; color: #1a3a5c; margin: 0; }
 .infoLink  { color: #1565C0; font-weight: 700; }
+
+/* ══ GOCHAR BASIS / STAYS / EVENTS ═══════════════════════════════ */
+.predDay      { font-family: 'Noto Serif Devanagari', serif; font-size: 0.85rem; color: #7a3000; margin: -6px 0 14px; font-weight: 600; }
+.warnBox      { font-family: 'Noto Serif Devanagari', serif; font-size: 0.86rem; line-height: 1.6; background: #FFF4CC; border: 1.5px solid #F2C94C; color: #5c3d00; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
+.basisBox     { background: #fff; border: 1.5px solid #eadbc8; border-radius: 16px; padding: 16px 18px; margin: 4px 0 22px; }
+.basisList    { list-style: none; padding: 0; margin: 0 0 10px; display: grid; gap: 6px; }
+.basisList li { display: flex; justify-content: space-between; gap: 10px; font-family: 'Noto Serif Devanagari', serif; font-size: 0.84rem; padding: 7px 10px; border-radius: 8px; }
+.basisGood    { background: #E8F5E9; color: #1b5e20; }
+.basisBad     { background: #FDECEC; color: #8e1b1b; }
+.basisNote    { font-family: 'Noto Serif Devanagari', serif; font-size: 0.76rem; color: #7a5a44; line-height: 1.6; margin: 0 0 16px; }
+.staysGrid    { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+.staysCard    { background: #fff; border: 1.5px solid #eadbc8; border-radius: 14px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+.staysPlanet  { font-family: 'Noto Serif Devanagari', serif; font-weight: 800; color: #7a1e00; font-size: 0.95rem; }
+.stayRow      { border-radius: 8px; padding: 7px 10px; }
+.stayDates    { display: block; font-size: 0.74rem; font-weight: 700; margin-bottom: 2px; }
+.stayText     { font-family: 'Noto Serif Devanagari', serif; font-size: 0.84rem; line-height: 1.6; margin: 0; }
+.eventsBox    { background: #fffdf8; border: 1.5px solid #eadbc8; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; }
+.eventsList   { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-family: 'Noto Serif Devanagari', serif; font-size: 0.84rem; line-height: 1.6; color: #3e1a00; }
+@media (max-width: 640px) {
+  .staysGrid { grid-template-columns: 1fr; }
+  .basisList li { flex-direction: column; gap: 2px; }
+}

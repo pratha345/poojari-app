@@ -1,10 +1,10 @@
-// src/pages/Rashifal.jsx — राशी भविष्य (आज, उद्या, साप्ताहिक, मासिक)
-import { useState, useEffect, useRef, useMemo } from 'react';
+// src/pages/Rashifal.jsx — राशी भविष्य (आज, उद्या, साप्ताहिक, मासिक, वार्षिक) — खऱ्या गोचरावर आधारित
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Header  from '../components/layout/Header';
 import Footer  from '../components/layout/Footer';
 import SEOHead from '../components/SEOHead';
-import { RASHIS, getPrediction, MONTHLY_BHAVISHYA } from '../data/rashifalData';
+import { RASHIS } from '../data/rashifalData';
 import { rashifalAPI } from '../api/index.js';
 import styles from './Rashifal.module.css';
 
@@ -13,7 +13,7 @@ const DAYS_MR   = ['रविवार','सोमवार','मंगळवा
 
 function todayMR() {
   const now = new Date(Date.now() + 330 * 60000);
-  return `${DAYS_MR[new Date().getDay()]}, ${now.getUTCDate()} ${MONTHS_MR[now.getUTCMonth()]} ${now.getUTCFullYear()}`;
+  return `${DAYS_MR[now.getUTCDay()]}, ${now.getUTCDate()} ${MONTHS_MR[now.getUTCMonth()]} ${now.getUTCFullYear()}`;
 }
 
 const SCHEMA = {
@@ -91,94 +91,120 @@ function CatCard({ icon, label, planet, text, color }) {
   );
 }
 
-// ── Weekly View ────────────────────────────────────────────────────
-function WeeklyView({ rashiId, rashi }) {
-  const weekData = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => {
-      const d    = getPrediction(rashiId, i);
-      const date = new Date(Date.now() + i * 86400000);
-      const qc   = QC[d.quality] || QC.neutral;
-      return {
-        ...d,
-        dayName: DAYS_MR[date.getDay()],
-        dateNum: date.getDate(),
-        monthName: MONTHS_MR[date.getMonth()],
-        qc,
-        isToday: i === 0,
-      };
-    });
-  }, [rashiId]);
-
+// ── "हे भविष्य कशावर आधारित आहे" ───────────────────────────────────
+function Basis({ rows, title = 'हे भविष्य कशावर आधारित आहे (ग्रहस्थिती)' }) {
+  if (!rows?.length) return null;
   return (
-    <div>
-      <div className={styles.weeklyHead}>
-        <h3 className={styles.sectionHeading}>📅 या आठवड्याचे भविष्य — {rashi.name}</h3>
-        <p className={styles.weeklySubtext}>येत्या ७ दिवसांचे दैनंदिन राशिभविष्य</p>
-      </div>
-      <div className={styles.weekGrid}>
-        {weekData.map((d, i) => (
-          <div
-            key={i}
-            className={`${styles.weekCard} ${d.isToday ? styles.weekCardToday : ''}`}
-            style={{ '--rashiColor': rashi.color }}
-          >
-            <span className={styles.weekDayName}>{d.dayName}</span>
-            <span className={styles.weekDate}>{d.dateNum} {d.monthName}</span>
-            <span
-              className={styles.weekScoreTag}
-              style={{ background: d.qc.bg, color: d.qc.color }}
-            >
-              {d.score}/१०
-            </span>
-            <p className={styles.weekText}>{d.general}</p>
-            <div className={styles.weekTip}>🪔 {d.tip}</div>
-          </div>
+    <div className={styles.basisBox}>
+      <h3 className={styles.sectionHeading}>🔭 {title}</h3>
+      <ul className={styles.basisList}>
+        {rows.map(b => (
+          <li key={b.key} className={b.good ? styles.basisGood : styles.basisBad}>
+            <span>{b.text}{b.retro ? ' (वक्री)' : ''}</span>
+            <strong>{b.good ? 'अनुकूल' : 'प्रतिकूल'}</strong>
+          </li>
         ))}
+      </ul>
+      <p className={styles.basisNote}>
+        स्थान चंद्र राशीपासून मोजले आहे. शुभ/अशुभ हे शास्त्रीय गोचर नियमांनुसार (फलदीपिका) सर्वसाधारण फळ आहे;
+        वैयक्तिक कुंडलीतील दशा-अंतर्दशेनुसार अनुभव बदलू शकतो.
+      </p>
+    </div>
+  );
+}
+
+function fmtDate(ymd) {
+  const [, m, d] = ymd.split('-').map(Number);
+  return `${d} ${MONTHS_MR[m - 1]}`;
+}
+
+// planet → its stays ("पासून – पर्यंत") with the result of each
+function PlanetStays({ planets }) {
+  return (
+    <div className={styles.staysGrid}>
+      {planets.map(p => (
+        <div key={p.key} className={styles.staysCard}>
+          <span className={styles.staysPlanet}>{p.planet}</span>
+          {p.stays.map((s, i) => (
+            <div key={i} className={`${styles.stayRow} ${s.good ? styles.basisGood : styles.basisBad}`}>
+              {p.stays.length > 1 && <span className={styles.stayDates}>{fmtDate(s.from)} – {fmtDate(s.to)}</span>}
+              <p className={styles.stayText}>{s.text}</p>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Events({ events, title }) {
+  if (!events?.length) return null;
+  return (
+    <div className={styles.eventsBox}>
+      <h3 className={styles.sectionHeading}>🗓️ {title}</h3>
+      <ul className={styles.eventsList}>
+        {events.map((e, i) => (
+          <li key={i}><strong>{e.dateMR}, {e.time}:</strong> {e.text}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SadeSati({ text }) {
+  if (!text) return null;
+  return <div className={styles.warnBox}>🪐 <strong>शनी:</strong> {text} चालू आहे.</div>;
+}
+
+function Remedy({ label, text }) {
+  return (
+    <div className={styles.tipBox}>
+      <span className={styles.tipIcon}>🪔</span>
+      <div>
+        <span className={styles.tipLabel}>{label}</span>
+        <p className={styles.tipText}>{text}</p>
       </div>
     </div>
   );
 }
 
 // ── Monthly View ───────────────────────────────────────────────────
-function MonthlyView({ rashiId, rashi }) {
-  const m = MONTHLY_BHAVISHYA[rashiId];
-  if (!m) return null;
-
+function MonthlyView({ m, rashi }) {
   return (
     <div>
       <div className={styles.monthlyHead} style={{ '--rashiColor': rashi.color, '--rashiBg': rashi.bg }}>
-        <div className={styles.monthlyTitleRow}>
-          <div className={styles.monthlyImgWrap}>
-            <img src={rashi.img} alt={rashi.name} className={styles.predImg}
-              onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextElementSibling.style.display='inline-block'; }}
-            />
-            <span className={styles.predSymbolFallback}>{rashi.symbol}</span>
-          </div>
-          <h3 className={styles.monthlyTitle}>{rashi.name} — {m.month} मासिक भविष्य</h3>
-        </div>
+        <h3 className={styles.monthlyTitle}>{rashi.name} — {m.month} मासिक भविष्य</h3>
         <p className={styles.monthlyOverview}>{m.overview}</p>
         <div className={styles.monthlyMeta}>
-          <span>📅 शुभ दिवस: <strong>{m.shubhDin}</strong></span>
-          <span>🎨 शुभ रंग: <strong>{m.shubhRang}</strong></span>
-          <span>💎 रत्न: <strong>{rashi.stone}</strong></span>
-          <span>🔢 शुभ अंक: <strong>{rashi.luckyNums.join(', ')}</strong></span>
+          <span>✅ अनुकूल दिवस (तारखा): <strong>{m.goodDays.join(', ')}</strong></span>
+          {m.chandrashtamaDays.length > 0 && <span>⚠️ चंद्राष्टम: <strong>{m.chandrashtamaDays.join(', ')}</strong></span>}
         </div>
       </div>
+      <SadeSati text={m.sadesati} />
+      <h3 className={styles.sectionHeading}>📖 ग्रहनिहाय फळ — {m.month}</h3>
+      <PlanetStays planets={m.planets} />
+      <Events events={m.events} title="या महिन्यातील ग्रहबदल" />
+      <Remedy label="या महिन्याचा उपाय" text={m.remedy} />
+      <Basis rows={m.basis} title="महिन्याच्या मध्यावरील ग्रहस्थिती" />
+    </div>
+  );
+}
 
-      <div className={styles.catGrid}>
-        <CatCard icon="💰" label="आर्थिक स्थिती"  color="#F57F17"  text={m.finance}  />
-        <CatCard icon="💑" label="प्रेम / संसार"   color="#C2185B"  text={m.love}     />
-        <CatCard icon="💼" label="कार्य / करिअर"   color="#1565C0"  text={m.career}   />
-        <CatCard icon="🏥" label="आरोग्य"           color="#2E7D32"  text={m.health}   />
+// ── Yearly View ────────────────────────────────────────────────────
+function YearlyView({ y, rashi }) {
+  return (
+    <div>
+      <div className={styles.monthlyHead} style={{ '--rashiColor': rashi.color, '--rashiBg': rashi.bg }}>
+        <h3 className={styles.monthlyTitle}>{rashi.name} — वार्षिक भविष्य {y.year}</h3>
+        <p className={styles.monthlyOverview}>{y.overview}</p>
       </div>
-
-      <div className={styles.tipBox}>
-        <span className={styles.tipIcon}>🪔</span>
-        <div>
-          <span className={styles.tipLabel}>या महिन्याचा उपाय</span>
-          <p className={styles.tipText}>{m.remedy}</p>
-        </div>
-      </div>
+      <h3 className={styles.sectionHeading}>📖 गुरू, शनी, राहू, केतू — वर्षभराचा गोचर</h3>
+      <PlanetStays planets={y.planets} />
+      <Events events={y.events} title={`${y.year} मधील महत्त्वाचे ग्रहबदल`} />
+      <Remedy label="वर्षभराचा उपाय" text={y.remedy} />
+      <p className={styles.basisNote}>
+        वार्षिक भविष्य मंद ग्रहांच्या (गुरू, शनी, राहू-केतू) गोचरावर आधारित आहे; सर्व तारखा प्रत्यक्ष खगोलीय गणितावरून.
+      </p>
     </div>
   );
 }
@@ -187,40 +213,22 @@ function MonthlyView({ rashiId, rashi }) {
 export default function Rashifal() {
   const [selected,    setSelected]    = useState(null);
   const [tab,         setTab]         = useState('today');
-  const [pred,        setPred]        = useState(null);
-  const [groqLoading, setGroqLoading] = useState(false);
-  const [weekData,    setWeekData]    = useState(null);
+  const [data,        setData]        = useState(null);
+  const [loading,     setLoading]     = useState(false);
+  const [error,       setError]       = useState(false);
   const predPanelRef = useRef(null);
 
+  // every tab comes from the gochar engine on the server
   useEffect(() => {
     if (selected === null) return;
-
-    // आज — local algorithm
-    if (tab === 'today') {
-      setPred(getPrediction(selected, 0));
-      return;
-    }
-
-    // उद्या — Groq API
-    if (tab === 'tomorrow') {
-      setGroqLoading(true);
-      setPred(null);
-      rashifalAPI.getTomorrow(selected)
-        .then(r => setPred(r.data.data))
-        .catch(() => setPred(getPrediction(selected, 1))) // fallback
-        .finally(() => setGroqLoading(false));
-      return;
-    }
-
-    // या आठवड्यात — Groq API
-    if (tab === 'weekly') {
-      setGroqLoading(true);
-      setWeekData(null);
-      rashifalAPI.getWeekly(selected)
-        .then(r => setWeekData(r.data.data))
-        .catch(() => setWeekData(null))
-        .finally(() => setGroqLoading(false));
-    }
+    const period = { today: 'today', tomorrow: 'tomorrow', weekly: 'week', monthly: 'month', yearly: 'year' }[tab];
+    let alive = true;
+    setLoading(true); setError(false); setData(null);
+    rashifalAPI.getGochar(selected, period)
+      .then(r => { if (alive) setData(r.data.data); })
+      .catch(() => { if (alive) setError(true); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, [selected, tab]);
 
   useEffect(() => {
@@ -255,7 +263,7 @@ export default function Rashifal() {
               <span className={styles.heroIcon}>🔮</span>
               <div>
                 <h1 className={styles.heroTitle}>मराठी राशिभविष्य</h1>
-                <p className={styles.heroSub}>आज · उद्या · साप्ताहिक · मासिक भविष्य · वैदिक ज्योतिष</p>
+                <p className={styles.heroSub}>आज · उद्या · साप्ताहिक · मासिक · वार्षिक — प्रत्यक्ष ग्रहस्थितीवर आधारित</p>
               </div>
             </div>
             <div className={styles.heroRight}>
@@ -272,7 +280,7 @@ export default function Rashifal() {
         <section className={styles.gridSection}>
           <div className={styles.gridHeader}>
             <h2 className={styles.gridTitle}>तुमची राशी निवडा</h2>
-            <p className={styles.gridSub}>राशी निवडल्यावर आजचे, साप्ताहिक आणि मासिक भविष्य पहा</p>
+            <p className={styles.gridSub}>राशी निवडल्यावर आजचे, साप्ताहिक, मासिक आणि वार्षिक भविष्य पहा</p>
           </div>
           <div className={styles.rashiGrid}>
             {RASHIS.map(r => (
@@ -314,7 +322,7 @@ export default function Rashifal() {
                 </div>
                 <div>
                   <h2 className={styles.predName}>{rashi.name} <span className={styles.predEng}>({rashi.eng})</span></h2>
-                  <p className={styles.predDates}>{rashi.dates}</p>
+                  <p className={styles.predDates}>चंद्र राशी — जन्मवेळी चंद्र ज्या राशीत होता ती रास</p>
                 </div>
               </div>
               <div className={styles.predMetaBlock}>
@@ -335,88 +343,85 @@ export default function Rashifal() {
               <button className={`${styles.tab} ${tab === 'tomorrow' ? styles.tabActive : ''}`} onClick={() => setTab('tomorrow')}>🌄 उद्या</button>
               <button className={`${styles.tab} ${tab === 'weekly'   ? styles.tabActive : ''}`} onClick={() => setTab('weekly')}>📅 या आठवड्यात</button>
               <button className={`${styles.tab} ${tab === 'monthly'  ? styles.tabActive : ''}`} onClick={() => setTab('monthly')}>📆 या महिन्यात</button>
+              <button className={`${styles.tab} ${tab === 'yearly'   ? styles.tabActive : ''}`} onClick={() => setTab('yearly')}>🗓️ वार्षिक</button>
             </div>
 
-            {/* ── Loading ── */}
-            {groqLoading && (
+            {/* ── Loading / error ── */}
+            {loading && (
               <div className={styles.groqLoading}>
                 <span className={styles.groqSpinner} />
-                <span>तुमचे भविष्य लोड होत आहे...</span>
+                <span>ग्रहस्थितीचे गणित होत आहे...</span>
               </div>
+            )}
+            {error && !loading && (
+              <div className={styles.warnBox}>भविष्य आत्ता मिळवता आले नाही. थोड्या वेळाने पुन्हा प्रयत्न करा.</div>
             )}
 
             {/* ── Today / Tomorrow ── */}
-            {(tab === 'today' || tab === 'tomorrow') && pred && !groqLoading && (
+            {(tab === 'today' || tab === 'tomorrow') && data?.general && !loading && (
               <>
-                {/* Score */}
-                <ScoreBar score={pred.score} scoreLabel={pred.scoreLabel} quality={pred.quality} dayLabel={tab === 'today' ? 'आजचा' : 'उद्याचा'} />
+                <ScoreBar score={data.score} scoreLabel={data.scoreLabel} quality={data.quality} dayLabel={tab === 'today' ? 'आजचा' : 'उद्याचा'} />
+                <p className={styles.predDay}>{data.dayName}, {data.dateMR}</p>
 
-                {/* Main Bhavishya Summary (replaces kundali chart) */}
-                <BhavishyaSummary
-                  pred={pred}
-                  rashi={rashi}
-                  label={tab === 'today' ? 'आजचे' : 'उद्याचे'}
-                />
+                {data.chandrashtama && (
+                  <div className={styles.warnBox}>⚠️ <strong>चंद्राष्टम:</strong> चंद्र आपल्या राशीपासून आठव्या स्थानी. महत्त्वाची कामे, मोठे व्यवहार व वाद टाळा.</div>
+                )}
+                <SadeSati text={data.sadesati} />
 
-                {/* Sun monthly context */}
+                <BhavishyaSummary pred={data} rashi={rashi} label={tab === 'today' ? 'आजचे' : 'उद्याचे'} />
+                {data.moonNote && (
+                  <div className={styles.sunEffect}>
+                    <span className={styles.sunEffectIcon}>🌙</span>
+                    <p className={styles.sunEffectText}>{data.moonNote}</p>
+                  </div>
+                )}
                 <div className={styles.sunEffect}>
                   <span className={styles.sunEffectIcon}>☀️</span>
-                  <p className={styles.sunEffectText}><strong>सूर्य गोचर (मासिक):</strong> {pred.sunEffect}</p>
+                  <p className={styles.sunEffectText}><strong>सूर्य गोचर (मासिक):</strong> {data.sunEffect}</p>
                 </div>
 
-                {/* 4 category predictions */}
-                <h3 className={styles.sectionHeading}>📖 ग्रह स्थितीनुसार भविष्य</h3>
+                <h3 className={styles.sectionHeading}>📖 ग्रहस्थितीनुसार भविष्य</h3>
                 <div className={styles.catGrid}>
-                  <CatCard icon="🌟" label="सर्वसाधारण"    planet="(चंद्र गोचर)" text={pred.general} color={rashi.color} />
-                  <CatCard icon="💑" label="प्रेम / संसार"  planet="(शुक्र गोचर)" text={pred.love}    color="#C2185B"    />
-                  <CatCard icon="💼" label="कार्य / व्यवसाय" planet="(बुध गोचर)"  text={pred.career}  color="#1565C0"    />
-                  <CatCard icon="🏥" label="आरोग्य"          planet="(मंगळ गोचर)" text={pred.health}  color="#2E7D32"    />
+                  <CatCard icon="🌟" label="सर्वसाधारण"     planet="(चंद्र गोचर)" text={data.general} color={rashi.color} />
+                  <CatCard icon="💑" label="प्रेम / संसार"   planet="(शुक्र गोचर)" text={data.love}    color="#C2185B"    />
+                  <CatCard icon="💼" label="कार्य / व्यवसाय" planet="(बुध गोचर)"  text={data.career}  color="#1565C0"    />
+                  <CatCard icon="🏥" label="आरोग्य / ऊर्जा"  planet="(मंगळ गोचर)" text={data.health}  color="#2E7D32"    />
                 </div>
 
-                {/* Guru & Shani */}
                 <div className={styles.guruShaniGrid}>
                   <div className={styles.guruBox}>
                     <div className={styles.gsHeader}>
                       <span style={{ color: PLANET_META.Jupiter.color }}>♃</span>
                       <span className={styles.gsTitle}>गुरू — भाग्य व ज्ञान</span>
                     </div>
-                    <p className={styles.gsText}>{pred.guru}</p>
+                    <p className={styles.gsText}>{data.guru}</p>
                   </div>
                   <div className={styles.shaniBox}>
                     <div className={styles.gsHeader}>
                       <span style={{ color: PLANET_META.Saturn.color }}>♄</span>
                       <span className={styles.gsTitle}>शनी — कर्म व शिस्त</span>
                     </div>
-                    <p className={styles.gsText}>{pred.shani}</p>
+                    <p className={styles.gsText}>{data.shani}</p>
                   </div>
                 </div>
 
-                {/* Remedy */}
-                <div className={styles.tipBox}>
-                  <span className={styles.tipIcon}>🪔</span>
-                  <div>
-                    <span className={styles.tipLabel}>आजचा उपाय</span>
-                    <p className={styles.tipText}>{pred.tip}</p>
-                  </div>
-                </div>
-
-                {/* CTA */}
-                <div className={styles.predCta}>
-                  <Link to="/pooja"    className={styles.ctaBtn}>🪔 शुभ मुहूर्तावर पूजा बुक करा</Link>
-                  <Link to="/panchang" className={styles.ctaBtnSec}>🕉️ आजचे पंचांग पहा</Link>
-                </div>
+                <Remedy label={tab === 'today' ? 'आजचा उपाय' : 'उद्याचा उपाय'} text={data.tip} />
+                <Basis rows={data.basis} />
               </>
             )}
 
-            {/* ── Weekly (Groq) ── */}
-            {tab === 'weekly' && !groqLoading && weekData && (
+            {/* ── Weekly ── */}
+            {tab === 'weekly' && data?.days && !loading && (
               <>
                 <div className={styles.weeklyHead}>
                   <h3 className={styles.sectionHeading}>📅 या आठवड्याचे भविष्य — {rashi.name}</h3>
-                  <p className={styles.weeklySubtext}>येत्या ७ दिवसांचे दैनंदिन राशिभविष्य</p>
+                  <p className={styles.weeklySubtext}>
+                    येत्या ७ दिवसांचे भविष्य (चंद्र गोचरानुसार). अनुकूल दिवस: {data.bestDays.join(', ')}
+                    {data.chandrashtamaDays.length > 0 && <> · चंद्राष्टम (सावधानी): {data.chandrashtamaDays.join(', ')}</>}
+                  </p>
                 </div>
                 <div className={styles.weekGrid}>
-                  {weekData.map((d, i) => {
+                  {data.days.map((d, i) => {
                     const qc = QC[d.quality] || QC.neutral;
                     return (
                       <div key={i}
@@ -426,30 +431,28 @@ export default function Rashifal() {
                         <span className={styles.weekDayName}>{d.dayName}</span>
                         <span className={styles.weekDate}>{d.dateNum} {d.monthName}</span>
                         <span className={styles.weekScoreTag} style={{ background: qc.bg, color: qc.color }}>
-                          {d.score}/१०
+                          {d.score}/१० · {d.scoreLabel}
                         </span>
                         <p className={styles.weekText}>{d.general}</p>
+                        {d.moonNote && <p className={styles.weekText}>🌙 {d.moonNote}</p>}
                         <div className={styles.weekTip}>🪔 {d.tip}</div>
                       </div>
                     );
                   })}
                 </div>
-                <div className={styles.predCta}>
-                  <Link to="/pooja"    className={styles.ctaBtn}>🪔 पूजा बुक करा</Link>
-                  <Link to="/panchang" className={styles.ctaBtnSec}>🕉️ पंचांग पहा</Link>
-                </div>
+                <Events events={data.events} title="या आठवड्यातील ग्रहबदल" />
               </>
             )}
 
-            {/* ── Monthly ── */}
-            {tab === 'monthly' && (
-              <>
-                <MonthlyView rashiId={selected} rashi={rashi} />
-                <div className={styles.predCta}>
-                  <Link to="/pooja"    className={styles.ctaBtn}>🪔 पूजा बुक करा</Link>
-                  <Link to="/panchang" className={styles.ctaBtnSec}>🕉️ पंचांग पहा</Link>
-                </div>
-              </>
+            {/* ── Monthly / Yearly ── */}
+            {tab === 'monthly' && data?.month && !loading && <MonthlyView m={data} rashi={rashi} />}
+            {tab === 'yearly'  && data?.year  && !loading && <YearlyView  y={data} rashi={rashi} />}
+
+            {data && !loading && (
+              <div className={styles.predCta}>
+                <Link to="/pooja"    className={styles.ctaBtn}>🪔 शुभ मुहूर्तावर पूजा बुक करा</Link>
+                <Link to="/panchang" className={styles.ctaBtnSec}>🕉️ आजचे पंचांग पहा</Link>
+              </div>
             )}
 
           </section>
@@ -460,7 +463,7 @@ export default function Rashifal() {
           <div className={styles.placeholder}>
             <span className={styles.placeholderIcon}>🔮</span>
             <p className={styles.placeholderText}>वर दिलेल्या बारा राशींपैकी तुमची राशी निवडा</p>
-            <p className={styles.placeholderSub}>आज, उद्या, साप्ताहिक आणि मासिक भविष्य मिळेल</p>
+            <p className={styles.placeholderSub}>आज, उद्या, साप्ताहिक, मासिक आणि वार्षिक भविष्य मिळेल</p>
           </div>
         )}
 
@@ -485,7 +488,6 @@ export default function Rashifal() {
                 <div className={styles.overviewDetails}>
                   <span>स्वामी: <strong>{r.lord}</strong></span>
                   <span>तत्त्व: <strong>{r.element}</strong></span>
-                  <span>{r.dates}</span>
                 </div>
                 <button className={styles.overviewBtn} onClick={() => pick(r.id)}>भविष्य पहा →</button>
               </div>
