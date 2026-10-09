@@ -1188,3 +1188,16 @@
 /* absolutely positioned near the edge would otherwise shrink and stack the tags */
 .niHouse { width: max-content; max-width: 110px; }
 @media (max-width: 480px) { .niHouse { max-width: 78px; } }
+
+.liveBtn {
+  border: 1px solid var(--secondary);
+  background: transparent;
+  color: var(--secondary);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 4px;
+}
+.liveBtn:hover { background: var(--secondary); color: #fff; }

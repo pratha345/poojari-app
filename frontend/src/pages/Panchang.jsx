@@ -300,6 +300,8 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, grahas = [], dark }) {
 export default function Panchang() {
   const [date,       setDate]       = useState(todayIST());
   const [time,       setTime]       = useState(nowISTTime());
+  // live = follow the current IST time (and date). Turns off when the user picks a date or time.
+  const [live,       setLive]       = useState(true);
   const [showClock,  setShowClock]  = useState(false);
   const [lat,        setLat]        = useState('18.5204');
   const [lon,        setLon]        = useState('73.8567');
@@ -372,6 +374,23 @@ export default function Panchang() {
       setLoading(false);
     }
   }, []);
+
+  // ── Live clock: move date/time forward every 30 s while in live mode ──
+  // Changing `time` refetches through the effect below, so the lagna and kundali stay current.
+  // Skipped while the tab is hidden; catches up as soon as it is visible again.
+  useEffect(() => {
+    if (!live) return;
+    const tick = () => {
+      if (document.hidden) return;
+      const t = nowISTTime(), d = todayIST();
+      setTime(prev => (prev === t ? prev : t));
+      setDate(prev => (prev === d ? prev : d));
+    };
+    tick();
+    const id = setInterval(tick, 30000);
+    document.addEventListener('visibilitychange', tick);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', tick); };
+  }, [live]);
 
   // ── Auto-refresh on any input change (debounced 400ms) ──────
   useEffect(() => {
@@ -509,7 +528,7 @@ export default function Panchang() {
                 value={date}
                 min="1900-01-01"
                 max="2099-12-31"
-                onChange={e => setDate(e.target.value)}
+                onChange={e => { setLive(false); setDate(e.target.value); }}
               />
               {date && (
                 <span className={styles.dateMR}>{formatMR(date)}</span>
@@ -530,8 +549,15 @@ export default function Panchang() {
                 <span className={styles.timePickerChevron}>▼</span>
               </button>
               <span className={styles.timeSub}>
-                {time}
-                <span className={styles.timeNote}> · लग्न बदलते</span>
+                {live
+                  ? <span className={styles.timeNote}>🟢 आत्ताची वेळ · आपोआप पुढे सरकते</span>
+                  : <>
+                      {time}<span className={styles.timeNote}> · निवडलेली वेळ</span>{' '}
+                      <button type="button" className={styles.liveBtn}
+                        onClick={() => { setDate(todayIST()); setTime(nowISTTime()); setLive(true); }}>
+                        ⟳ आत्ताची वेळ
+                      </button>
+                    </>}
               </span>
             </div>
 
@@ -776,7 +802,7 @@ export default function Panchang() {
       {showClock && (
         <ClockTimePicker
           value={time}
-          onChange={t => setTime(t)}
+          onChange={t => { setLive(false); setTime(t); }}
           onClose={() => setShowClock(false)}
         />
       )}
