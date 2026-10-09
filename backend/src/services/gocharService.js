@@ -7,7 +7,7 @@
 
 const Astro = require('astronomy-engine');
 
-const RASHIS = ['मेष', 'वृषभ', 'मिथुन', 'कर्क', 'सिंह', 'कन्या', 'तुळ', 'वृश्चिक', 'धनु', 'मकर', 'कुंभ', 'मीन'];
+const RASHIS = ['मेष', 'वृषभ', 'मिथुन', 'कर्क', 'सिंह', 'कन्या', 'तुला', 'वृश्चिक', 'धनु', 'मकर', 'कुंभ', 'मीन'];
 
 const PLANETS = {
   Sun:     { mr: 'सूर्य',  body: 'Sun' },
@@ -127,9 +127,9 @@ const isGood = (key, house) => GOOD_HOUSES[key].includes(house);
 // साडेसाती / अडीचकी status of Saturn for a Moon sign
 function shaniStatus(moonSign, saturnRashi) {
   const h = houseFrom(moonSign, saturnRashi);
-  if (h === 12) return 'साडेसाती — पहिला टप्पा';
-  if (h === 1)  return 'साडेसाती — दुसरा (मधला) टप्पा';
-  if (h === 2)  return 'साडेसाती — तिसरा टप्पा';
+  if (h === 12) return 'साडेसातीचा पहिला टप्पा';
+  if (h === 1)  return 'साडेसातीचा दुसरा (मधला) टप्पा';
+  if (h === 2)  return 'साडेसातीचा तिसरा (शेवटचा) टप्पा';
   if (h === 4)  return 'अडीचकी (चतुर्थ शनी)';
   if (h === 8)  return 'अडीचकी (अष्टम शनी)';
   return '';
