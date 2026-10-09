@@ -231,17 +231,20 @@ export default function Rashifal() {
     return () => { alive = false; };
   }, [selected, tab]);
 
+  // scroll to the prediction on every pick, also when the same rashi is clicked again
+  const [scrollTick, setScrollTick] = useState(0);
   useEffect(() => {
-    if (selected !== null && predPanelRef.current) {
+    if (scrollTick && predPanelRef.current) {
       predPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, [selected]);
+  }, [scrollTick]);
 
   const rashi = selected !== null ? RASHIS[selected] : null;
 
   const pick = (id) => {
     setSelected(id);
     setTab('today');
+    setScrollTick(t => t + 1);
   };
 
   return (

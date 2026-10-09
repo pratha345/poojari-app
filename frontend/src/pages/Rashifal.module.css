@@ -113,7 +113,7 @@
 .overviewSymbolFallback { font-size: 1.8rem; display: none; }
 
 /* ── Prediction Panel ──────────────────────────────────────────────── */
-.predPanel { background: #fff; border: 2px solid color-mix(in srgb, var(--rashiColor) 30%, transparent); border-radius: 24px; padding: 32px; margin: 24px 0; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
+.predPanel { scroll-margin-top: 96px; /* clear the sticky header */ background: #fff; border: 2px solid color-mix(in srgb, var(--rashiColor) 30%, transparent); border-radius: 24px; padding: 32px; margin: 24px 0; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
 @media (max-width: 600px) { .predPanel { padding: 18px 14px; } }
 
 .predHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
