@@ -25,6 +25,31 @@ async function resolveSlugRedirect(slug) {
   return null;
 }
 
+// ── Search helpers ────────────────────────────────────────────
+// Every word must appear somewhere in the post (title, excerpt, tags or body), in any order.
+// A longer Marathi word is also matched by its stem, so "उपासना" finds "उपासनेचे" / "उपासनेत".
+const MATRA_END = /[\u093E-\u094D\u0901-\u0903]+$/u;   // trailing vowel signs / anusvara
+const likeEsc = (w) => w.replace(/[\\%_]/g, (c) => '\\' + c);
+function searchTerms(q) {
+  return [...new Set(String(q).trim().split(/[\s,।]+/u).filter((w) => w.length > 1))].slice(0, 6).map((w) => {
+    const stem = w.replace(MATRA_END, '');
+    return [...w].length >= 5 && [...stem].length >= 3 ? stem : w;
+  });
+}
+const SEARCH_COLS = ['title', 'excerpt', 'CAST(tags AS CHAR)', 'content'];
+function searchSql(terms) {
+  const where = [], params = [], score = [], scoreParams = [];
+  for (const t of terms) {
+    const like = `%${likeEsc(t)}%`;
+    where.push(`(${SEARCH_COLS.map((c) => `${c} LIKE ?`).join(' OR ')})`);
+    params.push(...SEARCH_COLS.map(() => like));
+    // rank: title 6, tags 3, excerpt 2, body 1
+    score.push('(title LIKE ?) * 6 + (CAST(tags AS CHAR) LIKE ?) * 3 + (excerpt LIKE ?) * 2 + (content LIKE ?)');
+    scoreParams.push(like, like, like, like);
+  }
+  return { where: where.join(' AND '), params, score: score.join(' + '), scoreParams };
+}
+
 // ── Public: List published posts ──────────────────────────────
 exports.list = async (req, res) => {
   try {
@@ -41,10 +66,15 @@ exports.list = async (req, res) => {
     let where = ['is_published = 1'];
     const params = [];
     if (category) { where.push('category = ?'); params.push(category); }
-    if (search)   { where.push('(title LIKE ? OR excerpt LIKE ?)'); params.push(`%${search}%`, `%${search}%`); }
+    const terms = search ? searchTerms(search) : [];
+    const ss = terms.length ? searchSql(terms) : null;
+    if (ss) { where.push(ss.where); params.push(...ss.params); }
     const whereClause = where.join(' AND ');
 
-    const so = season ? seasonOrderSql(season) : { score: '0', label: 'NULL', params: [], labelParams: [] };
+    // search results: best match first; otherwise festival-aware order
+    const so = season ? seasonOrderSql(season)
+      : ss ? { score: `(${ss.score})`, label: 'NULL', params: ss.scoreParams, labelParams: [] }
+      : { score: '0', label: 'NULL', params: [], labelParams: [] };
     const [posts] = await pool.query(
       `SELECT id, title, slug, excerpt, image_url, author_name, category, tags, read_time, views, avg_rating, rating_count, created_at,
               ${so.label} AS season_label

@@ -239,7 +239,7 @@ export default function Blog() {
                 className={`${styles.catBtn} ${!currentCat ? styles.catActive : ''}`}
                 onClick={() => setFilter('')}
               >
-                <FaHandsPraying style={{marginRight:6}}/> सर्व लेख <span>{total}</span>
+                <FaHandsPraying style={{marginRight:6}}/> सर्व लेख <span>{categories.reduce((n, c) => n + Number(c.count || 0), 0) || total}</span>
               </button>
               {categories.map(c => (
                 <button
