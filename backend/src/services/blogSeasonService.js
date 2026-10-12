@@ -110,12 +110,13 @@ async function getTodaySeasonContext() {
 }
 
 // SQL fragments ranking posts by season relevance. Returns { score, label, params }
+// (no rules → score NULL: a bare "ORDER BY 0" is read by MySQL as column position 0 and fails)
 // where score/label are SQL expressions over blog_posts to put in SELECT/ORDER BY.
 const HAY = "(CONCAT_WS(' ', title, slug, CONVERT(CAST(tags AS CHAR) USING utf8mb4)) COLLATE utf8mb4_unicode_ci)";
 function seasonOrderSql(ctx) {
   const rules = ctx.seasons.map(s => ({ kw: s.kw, not: s.not, weight: s.weight, label: `${s.icon} ${s.name}` }));
   if (ctx.month) rules.push({ kw: ctx.month, weight: 100, label: `${ctx.month} मास` });
-  if (!rules.length) return { score: '0', label: 'NULL', params: [], labelParams: [] };
+  if (!rules.length) return { score: 'NULL', label: 'NULL', params: [], labelParams: [] };
   const whens = rules.map(r => (r.not
     ? `WHEN ${HAY} REGEXP ? AND NOT ${HAY} REGEXP ? THEN ?`
     : `WHEN ${HAY} REGEXP ? THEN ?`)).join(' ');

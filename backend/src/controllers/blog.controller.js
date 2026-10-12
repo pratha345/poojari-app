@@ -74,7 +74,7 @@ exports.list = async (req, res) => {
     // search results: best match first; otherwise festival-aware order
     const so = season ? seasonOrderSql(season)
       : ss ? { score: `(${ss.score})`, label: 'NULL', params: ss.scoreParams, labelParams: [] }
-      : { score: '0', label: 'NULL', params: [], labelParams: [] };
+      : { score: 'NULL', label: 'NULL', params: [], labelParams: [] };
     const [posts] = await pool.query(
       `SELECT id, title, slug, excerpt, image_url, author_name, category, tags, read_time, views, avg_rating, rating_count, created_at,
               ${so.label} AS season_label
