@@ -1,5 +1,6 @@
 // src/controllers/pujari.controller.js
 const pool = require('../config/db');
+const { getPolicy, bounds, resolvePrice, pricesForPujaris, pujariTenant, MAIN_TENANT } = require('../services/pricingService');
 const { success, error } = require('../utils/response.util');
 const { getCache, setCache, delCache } = require('../utils/redis');
 
@@ -321,7 +322,17 @@ exports.getMyPoojaServices = async (req, res) => {
        ORDER BY p.name_mr`,
       [pujari[0].id]
     );
-    return success(res, rows);
+    // the site's price (franchise or main) and the range a pujari may charge
+    const pj = await pujariTenant(pujari[0].id);
+    const tid = Number(pj?.tenant_id) || MAIN_TENANT;
+    const policy = await getPolicy(tid);
+    for (const r of rows) {
+      const site = await resolvePrice({ tenantId: tid, poojaId: r.id });
+      r.default_price = site.ok ? site.price : r.default_price;
+      const b = bounds(r.default_price, policy);
+      r.min_price = b.min; r.max_price = b.max;
+    }
+    return success(res, rows, policy.pujari_pricing ? undefined : 'तुमच्या साइटवर पुजाऱ्यांना स्वतःची किंमत ठेवण्याची परवानगी नाही.');
   } catch (err) {
     return error(res, 'सेवा यादी मिळवताना त्रुटी झाली.');
   }
@@ -335,6 +346,23 @@ exports.saveMyPoojaServices = async (req, res) => {
     if (!pujari.length) return error(res, 'प्रोफाईल सापडली नाही.', 404);
 
     const pujari_id = pujari[0].id;
+    const pj = await pujariTenant(pujari_id);
+    const tid = Number(pj?.tenant_id) || MAIN_TENANT;
+    const policy = await getPolicy(tid);
+
+    // a custom price must be allowed on this site and inside the super admin's range
+    const bad = [];
+    for (const s of services || []) {
+      if (!s.custom_price) continue;
+      if (!policy.pujari_pricing) return error(res, 'तुमच्या साइटवर पुजाऱ्यांना स्वतःची किंमत ठेवण्याची परवानगी नाही.', 403);
+      const site = await resolvePrice({ tenantId: tid, poojaId: s.pooja_id });
+      if (!site.ok) continue;
+      const b = bounds(site.price, policy);
+      const v = Number(s.custom_price);
+      if (!(v >= b.min && v <= b.max)) bad.push(`${site.pooja.name_mr} (₹${b.min}–₹${b.max})`);
+    }
+    if (bad.length) return error(res, `ही किंमत मर्यादेबाहेर आहे: ${bad.join(', ')}`, 400);
+
     await pool.query('DELETE FROM pujari_pooja_services WHERE pujari_id=?', [pujari_id]);
 
     if (services?.length) {
@@ -353,13 +381,14 @@ exports.saveMyPoojaServices = async (req, res) => {
 // ── Get Nearby Pujaris ────────────────────────────────────────
 exports.getNearbyPujaris = async (req, res) => {
   try {
-    const { city, district, lat, lng, limit = 6 } = req.query;
+    const { city, district, lat, lng, limit = 6, pooja_id } = req.query;
     const lim = parseInt(limit, 10);
 
-    // Tenant isolation — subdomain tenant sees only their pujaris
-    const tenantFilter = (req.tenantId && req.tenantId > 1)
-      ? `AND pp.tenant_id = ${parseInt(req.tenantId)}`
-      : '';
+    // Tenant isolation — every site (main included) lists only its own pujaris
+    const tid = parseInt(req.tenantId) || MAIN_TENANT;
+    const tenantFilter = `AND COALESCE((SELECT tpa.tenant_id FROM tenant_pujari_assignments tpa
+                                         WHERE tpa.pujari_id = pp.id AND tpa.is_active = 1 LIMIT 1),
+                                        pp.tenant_id, ${MAIN_TENANT}) = ${tid}`;
 
     const PUJARI_SELECT = `
       SELECT pp.id, pp.full_name, pp.city, pp.district,
@@ -371,6 +400,19 @@ exports.getNearbyPujaris = async (req, res) => {
       LEFT JOIN pujari_specializations ps ON pp.id = ps.pujari_id
       LEFT JOIN pooja_categories pc ON ps.category_id = pc.id`;
     const mapRow = p => ({ ...p, photo_url: resolveImageUrl(p.photo_url) });
+
+    // With ?pooja_id=, add each pujari's price and drop pujaris who don't do that pooja
+    const send = async (rows, extra = {}) => {
+      let data = rows.map(mapRow);
+      const pid = parseInt(pooja_id);
+      if (pid && data.length) {
+        const prices = await pricesForPujaris({ tenantId: tid, poojaId: pid, pujariIds: data.map(r => r.id) });
+        data = data.filter(r => prices.get(Number(r.id))?.offers !== false)
+                   .map(r => ({ ...r, price: prices.get(Number(r.id))?.price ?? null,
+                                price_source: prices.get(Number(r.id))?.source ?? null }));
+      }
+      return res.json({ success: true, data, ...extra });
+    };
 
     // ── GPS / coordinate-based search (Haversine) ─────────────
     if (lat && lng) {
@@ -393,7 +435,7 @@ exports.getNearbyPujaris = async (req, res) => {
            LIMIT ?`,
           [uLat, uLng, uLat, km, lim]
         );
-        if (rows.length > 0) return res.json({ success: true, data: rows.map(mapRow) });
+        if (rows.length > 0) return send(rows);
       }
 
       // No pujaris with coordinates at all → fall through to city search
@@ -412,7 +454,7 @@ exports.getNearbyPujaris = async (req, res) => {
            LIMIT ?`,
           [`%${city}%`, lim]
         );
-        if (rows.length > 0) return res.json({ success: true, data: rows.map(mapRow) });
+        if (rows.length > 0) return send(rows);
       }
 
       // Tier 2: district match (same jilla — broader but still local)
@@ -426,7 +468,7 @@ exports.getNearbyPujaris = async (req, res) => {
            LIMIT ?`,
           [`%${district}%`, lim]
         );
-        if (rows.length > 0) return res.json({ success: true, data: rows.map(mapRow) });
+        if (rows.length > 0) return send(rows);
       }
     }
 
@@ -440,7 +482,7 @@ exports.getNearbyPujaris = async (req, res) => {
        LIMIT ?`,
       [lim]
     );
-    return res.json({ success: true, data: anyPujaris.map(mapRow), fallback: true });
+    return send(anyPujaris, { fallback: true });
   } catch (err) {
     return res.json({ success: true, data: [] });
   }
@@ -474,8 +516,24 @@ exports.getPublicProfile = async (req, res) => {
       [id]
     );
 
+    // a franchise's pujari is not shown on another site
+    const tid = parseInt(req.tenantId) || MAIN_TENANT;
+    const pj = await pujariTenant(id);
+    if (Number(pj?.tenant_id) !== tid) return error(res, 'पुजारी सापडला नाही.', 404);
+
+    // pooja services with this pujari's price on this site (empty = all poojas at the site price)
+    const [svc] = await pool.query(
+      `SELECT pps.pooja_id, p.name_mr, p.slug FROM pujari_pooja_services pps
+         JOIN poojas p ON p.id = pps.pooja_id AND p.is_active = TRUE
+        WHERE pps.pujari_id = ? ORDER BY p.name_mr`, [id]);
+    const services = [];
+    for (const s of svc) {
+      const r = await resolvePrice({ tenantId: tid, poojaId: s.pooja_id, pujariId: id });
+      if (r.ok) services.push({ pooja_id: s.pooja_id, name_mr: s.name_mr, slug: s.slug, price: r.price, source: r.source });
+    }
+
     const p = rows[0];
-    return success(res, { ...p, photo_url: resolveImageUrl(p.photo_url), past_pujas: pastPujas });
+    return success(res, { ...p, photo_url: resolveImageUrl(p.photo_url), past_pujas: pastPujas, services });
   } catch (err) {
     return error(res, 'प्रोफाईल मिळवताना त्रुटी झाली.');
   }

@@ -2,6 +2,8 @@
 const bcrypt = require('bcryptjs');
 const pool   = require('../config/db');
 const { success, error } = require('../utils/response.util');
+const { getPolicy, cleanPolicy } = require('../services/pricingService');
+const { delCachePattern } = require('../utils/redis');
 
 // ── Platform-wide Stats ───────────────────────────────────────
 exports.getStats = async (req, res) => {
@@ -314,5 +316,37 @@ exports.getAllUsers = async (req, res) => {
     return success(res, { rows, total, page: parseInt(page), limit: parseInt(limit) });
   } catch (err) {
     return error(res, 'Users मिळवताना त्रुटी झाली.');
+  }
+};
+
+// ── Pricing policy per tenant (super admin decides what a franchise may charge) ──
+// GET /api/superadmin/tenants/:id/pricing-policy
+exports.getPricingPolicy = async (req, res) => {
+  try {
+    const [[t]] = await pool.query('SELECT id FROM tenants WHERE id = ?', [req.params.id]);
+    if (!t) return error(res, 'Tenant सापडला नाही.', 404);
+    return success(res, await getPolicy(t.id));
+  } catch (err) {
+    return error(res, 'किंमत धोरण मिळवताना त्रुटी झाली.');
+  }
+};
+
+// PUT /api/superadmin/tenants/:id/pricing-policy
+// Body: { tenant_pricing, pujari_pricing, min_pct, max_pct, commission_pct }
+exports.updatePricingPolicy = async (req, res) => {
+  try {
+    const [[t]] = await pool.query('SELECT id FROM tenants WHERE id = ?', [req.params.id]);
+    if (!t) return error(res, 'Tenant सापडला नाही.', 404);
+    const b = req.body || {};
+    if (b.min_pct != null && (b.min_pct < 0 || b.min_pct > 100)) return error(res, 'किमान % 0 ते 100 असावा.', 400);
+    if (b.max_pct != null && b.max_pct < 100) return error(res, 'कमाल % 100 किंवा जास्त असावा.', 400);
+    if (b.commission_pct != null && (b.commission_pct < 0 || b.commission_pct > 50)) return error(res, 'Commission 0 ते 50% असावे.', 400);
+    const policy = cleanPolicy({ ...(await getPolicy(t.id)), ...b });
+    await pool.query('UPDATE tenants SET pricing_policy = ? WHERE id = ?', [JSON.stringify(policy), t.id]);
+    await delCachePattern('pooja:list:*');
+    return success(res, policy, 'किंमत धोरण जतन केले. ✅');
+  } catch (err) {
+    console.error('updatePricingPolicy error:', err);
+    return error(res, 'किंमत धोरण जतन करताना त्रुटी झाली.');
   }
 };

@@ -16,6 +16,8 @@ export const poojaAPI = {
   getCategories: () => api.get('/poojas/categories'),
   getPoojas:     (params) => api.get('/poojas', { params }),
   getPoojaBySlug:(slug) => api.get(`/poojas/${slug}`),
+  // final price on this site, optionally for a chosen pujari
+  getPrice:      (id, pujariId) => api.get(`/poojas/price/${id}`, { params: pujariId ? { pujari_id: pujariId } : {} }),
   createPooja:   (data) => api.post('/poojas', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   updatePooja:   (id, data) => api.put(`/poojas/${id}`, data),
   uploadPoojaImage: (id, file) => {
@@ -254,6 +256,8 @@ export const superadminAPI = {
   deleteTenant:  (id)      => api.delete(`/superadmin/tenants/${id}`),
   getTenantStats:(id)      => api.get(`/superadmin/tenants/${id}/stats`),
   updatePlan:    (id, data)=> api.patch(`/superadmin/tenants/${id}/plan`, data),
+  getPricingPolicy:    (id)       => api.get(`/superadmin/tenants/${id}/pricing-policy`),
+  updatePricingPolicy: (id, data) => api.put(`/superadmin/tenants/${id}/pricing-policy`, data),
   getAllUsers:    (params)  => api.get('/superadmin/users', { params }),
   getRevenue:    (params)  => api.get('/superadmin/revenue', { params }),
 };

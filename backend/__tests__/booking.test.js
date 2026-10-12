@@ -70,6 +70,7 @@ describe('POST /api/bookings — Create booking', () => {
     pool.query
       .mockResolvedValueOnce([[MOCK_USER]])                              // authenticate
       .mockResolvedValueOnce([[MOCK_POOJA]])                             // get pooja
+      .mockResolvedValueOnce([[{ pricing_policy: null }]])               // site pricing policy
       .mockResolvedValueOnce([{ insertId: 100, affectedRows: 1 }]);      // INSERT
 
     const res = await request(app)
@@ -91,6 +92,7 @@ describe('POST /api/bookings — Create booking', () => {
     pool.query
       .mockResolvedValueOnce([[MOCK_USER]])
       .mockResolvedValueOnce([[MOCK_POOJA]])   // price = 1500
+      .mockResolvedValueOnce([[{ pricing_policy: null }]])   // default policy: 5% commission
       .mockResolvedValueOnce([{ insertId: 100, affectedRows: 1 }]);
 
     await request(app)
@@ -99,7 +101,7 @@ describe('POST /api/bookings — Create booking', () => {
       .send(validPayload);
 
     // INSERT call — check platform_fee=75, pujari_amount=1425
-    const insertCall = pool.query.mock.calls[2];
+    const insertCall = pool.query.mock.calls[3];
     const values = insertCall[1];
     expect(values[10]).toBe(75);    // platform_fee  = round(1500 * 0.05)
     expect(values[11]).toBe(1425);  // pujari_amount = 1500 - 75

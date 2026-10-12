@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const { success, error } = require('../utils/response.util');
 const { notifyAdminNewBooking } = require('../services/notificationService');
 const { delCache, delCachePattern } = require('../utils/redis');
+const { resolvePrice } = require('../services/pricingService');
 
 // Generate short booking code
 const genCode = () => 'POJ' + Date.now().toString(36).toUpperCase().slice(-6);
@@ -17,16 +18,15 @@ exports.createBooking = async (req, res) => {
     if (!pooja_id || !booking_date || !booking_time || !address?.trim())
       return error(res, 'सर्व आवश्यक माहिती भरा.', 400);
 
-    // Get pooja price
-    const [poojas] = await pool.query('SELECT * FROM poojas WHERE id = ?', [pooja_id]);
-    if (!poojas.length) return error(res, 'पूजा सापडली नाही.', 404);
-
-    const pooja = poojas[0];
-    const platform_fee = Math.round(pooja.price * 0.05); // 5% platform fee
-    const pujari_amount = pooja.price - platform_fee;
-    const booking_code = genCode();
-    const tenant_id = pooja.tenant_id || null;
+    // Price for this site (franchise) and, if chosen, this pujari — same rules the pages show
     const prefPujariId = preferred_pujari_id ? Number(preferred_pujari_id) : null;
+    const tenant_id    = req.tenantId || 1;
+    const priced = await resolvePrice({ tenantId: tenant_id, poojaId: pooja_id, pujariId: prefPujariId });
+    if (!priced.ok) return error(res, priced.reason, priced.status || 400);
+
+    const pooja = { ...priced.pooja, price: priced.price };
+    const { platform_fee, pujari_amount } = priced;
+    const booking_code = genCode();
 
     const [result] = await pool.query(
       `INSERT INTO bookings

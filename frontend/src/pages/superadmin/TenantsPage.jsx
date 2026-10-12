@@ -130,6 +130,26 @@ export default function TenantsPage() {
   const [editId, setEditId]       = useState(null);
   const [form, setForm]           = useState(EMPTY_FORM);
   const [nginxTenant, setNginxTenant] = useState(null);
+  // pricing policy: what this franchise and its pujaris may charge
+  const [priceTenant, setPriceTenant] = useState(null);
+  const [policy,      setPolicy]      = useState(null);
+  const [policySaving,setPolicySaving]= useState(false);
+
+  const openPricing = async (t) => {
+    setPriceTenant(t); setPolicy(null);
+    try { setPolicy((await superadminAPI.getPricingPolicy(t.id)).data.data); }
+    catch { toast.error('किंमत धोरण लोड झाले नाही.'); setPriceTenant(null); }
+  };
+  const savePricing = async () => {
+    setPolicySaving(true);
+    try {
+      const r = await superadminAPI.updatePricingPolicy(priceTenant.id, policy);
+      setPolicy(r.data.data);
+      toast.success(r.data.message || 'जतन केले');
+      setPriceTenant(null);
+    } catch (err) { toast.error(err.response?.data?.message || 'जतन करताना त्रुटी.'); }
+    finally { setPolicySaving(false); }
+  };
   const [copied, setCopied]       = useState(false);
 
   // Upgrade requests
@@ -428,6 +448,12 @@ export default function TenantsPage() {
                         >💳 Plan</button>
                         <button
                           className="btn btn-secondary btn-sm"
+                          title="किंमत धोरण — franchise व पुजाऱ्यांच्या किमतींचे अधिकार"
+                          onClick={() => openPricing(t)}
+                          style={{ background: '#2e7d32', color: '#fff', borderColor: '#2e7d32' }}
+                        >₹ किंमत</button>
+                        <button
+                          className="btn btn-secondary btn-sm"
                           title="Nginx Config"
                           onClick={() => { setNginxTenant(t); setCopied(false); }}
                           style={{ background: '#1a1a2e', color: '#fff', borderColor: '#1a1a2e' }}
@@ -652,6 +678,61 @@ export default function TenantsPage() {
           </div>
         </div>
       )}
+      {/* ── Pricing Policy Modal ── */}
+      {priceTenant && (
+        <div className={s.overlay} onClick={e => e.target === e.currentTarget && setPriceTenant(null)}>
+          <div className={s.modal} style={{ maxWidth: 520 }}>
+            <h2 className={s.modalTitle}>₹ किंमत धोरण — {priceTenant.name}</h2>
+            {!policy ? <p>लोड होत आहे...</p> : (
+              <>
+                <p style={{ fontSize: 13, color: '#666', marginTop: -10, marginBottom: 16 }}>
+                  {priceTenant.id === 1
+                    ? 'मुख्य साइट: मूळ किमती "पूजा व्यवस्थापन" मधून बदलतात. इथे पुजाऱ्यांच्या किमती व commission ठरवा.'
+                    : 'या franchise च्या किमती फक्त त्यांच्याच साइटवर लागतात; मुख्य साइटवर काहीही बदलत नाही.'}
+                </p>
+                {priceTenant.id !== 1 && (
+                  <label style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 12 }}>
+                    <input type="checkbox" checked={policy.tenant_pricing}
+                      onChange={e => setPolicy(p => ({ ...p, tenant_pricing: e.target.checked }))} />
+                    <span>Franchise ला स्वतःच्या पूजा-किमती ठेवण्याची परवानगी</span>
+                  </label>
+                )}
+                <label style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 16 }}>
+                  <input type="checkbox" checked={policy.pujari_pricing}
+                    onChange={e => setPolicy(p => ({ ...p, pujari_pricing: e.target.checked }))} />
+                  <span>पुजाऱ्यांना स्वतःची किंमत ठेवण्याची परवानगी (ग्राहकाने त्यांना निवडल्यावर लागते)</span>
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                  <label style={{ fontSize: 13 }}>किमान % (मूळ किमतीच्या)
+                    <input className={s.input} type="number" min="0" max="100" value={policy.min_pct}
+                      onChange={e => setPolicy(p => ({ ...p, min_pct: Number(e.target.value) }))} />
+                  </label>
+                  <label style={{ fontSize: 13 }}>कमाल %
+                    <input className={s.input} type="number" min="100" value={policy.max_pct}
+                      onChange={e => setPolicy(p => ({ ...p, max_pct: Number(e.target.value) }))} />
+                  </label>
+                  <label style={{ fontSize: 13 }}>Platform commission %
+                    <input className={s.input} type="number" min="0" max="50" value={policy.commission_pct}
+                      onChange={e => setPolicy(p => ({ ...p, commission_pct: Number(e.target.value) }))} />
+                  </label>
+                </div>
+                <p style={{ fontSize: 12, color: '#888', marginTop: 10 }}>
+                  उदा. मूळ किंमत ₹2,000 असेल तर franchise/पुजारी ₹{Math.ceil(2000 * policy.min_pct / 100).toLocaleString('mr-IN')} ते
+                  ₹{Math.floor(2000 * policy.max_pct / 100).toLocaleString('mr-IN')} यातच किंमत ठेवू शकतात.
+                  मर्यादेबाहेरची किंमत आपोआप लागू होत नाही.
+                </p>
+              </>
+            )}
+            <div className={s.modalActions}>
+              <button className="btn btn-secondary" onClick={() => setPriceTenant(null)}>रद्द करा</button>
+              <button className="btn btn-primary" onClick={savePricing} disabled={!policy || policySaving}>
+                {policySaving ? 'जतन होत आहे...' : '💾 जतन करा'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Nginx Config Modal ── */}
       {nginxTenant && (
         <div className={s.overlay} onClick={e => e.target === e.currentTarget && setNginxTenant(null)}>

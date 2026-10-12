@@ -240,6 +240,26 @@ export default function PujariProfile() {
                 </section>
               )}
 
+              {/* ── Poojas he does, with his price on this site ── */}
+              {profile.services?.length > 0 && (
+                <section className={styles.card}>
+                  <h2 className={styles.cardTitle}>🪔 पूजा व दक्षिणा</h2>
+                  <div className={styles.pastList}>
+                    {profile.services.map(s => (
+                      <button key={s.pooja_id} type="button" className={styles.pastItem}
+                        style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left' }}
+                        onClick={() => navigate(`/booking/${s.slug}`, { state: { pujariId: id, pujariName: profile.full_name } })}>
+                        <span className={styles.pastIcon}>🪔</span>
+                        <span style={{ flex: 1 }}>{s.name_mr}</span>
+                        <strong style={{ color: s.source === 'pujari' ? '#2e7d32' : '#7c2d00' }}>
+                          ₹{Number(s.price).toLocaleString('mr-IN')}
+                        </strong>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {/* ── Past Pujas ───────────────────────────── */}
               {pastPujas.length > 0 && (
                 <section className={styles.card}>

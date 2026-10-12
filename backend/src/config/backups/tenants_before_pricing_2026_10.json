@@ -1,0 +1,27 @@
+[
+ {
+  "id": 1,
+  "name": "Default Tenant",
+  "slug": "default",
+  "domain": "localhost",
+  "phone": null,
+  "city": null,
+  "contact_name": null,
+  "logo_url": null,
+  "plan": "basic",
+  "trial_ends_at": null,
+  "plan_expires_at": "2026-06-21T20:02:11.000Z",
+  "is_active": 1,
+  "created_at": "2026-04-27T13:12:42.000Z",
+  "updated_at": "2026-07-01T12:31:04.000Z",
+  "features": {
+   "blog": true,
+   "halls": true,
+   "theme": true,
+   "granth": true,
+   "kundali": true,
+   "whatsapp": true,
+   "dharmasindhu": true
+  }
+ }
+]

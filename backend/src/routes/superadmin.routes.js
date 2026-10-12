@@ -13,6 +13,8 @@ router.put('/tenants/:id',            ...guard, ctrl.updateTenant);
 router.patch('/tenants/:id/plan',     ...guard, ctrl.updatePlan);
 router.delete('/tenants/:id',         ...guard, ctrl.deleteTenant);
 router.get('/tenants/:id/stats',      ...guard, ctrl.getTenantStats);
+router.get('/tenants/:id/pricing-policy', ...guard, ctrl.getPricingPolicy);
+router.put('/tenants/:id/pricing-policy', ...guard, ctrl.updatePricingPolicy);
 router.get('/users',                  ...guard, ctrl.getAllUsers);
 router.get('/revenue',                ...guard, ctrl.getRevenueReport);
 

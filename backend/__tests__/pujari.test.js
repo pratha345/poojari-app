@@ -571,7 +571,9 @@ describe('GET /api/pujari/:id — Public profile', () => {
       .mockResolvedValueOnce([[MOCK_PUJARI_PROFILE]])   // profile query
       .mockResolvedValueOnce([[                         // past pujas
         { pooja_name: 'सत्यनारायण पूजा', booking_date: '2026-05-01' },
-      ]]);
+      ]])
+      .mockResolvedValueOnce([[{ id: 10, status: 'approved', tenant_id: 1 }]]) // pujari's site
+      .mockResolvedValueOnce([[]]); // no service list
 
     const res = await request(app).get('/api/pujari/10');
 
@@ -598,7 +600,9 @@ describe('GET /api/pujari/:id — Public profile', () => {
         ...MOCK_PUJARI_PROFILE,
         photo_url: 'https://cdn.example.com/uploads/pujari-1.jpg',
       }]])
-      .mockResolvedValueOnce([[]]); // no past pujas
+      .mockResolvedValueOnce([[]]) // no past pujas
+      .mockResolvedValueOnce([[{ id: 10, status: 'approved', tenant_id: 1 }]]) // pujari's site
+      .mockResolvedValueOnce([[]]); // no service list
 
     const res = await request(app).get('/api/pujari/10');
 
@@ -608,7 +612,9 @@ describe('GET /api/pujari/:id — Public profile', () => {
   it('returns empty past_pujas when no completed bookings', async () => {
     pool.query
       .mockResolvedValueOnce([[MOCK_PUJARI_PROFILE]])
-      .mockResolvedValueOnce([[]]); // no past pujas
+      .mockResolvedValueOnce([[]]) // no past pujas
+      .mockResolvedValueOnce([[{ id: 10, status: 'approved', tenant_id: 1 }]]) // pujari's site
+      .mockResolvedValueOnce([[]]); // no service list
 
     const res = await request(app).get('/api/pujari/10');
 

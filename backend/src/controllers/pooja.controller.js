@@ -2,6 +2,7 @@
 const pool = require('../config/db');
 const { success, error }                         = require('../utils/response.util');
 const { getCache, setCache, delCache, delCachePattern } = require('../utils/redis');
+const { getPolicy, resolvePrice, MAIN_TENANT } = require('../services/pricingService');
 
 const CAT_KEY  = 'pooja:categories';
 const CAT_TTL  = 60 * 60;       // 1 hour
@@ -49,16 +50,30 @@ exports.getPoojas = async (req, res) => {
     const listKey = `pooja:list:${JSON.stringify({ category, featured, search, min_price, max_price, page, limit, tenant_slug, tid: req.tenantId })}`;
     const cachedList = await getCache(listKey);
     if (cachedList) return success(res, cachedList);
+    // Which site is asking: subdomain/header tenant, else ?tenant_slug=, else the main site
+    let tid = req.tenantId || MAIN_TENANT;
+    if (tid === MAIN_TENANT && tenant_slug) {
+      const [[t]] = await pool.query('SELECT id FROM tenants WHERE slug = ? AND is_active = TRUE', [tenant_slug]);
+      if (t) tid = t.id;
+    }
+
+    // A franchise shows the shared catalogue with its own prices; it can hide poojas.
+    // The main site never reads franchise prices.
+    let priceExpr = 'p.price', samagriExpr = 'p.samagri_price', join = '';
+    const joinParams = [];
     let where = ['p.is_active = TRUE'];
     const params = [];
-
-    // Tenant isolation — subdomain tenant sees only their poojas
-    if (req.tenantId && req.tenantId > 1) {
-      where.push('p.tenant_id = ?');
-      params.push(req.tenantId);
-    } else if (tenant_slug) {
-      where.push('p.tenant_id = (SELECT id FROM tenants WHERE slug = ? AND is_active = TRUE LIMIT 1)');
-      params.push(tenant_slug);
+    if (tid !== MAIN_TENANT) {
+      const pol = await getPolicy(tid);
+      join = 'LEFT JOIN tenant_puja_config tpc ON tpc.pooja_id = p.id AND tpc.tenant_id = ?';
+      joinParams.push(tid);
+      where.push('(tpc.is_enabled IS NULL OR tpc.is_enabled = 1)');
+      if (pol.tenant_pricing) {
+        priceExpr = `CASE WHEN tpc.custom_price BETWEEN CEIL(p.price * ${pol.min_pct} / 100)
+                                                 AND FLOOR(p.price * ${pol.max_pct} / 100)
+                          THEN tpc.custom_price ELSE p.price END`;
+        samagriExpr = 'COALESCE(tpc.custom_samagri_price, p.samagri_price)';
+      }
     }
 
     if (category) {
@@ -72,29 +87,31 @@ exports.getPoojas = async (req, res) => {
       where.push('(p.name_mr LIKE ? OR p.short_desc LIKE ?)');
       params.push(`%${search}%`, `%${search}%`);
     }
-    if (min_price) { where.push('p.price >= ?'); params.push(min_price); }
-    if (max_price) { where.push('p.price <= ?'); params.push(max_price); }
+    if (min_price) { where.push(`${priceExpr} >= ?`); params.push(min_price); }
+    if (max_price) { where.push(`${priceExpr} <= ?`); params.push(max_price); }
 
     const offset = (page - 1) * limit;
     const whereClause = where.join(' AND ');
 
     const [rows] = await pool.query(
       `SELECT p.id, p.name_mr, p.name_en, p.slug, p.short_desc,
-              p.price, p.samagri_price, p.duration_hrs, p.image_url, p.is_featured,
+              ${priceExpr} AS price, ${samagriExpr} AS samagri_price, p.duration_hrs, p.image_url, p.is_featured,
               c.name_mr AS category_name, c.slug AS category_slug
        FROM poojas p
        JOIN pooja_categories c ON p.category_id = c.id
+       ${join}
        WHERE ${whereClause}
        ORDER BY p.is_featured DESC, p.id
        LIMIT ? OFFSET ?`,
-      [...params, parseInt(limit), parseInt(offset)]
+      [...joinParams, ...params, parseInt(limit), parseInt(offset)]
     );
 
     const [[{ total }]] = await pool.query(
       `SELECT COUNT(*) AS total FROM poojas p
        JOIN pooja_categories c ON p.category_id = c.id
+       ${join}
        WHERE ${whereClause}`,
-      params
+      [...joinParams, ...params]
     );
 
     const listData = {
@@ -137,18 +154,15 @@ exports.getPoojaBySlug = async (req, res) => {
 
     const pooja = { ...rows[0] };
 
-    // ── Tenant price override ──────────────────────────────────
+    // ── Franchise price / availability (same rules as booking) ──
     if (isTenant) {
+      const priced = await resolvePrice({ tenantId, poojaId: pooja.id });
+      if (!priced.ok) return error(res, priced.reason, 404);
+      pooja.price         = priced.price;
+      pooja.samagri_price = priced.samagri_price;
       const [[cfg]] = await pool.query(
-        'SELECT custom_price, custom_samagri_price, is_enabled, custom_desc_mr FROM tenant_puja_config WHERE tenant_id = ? AND pooja_id = ?',
-        [tenantId, pooja.id]
-      );
-      if (cfg) {
-        if (cfg.is_enabled === 0) return error(res, 'ही पूजा या ठिकाणी उपलब्ध नाही.', 404);
-        if (cfg.custom_price        != null) pooja.price         = cfg.custom_price;
-        if (cfg.custom_samagri_price!= null) pooja.samagri_price = cfg.custom_samagri_price;
-        if (cfg.custom_desc_mr)              pooja.description    = cfg.custom_desc_mr;
-      }
+        'SELECT custom_desc_mr FROM tenant_puja_config WHERE tenant_id = ? AND pooja_id = ?', [tenantId, pooja.id]);
+      if (cfg?.custom_desc_mr) pooja.description = cfg.custom_desc_mr;
     }
 
     // ── Samagri: tenant override → global fallback ─────────────
@@ -191,6 +205,32 @@ exports.getPoojaBySlug = async (req, res) => {
     console.error('getPoojaBySlug error:', err);
     return error(res, 'पूजा तपशील मिळवताना त्रुटी झाली.');
   }
+};
+
+// ── Price for this site, optionally with a chosen pujari ────────
+// GET /api/poojas/price/:id?pujari_id=
+exports.getPoojaPrice = async (req, res) => {
+  try {
+    const poojaId  = parseInt(req.params.id);
+    const pujariId = req.query.pujari_id ? parseInt(req.query.pujari_id) : null;
+    if (!poojaId) return error(res, 'पूजा ID चुकीचा आहे.', 400);
+    const r = await resolvePrice({ tenantId: req.tenantId || MAIN_TENANT, poojaId, pujariId });
+    if (!r.ok) return error(res, r.reason, 404);
+    return success(res, {
+      pooja_id: poojaId, pujari_id: pujariId, price: r.price, samagri_price: r.samagri_price,
+      source: r.source, site_price: r.tenant_price ?? r.base_price,
+    });
+  } catch (err) {
+    console.error('getPoojaPrice error:', err);
+    return error(res, 'किंमत मिळवताना त्रुटी झाली.');
+  }
+};
+
+// ── Main catalogue is edited only from the main site ──────────
+// Franchise admins set their own prices in tenant-config; they must not change ours.
+exports.mainSiteOnly = (req, res, next) => {
+  if (req.user?.role === 'super_admin' || (req.user?.tenant_id || MAIN_TENANT) === MAIN_TENANT) return next();
+  return error(res, 'मुख्य पूजा यादी फक्त मुख्य साइटवरून बदलता येते. तुमच्या किमती "पूजा सेटिंग्ज" मध्ये ठेवा.', 403);
 };
 
 // ── Admin: Create Pooja ───────────────────────────────────────

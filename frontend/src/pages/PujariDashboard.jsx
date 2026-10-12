@@ -296,11 +296,13 @@ function PoojaServicesManager() {
   const [poojas,  setPoojas]  = useState([]);
   const [selected,setSelected]= useState({}); // { pooja_id: custom_price|'' }
   const [saving,  setSaving]  = useState(false);
+  const [notice,  setNotice]  = useState(''); // e.g. own prices not allowed on this site
 
   useEffect(() => {
     pujariAPI.getMyServices()
       .then(r => {
         const list = r.data.data || [];
+        if (r.data.message && r.data.message !== 'यशस्वी') setNotice(r.data.message);
         setPoojas(list);
         const init = {};
         list.filter(p => p.is_offered).forEach(p => {
@@ -329,7 +331,7 @@ function PoojaServicesManager() {
       }));
       await pujariAPI.saveMyServices(services);
       toast.success('सेवा यादी जतन केली! 🙏');
-    } catch { toast.error('जतन करताना त्रुटी.'); }
+    } catch (err) { toast.error(err.response?.data?.message || 'जतन करताना त्रुटी.'); }
     finally { setSaving(false); }
   };
 
@@ -337,7 +339,8 @@ function PoojaServicesManager() {
     <div className={styles.availSection}>
       <div className={styles.availHeader}>
         <h2>🪔 माझ्या पूजा सेवा</h2>
-        <p>तुम्ही कोणत्या पूजा करता ते निवडा. वेगळी किंमत असल्यास टाका.</p>
+        <p>तुम्ही कोणत्या पूजा करता ते निवडा. वेगळी किंमत असल्यास टाका — ग्राहकाने तुम्हाला निवडल्यावर हीच किंमत लागेल.</p>
+        {notice && <p style={{ color: '#b71c1c', fontWeight: 600 }}>{notice}</p>}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
         {poojas.map(p => (
@@ -354,10 +357,15 @@ function PoojaServicesManager() {
               style={{ width: 18, height: 18, cursor: 'pointer' }}
             />
             <span style={{ flex: 1, fontWeight: 500 }}>{p.name_mr}</span>
-            <span style={{ color: '#999', fontSize: 13 }}>Default: ₹{p.default_price}</span>
-            {selected[p.id] !== undefined && (
+            <span style={{ color: '#999', fontSize: 13 }}>
+              साइटची किंमत: ₹{p.default_price}
+              {p.min_price != null && <> · मर्यादा ₹{p.min_price}–₹{p.max_price}</>}
+            </span>
+            {selected[p.id] !== undefined && !notice && (
               <input
                 type="number"
+                min={p.min_price ?? undefined}
+                max={p.max_price ?? undefined}
                 placeholder="माझी किंमत (optional)"
                 value={selected[p.id]}
                 onChange={e => setSelected(s => ({ ...s, [p.id]: e.target.value }))}

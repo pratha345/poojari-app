@@ -15,7 +15,11 @@ export default function TenantPujaConfig() {
 
   useEffect(() => {
     tenantConfigAPI.getPujaConfig()
-      .then(r => setPoojas(r.data.data || []))
+      .then(r => {
+        setPoojas(r.data.data || []);
+        // super admin may have switched franchise pricing off
+        if (r.data.message && r.data.message !== 'यशस्वी') toast(r.data.message, { icon: '🔒', duration: 6000 });
+      })
       .catch(() => toast.error('पूजा config लोड करता आली नाही.'))
       .finally(() => setLoading(false));
   }, []);
@@ -35,8 +39,8 @@ export default function TenantPujaConfig() {
         is_enabled:           pooja.is_enabled,
       });
       toast.success(`${pooja.name_mr} — config जतन केला! ✅`);
-    } catch {
-      toast.error('जतन करता आला नाही.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'जतन करता आला नाही.');
     } finally {
       setSaving(null);
     }
@@ -158,9 +162,12 @@ export default function TenantPujaConfig() {
                         onChange={e => handleChange(pooja.id, 'custom_price', e.target.value)}
                         placeholder={pooja.global_price}
                         className="w-28 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-                        min="0"
+                        min={pooja.min_price ?? 0}
+                        max={pooja.max_price ?? undefined}
                       />
-                      <span className="text-xs text-gray-400">किंमत</span>
+                      <span className="text-xs text-gray-400">
+                        किंमत{pooja.min_price != null && ` (₹${pooja.min_price}–₹${pooja.max_price})`}
+                      </span>
                     </div>
 
                     {/* Save */}

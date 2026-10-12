@@ -50,6 +50,9 @@ export default function Booking() {
   const preferredPujariName = navState?.pujariName || null;
   const { isAuthenticated, login } = useAuth();
   const [pooja,     setPooja]     = useState(null);
+  // chosen pujari: his price for this pooja, or why he can't be booked for it
+  const [pujariNote, setPujariNote] = useState('');
+  const [pujariOk,   setPujariOk]   = useState(true);
   const [loading,   setLoading]   = useState(true);
   const [submitting,setSubmitting]= useState(false);
   // step 0=OTP (if not logged in), 1=details, 2=confirm, 3=success
@@ -89,7 +92,20 @@ export default function Booking() {
 
   useEffect(() => {
     poojaAPI.getPoojaBySlug(slug)
-      .then(r => setPooja(r.data.data))
+      .then(async r => {
+        const p = r.data.data;
+        if (preferredPujariId) {
+          try {
+            const pr = (await poojaAPI.getPrice(p.id, preferredPujariId)).data.data;
+            p.price = pr.price;
+            if (pr.source === 'pujari') setPujariNote(`या पुजाऱ्यांची किंमत (साइटची किंमत ₹${Number(pr.site_price).toLocaleString('mr-IN')})`);
+          } catch (e) {
+            setPujariOk(false);
+            setPujariNote(`${e.response?.data?.message || 'हे पुजारी उपलब्ध नाहीत.'} बुकिंगनंतर आम्ही योग्य पुजारी नियुक्त करू.`);
+          }
+        }
+        setPooja(p);
+      })
       .catch(() => navigate('/pooja'))
       .finally(() => setLoading(false));
   }, [slug]);
@@ -210,10 +226,12 @@ export default function Booking() {
         district:      form.district,
         special_notes: form.special_notes,
       };
-      if (preferredPujariId) payload.preferred_pujari_id = preferredPujariId;
+      if (preferredPujariId && pujariOk) payload.preferred_pujari_id = preferredPujariId;
       const res = await bookingAPI.create(payload);
       setBookingCode(res.data.data.booking_code);
       setBookingId(res.data.data.booking_id);
+      // show exactly what the server charged
+      if (res.data.data.total_amount != null) setPooja(p => ({ ...p, price: res.data.data.total_amount }));
       setStep(3); // payment step
       toast.success('बुकिंग नोंदणी झाली! 🙏');
     } catch (err) {
@@ -383,6 +401,9 @@ export default function Booking() {
                       <div>
                         <div style={{ fontSize: 12, color: '#888' }}>पसंतीचे पुजारी</div>
                         <div style={{ fontWeight: 700, color: '#7c2d00' }}>{preferredPujariName}</div>
+                        {pujariNote && (
+                          <div style={{ fontSize: 12, marginTop: 2, color: pujariOk ? '#2e7d32' : '#b71c1c' }}>{pujariNote}</div>
+                        )}
                       </div>
                     </div>
                   )}

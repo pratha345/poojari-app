@@ -8,6 +8,8 @@ const { checkPlanExpiry } = require('../middleware/planExpiry.middleware');
 const { adminLimiter } = require('../middleware/security.middleware');
 
 // admin = tenant admin; super_admin also passes (authorize skips for super_admin)
+// shared catalogue (consultation services) — only the main site may change it
+const { mainSiteOnly } = require('../controllers/pooja.controller');
 const admin = [adminLimiter, authenticate, attachTenant, checkPlanExpiry, authorize('admin')];
 
 // ── Push Notifications ─────────────────────────────────────────
@@ -49,9 +51,9 @@ router.get ('/consultations',                    ...admin, ctrl.getConsultations
 router.put ('/consultations/:id/note',           ...admin, ctrl.updateConsultationNote);
 // Consultation Services (parameterized)
 router.get ('/consultation-services',            ...admin, ctrl.getConsultationServices);
-router.post('/consultation-services',            ...admin, ctrl.createConsultationService);
-router.put ('/consultation-services/:id',        ...admin, ctrl.updateConsultationService);
-router.patch('/consultation-services/:id/toggle',...admin, ctrl.toggleConsultationService);
+router.post('/consultation-services',            ...admin, mainSiteOnly, ctrl.createConsultationService);
+router.put ('/consultation-services/:id',        ...admin, mainSiteOnly, ctrl.updateConsultationService);
+router.patch('/consultation-services/:id/toggle',...admin, mainSiteOnly, ctrl.toggleConsultationService);
 
 // ── Hall Management ────────────────────────────────────────────
 router.get('/halls',         ...admin, hallCtrl.getAllHallsAdmin);

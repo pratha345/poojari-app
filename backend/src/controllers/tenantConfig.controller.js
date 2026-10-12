@@ -5,6 +5,8 @@
 'use strict';
 const pool = require('../config/db');
 const { success, error } = require('../utils/response.util');
+const { delCachePattern } = require('../utils/redis');
+const { getPolicy, bounds, pujariTenant, MAIN_TENANT } = require('../services/pricingService');
 
 // ════════════════════════════════════════════════════════════════════
 // SECTION A: PUJA CONFIG (price / enable overrides per tenant)
@@ -56,7 +58,13 @@ exports.getPujaConfig = async (req, res) => {
       ORDER BY c.sort_order, p.is_featured DESC, p.name_mr
     `, [tenantId]);
 
-    return success(res, rows);
+    const policy = await getPolicy(tenantId);
+    for (const r of rows) {
+      const b = bounds(Number(r.global_price), policy);
+      r.min_price = b.min; r.max_price = b.max;
+    }
+    return success(res, rows, policy.tenant_pricing ? undefined
+      : 'तुमच्या साइटला स्वतःच्या किमती ठेवण्याची परवानगी नाही (super admin ने बंद केले आहे).');
   } catch (err) {
     console.error('getPujaConfig error:', err);
     return error(res, 'पूजा config मिळवता आली नाही.');
@@ -80,7 +88,22 @@ exports.upsertPujaConfig = async (req, res) => {
     custom_desc_mr,
   } = req.body;
 
+  if ((Number(tenantId) || MAIN_TENANT) === MAIN_TENANT)
+    return error(res, 'मुख्य साइटच्या किमती "पूजा व्यवस्थापन" मधून बदला.', 400);
+
   try {
+    const policy = await getPolicy(tenantId);
+    const [[pooja]] = await pool.query('SELECT name_mr, price FROM poojas WHERE id = ? AND is_active = TRUE', [poojaId]);
+    if (!pooja) return error(res, 'पूजा सापडली नाही.', 404);
+    if (custom_price != null && custom_price !== '') {
+      if (!policy.tenant_pricing)
+        return error(res, 'तुमच्या साइटला स्वतःच्या किमती ठेवण्याची परवानगी नाही. Super admin शी संपर्क करा.', 403);
+      const b = bounds(Number(pooja.price), policy);
+      const v = Number(custom_price);
+      if (!(v >= b.min && v <= b.max))
+        return error(res, `${pooja.name_mr}: किंमत ₹${b.min} ते ₹${b.max} या मर्यादेत ठेवा.`, 400);
+    }
+
     await pool.query(`
       INSERT INTO tenant_puja_config
         (tenant_id, pooja_id, custom_price, custom_samagri_price, is_enabled, custom_desc_mr)
@@ -99,6 +122,7 @@ exports.upsertPujaConfig = async (req, res) => {
       custom_desc_mr       || null,
     ]);
 
+    await delCachePattern('pooja:list:*');
     return success(res, {}, 'पूजा config जतन केला! ✅');
   } catch (err) {
     console.error('upsertPujaConfig error:', err);
@@ -118,6 +142,7 @@ exports.deletePujaConfig = async (req, res) => {
       'DELETE FROM tenant_puja_config WHERE tenant_id = ? AND pooja_id = ?',
       [tenantId, poojaId]
     );
+    await delCachePattern('pooja:list:*');
     return success(res, {}, 'Override काढला — global defaults वापरले जातील.');
   } catch (err) {
     console.error('deletePujaConfig error:', err);
@@ -292,11 +317,18 @@ exports.assignPujari = async (req, res) => {
     );
     if (!pujari) return error(res, 'पुजारी सापडला नाही.', 404);
 
+    // A franchise admin may not take a pujari who works for another site; only super admin moves them.
+    const current = await pujariTenant(pujari_id);
+    if (req.user.role !== 'super_admin' && Number(current?.tenant_id) !== Number(tenantId))
+      return error(res, 'हा पुजारी दुसऱ्या साइटचा आहे. हलवण्यासाठी super admin शी संपर्क करा.', 403);
+
     await pool.query(`
       INSERT INTO tenant_pujari_assignments (tenant_id, pujari_id, is_active)
       VALUES (?, ?, 1)
       ON DUPLICATE KEY UPDATE is_active = 1, tenant_id = VALUES(tenant_id)
     `, [tenantId, pujari_id]);
+    // keep the profile's tenant in step, so every list agrees on where he works
+    await pool.query('UPDATE pujari_profiles SET tenant_id = ? WHERE id = ?', [tenantId, pujari_id]);
 
     return success(res, { pujari_id, name: pujari.name }, `${pujari.name} assign केला! ✅`);
   } catch (err) {
@@ -314,10 +346,13 @@ exports.removePujari = async (req, res) => {
   const pujariId = parseInt(req.params.pujariId);
 
   try {
-    await pool.query(
+    const [del] = await pool.query(
       'DELETE FROM tenant_pujari_assignments WHERE tenant_id = ? AND pujari_id = ?',
       [tenantId, pujariId]
     );
+    // back to the main site (not left pointing at this franchise)
+    if (del.affectedRows)
+      await pool.query('UPDATE pujari_profiles SET tenant_id = ? WHERE id = ? AND tenant_id = ?', [MAIN_TENANT, pujariId, tenantId]);
     return success(res, {}, 'पुजारी tenant मधून काढला.');
   } catch (err) {
     console.error('removePujari error:', err);

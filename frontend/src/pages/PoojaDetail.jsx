@@ -142,6 +142,12 @@ export default function PoojaDetail() {
       .finally(() => setLoading(false));
   }, [slug]);
 
+  // The GPS lookup can finish before the pooja loads; once it has, fetch again so each
+  // pujari card gets his price for this pooja (and pujaris who don't do it drop out).
+  useEffect(() => {
+    if (pooja?.id && nearbyFetched) fetchNearbyPujaris(nearbyCity, nearbyCoords, nearbyDistrict);
+  }, [pooja?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Auto-detect location on page load to pre-populate nearby pujaris
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -172,7 +178,7 @@ export default function PoojaDetail() {
     setNearbyLoading(true);
     setNearbyFetched(true);
     try {
-      const params = { limit: 4 };
+      const params = { limit: 4, pooja_id: pooja?.id };
       if (city) params.city = city;
       const d = district !== undefined ? district : nearbyDistrict;
       if (d) params.district = d;
@@ -438,6 +444,12 @@ export default function PoojaDetail() {
                                 </div>
                                 <div style={{ fontSize: 12, color: '#f7c948', fontWeight: 700 }}>
                                   ⭐ {p.avg_rating || '—'}
+                                  {p.price != null && (
+                                    <span style={{ marginLeft: 8, color: p.price_source === 'pujari' ? '#2e7d32' : '#7c2d00' }}
+                                      title={p.price_source === 'pujari' ? 'या पुजाऱ्यांची स्वतःची किंमत' : 'साइटची किंमत'}>
+                                      ₹{Number(p.price).toLocaleString('mr-IN')}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>
