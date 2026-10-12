@@ -157,7 +157,11 @@
   font-size:     13px;
   color:         var(--text);
 }
-.filterTag button { background: none; border: none; cursor: pointer; margin-left: 4px; color: var(--primary); }
+.filterTag { cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+             transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.filterTag:hover, .filterTag:focus-visible { background: #fde2d4; border-color: #e07b39; color: #b3261e; outline: none; }
+.filterX { font-weight: 700; color: var(--primary); }
+.filterTag:hover .filterX { color: #b3261e; }
 .resultCount { font-size: 13px; color: var(--text-muted); margin-left: auto; }
 
 /* ── Blog grid ───────────────────────────────────────────────── */

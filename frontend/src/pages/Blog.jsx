@@ -275,8 +275,20 @@ export default function Blog() {
             {/* Active filter tag */}
             {(currentCat || currentQ) && (
               <div className={styles.activeFilter}>
-                {currentCat && <span className={styles.filterTag}>{currentCat} ✕ <button onClick={() => setFilter('')} /></span>}
-                {currentQ   && <span className={styles.filterTag}>"{currentQ}" ✕ <button onClick={() => { setSearchInput(''); setSearchParams(currentCat ? { category: currentCat } : {}); }} /></span>}
+                {/* whole chip is the remove button */}
+                {currentCat && (
+                  <button type="button" className={styles.filterTag} onClick={() => setFilter('')}
+                    title="ही श्रेणी काढा" aria-label={`${currentCat} श्रेणी काढा`}>
+                    {currentCat} <span className={styles.filterX}>✕</span>
+                  </button>
+                )}
+                {currentQ && (
+                  <button type="button" className={styles.filterTag}
+                    onClick={() => { setSearchInput(''); setSearchParams(currentCat ? { category: currentCat } : {}); }}
+                    title="शोध काढा" aria-label={`"${currentQ}" शोध काढा`}>
+                    "{currentQ}" <span className={styles.filterX}>✕</span>
+                  </button>
+                )}
                 <span className={styles.resultCount}>{total} लेख सापडले</span>
               </div>
             )}
