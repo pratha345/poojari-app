@@ -357,3 +357,6 @@
   .ctaBtn   { margin-left: 0; }
   .statCards { gap: 8px; }
 }
+
+/* shown over the existing tables while new times load */
+.refreshing { text-align: center; font-size: 0.8rem; font-weight: 700; color: #b45309; margin: -8px 0 10px; }

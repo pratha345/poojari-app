@@ -153,12 +153,32 @@ function getActiveSlot(nowMs, ...tables) {
   return null;
 }
 
+// Nearest district to a GPS point, worked out in the browser (no reverse-geocoding call)
+function nearestDistrict(lat, lon) {
+  const toRad = d => (d * Math.PI) / 180;
+  let best = null, bestKm = Infinity;
+  for (const d of DISTRICTS) {
+    const dLat = toRad(Number(d.lat) - lat), dLon = toRad(Number(d.lon) - lon);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat)) * Math.cos(toRad(Number(d.lat))) * Math.sin(dLon / 2) ** 2;
+    const km = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    if (km < bestKm) { bestKm = km; best = d; }
+  }
+  return { district: best, km: bestKm };
+}
+
+const SAVED_KEY = 'muhurat_district';
+function savedDistrict() {
+  try { return DISTRICTS.find(d => d.name === localStorage.getItem(SAVED_KEY)) || null; } catch { return null; }
+}
+
 // ── Component ────────────────────────────────────────────────────────
 export default function Muhurat() {
   const [date,       setDate]       = useState(todayIST());
-  const [cityName,   setCityName]   = useState('पुणे');
-  const [lat,        setLat]        = useState('18.5204');
-  const [lon,        setLon]        = useState('73.8567');
+  // start with the district the visitor chose last time, so the first load is already right
+  const [initial] = useState(() => savedDistrict() || DISTRICTS[0]);
+  const [cityName,   setCityName]   = useState(initial.name);
+  const [lat,        setLat]        = useState(initial.lat);
+  const [lon,        setLon]        = useState(initial.lon);
   const [locLoading, setLocLoading] = useState(false);
   const [panData,    setPanData]    = useState(null);
   const [chog,       setChog]       = useState(null);
@@ -168,7 +188,7 @@ export default function Muhurat() {
   const [nowTime,    setNowTime]    = useState(new Date());
 
   // searchable dropdown
-  const [query,     setQuery]     = useState('पुणे');
+  const [query,     setQuery]     = useState(initial.name);
   const [open,      setOpen]      = useState(false);
   const [highlight, setHighlight] = useState(0);
   const dropRef  = useRef(null);
@@ -195,6 +215,15 @@ export default function Muhurat() {
   const selectDistrict = d => {
     setCityName(d.name); setLat(d.lat); setLon(d.lon);
     setQuery(d.name); setOpen(false); setHighlight(0);
+    try { localStorage.setItem(SAVED_KEY, d.name); } catch { /* storage blocked */ }
+  };
+
+  // GPS → nearest district within 60 km (same times as picking it), else the exact point
+  const applyGps = (la, lo) => {
+    const { district, km } = nearestDistrict(la, lo);
+    if (district && km <= 60) { selectDistrict(district); return; }
+    setLat(la.toFixed(4)); setLon(lo.toFixed(4));
+    setCityName('माझे स्थान'); setQuery('माझे स्थान');
   };
   const handleInputKey = e => {
     if (!open) { setOpen(true); return; }
@@ -204,10 +233,13 @@ export default function Muhurat() {
     if (e.key === 'Escape')    { setOpen(false); }
   };
 
+  const reqId = useRef(0);
   const fetchData = useCallback(async (d, la, lo) => {
+    const my = ++reqId.current;          // only the latest request may update the page
     setLoading(true);
     try {
       const res = await panchangAPI.get({ date: d, lat: la, lon: lo });
+      if (my !== reqId.current) return;
       const pd  = res.data.data;
       setPanData(pd);
       setChog(pd.sunriseAt && pd.sunsetAt && pd.nextSunriseAt ? buildChoghadiya(pd, d) : null);
@@ -215,96 +247,32 @@ export default function Muhurat() {
       setPrevChog(null);
       if (d === todayIST() && pd.sunriseAt && Date.now() < Date.parse(pd.sunriseAt)) {
         const pd2 = (await panchangAPI.get({ date: prevDate(d), lat: la, lon: lo })).data.data;
+        if (my !== reqId.current) return;
         if (pd2.sunriseAt && pd2.sunsetAt && pd2.nextSunriseAt) setPrevChog(buildChoghadiya(pd2, prevDate(d)));
       }
     } catch { /* silent */ }
-    finally { setLoading(false); }
+    finally { if (my === reqId.current) setLoading(false); }
   }, []);
 
   useEffect(() => { fetchData(date, lat, lon); }, [date, lat, lon, fetchData]);
 
-  // Auto-detect location on page load
+  // Auto-detect location on page load — skipped once the visitor has picked a district
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation || savedDistrict()) return;
     navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const la = pos.coords.latitude.toFixed(4);
-        const lo = pos.coords.longitude.toFixed(4);
-        setLat(la); setLon(lo);
-        try {
-          const res  = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${la}&lon=${lo}&format=json&accept-language=en`,
-            { headers: { 'Accept-Language': 'en' } }
-          );
-          const data = await res.json();
-          const addr = data.address || {};
-          const candidates = [
-            addr.county, addr.state_district, addr.district,
-            addr.city, addr.town, addr.village,
-          ].filter(Boolean).map(s => s.toLowerCase().replace(/\s*district\s*/gi, '').trim());
-
-          let found = null;
-          for (const raw of candidates) {
-            found = DISTRICTS.find(d => {
-              const engParts = d.eng.toLowerCase().split(' ').filter(e => e.length > 3);
-              return engParts.some(e => raw.includes(e) || e.includes(raw));
-            });
-            if (found) break;
-          }
-          // times are now for the GPS position, so the label must not stay "पुणे"
-          if (found) { selectDistrict(found); }
-          else { const label = candidates[0] || 'माझे स्थान'; setCityName(label); setQuery(label); }
-        } catch { setCityName('माझे स्थान'); setQuery('माझे स्थान'); }
-      },
-      () => { /* permission denied — keep default Pune */ },
-      { timeout: 8000 }
+      pos => applyGps(pos.coords.latitude, pos.coords.longitude),
+      () => { /* permission denied — keep the default district */ },
+      { timeout: 8000, maximumAge: 10 * 60 * 1000 }
     );
-  }, []); // runs once on mount
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const detectLocation = () => {
     if (!navigator.geolocation) return;
     setLocLoading(true);
     navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const la = pos.coords.latitude.toFixed(4);
-        const lo = pos.coords.longitude.toFixed(4);
-        setLat(la); setLon(lo);
-        try {
-          const res  = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${la}&lon=${lo}&format=json&accept-language=en`,
-            { headers: { 'Accept-Language': 'en' } }
-          );
-          const data = await res.json();
-          const addr = data.address || {};
-
-          // All candidate location names from Nominatim (most specific first)
-          const candidates = [
-            addr.county, addr.state_district, addr.district,
-            addr.city, addr.town, addr.village, addr.municipality,
-          ].filter(Boolean).map(s => s.toLowerCase().replace(/\s*district\s*/gi, '').trim());
-
-          // Match against our DISTRICTS list — English name match (precise)
-          let found = null;
-          for (const raw of candidates) {
-            found = DISTRICTS.find(d => {
-              const engParts = d.eng.toLowerCase().split(' ').filter(e => e.length > 3);
-              return engParts.some(e => raw.includes(e) || e.includes(raw));
-            });
-            if (found) break;
-          }
-
-          if (found) {
-            selectDistrict(found);
-          } else {
-            const label = candidates[0] || 'माझे स्थान';
-            setCityName(label); setQuery(label);
-          }
-        } catch {
-          setCityName('माझे स्थान'); setQuery('माझे स्थान');
-        }
-        setLocLoading(false);
-      },
-      () => setLocLoading(false), { timeout: 10000 }
+      pos => { applyGps(pos.coords.latitude, pos.coords.longitude); setLocLoading(false); },
+      () => setLocLoading(false),
+      { timeout: 10000 }
     );
   };
 
@@ -460,10 +428,11 @@ export default function Muhurat() {
             onClick={() => setTab('occasions')}>📋 प्रसंगनिहाय मुहूर्त</button>
         </div>
 
-        {loading && <div className={styles.loader}><div className={styles.spinner} /></div>}
+        {loading && !chog && <div className={styles.loader}><div className={styles.spinner} /></div>}
+        {loading && chog && <div className={styles.refreshing}>⟳ अपडेट होत आहे…</div>}
 
         {/* ══ CHOGHADIYA TAB ════════════════════════════════════════════ */}
-        {!loading && tab === 'choghadiya' && chog && (
+        {tab === 'choghadiya' && chog && (
           <div className={styles.chogWrap}>
             <div className={styles.chogColumns}>
 
@@ -584,7 +553,7 @@ export default function Muhurat() {
         )}
 
         {/* ══ OCCASIONS TAB ═════════════════════════════════════════════ */}
-        {!loading && tab === 'occasions' && chog && (
+        {tab === 'occasions' && chog && (
           <div className={styles.occasionsWrap}>
             <p className={styles.occasionsSub}>
               खालील वेळा फक्त चौघडियावर आधारित आहेत; राहु काळ येणारा भाग वगळा. विवाह, गृहप्रवेश व संस्कारांसाठी
