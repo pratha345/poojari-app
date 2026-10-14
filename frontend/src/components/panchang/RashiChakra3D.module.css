@@ -91,6 +91,40 @@
   filter: blur(6px); pointer-events: none;
 }
 
+/* ── galaxy backdrop: the whole राशि चक्र card is deep space ── */
+.space {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 38%, #171230 0%, #0c0a1c 45%, #07060f 100%);
+  box-shadow: inset 0 0 0 1px rgba(212, 175, 101, 0.28), 0 18px 50px rgba(10, 6, 30, 0.45);
+}
+.galaxy { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.nebula, .stars {
+  position: absolute; left: 50%; top: 42%; width: 190%; aspect-ratio: 1; translate: -50% -50%;
+  animation: drift 420s linear infinite;               /* the sky turns very slowly */
+}
+.nebula {
+  background:
+    radial-gradient(22% 16% at 34% 38%, rgba(124, 77, 255, 0.38), transparent 70%),
+    radial-gradient(20% 15% at 66% 62%, rgba(0, 172, 193, 0.28), transparent 70%),
+    radial-gradient(18% 14% at 64% 36%, rgba(236, 64, 122, 0.24), transparent 70%),
+    radial-gradient(24% 17% at 36% 66%, rgba(212, 175, 101, 0.22), transparent 72%),
+    linear-gradient(135deg, transparent 40%, rgba(190, 200, 255, 0.12) 47%, rgba(255, 236, 200, 0.20) 50%, rgba(190, 200, 255, 0.12) 53%, transparent 60%);
+  filter: blur(16px);
+}
+@keyframes drift { to { rotate: 360deg; } }
+/* soft golden light radiating from behind the wheel */
+.halo {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 236, 190, 0.30) 0%, rgba(255, 228, 170, 0.38) 88%, rgba(245, 217, 138, 0.18) 96%, transparent 100%);
+  animation: haloBreath 7s ease-in-out infinite;
+}
+@keyframes haloBreath { 0%, 100% { opacity: 0.75; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1.03); } }
+.tw0 { animation: twinkle 3.2s ease-in-out infinite; }
+.tw1 { animation: twinkle 4.4s ease-in-out -1.3s infinite; }
+.tw2 { animation: twinkle 5.6s ease-in-out -2.6s infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .halo, .tw0, .tw1, .tw2, .nebula, .stars { animation: none; } }
+
 /* rings */
 .nakA { fill: #261a0d; }
 .nakB { fill: #1c130a; }

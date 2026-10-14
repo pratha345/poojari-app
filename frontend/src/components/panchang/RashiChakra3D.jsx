@@ -80,6 +80,42 @@ function interpolate(samples, t) {
   return out;
 }
 
+// ── galaxy backdrop (decorative, drawn once): seeded stars, a Milky Way band, nebula light ──
+const Galaxy = memo(function Galaxy() {
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const stars = Array.from({ length: 260 }, (_, i) => {
+    // a third of the stars crowd along the Milky Way band (a diagonal strip)
+    const band = i % 3 === 0;
+    const u = rnd() * 1000, w = band ? (rnd() - 0.5) * 220 : rnd() * 1000;
+    const [x, y] = band ? [u, 1000 - u + w] : [u, w];
+    const big = rnd() > 0.93;
+    return { x, y, r: big ? 1.6 + rnd() * 1.2 : 0.5 + rnd() * 0.9, o: 0.35 + rnd() * 0.65, tw: i % 4, big,
+      c: rnd() > 0.85 ? '#ffe2b0' : rnd() > 0.75 ? '#cfe0ff' : '#ffffff' };
+  });
+  return (
+    <div className={s.galaxy} aria-hidden="true">
+      <div className={s.nebula} />
+      <svg viewBox="0 0 1000 1000" className={s.stars} preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id="rc-star"><stop offset="0%" stopColor="#fff" /><stop offset="100%" stopColor="#fff" stopOpacity="0" /></radialGradient>
+        </defs>
+        {[0, 1, 2, 3].map(g => (
+          <g key={g} className={s[`tw${g}`]}>
+            {stars.filter(st => st.tw === g).map((st, i) => (
+              <g key={i}>
+                {st.big && <circle cx={st.x} cy={st.y} r={st.r * 4} fill="url(#rc-star)" opacity={0.35} />}
+                {st.big && <path d={`M${st.x - st.r * 5},${st.y}H${st.x + st.r * 5}M${st.x},${st.y - st.r * 5}V${st.y + st.r * 5}`} stroke={st.c} strokeWidth="0.6" opacity="0.55" />}
+                <circle cx={st.x} cy={st.y} r={st.r} fill={st.c} opacity={st.o} />
+              </g>
+            ))}
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+});
+
 // ── static rings (memoised: drawn once) ──
 const Rings = memo(function Rings() {
   return (
@@ -240,7 +276,8 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
   }) : [];
 
   return (
-    <div className={s.root}>
+    <div className={`${s.root} ${s.space}`}>
+      <Galaxy />
       <div className={s.tabs} role="tablist">
         {[['lagna', 'लग्न'], ['rashi', 'राशि'], ['info', 'माहिती']].map(([k, label]) => (
           <button key={k} role="tab" aria-selected={view === k} className={`${s.tab} ${view === k ? s.tabOn : ''}`} onClick={() => setView(k)}>{label}</button>
@@ -256,6 +293,7 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
         <div ref={cam.viewerRef} className={`${s.viewer} ${cam.full && !document.fullscreenElement ? s.viewerFull : ''}`}>
         <div className={s.stage} ref={cam.stageRef} tabIndex={0} role="group"
           aria-label="राशि चक्र — ओढून फिरवा; बाण कळा: सरकवा, + / −: झूम, 0: मूळ दृश्य">
+          <div className={s.halo} aria-hidden="true" />
           <div className={s.shadow} />
           {!pos && !error && <div className={s.loading}>ग्रहस्थितीचे गणित होत आहे…</div>}
           <div className={s.wheel}>
