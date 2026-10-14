@@ -125,7 +125,6 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.6);
   transition: transform 0.35s cubic-bezier(.3,1.5,.6,1);
 }
-.knobActive { transition: none; }
 .stepBtn, .now {
   border: 1px solid rgba(232,196,122,0.3); background: rgba(255,220,150,0.06);
   color: var(--gold); border-radius: 22px; padding: 10px 12px; font-weight: 700; cursor: pointer; white-space: nowrap;

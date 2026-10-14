@@ -41,7 +41,6 @@
 .cur b { color: #fff3c4; text-shadow: 0 0 3px #000, 0 0 2px #000; }
 .rowInfo { grid-column: 2; font-size: 0.8rem; color: #d9c49a; line-height: 1.45; }
 
-.knob[data-active] { transition: none; }
 
 @media (max-width: 480px) {
   .row { grid-template-columns: 52px 1fr; column-gap: 8px; }

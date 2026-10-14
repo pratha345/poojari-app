@@ -100,66 +100,87 @@ export function useGrahaTimeline(t, lat, lon) {
   return { samples, pos, error };
 }
 
-/** Time state with live play, ±step and the jog dial (drag sideways = run time). */
+/**
+ * Time state with live play, ±step and the scrub slider. The knob stays where it is left:
+ * its position is the offset from an anchor time (centre = anchor), squared so small moves
+ * are fine-grained (full travel = ±RANGE). "आता" / a new page time re-anchors and centres it.
+ */
+export const SCRUB_RANGE = 15 * 86400000;
+const toF = (d) => Math.max(-1, Math.min(1, Math.sign(d) * Math.sqrt(Math.abs(d) / SCRUB_RANGE)));
+const fromF = (f) => Math.sign(f) * f * f * SCRUB_RANGE;
+
 export function useTimeControls(initial) {
   const [t, setT] = useState(() => initial || Date.now());
+  const [base, setBase] = useState(() => initial || Date.now());
   const [playing, setPlaying] = useState(false);
-  const [jogRate, setJogRate] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [half, setHalf] = useState(0);                           // usable knob travel each side (px)
   const knobRef = useRef(null);
-  useEffect(() => { if (initial) { setT(initial); setPlaying(false); } }, [initial]);
+  const live = useRef({ t, base }); live.current = { t, base };
+
+  const anchor = useCallback((ms) => { setPlaying(false); setT(ms); setBase(ms); }, []);
+  useEffect(() => { if (initial) anchor(initial); }, [initial, anchor]);
   useEffect(() => {
     if (!playing) return;
-    setT(Date.now());
-    const id = setInterval(() => setT(Date.now()), 1000);
+    const tick = () => { const n = Date.now(); setT(n); setBase(n); };
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [playing]);
+
   useEffect(() => {
     const knob = knobRef.current; if (!knob) return;
-    const track = knob.parentElement, MAX = 3 * 86400000;
-    let jog = null, raf = 0;
-    const loop = (now) => {
-      if (!jog) return;
-      const dt = (now - jog.last) / 1000; jog.last = now;
-      const f = jog.off / jog.max;
-      setT(x => x + Math.sign(f) * f * f * MAX * dt);
-      raf = requestAnimationFrame(loop);
-    };
+    const track = knob.parentElement;
+    const measure = () => setHalf(Math.max(40, track.clientWidth / 2 - 30));
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(track);
+    let drag = null;
     const down = (e) => {
       setPlaying(false);
-      jog = { x0: e.clientX, off: 0, max: Math.max(40, track.clientWidth / 2 - 30), last: performance.now() };
-      knob.dataset.active = '1';
-      raf = requestAnimationFrame(loop); e.preventDefault();
+      let { t: t0, base: b } = live.current;
+      if (Math.abs(t0 - b) > SCRUB_RANGE) { b = t0; setBase(b); }   // pushed past the end by ± → re-centre
+      drag = { x0: e.clientX, f0: toF(t0 - b), base: b, max: Math.max(40, track.clientWidth / 2 - 30) };
+      knob.setPointerCapture?.(e.pointerId);
+      setDragging(true); e.preventDefault();
     };
     const move = (e) => {
-      if (!jog) return;
-      jog.off = Math.max(-jog.max, Math.min(jog.max, e.clientX - jog.x0));
-      knob.style.transform = `translateX(${jog.off}px)`;
-      const f = jog.off / jog.max; setJogRate(Math.sign(f) * f * f * MAX);
+      if (!drag) return;
+      const f = Math.max(-1, Math.min(1, drag.f0 + (e.clientX - drag.x0) / drag.max));
+      setT(Math.round(drag.base + fromF(f)));
     };
-    const up = () => {
-      if (!jog) return;
-      jog = null; cancelAnimationFrame(raf);
-      delete knob.dataset.active; knob.style.transform = ''; setJogRate(0);
+    const up = () => { if (drag) { drag = null; setDragging(false); } };
+    const key = (e) => {
+      const step = { ArrowLeft: -60, ArrowRight: 60, PageDown: -1440, PageUp: 1440 }[e.key];
+      if (step) { e.preventDefault(); setPlaying(false); setT(x => x + step * 60000); }
     };
     knob.addEventListener('pointerdown', down);
+    knob.addEventListener('keydown', key);
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
     window.addEventListener('pointercancel', up);
     return () => {
-      cancelAnimationFrame(raf);
+      ro?.disconnect();
       knob.removeEventListener('pointerdown', down);
+      knob.removeEventListener('keydown', key);
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
     };
   }, []);
+
+  const offset = t - base;
+  const knobStyle = { transform: `translateX(${(toF(offset) * half).toFixed(1)}px)`, ...(dragging ? { transition: 'none' } : {}) };
   const nudge = (min) => { setPlaying(false); setT(x => x + min * 60000); };
-  const now = () => { setPlaying(false); setT(Date.now()); };
-  return { t, setT, playing, setPlaying, jogRate, knobRef, nudge, now };
+  const now = () => anchor(Date.now());
+  return { t, setT, playing, setPlaying, dragging, offset, knobRef, knobStyle, nudge, now };
 }
 
-export const fmtRate = (ms) => {
-  const h = Math.abs(ms) / 3600000;
-  const txt = h >= 24 ? `${(h / 24).toFixed(1)} दिवस` : `${h.toFixed(h < 10 ? 1 : 0)} तास`;
-  return `${ms > 0 ? '⏩' : '⏪'} ${txt}/सेकंद`;
+/** "+2 दिवस 4 तास" — how far the slider has moved time from its anchor. */
+export const fmtOffset = (ms) => {
+  const m = Math.round(Math.abs(ms) / 60000);
+  if (m < 1) return '';
+  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mi = m % 60;
+  const parts = [d && `${d} दिवस`, h && `${h} तास`, !d && mi && `${mi} मि`].filter(Boolean);
+  return `${ms > 0 ? '⏩ +' : '⏪ −'}${parts.join(' ')}`;
 };

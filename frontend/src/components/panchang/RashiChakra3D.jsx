@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, memo } from 'react';
 import { panchangAPI } from '../../api/index.js';
 import { RASHIS } from '../../data/rashifalData';
 import s from './RashiChakra3D.module.css';
+import { useTimeControls, fmtOffset } from './yantraTime';
 
 const RASHI = RASHIS.map(r => r.name);
 const NAKSHATRA = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशीर्ष', 'आर्द्रा', 'पुनर्वसू', 'पुष्य', 'आश्लेषा',
@@ -40,7 +41,6 @@ const C = 300;                                // SVG centre (viewBox 600)
 const R_OUT = 292, R_NAK = 252, R_RASHI = 206;
 const IST = 330 * 60000;
 const WINDOW_H = 240, STEP_MIN = 30;          // fetch 10 days of half-hourly samples
-const MAX_JOG = 3 * 86400000;                 // full jog = 3 days of chart time per second
 const DEFAULT_TILT = 26;
 
 const norm = (a) => ((a % 360) + 360) % 360;
@@ -130,24 +130,20 @@ const Rings = memo(function Rings() {
 
 export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli }) {
   const [view, setView]       = useState('rashi');      // lagna | rashi | info
-  const [t, setT]             = useState(() => syncMs || Date.now());
-  const [playing, setPlaying] = useState(false);
+  const { t, setT, playing, setPlaying, offset, knobRef, knobStyle, nudge, now } = useTimeControls(syncMs);
   const [samples, setSamples] = useState(null);
   const [error, setError]     = useState('');
   const [day, setDay]         = useState(null);          // panchang for the shown time (maas etc.)
   const [exact, setExact]     = useState(null);          // exact positions once the time settles
   const [sel, setSel]         = useState(null);          // selected graha (info card)
-  const [jogRate, setJogRate] = useState(0);             // chart ms per real second while jogging
 
-  const stageRef = useRef(null), wheelRef = useRef(null), knobRef = useRef(null);
+  const stageRef = useRef(null), wheelRef = useRef(null);
   const view3d = useRef({ rot: 0, tilt: DEFAULT_TILT, vRot: 0 });
   const movedRef = useRef(0);                    // last time a drag moved (tap vs drag)
   const fetching = useRef(false);
   const tRef = useRef(t); tRef.current = t;
   const reduceMotion = useMemo(() => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, []);
 
-  // page picked a new date/time → follow it
-  useEffect(() => { if (syncMs) { setT(syncMs); setPlaying(false); } }, [syncMs]);
 
   // ── data: keep a 10-day window of samples around t ──
   const ensureWindow = useCallback(async (at) => {
@@ -258,61 +254,6 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
     requestAnimationFrame(step);
   };
 
-  // ── time: live play, and the jog dial (drag sideways = run time forward / back) ──
-  useEffect(() => {
-    if (!playing) return;
-    const id = setInterval(() => setT(Date.now()), 1000);
-    setT(Date.now());
-    return () => clearInterval(id);
-  }, [playing]);
-
-  useEffect(() => {
-    const knob = knobRef.current; if (!knob) return;
-    const track = knob.parentElement;
-    let jog = null, raf = 0;
-    const loop = (now) => {
-      if (!jog) return;
-      const dt = (now - jog.last) / 1000; jog.last = now;
-      const f = jog.off / jog.max;
-      setT(x => x + Math.sign(f) * f * f * MAX_JOG * dt);
-      raf = requestAnimationFrame(loop);
-    };
-    const down = (e) => {
-      setPlaying(false);
-      jog = { x0: e.clientX, off: 0, max: Math.max(40, track.clientWidth / 2 - 30), last: performance.now() };
-      knob.setPointerCapture?.(e.pointerId);
-      knob.classList.add(s.knobActive);
-      raf = requestAnimationFrame(loop);
-      e.preventDefault();
-    };
-    const move = (e) => {
-      if (!jog) return;
-      jog.off = Math.max(-jog.max, Math.min(jog.max, e.clientX - jog.x0));
-      knob.style.transform = `translateX(${jog.off}px)`;
-      const f = jog.off / jog.max;
-      setJogRate(Math.sign(f) * f * f * MAX_JOG);
-    };
-    const up = () => {
-      if (!jog) return;
-      jog = null; cancelAnimationFrame(raf);
-      knob.classList.remove(s.knobActive);
-      knob.style.transform = '';                 // springs back to the centre (CSS transition)
-      setJogRate(0);
-    };
-    knob.addEventListener('pointerdown', down);
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-    window.addEventListener('pointercancel', up);
-    return () => {
-      cancelAnimationFrame(raf);
-      knob.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-      window.removeEventListener('pointercancel', up);
-    };
-  }, []);
-
-  const nudge = (min) => { setPlaying(false); setT(x => x + min * 60000); };
 
   // ── what the bottom line says ──
   const p = istParts(t);
@@ -361,11 +302,6 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
     const [x, y] = pt(r * 30 + 15, R_RASHI - 18);
     return { h: h + 1, x, y };
   }) : [];
-  const fmtRate = (ms) => {
-    const h = Math.abs(ms) / 3600000;
-    const txt = h >= 24 ? `${(h / 24).toFixed(1)} दिवस` : `${h.toFixed(h < 10 ? 1 : 0)} तास`;
-    return `${ms > 0 ? '⏩' : '⏪'} ${txt}/सेकंद`;
-  };
 
   return (
     <div className={s.root}>
@@ -465,19 +401,19 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
 
       {/* time controls */}
       <div className={s.timeRow}>
-        {jogRate !== 0 && <span className={s.rate}>{fmtRate(jogRate)}</span>}
+        {fmtOffset(offset) && <span className={s.rate}>{fmtOffset(offset)}</span>}
         <button type="button" className={s.play} onClick={() => setPlaying(x => !x)} aria-pressed={playing}>
           {playing ? '⏸' : '▶'} <span>{playing ? 'चालू' : 'स्थिर'}</span>
         </button>
       </div>
       <div className={s.jogRow}>
         <button type="button" className={s.stepBtn} onClick={() => nudge(-60)} aria-label="एक तास मागे">−1ता</button>
-        <div className={s.jogTrack} aria-label="वेळ पुढे-मागे: ओढा">
+        <div className={s.jogTrack} aria-label="वेळ पुढे-मागे: ओढा (±15 दिवस)">
           {Array.from({ length: 9 }, (_, i) => <i key={i} />)}
-          <button type="button" ref={knobRef} className={s.knob} aria-label="वेळ ओढा">‹›</button>
+          <button type="button" ref={knobRef} className={s.knob} style={knobStyle} aria-label="वेळ ओढा; बाण कळांनी ±1 तास">‹›</button>
         </div>
         <button type="button" className={s.stepBtn} onClick={() => nudge(60)} aria-label="एक तास पुढे">+1ता</button>
-        <button type="button" className={s.now} onClick={() => { setPlaying(false); setT(Date.now()); }}>आता</button>
+        <button type="button" className={s.now} onClick={now}>आता</button>
       </div>
 
       <div className={s.when}>

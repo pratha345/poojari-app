@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState, memo } from 'react';
 import { panchangAPI } from '../../api/index.js';
 import { RASHIS } from '../../data/rashifalData';
-import { useGrahaTimeline, useTimeControls, nextBoundary, norm, istParts, ymd, hhmm, fmtRate, IST } from './yantraTime';
+import { useGrahaTimeline, useTimeControls, nextBoundary, norm, istParts, ymd, hhmm, fmtOffset, IST } from './yantraTime';
 import c from './RashiChakra3D.module.css';            // shared stage / controls styling
 import s from './PanchangYantra3D.module.css';
 
@@ -274,16 +274,16 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
       )}
 
       <div className={c.timeRow}>
-        {tc.jogRate !== 0 && <span className={c.rate}>{fmtRate(tc.jogRate)}</span>}
+        {fmtOffset(tc.offset) && <span className={c.rate}>{fmtOffset(tc.offset)}</span>}
         <button type="button" className={c.play} onClick={() => tc.setPlaying(x => !x)} aria-pressed={tc.playing}>
           {tc.playing ? '⏸' : '▶'} <span>{tc.playing ? 'चालू' : 'स्थिर'}</span>
         </button>
       </div>
       <div className={c.jogRow}>
         <button type="button" className={c.stepBtn} onClick={() => tc.nudge(-60)} aria-label="एक तास मागे">−1ता</button>
-        <div className={c.jogTrack} aria-label="वेळ पुढे-मागे: ओढा">
+        <div className={c.jogTrack} aria-label="वेळ पुढे-मागे: ओढा (±15 दिवस)">
           {Array.from({ length: 9 }, (_, i) => <i key={i} />)}
-          <button type="button" ref={tc.knobRef} className={`${c.knob} ${s.knob}`} aria-label="वेळ ओढा">‹›</button>
+          <button type="button" ref={tc.knobRef} className={c.knob} style={tc.knobStyle} aria-label="वेळ ओढा; बाण कळांनी ±1 तास">‹›</button>
         </div>
         <button type="button" className={c.stepBtn} onClick={() => tc.nudge(60)} aria-label="एक तास पुढे">+1ता</button>
         <button type="button" className={c.now} onClick={tc.now}>आता</button>
