@@ -13,6 +13,7 @@ import { RASHIS } from '../data/rashifalData';
 import RashiChakra3D from '../components/panchang/RashiChakra3D';
 import DishaYantra3D from '../components/panchang/DishaYantra3D';
 import PanchangYantra3D from '../components/panchang/PanchangYantra3D';
+import SankalpMantra from '../components/panchang/SankalpMantra';
 
 const RASHI_IMG = Object.fromEntries(RASHIS.map(r => [r.name, r.img]));
 
@@ -305,7 +306,7 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, grahas = [], dark }) {
 // What survives a refresh: tab + picked date/time live in the URL (shareable, back button);
 // district and dark mode in localStorage; the last result in sessionStorage so a refresh
 // paints straight away instead of skeleton → data → GPS district → data.
-const TABS = ['panchang', 'chakra', 'yantra', 'disha'];
+const TABS = ['panchang', 'chakra', 'yantra', 'sankalp', 'disha'];
 const PLACE_KEY = 'panchang_place', DARK_KEY = 'panchang_dark', LAST_KEY = 'panchang_last';
 const store = {
   get: (k, ss) => { try { return JSON.parse((ss ? sessionStorage : localStorage).getItem(k)); } catch { return null; } },
@@ -693,10 +694,13 @@ export default function Panchang() {
             className={`${styles.pageTab} ${pageTab === 'chakra' ? styles.pageTabOn : ''}`}>🪐 राशि चक्र</button>
           <button role="tab" aria-selected={pageTab === 'yantra'} onClick={() => setPageTab('yantra')}
             className={`${styles.pageTab} ${pageTab === 'yantra' ? styles.pageTabOn : ''}`}>🔆 पंचांग यंत्र</button>
+          <button role="tab" aria-selected={pageTab === 'sankalp'} onClick={() => setPageTab('sankalp')}
+            className={`${styles.pageTab} ${pageTab === 'sankalp' ? styles.pageTabOn : ''}`}>🙏 संकल्प मंत्र</button>
           <button role="tab" aria-selected={pageTab === 'disha'} onClick={() => setPageTab('disha')}
             className={`${styles.pageTab} ${pageTab === 'disha' ? styles.pageTabOn : ''}`}>🧭 दिशा यंत्र</button>
         </div>
 
+        {pageTab === 'sankalp' && <SankalpMantra data={data} place={cityName} />}
         {pageTab === 'disha' && <DishaYantra3D lat={Number(lat)} lon={Number(lon)} place={cityName} />}
         {pageTab === 'yantra' && (
           <PanchangYantra3D lat={Number(lat)} lon={Number(lon)} place={cityName}

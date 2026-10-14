@@ -1,0 +1,62 @@
+/* संकल्प मंत्र — espresso card, antique gold text, changing values in soft green */
+.root {
+  max-width: 720px; margin: 0 auto; padding: 22px 22px 24px; border-radius: 20px;
+  background: radial-gradient(120% 90% at 50% 20%, #3a2716 0%, #302014 35%, #1b1009 100%);
+  color: #f0d590; box-shadow: inset 0 0 0 1px rgba(212, 175, 101, 0.28), 0 18px 50px rgba(30, 15, 0, 0.35);
+}
+.title { margin: 0; font-family: var(--font-display, inherit); font-size: 1.8rem; color: #f5c518; }
+.when { margin: 4px 0 0; font-size: 0.82rem; color: #bfae8a; }
+.wait { text-align: center; color: #bfae8a; padding: 40px 0; }
+
+.tabs { display: flex; justify-content: center; gap: 10px; margin: 18px 0 16px; }
+.tab {
+  min-width: 96px; padding: 10px 20px; border-radius: 14px; border: 1px solid transparent; cursor: pointer;
+  background: none; color: #e9dcc0; font-size: 1.08rem; font-weight: 700; font-family: var(--font-display, inherit);
+}
+.tab:hover { background: rgba(255, 220, 150, 0.06); }
+.tabOn { background: rgba(212, 175, 101, 0.22); color: #f5c518; border-color: rgba(212, 175, 101, 0.35); }
+
+/* माहिती */
+.list { list-style: none; margin: 0 auto; padding: 0 6px; max-width: 520px; display: grid; gap: 8px; }
+.list li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px dashed rgba(212, 175, 101, 0.15); padding-bottom: 6px; }
+.list b { color: #7ee07e; font-size: 1.22rem; font-weight: 600; font-family: var(--font-display, inherit); }
+.list span { color: #bfae8a; font-size: 0.85rem; text-align: right; }
+.grahaList { margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(212, 175, 101, 0.3); }
+.grahaList li { border-bottom: none; padding-bottom: 0; }
+.grahaList b { font-size: 1.08rem; }
+.note { margin: 18px 4px 0; font-size: 0.8rem; color: #a99773; line-height: 1.6; }
+
+/* लघु / विस्तृत */
+.form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; margin-bottom: 16px; }
+.form label { display: grid; gap: 4px; font-size: 0.8rem; color: #bfae8a; font-weight: 700; }
+.form input {
+  padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(212, 175, 101, 0.35);
+  background: rgba(0, 0, 0, 0.25); color: #fff4de; font-size: 0.95rem; font-family: inherit;
+}
+.form input:focus { outline: 2px solid #f5d98a; outline-offset: 1px; }
+.form input::placeholder { color: #7d6d50; }
+.gender { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(212, 175, 101, 0.35); background: none; color: #d8c6a0; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+.chipOn { background: rgba(212, 175, 101, 0.25); color: #f5d98a; border-color: #d4af65; }
+
+.mantra {
+  margin: 0; white-space: pre-line; font-size: 1.3rem; line-height: 1.85; color: #f0c040;
+  font-family: var(--font-display, inherit); word-break: break-word;
+}
+.val { color: #7ee07e; }
+.ph { color: #7ee07e; opacity: 0.8; }
+.actions { display: flex; justify-content: center; margin-top: 18px; }
+.copy {
+  padding: 11px 22px; border-radius: 22px; border: 1px solid #d4af65; cursor: pointer; font-weight: 800;
+  background: linear-gradient(180deg, #e6c47c, #b08a40); color: #1b1009; font-size: 0.98rem;
+}
+.copy:hover { background: linear-gradient(180deg, #f5d98a, #c49b4a); }
+
+@media (max-width: 480px) {
+  .root { padding: 18px 14px 20px; border-radius: 14px; }
+  .title { font-size: 1.5rem; }
+  .tab { min-width: 0; padding: 9px 16px; font-size: 1rem; }
+  .form { grid-template-columns: 1fr; }
+  .mantra { font-size: 1.15rem; }
+  .list b { font-size: 1.1rem; }
+}
