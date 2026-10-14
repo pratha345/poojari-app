@@ -1278,14 +1278,6 @@
 .mcMin { stroke: var(--primary); stroke-width: 2; stroke-linecap: round; transition: transform 0.4s; }
 .mcHub { fill: #5a2a0c; }
 
-.livePill {
-  display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px; border-radius: 999px;
-  background: rgba(46, 160, 67, 0.1); color: #237a35; font-size: 0.78rem; font-weight: 700;
-}
-.dark .livePill { background: rgba(46, 160, 67, 0.16); color: #7ddc8f; }
-.liveDot, .liveDotBusy { width: 8px; height: 8px; border-radius: 50%; background: #2ea043; box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.6); animation: livePulse 2s infinite; }
-.liveDotBusy { background: #e0a800; }
-@keyframes livePulse { 70% { box-shadow: 0 0 0 7px rgba(46, 160, 67, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0); } }
 .backLive {
   padding: 5px 12px; border-radius: 999px; border: 1px solid var(--primary); background: none; cursor: pointer;
   color: var(--primary); font-weight: 700; font-size: 0.8rem; font-family: inherit;
@@ -1356,6 +1348,6 @@
   .dockIcon { font-size: 1.25rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .calDay, .liveDot, .liveDotBusy { animation: none; }
+  .calDay { animation: none; }
   .calPage, .dockBtn, .timeChip { transition: none; }
 }

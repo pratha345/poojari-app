@@ -638,12 +638,7 @@ export default function Panchang() {
               </span>
               <span className={styles.timeChipChev} aria-hidden="true">▾</span>
             </button>
-            {live ? (
-              <span className={styles.livePill} title={lastRefresh ? `शेवटचे अपडेट: ${formatTime12h(lastRefresh)}` : undefined}>
-                <i className={loading ? styles.liveDotBusy : styles.liveDot} />
-                {loading ? 'अपडेट होत आहे…' : 'आत्ताची वेळ · आपोआप'}
-              </span>
-            ) : (
+            {!live && (
               <button type="button" className={styles.backLive}
                 onClick={() => { setDate(todayIST()); setTime(nowISTTime()); setLive(true); }}>
                 ⟳ आत्ताच्या वेळेवर या
