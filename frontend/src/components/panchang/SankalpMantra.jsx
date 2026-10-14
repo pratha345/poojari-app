@@ -19,7 +19,7 @@ const SAMVATSAR = ['प्रभव', 'विभव', 'शुक्ल', 'प्
   'प्लव', 'शुभकृत्', 'शोभकृत्', 'क्रोधी', 'विश्वावसु', 'पराभव', 'प्लवङ्ग', 'कीलक', 'सौम्य', 'साधारण', 'विरोधकृत्',
   'परिधावी', 'प्रमादी', 'आनन्द', 'राक्षस', 'नल', 'पिङ्गल', 'कालयुक्त', 'सिद्धार्थी', 'रौद्र', 'दुर्मति', 'दुन्दुभि',
   'रुधिरोद्गारी', 'रक्ताक्षी', 'क्रोधन', 'क्षय'];
-const VAAR = { 'रविवार': 'रवि', 'सोमवार': 'सोम', 'मंगळवार': 'मङ्गल', 'बुधवार': 'बुध', 'गुरुवार': 'गुरु', 'शुक्रवार': 'शुक्र', 'शनिवार': 'शनि' };
+const VAAR = { 'रविवार': 'रविवार', 'सोमवार': 'सोमवार', 'मंगळवार': 'मंगलवार', 'बुधवार': 'बुधवार', 'गुरुवार': 'गुरुवार', 'शुक्रवार': 'शुक्रवार', 'शनिवार': 'शनिवार' };
 // Marathi spellings from the API → Sanskrit stems
 const SK = {
   'पुनर्वसू': 'पुनर्वसु', 'मूळ': 'मूल', 'पूर्वा फाल्गुनी': 'पूर्वाफाल्गुनी', 'उत्तरा फाल्गुनी': 'उत्तराफाल्गुनी',
@@ -77,7 +77,7 @@ function build(e, f, full) {
   if (e.ayana) out.push(V(e.ayana), ' ');
   if (e.ritu) out.push(V(e.ritu), ' ऋतौ ');
   out.push(full ? 'महामाङ्गल्यप्रदे मासोत्तमे ' : '', V(e.maas), ' मासे ', V(e.paksha), ' पक्षे ', V(e.tithi), ' तिथौ ',
-    V(e.vaar), 'वासरे');
+    V(e.vaar), ' शुभवासरे');
   if (full) {
     out.push(' ', V(e.nakshatra), ' नक्षत्रे ', V(e.yoga), ' योगे ', V(e.karana), ' करणे');
     out.push('\n\n');
@@ -135,7 +135,7 @@ export default function SankalpMantra({ data, place }) {
             <li><b>{e.maas} मासे</b><span>{data.maas} महिना (अमांत)</span></li>
             <li><b>{e.paksha} पक्षे</b><span>{data.paksha}</span></li>
             <li><b>{e.tithi} तिथौ</b><span>{data.tithi?.name}</span></li>
-            <li><b>{e.vaar}वासरे</b><span>{data.var}</span></li>
+            <li><b>{e.vaar} शुभवासरे</b><span>{data.var}</span></li>
             <li><b>{e.nakshatra} नक्षत्रे</b><span>{data.nakshatra}</span></li>
             <li><b>{e.yoga} योगे</b><span>{data.yoga}</span></li>
             <li><b>{e.karana} करणे</b><span>{data.karana}</span></li>
