@@ -57,19 +57,33 @@ const ZodiacRing = memo(function ZodiacRing() {
     <svg viewBox="0 0 600 600" className={c.layer} aria-hidden="true">
       <defs>
         <linearGradient id="py-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f5d98a" /><stop offset="45%" stopColor="#b8862f" /><stop offset="100%" stopColor="#6f4b16" />
+          <stop offset="0%" stopColor="#fff1c9" /><stop offset="22%" stopColor="#e2bf72" /><stop offset="48%" stopColor="#9a7230" /><stop offset="72%" stopColor="#f2d58e" /><stop offset="100%" stopColor="#7a5420" />
         </linearGradient>
         <radialGradient id="py-face" cx="50%" cy="45%" r="60%">
-          <stop offset="0%" stopColor="#33220f" /><stop offset="75%" stopColor="#1c1209" /><stop offset="100%" stopColor="#120b05" />
+          <stop offset="0%" stopColor="#2b1d10" /><stop offset="70%" stopColor="#170f08" /><stop offset="100%" stopColor="#0f0904" />
+        </radialGradient>
+        {/* शुक्ल = warm light, कृष्ण = midnight indigo */}
+        <radialGradient id="py-shukla" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffecbe" stopOpacity="0.20" /><stop offset="100%" stopColor="#f5d98a" stopOpacity="0.06" />
+        </radialGradient>
+        <radialGradient id="py-krishna" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#141a3a" stopOpacity="0.70" /><stop offset="100%" stopColor="#0a0d20" stopOpacity="0.45" />
+        </radialGradient>
+        <radialGradient id="py-sun" cx="38%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#fff6d0" /><stop offset="45%" stopColor="#ffc22e" /><stop offset="100%" stopColor="#d07a00" />
+        </radialGradient>
+        <radialGradient id="py-moon" cx="38%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#ffffff" /><stop offset="60%" stopColor="#dfe3ec" /><stop offset="100%" stopColor="#9aa1b2" />
         </radialGradient>
       </defs>
       <circle cx={C} cy={C} r={R_OUT + 5} fill="url(#py-gold)" />
-      <circle cx={C} cy={C} r={R_OUT} fill="#22160b" />
+      <circle cx={C} cy={C} r={R_OUT} fill="#1c130a" />
       {RASHI.map((n, i) => {
         const a = i * 30, mid = a + 15, [x, y] = pt(mid, (R_OUT + R_RASHI) / 2 + 2);
         const [bx1, by1] = pt(a, R_RASHI), [bx2, by2] = pt(a, R_OUT);
         return (
           <g key={n}>
+            <path d={arc(R_RASHI, R_OUT, a, a + 30)} className={i % 2 ? s.band1 : s.band0} />
             <line x1={bx1} y1={by1} x2={bx2} y2={by2} className={s.rashiDiv} />
             <text x={x} y={y} className={s.rashiText} transform={`rotate(${ringTextRot(mid)}, ${x}, ${y})`}>{n}</text>
           </g>
@@ -80,6 +94,7 @@ const ZodiacRing = memo(function ZodiacRing() {
         const [x1, y1] = pt(d, R_RASHI), [x2, y2] = pt(d, R_RASHI + len);
         return `M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}`;
       }).join('')} />
+      <circle cx={C} cy={C} r={R_OUT - 1.5} fill="none" stroke="rgba(255, 241, 201, 0.25)" strokeWidth="1" />
       <circle cx={C} cy={C} r={R_RASHI} fill="url(#py-face)" stroke="url(#py-gold)" strokeWidth="2.5" />
     </svg>
   );
@@ -183,7 +198,7 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
                   <g key={i}>
                     <path d={arc(R_TITHI_I, R_TITHI_O, a1, a1 + 12)}
                       className={`${i < 15 ? s.tShukla : s.tKrishna} ${cur ? s.tCur : ''}`} />
-                    <text x={x} y={y} className={`${s.tNum} ${cur ? s.tNumCur : ''}`}
+                    <text x={x} y={y} className={`${s.tNum} ${i >= 15 ? s.tNumK : ''} ${cur ? s.tNumCur : ''}`}
                       transform={`rotate(${ringTextRot(mid)}, ${x}, ${y})`}>{i === 14 ? 'पौ' : i === 29 ? 'अ' : DEV((i % 15) + 1)}</text>
                   </g>
                 );
@@ -198,7 +213,7 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
             <svg viewBox="0 0 600 600" className={`${c.layer} ${c.z2}`}>
               {[[limbs.sun + 90, 'शुक्ल पक्ष'], [limbs.sun + 270, 'कृष्ण पक्ष']].map(([a, label]) => {
                 const [x, y] = pt(a, 132);
-                return <g key={label} className={c.upright} style={{ transformOrigin: `${x}px ${y}px` }}><text x={x} y={y} className={s.pakshaText}>{label}</text></g>;
+                return <g key={label} className={c.upright} style={{ transformOrigin: `${x}px ${y}px` }}><text x={x} y={y} className={`${s.pakshaText} ${label.startsWith('कृष्ण') ? s.pakshaK : ''}`}>{label}</text></g>;
               })}
               <circle cx={sunPt[0]} cy={sunPt[1]} r="13" className={s.sun} />
               <circle cx={moonPt[0]} cy={moonPt[1]} r="11" className={s.moon} />

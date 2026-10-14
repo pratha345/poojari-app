@@ -38,7 +38,10 @@
 .viewer:fullscreen .stage, .viewerFull .stage { width: min(96vw, calc(100dvh - 210px)); max-width: none; margin: 0; }
 
 .stage {
-  --rot: 0deg; --tilt: 26deg; --zoom: 1; --px: 0px; --py: 0px;   /* the camera (view3d.js) */
+  --rot: 0deg; --tilt: 26deg; --px: 0px; --py: 0px;   /* the camera (view3d.js) */
+  --zoom: 1;     /* total zoom */
+  --zoomL: 1;    /* zoom baked into the layout — the SVG is drawn at this size, so it stays sharp */
+  --zoomS: 1;    /* the rest, as a quick transform while a gesture is running (= zoom / zoomL) */
   position: relative;
   width: min(100%, 560px);
   aspect-ratio: 1;
@@ -56,11 +59,14 @@
 .stage:global(.is-dragging), .dragging { cursor: grabbing; }
 
 .wheel {
-  position: absolute; inset: 3%;
+  position: absolute; left: 50%; top: 50%;
+  width: calc(94% * var(--zoomL)); height: calc(94% * var(--zoomL));
   transform-style: preserve-3d;
-  transform: translate3d(var(--px), var(--py), 0) scale(var(--zoom)) rotateX(var(--tilt)) rotateZ(var(--rot));
+  transform: translate(-50%, -50%) translate3d(var(--px), var(--py), 0) scale(var(--zoomS)) rotateX(var(--tilt)) rotateZ(var(--rot));
   will-change: transform;
+  -webkit-font-smoothing: antialiased;
 }
+.wheel svg { shape-rendering: geometricPrecision; text-rendering: geometricPrecision; }
 /* restrained brushed-metal light: fixed to the viewer, so it glides over the face as the wheel turns */
 .sheen {
   position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
@@ -73,9 +79,9 @@
 .plate, .layer, .hub { position: absolute; inset: 0; width: 100%; height: 100%; }
 .plate { border-radius: 50%; box-shadow: 0 0 0 1px rgba(0,0,0,0.45), 0 0 0 2px rgba(245, 217, 138, 0.10), 0 22px 40px rgba(0, 0, 0, 0.55); }
 .z0 { transform: translateZ(0); }
-.z1 { transform: translateZ(10px); }
-.z2 { transform: translateZ(22px); }
-.z3 { transform: translateZ(30px); }
+.z1 { transform: translateZ(calc(10px * var(--zoomL))); }
+.z2 { transform: translateZ(calc(22px * var(--zoomL))); }
+.z3 { transform: translateZ(calc(30px * var(--zoomL))); }
 
 /* soft ground shadow that flattens as the wheel tilts */
 .shadow {
@@ -86,11 +92,11 @@
 }
 
 /* rings */
-.nakA { fill: #2c1d0f; }
-.nakB { fill: #251809; }
-.nakText { fill: #d9c49a; font-size: 10.5px; text-anchor: middle; dominant-baseline: middle; font-family: var(--font-body, inherit); }
-.rashiCell { fill: #1c1209; stroke: rgba(212, 175, 101, 0.25); stroke-width: 1; }
-.rashiText { fill: var(--gold); font-size: 17px; font-weight: 800; text-anchor: middle; dominant-baseline: middle; font-family: var(--font-display, inherit); }
+.nakA { fill: #261a0d; }
+.nakB { fill: #1c130a; }
+.nakText { fill: #eadbb5; font-size: 10.5px; text-anchor: middle; dominant-baseline: middle; font-family: var(--font-body, inherit); }
+.rashiCell { fill: #160e07; stroke: rgba(212, 175, 101, 0.25); stroke-width: 1; }
+.rashiText { fill: #f0d590; font-size: 17px; font-weight: 800; text-anchor: middle; dominant-baseline: middle; font-family: var(--font-display, inherit); }
 .spoke { stroke: rgba(212, 175, 101, 0.12); stroke-width: 1; }
 .orbit { fill: none; stroke: rgba(212, 175, 101, 0.08); stroke-width: 1; }
 
@@ -181,7 +187,7 @@
 
 /* browsers without 3D transforms get a flat, fully readable wheel */
 @supports not (transform-style: preserve-3d) {
-  .wheel { transform: translate(var(--px), var(--py)) scale(var(--zoom)) rotateZ(var(--rot)); }
+  .wheel { transform: translate(-50%, -50%) translate(var(--px), var(--py)) scale(var(--zoomS)) rotateZ(var(--rot)); }
   .sheen { transform: rotateZ(calc(var(--rot) * -1)); }
   .z1, .z2, .z3 { transform: none; }
 }

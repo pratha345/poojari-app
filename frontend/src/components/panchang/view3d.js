@@ -18,7 +18,7 @@ const KEYS = ['rot', 'tilt', 'zoom', 'px', 'py'];
  * @param onRest        called with the user rotation once a gesture / animation settles
  */
 export function useView3D({ defaultTilt = 26, rotOffsetRef, onRest } = {}) {
-  const v = useRef({ rot: 0, tilt: defaultTilt, zoom: 1, px: 0, py: 0, vRot: 0 });
+  const v = useRef({ rot: 0, tilt: defaultTilt, zoom: 1, zoomL: 1, px: 0, py: 0, vRot: 0 });
   const stageEl = useRef(null);
   const viewerRef = useRef(null);
   const movedAt = useRef(0);                         // last time a drag moved (tap vs drag)
@@ -40,14 +40,18 @@ export function useView3D({ defaultTilt = 26, rotOffsetRef, onRest } = {}) {
     el.style.setProperty('--rot', `${(s.rot + (rotOffsetRef?.current || 0)).toFixed(2)}deg`);
     el.style.setProperty('--tilt', `${s.tilt.toFixed(2)}deg`);
     el.style.setProperty('--zoom', s.zoom.toFixed(3));
+    el.style.setProperty('--zoomL', s.zoomL.toFixed(3));
+    el.style.setProperty('--zoomS', (s.zoom / s.zoomL).toFixed(4));
     el.style.setProperty('--px', `${s.px.toFixed(1)}px`);
     el.style.setProperty('--py', `${s.py.toFixed(1)}px`);
   }, [rotOffsetRef]);
   const settle = useCallback(() => {
     const s = v.current, mode = modeOf(s.tilt), zoom = Math.round(s.zoom * 100);
+    // HD: once still, redraw at the real size instead of stretching the old picture
+    if (s.zoomL !== s.zoom) { s.zoomL = s.zoom; apply(); }
     setHud(h => (h.mode === mode && h.zoom === zoom ? h : { mode, zoom }));
     onRestRef.current?.(s.rot);
-  }, []);
+  }, [apply]);
 
   /** Smoothly move to a target camera (respects reduced motion). */
   const animateTo = useCallback((target, ms = 450) => {

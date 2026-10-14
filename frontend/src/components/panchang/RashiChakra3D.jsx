@@ -86,15 +86,15 @@ const Rings = memo(function Rings() {
     <svg viewBox="0 0 600 600" className={s.layer} aria-hidden="true">
       <defs>
         <radialGradient id="rc-face" cx="50%" cy="45%" r="60%">
-          <stop offset="0%" stopColor="#3a2614" /><stop offset="70%" stopColor="#1f140b" /><stop offset="100%" stopColor="#140d07" />
+          <stop offset="0%" stopColor="#2e1f11" /><stop offset="70%" stopColor="#180f08" /><stop offset="100%" stopColor="#0f0904" />
         </radialGradient>
         <linearGradient id="rc-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f5d98a" /><stop offset="45%" stopColor="#b8862f" /><stop offset="100%" stopColor="#6f4b16" />
+          <stop offset="0%" stopColor="#fff1c9" /><stop offset="22%" stopColor="#e2bf72" /><stop offset="48%" stopColor="#9a7230" /><stop offset="72%" stopColor="#f2d58e" /><stop offset="100%" stopColor="#7a5420" />
         </linearGradient>
       </defs>
       {/* bevelled outer rim */}
       <circle cx={C} cy={C} r={R_OUT + 5} fill="url(#rc-gold)" />
-      <circle cx={C} cy={C} r={R_OUT} fill="#24180d" />
+      <circle cx={C} cy={C} r={R_OUT} fill="#1c130a" />
       {/* nakshatra band */}
       {NAKSHATRA.map((n, i) => {
         const a = i * (360 / 27), mid = a + 360 / 54, [x, y] = pt(mid, (R_OUT + R_NAK) / 2);
