@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import s from './SankalpMantra.module.css';
 import Tamrapatra from './Tamrapatra';
+import KaalKram from './KaalKram';
 
 const MAAS = ['चैत्र', 'वैशाख', 'ज्येष्ठ', 'आषाढ', 'श्रावण', 'भाद्रपद', 'आश्विन', 'कार्तिक', 'मार्गशीर्ष', 'पौष', 'माघ', 'फाल्गुन'];
 const RITU = ['वसन्त', 'ग्रीष्म', 'वर्षा', 'शरद्', 'हेमन्त', 'शिशिर'];
@@ -39,7 +40,7 @@ const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; 
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } };
 
 /** The Sanskrit pieces for the panchang shown on the page. */
-function elements(data, place) {
+export function elements(data, place) {
   const adhik = /अधिक/.test(data.maas || '');
   const maasName = (data.maas || '').replace('अधिक', '').trim();
   const mi = MAAS.indexOf(maasName);
@@ -51,6 +52,18 @@ function elements(data, place) {
   const n = data.tithi?.num;
   const tithi = n === 15 ? 'पौर्णिमा' : n === 30 ? 'अमावास्या' : TITHI[(n - 1) % 15] || data.tithi?.name;
   const shukla = /शुक्ल/.test(data.paksha);
+  // how far through each unit the chosen moment is (0…1), for the कालक्रम steps
+  const el = (((Number(data._moon_sun_diff) % 360) + 360) % 360) || 0;
+  const at = Date.parse(`${data.date}T${data.selectedTime}:00+05:30`);
+  const rise = Date.parse(data.sunriseAt), next = Date.parse(data.nextSunriseAt);
+  const clamp01 = (x) => (Number.isFinite(x) ? Math.min(1, Math.max(0, x)) : null);
+  const frac = {
+    year: mi >= 0 ? clamp01((mi + el / 360) / 12) : null,
+    ayana: uttar == null ? null : clamp01((((sunSid - (uttar ? 270 : 90)) % 360) + 360) % 360 / 180),
+    ritu: mi >= 0 ? clamp01(((mi % 2) + el / 360) / 2) : null,
+    maas: clamp01(el / 360), paksha: clamp01((el % 180) / 180), tithi: clamp01((el % 12) / 12),
+    vaar: clamp01((at - rise) / (next - rise)),
+  };
   const rashiOf = Object.fromEntries((data.grahas || []).map(g => [g.key, g.rashi]));
   rashiOf.Sun = data.suryaRashi; rashiOf.Moon = data.chandraRashi;
   return {
@@ -60,7 +73,7 @@ function elements(data, place) {
     maas: `${adhik ? 'अधिक ' : ''}${maasName}`, paksha: shukla ? 'शुक्ल' : 'कृष्ण',
     tithi, vaar: VAAR[data.var] || data.var, nakshatra: sk(data.nakshatra), yoga: sk(data.yoga), karana: sk(data.karana),
     grahas: GRAHA.filter(([k]) => rashiOf[k]).map(([k, loc]) => [sk(rashiOf[k]), loc]),
-    place,
+    place, frac,
   };
 }
 
@@ -126,21 +139,7 @@ export default function SankalpMantra({ data, place }) {
 
       {view === 'info' ? (
         <>
-          <ul className={s.list}>
-            <li><b>शालिवाहन शके {DEV(e.shaka)}</b><span>{e.samvatsar} नाम संवत्सरे</span></li>
-            {e.ayana && <li><b>{e.ayana}</b><span>{e.ayanaMr}</span></li>}
-            {e.ritu && <li><b>{e.ritu} ऋतौ</b><span>{e.rituMr} ऋतू</span></li>}
-            <li><b>{e.maas} मासे</b><span>{data.maas} महिना (अमांत)</span></li>
-            <li><b>{e.paksha} पक्षे</b><span>{data.paksha}</span></li>
-            <li><b>{e.tithi} तिथौ</b><span>{data.tithi?.name}</span></li>
-            <li><b>{e.vaar} शुभवासरे</b><span>{data.var}</span></li>
-            <li><b>{e.nakshatra} नक्षत्रे</b><span>{data.nakshatra}</span></li>
-            <li><b>{e.yoga} योगे</b><span>{data.yoga}</span></li>
-            <li><b>{e.karana} करणे</b><span>{data.karana}</span></li>
-          </ul>
-          <ul className={`${s.list} ${s.grahaList}`}>
-            {e.grahas.map(([r, loc]) => <li key={loc}><b>{r} राशिस्थिते {loc}</b></li>)}
-          </ul>
+          <KaalKram e={e} data={data} />
           <p className={s.note}>
             संकल्प ज्या क्षणी करता त्या क्षणाची तिथी, नक्षत्र, योग व करण घ्यावे — वर तारीख, वेळ व जिल्हा बदलल्यास हा
             संकल्प त्याप्रमाणे बदलतो. ऋतू चांद्रमासानुसार, अयन निरयन. स्थानिक आचारानुसार शब्दरचनेत थोडा फरक असू शकतो.
