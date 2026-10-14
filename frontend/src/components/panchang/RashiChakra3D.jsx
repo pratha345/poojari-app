@@ -73,6 +73,7 @@ function interpolate(samples, t) {
     if (d > 180) d -= 360; if (d < -180) d += 360;
     out[k] = norm(a[k] + d * f);
     out[k + '_retro'] = NODE.has(k) || (k !== 'lagna' && d < 0);
+    out[k + '_speed'] = (d / step) * 86400000;          // degrees per day
   }
   return out;
 }
@@ -114,6 +115,12 @@ const Rings = memo(function Rings() {
         );
       })}
       <circle cx={C} cy={C} r={R_RASHI} fill="url(#rc-face)" stroke="url(#rc-gold)" strokeWidth="3" />
+      {/* degree scale: 1° / 5° / 10° ticks, like an engraved instrument */}
+      <path className={s.ticks} d={Array.from({ length: 360 }, (_, d) => {
+        const len = d % 10 === 0 ? 9 : d % 5 === 0 ? 6 : 3;
+        const [x1, y1] = pt(d, R_RASHI + 2), [x2, y2] = pt(d, R_RASHI + 2 + len);
+        return `M${x1.toFixed(1)},${y1.toFixed(1)}L${x2.toFixed(1)},${y2.toFixed(1)}`;
+      }).join('')} />
       {/* faint spokes at sign boundaries and orbit circles */}
       {RASHI.map((_, i) => { const [x, y] = pt(i * 30, R_RASHI); return <line key={i} x1={C} y1={C} x2={x} y2={y} className={s.spoke} />; })}
       {[72, 104, 136, 168].map(r => <circle key={r} cx={C} cy={C} r={r} className={s.orbit} />)}
@@ -121,16 +128,20 @@ const Rings = memo(function Rings() {
   );
 });
 
-export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
+export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli }) {
   const [view, setView]       = useState('rashi');      // lagna | rashi | info
   const [t, setT]             = useState(() => syncMs || Date.now());
   const [playing, setPlaying] = useState(false);
   const [samples, setSamples] = useState(null);
   const [error, setError]     = useState('');
   const [day, setDay]         = useState(null);          // panchang for the shown time (maas etc.)
+  const [exact, setExact]     = useState(null);          // exact positions once the time settles
+  const [sel, setSel]         = useState(null);          // selected graha (info card)
+  const [jogRate, setJogRate] = useState(0);             // chart ms per real second while jogging
 
   const stageRef = useRef(null), wheelRef = useRef(null), knobRef = useRef(null);
   const view3d = useRef({ rot: 0, tilt: DEFAULT_TILT, vRot: 0 });
+  const movedRef = useRef(0);                    // last time a drag moved (tap vs drag)
   const fetching = useRef(false);
   const tRef = useRef(t); tRef.current = t;
   const reduceMotion = useMemo(() => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, []);
@@ -167,6 +178,9 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
       const date = `${p.y}-${String(p.mo + 1).padStart(2, '0')}-${String(p.d).padStart(2, '0')}`;
       panchangAPI.get({ date, time: `${String(p.h).padStart(2, '0')}:${String(p.mi).padStart(2, '0')}`, lat, lon })
         .then(r => setDay(r.data.data)).catch(() => {});
+      const at = tRef.current;
+      panchangAPI.chakra({ start: new Date(at).toISOString(), hours: 1, step: 60, lat, lon })
+        .then(r => setExact({ t: at, row: r.data.data.samples[0] })).catch(() => {});
     }, 700);
     return () => clearTimeout(id);
   }, [minuteKey, lat, lon]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -191,14 +205,15 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
     const down = (e) => {
       if (e.button !== undefined && e.button !== 0) return;
       cancelAnimationFrame(raf);
-      drag = { x: e.clientX, y: e.clientY, lx: e.clientX, lt: performance.now() };
-      stage.setPointerCapture?.(e.pointerId);
+      drag = { x: e.clientX, y: e.clientY, lx: e.clientX, lt: performance.now(), moved: 0 };
       stage.classList.add(s.dragging);
     };
     const move = (e) => {
       if (!drag) return;
       const v = view3d.current, now = performance.now();
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      drag.moved += Math.abs(dx) + Math.abs(dy);
+      if (drag.moved > 6) movedRef.current = performance.now();
       v.rot += dx * 0.45;
       v.tilt = Math.min(55, Math.max(0, v.tilt + dy * 0.25));
       // flick speed in degrees per frame, capped so one fast swipe can't spin the wheel wildly
@@ -274,12 +289,15 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
       if (!jog) return;
       jog.off = Math.max(-jog.max, Math.min(jog.max, e.clientX - jog.x0));
       knob.style.transform = `translateX(${jog.off}px)`;
+      const f = jog.off / jog.max;
+      setJogRate(Math.sign(f) * f * f * MAX_JOG);
     };
     const up = () => {
       if (!jog) return;
       jog = null; cancelAnimationFrame(raf);
       knob.classList.remove(s.knobActive);
       knob.style.transform = '';                 // springs back to the centre (CSS transition)
+      setJogRate(0);
     };
     knob.addEventListener('pointerdown', down);
     window.addEventListener('pointermove', move);
@@ -331,6 +349,24 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
   }, [pos, restRot, lagnaOffset]);
   const [lx, ly] = pos ? pt(pos.lagna, R_RASHI - 6) : [0, 0];
 
+  // exact values at rest; interpolated while the time is moving
+  const val = (k) => (exact && Math.abs(exact.t - t) < 1000 ? exact.row[k] : pos?.[k]);
+  const rows = pos && [...GRAHA.map(g => ({ ...g, lon: val(g.key), retro: pos[g.key + '_retro'], speed: pos[g.key + '_speed'] })),
+    { key: 'lagna', mr: 'लग्न', c: '#f6d58a', lon: val('lagna'), retro: false, speed: null }];
+  const nakOf = (lon) => `${NAKSHATRA[Math.floor(lon / (360 / 27))]} (${Math.floor((lon % (360 / 27)) / (360 / 108)) + 1})`;
+  const selRow = sel && rows?.find(r => r.key === sel);
+  // whole-sign houses for the lagna view: house 1 = the lagna's rashi
+  const houses = view === 'lagna' && pos ? Array.from({ length: 12 }, (_, h) => {
+    const r = (Math.floor(pos.lagna / 30) + h) % 12;
+    const [x, y] = pt(r * 30 + 15, R_RASHI - 18);
+    return { h: h + 1, x, y };
+  }) : [];
+  const fmtRate = (ms) => {
+    const h = Math.abs(ms) / 3600000;
+    const txt = h >= 24 ? `${(h / 24).toFixed(1)} दिवस` : `${h.toFixed(h < 10 ? 1 : 0)} तास`;
+    return `${ms > 0 ? '⏩' : '⏪'} ${txt}/सेकंद`;
+  };
+
   return (
     <div className={s.root}>
       <div className={s.tabs} role="tablist">
@@ -339,11 +375,15 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
         ))}
       </div>
 
+      <p className={s.caption}>
+        निरयन · लाहिरी अयनांश · {place || 'निवडलेले ठिकाण'} ({Math.abs(lat).toFixed(2)}°{lat >= 0 ? 'उ' : 'द'}, {Math.abs(lon).toFixed(2)}°{lon >= 0 ? 'पू' : 'प'})
+      </p>
       {error && <p className={s.error}>{error}</p>}
 
       {view !== 'info' ? (
         <div className={s.stage} ref={stageRef} title="फिरवण्यासाठी ओढा · झुकवण्यासाठी वर-खाली ओढा">
           <div className={s.shadow} />
+          {!pos && !error && <div className={s.loading}>ग्रहस्थितीचे गणित होत आहे…</div>}
           <div className={s.wheel} ref={wheelRef}>
             <div className={`${s.plate} ${s.z0}`}><Rings /></div>
             <svg viewBox="0 0 600 600" className={`${s.layer} ${s.z1}`} aria-label="ग्रहस्थिती">
@@ -355,13 +395,24 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
                       <circle cx={lx} cy={ly} r="7" className={s.lagnaDot} />
                     </g>
                   )}
-                  {markers.map(m => <line key={m.key} x1={C} y1={C} x2={m.x} y2={m.y} stroke={m.c} className={s.ray} />)}
+                  {markers.map(m => <line key={m.key} x1={C} y1={C} x2={m.x} y2={m.y} stroke={m.c}
+                    className={`${s.ray} ${sel && sel !== m.key ? s.dim : ''}`} />)}
                 </g>
               )}
             </svg>
             <svg viewBox="0 0 600 600" className={`${s.layer} ${s.z2}`}>
+              {houses.map(hh => (
+                <g key={hh.h} className={s.upright} style={{ transformOrigin: `${hh.x}px ${hh.y}px` }}>
+                  <text x={hh.x} y={hh.y} className={s.houseNum}>{hh.h}</text>
+                </g>
+              ))}
               {markers?.map(m => (
-                <g key={m.key} className={s.marker}>
+                <g key={m.key} className={`${s.marker} ${sel === m.key ? s.markerSel : ''} ${sel && sel !== m.key ? s.dim : ''}`}
+                  role="button" tabIndex={0} aria-label={`${m.mr} — तपशील`}
+                  onClick={() => { if (performance.now() - movedRef.current > 250) setSel(x => (x === m.key ? null : m.key)); }}
+                  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSel(x => (x === m.key ? null : m.key)); }}>
+                  <circle cx={m.x} cy={m.y} r="14" className={s.hit} />
+                  {sel === m.key && <circle cx={m.x} cy={m.y} r="12" className={s.selRing} />}
                   <circle cx={m.x} cy={m.y + 2.5} r="7.5" className={s.markerShadow} />
                   <circle cx={m.x} cy={m.y} r="7.5" fill={m.c} className={s.markerBody} />
                   <circle cx={m.x - 2.2} cy={m.y - 2.4} r="2.4" className={s.markerShine} />
@@ -379,19 +430,31 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
             <div className={`${s.hub} ${s.z3}`}><span /></div>
           </div>
           <button type="button" className={s.reset} onClick={resetView} title="मूळ दृश्य">⟲</button>
+          {selRow && (
+            <div className={s.card} role="dialog" aria-label={`${selRow.mr} तपशील`}>
+              <button type="button" className={s.cardX} onClick={() => setSel(null)} aria-label="बंद करा">×</button>
+              <div className={s.cardHead}><span className={s.dot} style={{ background: selRow.c }} />{selRow.mr}
+                {selRow.retro && !NODE.has(selRow.key) && <em> वक्री</em>}</div>
+              <dl>
+                <dt>राशी</dt><dd>{RASHI[Math.floor(selRow.lon / 30)]} {dms(selRow.lon % 30)}</dd>
+                <dt>नक्षत्र</dt><dd>{nakOf(selRow.lon)}</dd>
+                {selRow.speed != null && <><dt>गती</dt><dd>{Math.abs(selRow.speed).toFixed(selRow.key === 'Moon' ? 1 : 2)}°/दिवस</dd></>}
+              </dl>
+            </div>
+          )}
         </div>
       ) : (
         <div className={s.infoWrap}>
           <table className={s.table}>
-            <thead><tr><th>ग्रह</th><th>राशी</th><th>अंश</th><th>नक्षत्र (चरण)</th></tr></thead>
+            <thead><tr><th>ग्रह</th><th>राशी</th><th>अंश</th><th>नक्षत्र (चरण)</th><th>गती / दिवस</th></tr></thead>
             <tbody>
-              {pos && [...GRAHA.map(g => ({ ...g, lon: pos[g.key], retro: pos[g.key + '_retro'] })),
-                { key: 'lagna', mr: 'लग्न', c: '#f6d58a', lon: pos.lagna, retro: false }].map(g => (
-                <tr key={g.key}>
+              {rows?.map(g => (
+                <tr key={g.key} className={g.retro && !NODE.has(g.key) ? s.retroRow : ''}>
                   <td><span className={s.dot} style={{ background: g.c }} />{g.mr}{g.retro && !NODE.has(g.key) ? ' (वक्री)' : ''}</td>
                   <td>{RASHI[Math.floor(g.lon / 30)]}</td>
-                  <td>{dms(g.lon % 30)}</td>
-                  <td>{NAKSHATRA[Math.floor(g.lon / (360 / 27))]} ({Math.floor((g.lon % (360 / 27)) / (360 / 108)) + 1})</td>
+                  <td className={s.num}>{dms(g.lon % 30)}</td>
+                  <td>{nakOf(g.lon)}</td>
+                  <td className={s.num}>{g.speed == null ? '—' : `${g.speed < 0 ? '−' : ''}${Math.abs(g.speed).toFixed(g.key === 'Moon' ? 1 : 2)}°`}</td>
                 </tr>
               ))}
             </tbody>
@@ -402,6 +465,7 @@ export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
 
       {/* time controls */}
       <div className={s.timeRow}>
+        {jogRate !== 0 && <span className={s.rate}>{fmtRate(jogRate)}</span>}
         <button type="button" className={s.play} onClick={() => setPlaying(x => !x)} aria-pressed={playing}>
           {playing ? '⏸' : '▶'} <span>{playing ? 'चालू' : 'स्थिर'}</span>
         </button>

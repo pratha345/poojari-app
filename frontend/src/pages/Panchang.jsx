@@ -659,6 +659,7 @@ export default function Panchang() {
           <RashiChakra3D
             lat={Number(lat)}
             lon={Number(lon)}
+            place={cityName}
             // follow a date/time the visitor picked above; in live mode the wheel keeps its own clock
             syncMs={live ? null : Date.parse(`${date}T${time}:00+05:30`)}
             onShowKundli={(ms) => {
