@@ -1,13 +1,15 @@
 // src/components/panchang/Tamrapatra.jsx — the sankalp engraved on a 3D copper plate (CSS 3D only)
 //
 // A copper plate with real edge thickness (stacked layers), a ring and seal through the top,
-// engraved text and gold-inlaid values. It leans toward the mouse on desktop, follows the
-// phone's tilt on Android, and sways gently elsewhere; a light reflection moves with it.
+// engraved text and gold-inlaid values. It leans toward the mouse on desktop and follows the
+// phone's tilt on Android; a light reflection moves with it. It only moves when you do: once
+// still, the browser redraws the text at full resolution (a plate that never stops moving is
+// kept as a soft, low-resolution picture).
 // Touch scrolling over the plate is left alone (no drag), so a long sankalp still scrolls.
 import { useEffect, useRef } from 'react';
 import s from './Tamrapatra.module.css';
 
-const REST_X = 7, REST_Y = -5;              // resting lean (deg)
+const REST_X = 4, REST_Y = -3;              // resting lean (deg) — small, so the text stays crisp
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 const EDGES = [1, 2, 3, 4, 5, 6, 7];
 
@@ -19,7 +21,7 @@ export default function Tamrapatra({ parts, title, footer, children }) {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const fine = window.matchMedia?.('(pointer: fine)').matches;
     const cur = { x: REST_X, y: REST_Y }, tgt = { x: REST_X, y: REST_Y };
-    let mode = fine ? 'mouse' : 'idle', hovering = false, base = null, raf = 0, visible = true;
+    let hovering = false, base = null, raf = 0, visible = true;
 
     const write = () => {
       plate.style.setProperty('--rx', `${cur.x.toFixed(2)}deg`);
@@ -28,14 +30,16 @@ export default function Tamrapatra({ parts, title, footer, children }) {
       plate.style.setProperty('--lx', `${(50 - cur.y * 3).toFixed(1)}%`);
       plate.style.setProperty('--ly', `${(30 + cur.x * 3).toFixed(1)}%`);
     };
-    const loop = (t) => {
+    const loop = () => {
       raf = 0;
       if (!visible || document.hidden) return;
-      if (mode === 'idle' && !reduce) { tgt.x = REST_X + Math.sin(t / 4100) * 3; tgt.y = REST_Y + Math.sin(t / 3000) * 7; }
-      cur.x += (tgt.x - cur.x) * 0.08; cur.y += (tgt.y - cur.y) * 0.08;
+      cur.x += (tgt.x - cur.x) * 0.12; cur.y += (tgt.y - cur.y) * 0.12;
+      const moving = Math.abs(tgt.x - cur.x) > 0.03 || Math.abs(tgt.y - cur.y) > 0.03;
+      if (!moving) { cur.x = tgt.x; cur.y = tgt.y; }                  // land exactly, then stop
       write();
-      const moving = Math.abs(tgt.x - cur.x) > 0.02 || Math.abs(tgt.y - cur.y) > 0.02;
-      if (moving || (mode === 'idle' && !reduce) || mode === 'gyro') raf = requestAnimationFrame(loop);
+      // at rest the plate lies flat (no 3D layer) so the text is drawn at full resolution
+      plate.dataset.flat = !moving && !hovering && cur.x === REST_X && cur.y === REST_Y ? '1' : '';
+      if (moving) raf = requestAnimationFrame(loop);
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
 
@@ -51,17 +55,17 @@ export default function Tamrapatra({ parts, title, footer, children }) {
     const orient = (e) => {
       if (e.beta == null || e.gamma == null) return;
       if (!base) base = { b: e.beta, g: e.gamma };
-      mode = 'gyro';
-      tgt.x = clamp(REST_X + (e.beta - base.b) * 0.45, -8, 20);
-      tgt.y = clamp(REST_Y + (e.gamma - base.g) * 0.6, -18, 18);
-      kick();
+      const x = clamp(REST_X + (e.beta - base.b) * 0.45, -8, 20);
+      const y = clamp(REST_Y + (e.gamma - base.g) * 0.6, -18, 18);
+      if (Math.abs(x - tgt.x) < 0.4 && Math.abs(y - tgt.y) < 0.4) return;   // ignore sensor jitter
+      tgt.x = x; tgt.y = y; kick();
     };
     const io = typeof IntersectionObserver !== 'undefined'
       ? new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) kick(); }) : null;
     io?.observe(scene);
     const vis = () => { if (!document.hidden) kick(); };
 
-    write(); kick();
+    write(); plate.dataset.flat = '1';
     scene.addEventListener('pointermove', move);
     scene.addEventListener('pointerleave', leave);
     document.addEventListener('visibilitychange', vis);

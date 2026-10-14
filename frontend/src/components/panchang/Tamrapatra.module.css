@@ -8,8 +8,9 @@
 .plate {
   position: relative; transform-style: preserve-3d;
   transform: rotateX(var(--rx)) rotateY(var(--ry));
-  will-change: transform;
 }
+.plate[data-flat="1"] { transform: none; }
+.plate[data-flat="1"] .edge { visibility: hidden; }
 /* edge thickness: darker copper sheets stacked behind the face */
 .edge {
   position: absolute; inset: 0; border-radius: 14px 14px 18px 18px;
@@ -21,12 +22,14 @@
   padding: 92px 40px 28px;
   /* copper: warm base, brushed lines, hammered patina at the corners */
   background:
-    repeating-linear-gradient(92deg, rgba(255, 220, 190, 0.05) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(92deg, rgba(255, 220, 190, 0.03) 0 1px, transparent 1px 4px),
     radial-gradient(120% 60% at 10% 100%, rgba(40, 90, 70, 0.22), transparent 55%),
     radial-gradient(90% 50% at 100% 0%, rgba(40, 90, 70, 0.16), transparent 55%),
     linear-gradient(160deg, #d9905a 0%, #b8693a 30%, #9c522a 55%, #c27a46 78%, #8f4a24 100%);
   box-shadow: inset 0 2px 0 rgba(255, 220, 190, 0.45), inset 0 -3px 6px rgba(60, 20, 0, 0.45),
-              inset 0 0 40px rgba(70, 25, 5, 0.35);
+              inset 0 0 40px rgba(70, 25, 5, 0.35),
+              /* the plate's thickness, visible even when it lies flat */
+              0 2px 0 #7a3c18, 0 4px 0 #5e2c10, 0 6px 0 #4a2109, 0 14px 22px rgba(0, 0, 0, 0.5);
 }
 .border {
   position: absolute; inset: 12px; border-radius: 10px 10px 14px 14px; pointer-events: none;
@@ -45,19 +48,20 @@
 
 /* engraved writing: dark cut with a lit lower lip */
 .head, .title, .text, .foot, .end {
-  position: relative; color: #3a1807;
-  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.55), 0 -1px 0 rgba(30, 8, 0, 0.35);
+  position: relative; color: #2e1205;
+  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.45);              /* one sharp lit lip — no blur */
   font-family: var(--font-display, inherit);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
 .head { margin: 0; text-align: center; font-size: 1rem; letter-spacing: 2px; opacity: 0.85; }
 .title { margin: 2px 0 12px; text-align: center; font-size: 1.45rem; font-weight: 800; letter-spacing: 1px; }
 .text { margin: 0; white-space: pre-line; font-size: 1.2rem; line-height: 1.95; word-break: break-word; }
 /* changing values: gold inlay standing proud of the copper */
 .inlay {
-  color: #ffe08a; font-weight: 700;
-  text-shadow: 0 1px 0 #6a3410, 0 2px 2px rgba(40, 12, 0, 0.55), 0 0 8px rgba(255, 210, 110, 0.35);
+  color: #ffe38f; font-weight: 700;
+  text-shadow: 0 1px 0 #5a2a0c, 0 2px 0 rgba(40, 12, 0, 0.45);  /* raised, crisp edges */
 }
-.ph { color: #ffe08a; opacity: 0.75; font-style: italic; text-shadow: 0 1px 0 #6a3410; }
+.ph { color: #ffe08a; opacity: 0.8; font-style: italic; text-shadow: 0 1px 0 #5a2a0c; }
 /* माहिती: one engraved row per element — Sanskrit inlaid in gold, Marathi cut beside it */
 .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .rows li {
@@ -67,8 +71,8 @@
 .rows li:last-child { border-bottom: none; box-shadow: none; }
 .rows b { font-size: 1.2rem; font-family: var(--font-display, inherit); }
 .rows span {
-  color: #3a1807; font-size: 0.9rem; text-align: right;
-  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.55), 0 -1px 0 rgba(30, 8, 0, 0.35);
+  color: #2e1205; font-size: 0.9rem; text-align: right; font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.45);
 }
 .rowsGap { margin-top: 14px; padding-top: 10px !important; border-top: 2px solid rgba(70, 28, 8, 0.45); }
 .foot { margin: 14px 0 0; text-align: center; font-size: 0.85rem; opacity: 0.85; }
@@ -118,5 +122,4 @@
   .end { margin-top: 4px; font-size: 0.9rem; }
   .shadow { height: 16px; }
 }
-@media (prefers-reduced-motion: reduce) { .plate { will-change: auto; } }
 @supports not (transform-style: preserve-3d) { .edge { display: none; } .plate { transform: none; } }
