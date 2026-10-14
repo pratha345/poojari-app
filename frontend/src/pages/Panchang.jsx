@@ -1,6 +1,6 @@
 // src/pages/Panchang.jsx — हिंदू पंचांग + कुंडली पृष्ठ
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -302,31 +302,73 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, grahas = [], dark }) {
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════
 
+// What survives a refresh: tab + picked date/time live in the URL (shareable, back button);
+// district and dark mode in localStorage; the last result in sessionStorage so a refresh
+// paints straight away instead of skeleton → data → GPS district → data.
+const TABS = ['panchang', 'chakra', 'yantra', 'disha'];
+const PLACE_KEY = 'panchang_place', DARK_KEY = 'panchang_dark', LAST_KEY = 'panchang_last';
+const store = {
+  get: (k, ss) => { try { return JSON.parse((ss ? sessionStorage : localStorage).getItem(k)); } catch { return null; } },
+  set: (k, v, ss) => { try { (ss ? sessionStorage : localStorage).setItem(k, JSON.stringify(v)); } catch { /* private mode */ } },
+};
+function initialState(params) {
+  const qd = params.get('date'), qt = params.get('time'), qtab = params.get('tab');
+  const custom = /^\d{4}-\d{2}-\d{2}$/.test(qd || '');
+  const place = store.get(PLACE_KEY);
+  const okPlace = place && place.name && Number.isFinite(Number(place.lat)) && Number.isFinite(Number(place.lon));
+  const date = custom ? qd : todayIST();
+  const lat = okPlace ? String(place.lat) : '18.5204', lon = okPlace ? String(place.lon) : '73.8567';
+  const last = store.get(LAST_KEY, true);
+  return {
+    tab: TABS.includes(qtab) ? qtab : 'panchang',
+    live: !custom,
+    date,
+    time: custom && /^\d{2}:\d{2}$/.test(qt || '') ? qt : nowISTTime(),
+    lat, lon, name: okPlace ? place.name : 'पुणे', savedPlace: !!okPlace,
+    dark: store.get(DARK_KEY) === true,
+    data: last && last.key === `${date}|${lat}|${lon}` ? last.data : null,
+  };
+}
+
 export default function Panchang() {
-  const [date,       setDate]       = useState(todayIST());
-  const [time,       setTime]       = useState(nowISTTime());
+  const [params, setParams] = useSearchParams();
+  const init = useRef(null);
+  if (!init.current) init.current = initialState(params);
+  const I = init.current;
+
+  const [date,       setDate]       = useState(I.date);
+  const [time,       setTime]       = useState(I.time);
   // live = follow the current IST time (and date). Turns off when the user picks a date or time.
-  const [live,       setLive]       = useState(true);
-  // पंचांग | राशि चक्र
-  const [pageTab,    setPageTab]    = useState('panchang');
+  const [live,       setLive]       = useState(I.live);
+  // पंचांग | राशि चक्र | पंचांग यंत्र | दिशा यंत्र
+  const [pageTab,    setPageTab]    = useState(I.tab);
   const [showClock,  setShowClock]  = useState(false);
-  const [lat,        setLat]        = useState('18.5204');
-  const [lon,        setLon]        = useState('73.8567');
-  const [cityName,   setCityName]   = useState('पुणे');
-  const [data,       setData]       = useState(null);
+  const [lat,        setLat]        = useState(I.lat);
+  const [lon,        setLon]        = useState(I.lon);
+  const [cityName,   setCityName]   = useState(I.name);
+  const [data,       setData]       = useState(I.data);
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState('');
   const [locLoading, setLocLoading] = useState(false);
-  const [dark,       setDark]       = useState(false);
-  const [animKey,    setAnimKey]    = useState(0);
+  const [dark,       setDark]       = useState(I.dark);
   const [lastRefresh,setLastRefresh]= useState('');
+
+  // keep the URL / storage in step with what is on screen (replace: no history spam)
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search);
+    if (pageTab === 'panchang') next.delete('tab'); else next.set('tab', pageTab);
+    if (live) { next.delete('date'); next.delete('time'); } else { next.set('date', date); next.set('time', time); }
+    if (next.toString() !== new URLSearchParams(window.location.search).toString()) setParams(next, { replace: true });
+  }, [pageTab, live, date, time, setParams]);
+  useEffect(() => { store.set(PLACE_KEY, { name: cityName, lat, lon }); }, [cityName, lat, lon]);
+  useEffect(() => { store.set(DARK_KEY, dark); }, [dark]);
 
   // Rating state
   const [panRating,  setPanRating]  = useState({ helpful: 0, not_helpful: 0, user_vote: null });
   const [ratingDone, setRatingDone] = useState(false);
 
   // searchable district dropdown
-  const [query,     setQuery]     = useState('पुणे');
+  const [query,     setQuery]     = useState(I.name);
   const [open,      setOpen]      = useState(false);
   const [highlight, setHighlight] = useState(0);
   const dropRef  = useRef(null);
@@ -364,11 +406,10 @@ export default function Panchang() {
   };
 
   // ── Fetch ───────────────────────────────────────────────────
-  // silent: background refresh from the live clock — update values in place, no spinner,
-  // no fade, no remount (remounting every minute looked like a full page reload).
-  // animate: replay the entry animation (only when the date or place changes).
+  // Values always swap in place: no remount, no fade, no dimming (that read as a page blink).
+  // silent: background refresh from the live clock — not even the "अपडेट होत आहे" note.
   const reqId = useRef(0);
-  const fetchPanchang = useCallback(async (d, la, lo, t, { silent = false, animate = false } = {}) => {
+  const fetchPanchang = useCallback(async (d, la, lo, t, { silent = false } = {}) => {
     const my = ++reqId.current;            // ignore responses that arrive out of order
     if (!silent) setLoading(true);
     setError('');
@@ -379,7 +420,7 @@ export default function Panchang() {
       const res = await panchangAPI.get(params);
       if (my !== reqId.current) return;
       setData(res.data.data);
-      if (animate) setAnimKey(k => k + 1);
+      store.set(LAST_KEY, { key: `${d}|${la}|${lo}`, data: res.data.data }, true);
       setLastRefresh(nowISTTime());
     } catch (err) {
       if (my === reqId.current && !silent) setError(err.response?.data?.message || 'पंचांग माहिती मिळवण्यात त्रुटी झाली.');
@@ -407,18 +448,14 @@ export default function Panchang() {
   }, [live]);
 
   // ── Auto-refresh on any input change (debounced 400ms) ──────
-  // Live-clock ticks refresh quietly; a new date or place replays the entry animation.
-  const silentNext = useRef(false);
-  const lastPlace  = useRef('');
+  // Live-clock ticks (and the first load when a cached result is already on screen) are quiet.
+  const silentNext = useRef(!!I.data);
   useEffect(() => {
     clearTimeout(debounceRef.current);
     const silent = silentNext.current;
     silentNext.current = false;
-    const place = `${date}|${lat}|${lon}`;
-    const animate = !silent && place !== lastPlace.current;
-    lastPlace.current = place;
     debounceRef.current = setTimeout(() => {
-      fetchPanchang(date, lat, lon, time, { silent, animate });
+      fetchPanchang(date, lat, lon, time, { silent });
     }, silent ? 0 : 400);
     return () => clearTimeout(debounceRef.current);
   }, [date, time, lat, lon, fetchPanchang]);
@@ -458,9 +495,8 @@ export default function Panchang() {
     const la = nearest ? nearest.lat : gpsLat.toFixed(4);
     const lo = nearest ? nearest.lon : gpsLon.toFixed(4);
     const label = nearest ? nearest.name : 'माझे स्थान';
-    setLat(la); setLon(lo);
+    setLat(la); setLon(lo);                // the input-change effect fetches once
     setCityName(label); setQuery(label);
-    fetchPanchang(date, la, lo, time);
   };
 
   const detectLocation = () => {
@@ -477,7 +513,7 @@ export default function Panchang() {
   // (no error shown) if the user hasn't granted/denied location yet;
   // पुणे stays as the default when permission isn't available.
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation || I.savedPlace) return;   // a remembered district wins on refresh
     navigator.geolocation.getCurrentPosition(
       pos => applyGpsPosition(pos.coords.latitude, pos.coords.longitude),
       () => {},                 // denied/unavailable — keep default पुणे, no error shown
@@ -687,10 +723,7 @@ export default function Panchang() {
 
         {/* ═══ RESULTS ══════════════════════════════════════ */}
         {data && pageTab === 'panchang' && (
-          <div
-            key={animKey}
-            className={`${styles.results} ${loading ? styles.resultsRefreshing : ''}`}
-          >
+          <div className={styles.results}>
 
             {/* ── Date + Time banner ── */}
             <div className={styles.dateBanner}>
