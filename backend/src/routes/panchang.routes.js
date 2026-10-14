@@ -59,8 +59,34 @@ async function handlePanchang(req, res) {
 // GET /api/panchang?date=YYYY-MM-DD (frontend uses this)
 router.get('/', handlePanchang);
 
-// GET /api/panchang/YYYY-MM-DD (tests use this)
-router.get('/:date', (req, res) => {
+// GET /api/panchang/chakra?start=<ISO>&hours=96&step=30&lat=&lon=
+// Sidereal longitudes (Lahiri) of the nine grahas and the lagna, sampled every `step`
+// minutes from `start` — feeds the Rashi Chakra wheel, which interpolates between samples.
+const gochar = require('../services/gocharService');
+const CHAKRA_KEYS = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+router.get('/chakra', (req, res) => {
+  const start = Date.parse(req.query.start || new Date().toISOString());
+  const hours = Math.min(240, Math.max(1, parseInt(req.query.hours) || 96));
+  const step  = Math.min(240, Math.max(10, parseInt(req.query.step) || 30));
+  const lat   = parseFloat(req.query.lat ?? 18.5204);
+  const lon   = parseFloat(req.query.lon ?? 73.8567);
+  if (!Number.isFinite(start) || start < Date.UTC(1900, 0) || start > Date.UTC(2100, 0))
+    return res.status(400).json({ success: false, message: 'अवैध वेळ.' });
+  if (!(lat >= -66 && lat <= 66) || !(lon >= -180 && lon <= 180))
+    return res.status(400).json({ success: false, message: 'अवैध स्थान.' });
+  const samples = [];
+  for (let m = 0; m <= hours * 60; m += step) {
+    const d = new Date(start + m * 60000);
+    const row = { t: d.getTime(), lagna: +gochar.lagnaLon(d, lat, lon).toFixed(4) };
+    for (const k of CHAKRA_KEYS) row[k] = +gochar.siderealLon(k, d).toFixed(4);
+    samples.push(row);
+  }
+  res.set('Cache-Control', 'public, max-age=300');
+  res.json({ success: true, data: { step, samples } });
+});
+
+// GET /api/panchang/YYYY-MM-DD (tests use this) — only matches a date, so /rating etc. reach their own routes
+router.get('/:date(\\d{4}-\\d{2}-\\d{2})', (req, res) => {
   req.query.date = req.params.date;
   if (req.query.lat === undefined && req.params.lat) req.query.lat = req.params.lat;
   return handlePanchang(req, res);

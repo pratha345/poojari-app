@@ -147,7 +147,18 @@ function positions(date, moonSign = null) {
   });
 }
 
+// Sidereal lagna (ascendant) at an instant for a place: apparent sidereal time and the true
+// obliquity, minus the same Lahiri ayanamsha as the planets (so chart and planets agree).
+function lagnaLon(date, lat, lon) {
+  const t = Astro.MakeTime(date);
+  const ramc = (((Astro.SiderealTime(t) * 15 + lon) % 360) + 360) % 360 * Math.PI / 180;
+  const eps = Astro.e_tilt(t).tobl * Math.PI / 180;
+  const phi = lat * Math.PI / 180;
+  const asc = Math.atan2(Math.cos(ramc), -(Math.sin(ramc) * Math.cos(eps) + Math.tan(phi) * Math.sin(eps))) * 180 / Math.PI;
+  return norm360(asc - lahiri(t));
+}
+
 module.exports = {
   RASHIS, PLANETS, GOOD_HOUSES,
-  siderealLon, rashiIdx, speed, ingresses, stations, positions, houseFrom, isGood, shaniStatus,
+  siderealLon, rashiIdx, speed, ingresses, stations, positions, houseFrom, isGood, shaniStatus, lagnaLon,
 };

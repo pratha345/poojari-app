@@ -10,6 +10,7 @@ import { panchangAPI } from '../api/index.js';
 import { getSessionId } from '../utils/session.js';
 import styles from '../styles/Panchang.module.css';
 import { RASHIS } from '../data/rashifalData';
+import RashiChakra3D from '../components/panchang/RashiChakra3D';
 
 const RASHI_IMG = Object.fromEntries(RASHIS.map(r => [r.name, r.img]));
 
@@ -304,6 +305,8 @@ export default function Panchang() {
   const [time,       setTime]       = useState(nowISTTime());
   // live = follow the current IST time (and date). Turns off when the user picks a date or time.
   const [live,       setLive]       = useState(true);
+  // पंचांग | राशि चक्र
+  const [pageTab,    setPageTab]    = useState('panchang');
   const [showClock,  setShowClock]  = useState(false);
   const [lat,        setLat]        = useState('18.5204');
   const [lon,        setLon]        = useState('73.8567');
@@ -644,8 +647,33 @@ export default function Panchang() {
         {/* Skeleton */}
         {loading && !data && <Skeleton />}
 
+        {/* ═══ पंचांग | राशि चक्र ══════════════════════════════ */}
+        <div className={styles.pageTabs} role="tablist">
+          <button role="tab" aria-selected={pageTab === 'panchang'} onClick={() => setPageTab('panchang')}
+            className={`${styles.pageTab} ${pageTab === 'panchang' ? styles.pageTabOn : ''}`}>📅 पंचांग</button>
+          <button role="tab" aria-selected={pageTab === 'chakra'} onClick={() => setPageTab('chakra')}
+            className={`${styles.pageTab} ${pageTab === 'chakra' ? styles.pageTabOn : ''}`}>🪐 राशि चक्र</button>
+        </div>
+
+        {pageTab === 'chakra' && (
+          <RashiChakra3D
+            lat={Number(lat)}
+            lon={Number(lon)}
+            // follow a date/time the visitor picked above; in live mode the wheel keeps its own clock
+            syncMs={live ? null : Date.parse(`${date}T${time}:00+05:30`)}
+            onShowKundli={(ms) => {
+              const ist = new Date(ms + 330 * 60000).toISOString();
+              setLive(false);
+              setDate(ist.slice(0, 10));
+              setTime(ist.slice(11, 16));
+              setPageTab('panchang');
+              setTimeout(() => document.getElementById('kundali-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 600);
+            }}
+          />
+        )}
+
         {/* ═══ RESULTS ══════════════════════════════════════ */}
-        {data && (
+        {data && pageTab === 'panchang' && (
           <div
             key={animKey}
             className={`${styles.results} ${loading ? styles.resultsRefreshing : ''}`}
@@ -760,7 +788,7 @@ export default function Panchang() {
             )}
 
             {/* ── Kundali ── */}
-            <section className={styles.section}>
+            <section className={styles.section} id="kundali-section">
               <h2 className={styles.sectionHeading}>
                 <span className={styles.sectionIcon}>🔯</span>
                 उत्तर भारतीय कुंडली
@@ -786,7 +814,7 @@ export default function Panchang() {
         )}
 
         {/* ── Panchang Rating Widget ─────────────────────── */}
-        {data && (
+        {data && pageTab === 'panchang' && (
           <div className={styles.panchangRatingBox}>
             {!ratingDone ? (
               <>

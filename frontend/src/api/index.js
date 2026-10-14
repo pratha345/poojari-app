@@ -101,6 +101,8 @@ export const panchangAPI = {
   get:       (params)                  => api.get ('/panchang',        { params }),
   rate:      (date, is_helpful, sid)   => api.post('/panchang/rate',   { date, is_helpful, session_id: sid }),
   getRating: (date, session_id)        => api.get ('/panchang/rating', { params: { date, session_id } }),
+  // sidereal graha + lagna longitudes sampled over time (Rashi Chakra)
+  chakra:    (params)                  => api.get ('/panchang/chakra', { params }),
 };
 
 // src/api/kundali.api.js  (Admin only — JWT must have role=admin)

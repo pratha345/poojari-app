@@ -1207,3 +1207,14 @@
   margin-left: 4px;
 }
 .liveBtn:hover { background: var(--secondary); color: #fff; }
+
+/* ── पंचांग | राशि चक्र tabs ── */
+.pageTabs { display: flex; gap: 10px; justify-content: center; margin: 4px 0 18px; }
+.pageTab {
+  font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+  padding: 9px 22px; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--kd-border); background: var(--kd-bg); color: var(--kd-text);
+  transition: background 0.15s, color 0.15s;
+}
+.pageTab:hover { background: var(--kd-cell); }
+.pageTabOn { background: linear-gradient(180deg, #6b4a17, #4c330f); color: #f6d58a; border-color: #b8862f; }

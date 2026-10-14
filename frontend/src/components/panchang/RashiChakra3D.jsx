@@ -1,0 +1,436 @@
+// src/components/panchang/RashiChakra3D.jsx — राशि चक्र (interactive, CSS-3D)
+//
+// Positions come from /api/panchang/chakra (sidereal, Lahiri, astronomy-engine — the same
+// engine as the panchang and rashifal). The wheel only draws them; nothing is estimated here
+// except linear interpolation between half-hourly samples while the time is being scrubbed.
+//
+// 3D is plain CSS: a perspective stage, a wheel tilted with rotateX/rotateZ and layers lifted
+// with translateZ. Dragging the wheel changes only the view (rotation/tilt), never the time.
+import { useCallback, useEffect, useMemo, useRef, useState, memo } from 'react';
+import { panchangAPI } from '../../api/index.js';
+import { RASHIS } from '../../data/rashifalData';
+import s from './RashiChakra3D.module.css';
+
+const RASHI = RASHIS.map(r => r.name);
+const NAKSHATRA = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशीर्ष', 'आर्द्रा', 'पुनर्वसू', 'पुष्य', 'आश्लेषा',
+  'मघा', 'पूर्वा फाल्गुनी', 'उत्तरा फाल्गुनी', 'हस्त', 'चित्रा', 'स्वाती', 'विशाखा', 'अनुराधा', 'ज्येष्ठा',
+  'मूळ', 'पूर्वाषाढा', 'उत्तराषाढा', 'श्रवण', 'धनिष्ठा', 'शततारका', 'पूर्वा भाद्रपदा', 'उत्तरा भाद्रपदा', 'रेवती'];
+const NAK_SHORT = { 'पूर्वा फाल्गुनी': 'पू. फाल्गुनी', 'उत्तरा फाल्गुनी': 'उ. फाल्गुनी', 'पूर्वाषाढा': 'पू. षाढा',
+  'उत्तराषाढा': 'उ. षाढा', 'पूर्वा भाद्रपदा': 'पू. भाद्रपदा', 'उत्तरा भाद्रपदा': 'उ. भाद्रपदा' };
+const TITHI = ['प्रतिपदा', 'द्वितीया', 'तृतीया', 'चतुर्थी', 'पंचमी', 'षष्ठी', 'सप्तमी', 'अष्टमी', 'नवमी', 'दशमी',
+  'एकादशी', 'द्वादशी', 'त्रयोदशी', 'चतुर्दशी'];
+const DAYS = ['रविवार', 'सोमवार', 'मंगळवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+const MONTHS = ['जानेवारी', 'फेब्रुवारी', 'मार्च', 'एप्रिल', 'मे', 'जून', 'जुलै', 'ऑगस्ट', 'सप्टेंबर', 'ऑक्टोबर', 'नोव्हेंबर', 'डिसेंबर'];
+
+// orbit radius (inner → outer), colour, Marathi name
+const GRAHA = [
+  { key: 'Moon',    mr: 'चंद्र', r: 72,  c: '#cfd8dc' },
+  { key: 'Mercury', mr: 'बुध',   r: 88,  c: '#4caf50' },
+  { key: 'Venus',   mr: 'शुक्र', r: 104, c: '#ec407a' },
+  { key: 'Sun',     mr: 'सूर्य', r: 120, c: '#f08a24' },
+  { key: 'Mars',    mr: 'मंगळ',  r: 136, c: '#e53935' },
+  { key: 'Jupiter', mr: 'गुरू',  r: 152, c: '#f9a825' },
+  { key: 'Saturn',  mr: 'शनी',   r: 168, c: '#7986cb' },
+  { key: 'Rahu',    mr: 'राहू',  r: 184, c: '#ab47bc' },
+  { key: 'Ketu',    mr: 'केतू',  r: 184, c: '#26a69a' },
+];
+const NODE = new Set(['Rahu', 'Ketu']);      // mean nodes: always retrograde
+
+const C = 300;                                // SVG centre (viewBox 600)
+const R_OUT = 292, R_NAK = 252, R_RASHI = 206;
+const IST = 330 * 60000;
+const WINDOW_H = 240, STEP_MIN = 30;          // fetch 10 days of half-hourly samples
+const MAX_JOG = 3 * 86400000;                 // full jog = 3 days of chart time per second
+const DEFAULT_TILT = 26;
+
+const norm = (a) => ((a % 360) + 360) % 360;
+// screen point for longitude λ at radius r (Mesha at top-left, signs run anti-clockwise)
+const pt = (lon, r) => {
+  const th = ((90 + lon) * Math.PI) / 180;
+  return [C + r * Math.cos(th), C - r * Math.sin(th)];
+};
+const arc = (r1, r2, a1, a2) => {            // ring sector between longitudes a1..a2
+  const [x1, y1] = pt(a1, r2), [x2, y2] = pt(a2, r2), [x3, y3] = pt(a2, r1), [x4, y4] = pt(a1, r1);
+  return `M${x1},${y1} A${r2},${r2} 0 0 0 ${x2},${y2} L${x3},${y3} A${r1},${r1} 0 0 1 ${x4},${y4} Z`;
+};
+// rotation for text written along the ring at longitude `mid`, never upside down
+const ringTextRot = (mid) => { const m = norm(mid); return m > 90 && m < 270 ? 180 - m : -m; };
+const dms = (x) => { const d = Math.floor(x); const m = Math.floor((x - d) * 60); return `${d}°${String(m).padStart(2, '0')}′`; };
+const istParts = (ms) => { const d = new Date(ms + IST); return { y: d.getUTCFullYear(), mo: d.getUTCMonth(), d: d.getUTCDate(), h: d.getUTCHours(), mi: d.getUTCMinutes(), wd: d.getUTCDay() }; };
+const toLocalInput = (ms) => new Date(ms + IST).toISOString().slice(0, 16);
+const fromLocalInput = (v) => Date.parse(v + ':00+05:30');
+
+// linear interpolation between samples, unwrapping 360° jumps
+function interpolate(samples, t) {
+  if (!samples?.length) return null;
+  const step = samples.length > 1 ? samples[1].t - samples[0].t : 1;
+  const i = Math.min(samples.length - 2, Math.max(0, Math.floor((t - samples[0].t) / step)));
+  const a = samples[i], b = samples[i + 1] || a;
+  const f = Math.min(1, Math.max(0, (t - a.t) / step));
+  const out = {};
+  for (const k of [...GRAHA.map(g => g.key), 'lagna']) {
+    let d = b[k] - a[k];
+    if (d > 180) d -= 360; if (d < -180) d += 360;
+    out[k] = norm(a[k] + d * f);
+    out[k + '_retro'] = NODE.has(k) || (k !== 'lagna' && d < 0);
+  }
+  return out;
+}
+
+// ── static rings (memoised: drawn once) ──
+const Rings = memo(function Rings() {
+  return (
+    <svg viewBox="0 0 600 600" className={s.layer} aria-hidden="true">
+      <defs>
+        <radialGradient id="rc-face" cx="50%" cy="45%" r="60%">
+          <stop offset="0%" stopColor="#3a2614" /><stop offset="70%" stopColor="#1f140b" /><stop offset="100%" stopColor="#140d07" />
+        </radialGradient>
+        <linearGradient id="rc-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#f6d58a" /><stop offset="45%" stopColor="#b8862f" /><stop offset="100%" stopColor="#6f4b16" />
+        </linearGradient>
+      </defs>
+      {/* bevelled outer rim */}
+      <circle cx={C} cy={C} r={R_OUT + 5} fill="url(#rc-gold)" />
+      <circle cx={C} cy={C} r={R_OUT} fill="#24180d" />
+      {/* nakshatra band */}
+      {NAKSHATRA.map((n, i) => {
+        const a = i * (360 / 27), mid = a + 360 / 54, [x, y] = pt(mid, (R_OUT + R_NAK) / 2);
+        return (
+          <g key={n}>
+            <path d={arc(R_NAK, R_OUT, a, a + 360 / 27)} className={i % 2 ? s.nakA : s.nakB} />
+            <text x={x} y={y} className={s.nakText} transform={`rotate(${ringTextRot(mid)}, ${x}, ${y})`}>{NAK_SHORT[n] || n}</text>
+          </g>
+        );
+      })}
+      <circle cx={C} cy={C} r={R_NAK} fill="none" stroke="#b8862f" strokeWidth="1.5" strokeDasharray="3 3" />
+      {/* rashi band */}
+      {RASHI.map((n, i) => {
+        const a = i * 30, mid = a + 15, [x, y] = pt(mid, (R_NAK + R_RASHI) / 2);
+        return (
+          <g key={n}>
+            <path d={arc(R_RASHI, R_NAK, a, a + 30)} className={s.rashiCell} />
+            <text x={x} y={y} className={s.rashiText} transform={`rotate(${ringTextRot(mid)}, ${x}, ${y})`}>{n}</text>
+          </g>
+        );
+      })}
+      <circle cx={C} cy={C} r={R_RASHI} fill="url(#rc-face)" stroke="url(#rc-gold)" strokeWidth="3" />
+      {/* faint spokes at sign boundaries and orbit circles */}
+      {RASHI.map((_, i) => { const [x, y] = pt(i * 30, R_RASHI); return <line key={i} x1={C} y1={C} x2={x} y2={y} className={s.spoke} />; })}
+      {[72, 104, 136, 168].map(r => <circle key={r} cx={C} cy={C} r={r} className={s.orbit} />)}
+    </svg>
+  );
+});
+
+export default function RashiChakra3D({ lat, lon, syncMs, onShowKundli }) {
+  const [view, setView]       = useState('rashi');      // lagna | rashi | info
+  const [t, setT]             = useState(() => syncMs || Date.now());
+  const [playing, setPlaying] = useState(false);
+  const [samples, setSamples] = useState(null);
+  const [error, setError]     = useState('');
+  const [day, setDay]         = useState(null);          // panchang for the shown time (maas etc.)
+
+  const stageRef = useRef(null), wheelRef = useRef(null), knobRef = useRef(null);
+  const view3d = useRef({ rot: 0, tilt: DEFAULT_TILT, vRot: 0 });
+  const fetching = useRef(false);
+  const tRef = useRef(t); tRef.current = t;
+  const reduceMotion = useMemo(() => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, []);
+
+  // page picked a new date/time → follow it
+  useEffect(() => { if (syncMs) { setT(syncMs); setPlaying(false); } }, [syncMs]);
+
+  // ── data: keep a 10-day window of samples around t ──
+  const ensureWindow = useCallback(async (at) => {
+    const cur = samples;
+    const margin = 12 * 3600000;
+    if (cur && at > cur[0].t + margin && at < cur[cur.length - 1].t - margin) return;
+    if (fetching.current) return;
+    fetching.current = true;
+    try {
+      const start = new Date(at - (WINDOW_H / 2) * 3600000).toISOString();
+      const r = await panchangAPI.chakra({ start, hours: WINDOW_H, step: STEP_MIN, lat, lon });
+      setSamples(r.data.data.samples); setError('');
+    } catch {
+      setError('ग्रहस्थिती मिळवता आली नाही.');
+    } finally { fetching.current = false; }
+  }, [samples, lat, lon]);
+
+  useEffect(() => { setSamples(null); }, [lat, lon]);           // new place → fresh lagna
+  useEffect(() => { ensureWindow(t); }, [t, ensureWindow]);
+
+  const pos = useMemo(() => interpolate(samples, t), [samples, t]);
+
+  // panchang (maas, var) for the shown minute, once the time settles
+  const minuteKey = Math.floor(t / 60000);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const p = istParts(t);
+      const date = `${p.y}-${String(p.mo + 1).padStart(2, '0')}-${String(p.d).padStart(2, '0')}`;
+      panchangAPI.get({ date, time: `${String(p.h).padStart(2, '0')}:${String(p.mi).padStart(2, '0')}`, lat, lon })
+        .then(r => setDay(r.data.data)).catch(() => {});
+    }, 700);
+    return () => clearTimeout(id);
+  }, [minuteKey, lat, lon]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── wheel rotation (view only) — written straight to CSS variables, no re-render ──
+  const lagnaOffset = view === 'lagna' && pos ? pos.lagna - 90 : 0;   // lagna at the left (east)
+  const [restRot, setRestRot] = useState(0);     // user rotation once a drag/spin has settled
+  const offsetRef = useRef(0);
+  const applyView = useCallback(() => {          // stable: reads refs, so listeners stay bound
+    const el = wheelRef.current; if (!el) return;
+    const v = view3d.current;
+    el.style.setProperty('--rot', `${v.rot + offsetRef.current}deg`);
+    el.style.setProperty('--tilt', `${v.tilt}deg`);
+  }, []);
+  useEffect(() => { offsetRef.current = lagnaOffset; applyView(); }, [lagnaOffset, applyView, view]);
+  // a new view starts from the default orientation (lagna then sits exactly at the left)
+  useEffect(() => { view3d.current.rot = 0; view3d.current.vRot = 0; setRestRot(0); applyView(); }, [view, applyView]);
+
+  useEffect(() => {
+    const stage = stageRef.current; if (!stage) return;
+    let drag = null, raf = 0;
+    const down = (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      cancelAnimationFrame(raf);
+      drag = { x: e.clientX, y: e.clientY, lx: e.clientX, lt: performance.now() };
+      stage.setPointerCapture?.(e.pointerId);
+      stage.classList.add(s.dragging);
+    };
+    const move = (e) => {
+      if (!drag) return;
+      const v = view3d.current, now = performance.now();
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      v.rot += dx * 0.45;
+      v.tilt = Math.min(55, Math.max(0, v.tilt + dy * 0.25));
+      // flick speed in degrees per frame, capped so one fast swipe can't spin the wheel wildly
+      v.vRot = Math.max(-12, Math.min(12, ((e.clientX - drag.lx) * 0.45) / Math.max(8, now - drag.lt) * 16));
+      drag.x = e.clientX; drag.y = e.clientY; drag.lx = e.clientX; drag.lt = now;
+      applyView();
+    };
+    const up = () => {
+      if (!drag) return;
+      drag = null; stage.classList.remove(s.dragging);
+      if (reduceMotion) { setRestRot(view3d.current.rot); return; }
+      const spin = () => {                       // gentle inertia
+        const v = view3d.current;
+        v.vRot *= 0.92;
+        if (Math.abs(v.vRot) < 0.05) { setRestRot(v.rot); return; }
+        v.rot += v.vRot; applyView(); raf = requestAnimationFrame(spin);
+      };
+      raf = requestAnimationFrame(spin);
+    };
+    stage.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    return () => {
+      cancelAnimationFrame(raf);
+      stage.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+    };
+  }, [applyView, reduceMotion]);
+
+  const resetView = () => {
+    const v = view3d.current; const from = { ...v }; const t0 = performance.now();
+    setRestRot(0);
+    if (reduceMotion) { v.rot = 0; v.tilt = DEFAULT_TILT; v.vRot = 0; applyView(); return; }
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / 450), e = 1 - (1 - k) ** 3;
+      v.rot = from.rot * (1 - e); v.tilt = from.tilt + (DEFAULT_TILT - from.tilt) * e; v.vRot = 0;
+      applyView(); if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  // ── time: live play, and the jog dial (drag sideways = run time forward / back) ──
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => setT(Date.now()), 1000);
+    setT(Date.now());
+    return () => clearInterval(id);
+  }, [playing]);
+
+  useEffect(() => {
+    const knob = knobRef.current; if (!knob) return;
+    const track = knob.parentElement;
+    let jog = null, raf = 0;
+    const loop = (now) => {
+      if (!jog) return;
+      const dt = (now - jog.last) / 1000; jog.last = now;
+      const f = jog.off / jog.max;
+      setT(x => x + Math.sign(f) * f * f * MAX_JOG * dt);
+      raf = requestAnimationFrame(loop);
+    };
+    const down = (e) => {
+      setPlaying(false);
+      jog = { x0: e.clientX, off: 0, max: Math.max(40, track.clientWidth / 2 - 30), last: performance.now() };
+      knob.setPointerCapture?.(e.pointerId);
+      knob.classList.add(s.knobActive);
+      raf = requestAnimationFrame(loop);
+      e.preventDefault();
+    };
+    const move = (e) => {
+      if (!jog) return;
+      jog.off = Math.max(-jog.max, Math.min(jog.max, e.clientX - jog.x0));
+      knob.style.transform = `translateX(${jog.off}px)`;
+    };
+    const up = () => {
+      if (!jog) return;
+      jog = null; cancelAnimationFrame(raf);
+      knob.classList.remove(s.knobActive);
+      knob.style.transform = '';                 // springs back to the centre (CSS transition)
+    };
+    knob.addEventListener('pointerdown', down);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    return () => {
+      cancelAnimationFrame(raf);
+      knob.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+    };
+  }, []);
+
+  const nudge = (min) => { setPlaying(false); setT(x => x + min * 60000); };
+
+  // ── what the bottom line says ──
+  const p = istParts(t);
+  const info = pos && (() => {
+    const el = norm(pos.Moon - pos.Sun);
+    const tn = Math.floor(el / 12);                     // 0..29
+    const tithi = tn === 14 ? 'पौर्णिमा' : tn === 29 ? 'अमावस्या' : TITHI[tn % 15];
+    const nk = Math.floor(pos.Moon / (360 / 27));
+    const pada = Math.floor((pos.Moon % (360 / 27)) / (360 / 108)) + 1;
+    return { tithi, paksha: tn < 15 ? 'शुक्ल पक्ष' : 'कृष्ण पक्ष', nak: NAKSHATRA[nk], pada };
+  })();
+
+  // planet markers; labels counter-rotate so they stay upright while the wheel turns
+  const markers = useMemo(() => {
+    if (!pos) return null;
+    const rot = ((restRot + lagnaOffset) * Math.PI) / 180;           // CSS rotateZ, clockwise
+    const toScreen = (x, y) => [C + (x - C) * Math.cos(rot) - (y - C) * Math.sin(rot), C + (x - C) * Math.sin(rot) + (y - C) * Math.cos(rot)];
+    const list = GRAHA.map(g => { const [x, y] = pt(pos[g.key], g.r); return { ...g, x, y, lon: pos[g.key], retro: pos[g.key + '_retro'] }; });
+    const boxes = list.map(m => { const [sx, sy] = toScreen(m.x, m.y); return [sx - 9, sy - 9, sx + 9, sy + 9]; });
+    const hit = (b) => boxes.some(o => b[0] < o[2] && b[2] > o[0] && b[1] < o[3] && b[3] > o[1]);
+    for (const m of list) {
+      const [sx, sy] = toScreen(m.x, m.y);
+      const w = (m.mr.length + (m.retro ? 1 : 0)) * 8 + 4, h = 16;
+      const tries = [[12, 5, 'start'], [-12, 5, 'end'], [-w / 2, -14, 'start'], [-w / 2, 22, 'start'], [12, -12, 'start'], [12, 20, 'start']];
+      let pick = tries[0];
+      for (const tr of tries) {
+        const x0 = tr[2] === 'end' ? sx + tr[0] - w : sx + tr[0];
+        const b = [x0, sy + tr[1] - 12, x0 + w, sy + tr[1] - 12 + h];
+        if (!hit(b)) { pick = tr; boxes.push(b); break; }
+      }
+      m.dx = pick[0]; m.dy = pick[1]; m.anchor = pick[2];
+    }
+    return list;
+  }, [pos, restRot, lagnaOffset]);
+  const [lx, ly] = pos ? pt(pos.lagna, R_RASHI - 6) : [0, 0];
+
+  return (
+    <div className={s.root}>
+      <div className={s.tabs} role="tablist">
+        {[['lagna', 'लग्न'], ['rashi', 'राशि'], ['info', 'माहिती']].map(([k, label]) => (
+          <button key={k} role="tab" aria-selected={view === k} className={`${s.tab} ${view === k ? s.tabOn : ''}`} onClick={() => setView(k)}>{label}</button>
+        ))}
+      </div>
+
+      {error && <p className={s.error}>{error}</p>}
+
+      {view !== 'info' ? (
+        <div className={s.stage} ref={stageRef} title="फिरवण्यासाठी ओढा · झुकवण्यासाठी वर-खाली ओढा">
+          <div className={s.shadow} />
+          <div className={s.wheel} ref={wheelRef}>
+            <div className={`${s.plate} ${s.z0}`}><Rings /></div>
+            <svg viewBox="0 0 600 600" className={`${s.layer} ${s.z1}`} aria-label="ग्रहस्थिती">
+              {pos && (
+                <g>
+                  {view === 'lagna' && (
+                    <g>
+                      <line x1={C} y1={C} x2={lx} y2={ly} className={s.lagnaLine} />
+                      <circle cx={lx} cy={ly} r="7" className={s.lagnaDot} />
+                    </g>
+                  )}
+                  {markers.map(m => <line key={m.key} x1={C} y1={C} x2={m.x} y2={m.y} stroke={m.c} className={s.ray} />)}
+                </g>
+              )}
+            </svg>
+            <svg viewBox="0 0 600 600" className={`${s.layer} ${s.z2}`}>
+              {markers?.map(m => (
+                <g key={m.key} className={s.marker}>
+                  <circle cx={m.x} cy={m.y + 2.5} r="7.5" className={s.markerShadow} />
+                  <circle cx={m.x} cy={m.y} r="7.5" fill={m.c} className={s.markerBody} />
+                  <circle cx={m.x - 2.2} cy={m.y - 2.4} r="2.4" className={s.markerShine} />
+                  <g className={s.upright} style={{ transformOrigin: `${m.x}px ${m.y}px` }}>
+                    <text x={m.x + m.dx} y={m.y + m.dy} fill={m.c} textAnchor={m.anchor} className={s.markerText}>{m.mr}{m.retro ? '*' : ''}</text>
+                  </g>
+                </g>
+              ))}
+              {view === 'lagna' && pos && (
+                <g className={s.upright} style={{ transformOrigin: `${lx}px ${ly}px` }}>
+                  <text x={lx + 12} y={ly - 10} className={s.lagnaText}>लग्न</text>
+                </g>
+              )}
+            </svg>
+            <div className={`${s.hub} ${s.z3}`}><span /></div>
+          </div>
+          <button type="button" className={s.reset} onClick={resetView} title="मूळ दृश्य">⟲</button>
+        </div>
+      ) : (
+        <div className={s.infoWrap}>
+          <table className={s.table}>
+            <thead><tr><th>ग्रह</th><th>राशी</th><th>अंश</th><th>नक्षत्र (चरण)</th></tr></thead>
+            <tbody>
+              {pos && [...GRAHA.map(g => ({ ...g, lon: pos[g.key], retro: pos[g.key + '_retro'] })),
+                { key: 'lagna', mr: 'लग्न', c: '#f6d58a', lon: pos.lagna, retro: false }].map(g => (
+                <tr key={g.key}>
+                  <td><span className={s.dot} style={{ background: g.c }} />{g.mr}{g.retro && !NODE.has(g.key) ? ' (वक्री)' : ''}</td>
+                  <td>{RASHI[Math.floor(g.lon / 30)]}</td>
+                  <td>{dms(g.lon % 30)}</td>
+                  <td>{NAKSHATRA[Math.floor(g.lon / (360 / 27))]} ({Math.floor((g.lon % (360 / 27)) / (360 / 108)) + 1})</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className={s.note}>निरयन (लाहिरी अयनांश). * = वक्री; राहू-केतू मध्यम पात, नेहमी वक्री गतीने.</p>
+        </div>
+      )}
+
+      {/* time controls */}
+      <div className={s.timeRow}>
+        <button type="button" className={s.play} onClick={() => setPlaying(x => !x)} aria-pressed={playing}>
+          {playing ? '⏸' : '▶'} <span>{playing ? 'चालू' : 'स्थिर'}</span>
+        </button>
+      </div>
+      <div className={s.jogRow}>
+        <button type="button" className={s.stepBtn} onClick={() => nudge(-60)} aria-label="एक तास मागे">−1ता</button>
+        <div className={s.jogTrack} aria-label="वेळ पुढे-मागे: ओढा">
+          {Array.from({ length: 9 }, (_, i) => <i key={i} />)}
+          <button type="button" ref={knobRef} className={s.knob} aria-label="वेळ ओढा">‹›</button>
+        </div>
+        <button type="button" className={s.stepBtn} onClick={() => nudge(60)} aria-label="एक तास पुढे">+1ता</button>
+        <button type="button" className={s.now} onClick={() => { setPlaying(false); setT(Date.now()); }}>आता</button>
+      </div>
+
+      <div className={s.when}>
+        <label className={s.dateBox}>
+          <span className={s.date}>{p.d} {MONTHS[p.mo]} {p.y}</span>
+          <span className={s.time}>{String(p.h).padStart(2, '0')}:{String(p.mi).padStart(2, '0')}</span>
+          <input type="datetime-local" value={toLocalInput(t)} aria-label="तारीख व वेळ निवडा"
+            onChange={e => { const v = fromLocalInput(e.target.value); if (Number.isFinite(v)) { setPlaying(false); setT(v); } }} />
+        </label>
+        {onShowKundli && <button type="button" className={s.kundliBtn} onClick={() => onShowKundli(t)}>कुंडली</button>}
+      </div>
+      {info && (
+        <p className={s.summary}>
+          {info.tithi}, {info.paksha}{day?.maas ? `, ${day.maas}` : ''}<br />
+          {info.nak} ({info.pada}), {DAYS[p.wd]}
+        </p>
+      )}
+    </div>
+  );
+}
