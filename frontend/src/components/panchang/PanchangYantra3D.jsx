@@ -10,6 +10,7 @@ import { panchangAPI } from '../../api/index.js';
 import { RASHIS } from '../../data/rashifalData';
 import { useView3D } from './view3d';
 import ViewToolbar from './ViewToolbar';
+import { Galaxy } from './RashiChakra3D';
 import { useGrahaTimeline, useTimeControls, nextBoundary, norm, istParts, ymd, hhmm, fmtOffset, IST } from './yantraTime';
 import c from './RashiChakra3D.module.css';            // shared stage / controls styling
 import s from './PanchangYantra3D.module.css';
@@ -171,7 +172,8 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
   );
 
   return (
-    <div className={c.root}>
+    <div className={`${c.root} ${c.space}`}>
+      <Galaxy />
       <p className={c.caption}>
         {DAYS[p.wd]}, {p.d} {MONTHS[p.mo]} {p.y} · {String(p.h).padStart(2, '0')}:{String(p.mi).padStart(2, '0')} · {place || 'निवडलेले ठिकाण'} · निरयन, लाहिरी
       </p>
@@ -180,6 +182,7 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
       <div ref={cam.viewerRef} className={`${c.viewer} ${cam.full && !document.fullscreenElement ? c.viewerFull : ''}`}>
       <div className={c.stage} ref={cam.stageRef} tabIndex={0} role="group"
         aria-label="पंचांग यंत्र — ओढून फिरवा; बाण कळा: सरकवा, + / −: झूम, 0: मूळ दृश्य">
+        <div className={c.halo} aria-hidden="true" />
         <div className={c.shadow} />
         {!pos && !error && <div className={c.loading}>गणित होत आहे…</div>}
         <div className={c.wheel}>

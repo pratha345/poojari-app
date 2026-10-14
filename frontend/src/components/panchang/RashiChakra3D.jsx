@@ -81,7 +81,7 @@ function interpolate(samples, t) {
 }
 
 // ── galaxy backdrop (decorative, drawn once): seeded stars, a Milky Way band, nebula light ──
-const Galaxy = memo(function Galaxy() {
+export const Galaxy = memo(function Galaxy() {
   let seed = 7;
   const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   const stars = Array.from({ length: 260 }, (_, i) => {
