@@ -173,15 +173,17 @@ function PCard({ icon, label, value, sub, accent }) {
 }
 
 /* ── Muhurta time block ── */
-function MuhurtaBlock({ icon, label, range, bad }) {
+// tone: 'good' = शुभ (green), 'bad' = टाळावे (red), 'warn' = वर्ज्य / सावधानी (amber)
+function MuhurtaBlock({ icon, label, range, tone = 'good' }) {
+  const cls = { good: styles.muhurtaGood, bad: styles.muhurtaBad, warn: styles.muhurtaWarn }[tone];
   return (
-    <div className={`${styles.muhurtaBlock} ${bad ? styles.muhurtaBad : styles.muhurtaGood}`}>
+    <div className={`${styles.muhurtaBlock} ${cls}`}>
       <div className={styles.muhurtaTop}>
         <span className={styles.muhurtaIcon}>{icon}</span>
         <span className={styles.muhurtaLabel}>{label}</span>
       </div>
       <span className={styles.muhurtaTime}>
-        {range ? `${range.start} – ${range.end}` : '—'}
+        {range ? `${formatTime12h(range.start)} – ${formatTime12h(range.end)}` : '—'}
       </span>
     </div>
   );
@@ -732,14 +734,17 @@ export default function Panchang() {
                 काळ / मुहूर्त
               </h2>
               <div className={styles.muhurtaGrid}>
-                <MuhurtaBlock icon="🙏" label={data.abhijitMuhurat?.avoid ? 'अभिजित मुहूर्त (बुधवारी वर्ज्य)' : 'अभिजित मुहूर्त'} range={data.abhijitMuhurat} bad={!!data.abhijitMuhurat?.avoid} />
-                <MuhurtaBlock icon="🔴" label="राहु काळ"       range={data.rahuKaal}       bad={true}  />
-                <MuhurtaBlock icon="⚫" label="गुळिक काळ"      range={data.gulikaKaal}     bad={true}  />
-                <MuhurtaBlock icon="🟡" label="यमगंड"           range={data.yamaganda}      bad={true}  />
+                <MuhurtaBlock icon="🙏" label={data.abhijitMuhurat?.avoid ? 'अभिजित मुहूर्त (बुधवारी वर्ज्य)' : 'अभिजित मुहूर्त'}
+                  range={data.abhijitMuhurat} tone={data.abhijitMuhurat?.avoid ? 'warn' : 'good'} />
+                <MuhurtaBlock icon="🔴" label="राहु काळ"       range={data.rahuKaal}       tone="bad" />
+                <MuhurtaBlock icon="⚫" label="गुळिक काळ"      range={data.gulikaKaal}     tone="bad" />
+                <MuhurtaBlock icon="🟡" label="यमगंड"           range={data.yamaganda}      tone="bad" />
               </div>
               <p className={styles.muhurtaNote}>
                 ℹ️ <strong>राहु काळ, गुळिक काळ, यमगंड</strong> — या काळात महत्त्वाची कामे, प्रवास, व्यवहार टाळावेत.
-                <strong> अभिजित मुहूर्त</strong> सर्वोत्तम शुभ वेळ आहे.
+                {data.abhijitMuhurat?.avoid
+                  ? <> <strong>अभिजित मुहूर्त</strong> बुधवारी वर्ज्य मानतात — आज शुभ कामासाठी अमृत, शुभ किंवा लाभ चौघडिया पाहावा.</>
+                  : <> <strong>अभिजित मुहूर्त</strong> सर्वोत्तम शुभ वेळ आहे.</>}
               </p>
             </section>
 

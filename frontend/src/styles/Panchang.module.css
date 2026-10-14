@@ -680,6 +680,12 @@
   border-color: #ef9a9a;
   color: #c62828;
 }
+.muhurtaWarn {
+  background: linear-gradient(135deg, #fff8e1, #fffdf3);
+  border-color: #f2c94c;
+  color: #a15c00;
+}
+.dark .muhurtaWarn { background: linear-gradient(135deg, #2a1f05, #1e1604); border-color: #6b5214; color: #f5c06e; }
 .dark .muhurtaGood { background: linear-gradient(135deg, #0e2410, #0a1c0c); border-color: #2e5030; color: #81c784; }
 .dark .muhurtaBad  { background: linear-gradient(135deg, #2c0a0a, #200808); border-color: #5a1e1e; color: #ef9a9a; }
 
