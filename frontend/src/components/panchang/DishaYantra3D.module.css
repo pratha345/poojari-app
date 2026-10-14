@@ -75,7 +75,6 @@
 .hub span    { width: 5%; aspect-ratio: 1; background: radial-gradient(circle at 35% 30%, #fff3d2, #b8862f 60%, #5c3d10); z-index: 1; }
 
 .controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
-.live { color: #a5d6a7; font-weight: 700; }
 .reset {
   border: 1px solid rgba(232,196,122,0.35); background: rgba(255,220,150,0.06);
   color: var(--gold); border-radius: 22px; padding: 9px 16px; font-weight: 700; cursor: pointer;
@@ -85,7 +84,6 @@
 .facts dt { color: var(--gold); font-weight: 700; white-space: nowrap; }
 .facts dd { margin: 0; color: #e8dcc0; }
 .shoolRow { color: #ef9a9a !important; }
-.note { font-size: 0.76rem; color: #a8936a; margin: 12px 6px 0; line-height: 1.6; }
 
 @media (max-width: 480px) {
   .root { padding: 14px 8px 18px; border-radius: 14px; }

@@ -259,7 +259,6 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
       </div>
 
       <div className={s.controls}>
-        {mode === 'sensor' && <span className={s.live}>● Compass चालू — फोन सपाट धरा</span>}
         <button type="button" className={s.reset} onClick={() => { target.current = 0; wheelRef.current?.style.setProperty('--tilt', '18deg'); }}
           title="उत्तर वर">उत्तर ↑</button>
       </div>
@@ -276,10 +275,6 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
           ? `${dirOf(sun.az).mr} दिशेला, ${Math.round(sun.az)}° (क्षितिजापासून ${Math.round(sun.el)}° वर) — compass तपासण्यासाठी ☀ खूण सूर्याकडे जुळवा.`
           : 'सूर्य सध्या क्षितिजाखाली आहे.'}{place ? ` · ${place}` : ''}</dd>
       </dl>
-      <p className={s.note}>
-        अचूकतेसाठी फोन सपाट धरा, धातू/चुंबकापासून दूर ठेवा आणि गरज वाटल्यास फोन हवेत "8" आकारात फिरवून compass calibrate करा.
-        महाराष्ट्रात चुंबकीय व भौगोलिक उत्तर यांत १° पेक्षा कमी फरक आहे.
-      </p>
     </div>
   );
 }
