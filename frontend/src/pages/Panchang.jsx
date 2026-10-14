@@ -357,21 +357,27 @@ export default function Panchang() {
   };
 
   // ── Fetch ───────────────────────────────────────────────────
-  const fetchPanchang = useCallback(async (d, la, lo, t) => {
-    setLoading(true);
+  // silent: background refresh from the live clock — update values in place, no spinner,
+  // no fade, no remount (remounting every minute looked like a full page reload).
+  // animate: replay the entry animation (only when the date or place changes).
+  const reqId = useRef(0);
+  const fetchPanchang = useCallback(async (d, la, lo, t, { silent = false, animate = false } = {}) => {
+    const my = ++reqId.current;            // ignore responses that arrive out of order
+    if (!silent) setLoading(true);
     setError('');
     try {
       const params = { date: d };
       if (la && lo) { params.lat = la; params.lon = lo; }
       if (t)        { params.time = t; }
       const res = await panchangAPI.get(params);
+      if (my !== reqId.current) return;
       setData(res.data.data);
-      setAnimKey(k => k + 1);
+      if (animate) setAnimKey(k => k + 1);
       setLastRefresh(nowISTTime());
     } catch (err) {
-      setError(err.response?.data?.message || 'पंचांग माहिती मिळवण्यात त्रुटी झाली.');
+      if (my === reqId.current && !silent) setError(err.response?.data?.message || 'पंचांग माहिती मिळवण्यात त्रुटी झाली.');
     } finally {
-      setLoading(false);
+      if (my === reqId.current && !silent) setLoading(false);
     }
   }, []);
 
@@ -383,8 +389,9 @@ export default function Panchang() {
     const tick = () => {
       if (document.hidden) return;
       const t = nowISTTime(), d = todayIST();
-      setTime(prev => (prev === t ? prev : t));
-      setDate(prev => (prev === d ? prev : d));
+      // mark the refetch quiet only when the tick actually changes something
+      setTime(prev => { if (prev === t) return prev; silentNext.current = true; return t; });
+      setDate(prev => { if (prev === d) return prev; silentNext.current = true; return d; });
     };
     tick();
     const id = setInterval(tick, 30000);
@@ -393,11 +400,19 @@ export default function Panchang() {
   }, [live]);
 
   // ── Auto-refresh on any input change (debounced 400ms) ──────
+  // Live-clock ticks refresh quietly; a new date or place replays the entry animation.
+  const silentNext = useRef(false);
+  const lastPlace  = useRef('');
   useEffect(() => {
     clearTimeout(debounceRef.current);
+    const silent = silentNext.current;
+    silentNext.current = false;
+    const place = `${date}|${lat}|${lon}`;
+    const animate = !silent && place !== lastPlace.current;
+    lastPlace.current = place;
     debounceRef.current = setTimeout(() => {
-      fetchPanchang(date, lat, lon, time);
-    }, 400);
+      fetchPanchang(date, lat, lon, time, { silent, animate });
+    }, silent ? 0 : 400);
     return () => clearTimeout(debounceRef.current);
   }, [date, time, lat, lon, fetchPanchang]);
 
