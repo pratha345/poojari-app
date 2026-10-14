@@ -1,6 +1,6 @@
 // src/components/layout/Header.jsx — Single-row clean navbar
 import { useState, useEffect, useRef } from 'react';
-import { FaHandsPraying, FaFire, FaLaptop, FaBuilding, FaOm, FaWandMagicSparkles, FaCalendarDays, FaBook, FaLocationDot, FaMagnifyingGlass, FaBell } from 'react-icons/fa6';
+import { FaHandsPraying, FaFire, FaLaptop, FaBuilding, FaOm, FaWandMagicSparkles, FaCalendarDays, FaBook, FaLocationDot, FaMagnifyingGlass, FaBell, FaCompass } from 'react-icons/fa6';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLang } from '../../context/LanguageContext';
@@ -30,6 +30,7 @@ function buildNav(t) {
         { to: '/panchang', icon: FaOm,                iconBg: 'linear-gradient(135deg,#8b5cf6,#6d28d9)', label: t.nav.panchang, desc: t.nav.home === 'Home' ? "Today's Tithi, Nakshatra, Yoga" : 'आजचे तिथी, नक्षत्र, योग' },
         { to: '/rashifal', icon: FaWandMagicSparkles, iconBg: 'linear-gradient(135deg,#ec4899,#be185d)', label: t.nav.rashifal,  desc: t.nav.home === 'Home' ? 'Daily horoscope for all signs' : 'मेष ते मीन आजचे भविष्य' },
         { to: '/muhurat',  icon: FaCalendarDays,      iconBg: 'linear-gradient(135deg,#D4AF37,#a07810)', label: t.nav.muhurat,   desc: t.nav.home === 'Home' ? 'Auspicious time & Muhurat calendar' : 'शुभ वेळ व मुहूर्त कॅलेंडर' },
+        { to: '/disha-yantra', icon: FaCompass,       iconBg: 'linear-gradient(135deg,#8a5f1d,#5c3d10)', label: t.nav.disha,     desc: t.nav.home === 'Home' ? 'Compass, today\'s Dishashool, puja direction' : 'कंपास, आजची दिशाशूल, पूजेची दिशा' },
       ],
     },
     { to: '/blog',          icon: FaBook,        iconColor: '#8b5cf6', label: t.nav.blog   },

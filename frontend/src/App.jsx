@@ -81,6 +81,7 @@ const About           = lazy(() => import('./pages/About'));
 const Panchang        = lazy(() => import('./pages/Panchang'));
 const Muhurat         = lazy(() => import('./pages/Muhurat'));
 const Rashifal        = lazy(() => import('./pages/Rashifal'));
+const DishaYantra     = lazy(() => import('./pages/DishaYantra'));
 
 const AdminDashboard  = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminReport     = lazy(() => import('./pages/admin/AdminReport'));
@@ -195,6 +196,7 @@ export default function App() {
             <Route path="/panchang"        element={<Panchang />} />
             <Route path="/muhurat"         element={<Muhurat />} />
             <Route path="/rashifal"        element={<Rashifal />} />
+            <Route path="/disha-yantra"    element={<DishaYantra />} />
             <Route path="/hall-booking"    element={<HallBooking />} />
             <Route path="/book-pujari"     element={<BookPujari />} />
             <Route path="/online-puja"    element={<OnlinePuja />} />

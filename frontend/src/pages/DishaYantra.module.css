@@ -1,0 +1,6 @@
+.page { background: #fdf6ec; min-height: 100vh; }
+.hero { background: linear-gradient(135deg, #6b2a06, #8a3a0b); color: #fff; padding: 28px 0 24px; }
+.title { font-family: var(--font-display, inherit); font-size: 2rem; margin: 0 0 6px; color: #fff; }
+.sub { margin: 0; color: #f6d58a; font-size: 0.95rem; }
+.more { text-align: center; margin-top: 20px; font-weight: 700; }
+.more a { color: #8a3a0b; }

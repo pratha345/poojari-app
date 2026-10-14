@@ -1,0 +1,107 @@
+/* DishaYantra3D — brass compass on a dark wooden case, CSS-3D only */
+.root {
+  --gold: #e8c47a;
+  --ink: #f3e6c8;
+  background: radial-gradient(120% 90% at 50% 30%, #3b2410 0%, #24160a 55%, #150d06 100%);
+  border-radius: 20px;
+  padding: 18px 16px 22px;
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.08), 0 18px 50px rgba(30, 15, 0, 0.35);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* fixed pointer above the dial: the direction you face */
+.pointer { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin-bottom: 4px; }
+.pointer strong { font-family: var(--font-display, inherit); font-size: 1.6rem; color: var(--gold); }
+.caret { color: var(--gold); font-size: 1rem; transform: translateY(-2px); }
+.headingDeg { font-size: 1.05rem; color: #d9c49a; font-variant-numeric: tabular-nums; }
+
+.stage {
+  position: relative; width: min(100%, 520px); aspect-ratio: 1; margin: 0 auto;
+  perspective: 1400px; perspective-origin: 50% 30%;
+  touch-action: none; cursor: grab; user-select: none;
+}
+.dragging { cursor: grabbing; }
+/* a fixed index mark at 12 o'clock */
+.stage::before {
+  content: ''; position: absolute; left: 50%; top: -2px; z-index: 5;
+  width: 0; height: 0; transform: translateX(-50%);
+  border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 14px solid var(--gold);
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
+}
+.wheel {
+  --rot: 0deg; --tilt: 18deg;
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  transform: rotateX(var(--tilt)) rotateZ(var(--rot));
+  will-change: transform;
+}
+.plate, .layer, .hub { position: absolute; inset: 0; width: 100%; height: 100%; }
+.plate { border-radius: 50%; }
+.z0 { transform: translateZ(0); box-shadow: 0 22px 40px rgba(0,0,0,0.55); border-radius: 50%; }
+.z1 { transform: translateZ(14px); filter: drop-shadow(0 6px 6px rgba(0,0,0,0.55)); }
+.z2 { transform: translateZ(22px); }
+.z3 { transform: translateZ(30px); }
+.shadow {
+  position: absolute; left: 12%; right: 12%; bottom: -3%; height: 11%;
+  background: radial-gradient(closest-side, rgba(0,0,0,0.55), transparent); filter: blur(6px); pointer-events: none;
+}
+
+.ticks { stroke: rgba(232, 196, 122, 0.6); stroke-width: 1.2; }
+.deg { fill: #cdb68a; font-size: 13px; text-anchor: middle; dominant-baseline: middle; font-variant-numeric: tabular-nums; }
+.shool { fill: rgba(229, 57, 53, 0.16); stroke: rgba(229, 57, 53, 0.45); stroke-width: 1; }
+.shoolText { fill: #ef9a9a; font-size: 13px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; paint-order: stroke; stroke: #1a1008; stroke-width: 3px; }
+
+/* rose: two-tone gold facets, north tip red */
+.roseA { fill: #f2c94c; }
+.roseB { fill: #8a5f1d; }
+.roseNorthA { fill: #ef5350; }
+.roseNorthB { fill: #b71c1c; }
+.roseA, .roseB, .roseNorthA, .roseNorthB { stroke: #1a1008; stroke-width: 2.5; stroke-linejoin: round; }
+
+.upright { transform-box: view-box; transform: rotate(calc(var(--rot) * -1)); }
+.mainDir { fill: var(--gold); font-size: 25px; font-weight: 800; text-anchor: middle; dominant-baseline: middle; font-family: var(--font-display, inherit); paint-order: stroke; stroke: #1a1008; stroke-width: 4px; }
+.subDir { fill: #e9d7ae; font-size: 17px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; paint-order: stroke; stroke: #1a1008; stroke-width: 3px; }
+.dik { fill: #a8936a; font-size: 12px; text-anchor: middle; dominant-baseline: middle; paint-order: stroke; stroke: #1a1008; stroke-width: 3px; }
+
+.sunDisc { fill: rgba(255, 183, 77, 0.2); stroke: #ffb74d; stroke-width: 1.5; }
+.sunGlyph { fill: #ffca28; font-size: 16px; text-anchor: middle; dominant-baseline: middle; }
+.sunDown { opacity: 0.35; }
+
+.hub { display: grid; place-items: center; pointer-events: none; }
+.hub::before, .hub::after, .hub span { content: ''; position: absolute; border-radius: 50%; }
+.hub::before { width: 12%; aspect-ratio: 1; background: conic-gradient(from 30deg, #f6d58a, #8a5f1d, #f6d58a, #6f4b16, #f6d58a); box-shadow: 0 4px 10px rgba(0,0,0,0.6); }
+.hub::after  { width: 8%; aspect-ratio: 1; background: #1a1008; }
+.hub span    { width: 5%; aspect-ratio: 1; background: radial-gradient(circle at 35% 30%, #fff3d2, #b8862f 60%, #5c3d10); z-index: 1; }
+
+.controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.start {
+  border: none; border-radius: 24px; padding: 11px 22px; cursor: pointer;
+  background: linear-gradient(180deg, #f6d58a, #c9962e); color: #3b2410; font-weight: 800; font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+}
+.live { color: #a5d6a7; font-weight: 700; }
+.reset {
+  border: 1px solid rgba(232,196,122,0.35); background: rgba(255,220,150,0.06);
+  color: var(--gold); border-radius: 22px; padding: 9px 16px; font-weight: 700; cursor: pointer;
+}
+.msg { text-align: center; color: #ffcc80; font-size: 0.86rem; margin: 10px 4px 0; }
+
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 16px 6px 0; font-size: 0.92rem; line-height: 1.5; }
+.facts dt { color: var(--gold); font-weight: 700; white-space: nowrap; }
+.facts dd { margin: 0; color: #e8dcc0; }
+.shoolRow { color: #ef9a9a !important; }
+.note { font-size: 0.76rem; color: #a8936a; margin: 12px 6px 0; line-height: 1.6; }
+
+@media (max-width: 480px) {
+  .root { padding: 14px 8px 18px; border-radius: 14px; }
+  .mainDir { font-size: 30px; }
+  .subDir { font-size: 21px; }
+  .dik, .deg { font-size: 15px; }
+  .facts { grid-template-columns: 1fr; gap: 2px; }
+  .facts dd { margin-bottom: 8px; }
+}
+@supports not (transform-style: preserve-3d) {
+  .wheel { transform: rotateZ(var(--rot)); }
+  .z1, .z2, .z3 { transform: none; }
+}

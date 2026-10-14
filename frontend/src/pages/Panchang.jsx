@@ -11,6 +11,7 @@ import { getSessionId } from '../utils/session.js';
 import styles from '../styles/Panchang.module.css';
 import { RASHIS } from '../data/rashifalData';
 import RashiChakra3D from '../components/panchang/RashiChakra3D';
+import DishaYantra3D from '../components/panchang/DishaYantra3D';
 
 const RASHI_IMG = Object.fromEntries(RASHIS.map(r => [r.name, r.img]));
 
@@ -653,7 +654,11 @@ export default function Panchang() {
             className={`${styles.pageTab} ${pageTab === 'panchang' ? styles.pageTabOn : ''}`}>📅 पंचांग</button>
           <button role="tab" aria-selected={pageTab === 'chakra'} onClick={() => setPageTab('chakra')}
             className={`${styles.pageTab} ${pageTab === 'chakra' ? styles.pageTabOn : ''}`}>🪐 राशि चक्र</button>
+          <button role="tab" aria-selected={pageTab === 'disha'} onClick={() => setPageTab('disha')}
+            className={`${styles.pageTab} ${pageTab === 'disha' ? styles.pageTabOn : ''}`}>🧭 दिशा यंत्र</button>
         </div>
+
+        {pageTab === 'disha' && <DishaYantra3D lat={Number(lat)} lon={Number(lon)} place={cityName} />}
 
         {pageTab === 'chakra' && (
           <RashiChakra3D

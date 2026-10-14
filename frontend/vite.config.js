@@ -62,7 +62,7 @@ export default defineConfig({
           }
           // Heavy pages — Panchang + Rashifal use suncalc, split together
           if (id.includes('/pages/Panchang') || id.includes('/pages/Rashifal') ||
-              id.includes('/pages/Muhurat')) {
+              id.includes('/pages/Muhurat') || id.includes('/pages/DishaYantra')) {
             return 'astro-pages';
           }
           // Map component — leaflet and react-leaflet are heavy

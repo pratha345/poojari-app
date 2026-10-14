@@ -33,6 +33,7 @@ const STATIC_URLS = [
   { loc: '/blog',         changefreq: 'daily',   priority: '0.85' },
   { loc: '/cities',       changefreq: 'weekly',  priority: '0.85' },
   { loc: '/rashifal',     changefreq: 'daily',   priority: '0.8', lastmod: TODAY },
+  { loc: '/disha-yantra', changefreq: 'monthly', priority: '0.7', lastmod: TODAY },
   { loc: '/online-puja',  changefreq: 'weekly',  priority: '0.85' },
   { loc: '/hall-booking', changefreq: 'weekly',  priority: '0.85' },
 
