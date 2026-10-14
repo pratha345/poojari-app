@@ -129,7 +129,7 @@ export default function SankalpMantra({ data, place }) {
         <>
           <Tamrapatra title="संकल्पातील पंचांग"
             footer={`${Number(d)}-${Number(m)}-${y} · ${data.selectedTime} · ${place}`}>
-            <ul className={tp.rows}>
+            <ul className={`${tp.rows} ${tp.rowsGrid}`}>
               {[
                 [`शालिवाहन शके ${DEV(e.shaka)}`, `${e.samvatsar} नाम संवत्सरे`],
                 e.ayana && [e.ayana, e.ayanaMr],
@@ -144,8 +144,10 @@ export default function SankalpMantra({ data, place }) {
               ].filter(Boolean).map(([sa, mr]) => (
                 <li key={sa}><b className={tp.inlay} lang="sa">{sa}</b><span>{mr}</span></li>
               ))}
-              {e.grahas.map(([r, loc], i) => (
-                <li key={loc} className={i === 0 ? tp.rowsGap : ''}><b className={tp.inlay} lang="sa">{r} राशिस्थिते {loc}</b></li>
+            </ul>
+            <ul className={`${tp.rows} ${tp.rowsGap}`}>
+              {e.grahas.map(([r, loc]) => (
+                <li key={loc}><b className={tp.inlay} lang="sa">{r} राशिस्थिते {loc}</b></li>
               ))}
             </ul>
           </Tamrapatra>

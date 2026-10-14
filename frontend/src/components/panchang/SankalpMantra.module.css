@@ -45,7 +45,8 @@
 .copy:hover { background: linear-gradient(180deg, #f5d98a, #c49b4a); }
 
 @media (max-width: 480px) {
-  .root { padding: 18px 14px 20px; border-radius: 14px; }
+  .root { padding: 14px 10px 16px; border-radius: 14px; }
+  .tabs { margin: 10px 0 6px; }
   .title { font-size: 1.5rem; }
   .tab { min-width: 0; padding: 9px 16px; font-size: 1rem; }
   .form { grid-template-columns: 1fr; }
