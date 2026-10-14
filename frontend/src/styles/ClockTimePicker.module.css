@@ -1,341 +1,159 @@
 /* ═══════════════════════════════════════════════════════════════
-   ClockTimePicker.module.css — SVG clock dial, Hindu brown/orange theme
+   ClockTimePicker.module.css — 3D watch face, flip-clock tiles, raised keys
+   (espresso & antique gold, matching the panchang yantras)
 ═══════════════════════════════════════════════════════════════ */
 
 /* ── Modal overlay ── */
 .overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.72);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  animation: overlayIn 0.18s ease;
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(40, 20, 5, 0.6), rgba(0, 0, 0, 0.82));
   backdrop-filter: blur(6px);
+  perspective: 1200px;
+  animation: overlayIn 0.2s ease;
 }
+@keyframes overlayIn { from { opacity: 0; } }
 
-@keyframes overlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ── Picker panel ── */
+/* ── Picker panel: swings up into place ── */
 .picker {
-  background: linear-gradient(160deg, #1e0a00 0%, #2a1200 100%);
-  border: 2px solid #7a3200;
-  border-radius: 24px;
-  padding: 26px 24px 20px;
-  width: 320px;
-  max-width: 94vw;
+  position: relative; width: 330px; max-width: 94vw; padding: 22px 20px 18px; border-radius: 26px;
+  background: linear-gradient(165deg, #3a2716 0%, #24160a 55%, #170d05 100%);
+  border: 1px solid rgba(212, 175, 101, 0.55);
   box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.85),
-    0 0   48px rgba(160, 60, 0, 0.25),
-    inset 0 1px 0 rgba(255, 160, 60, 0.12);
-  animation: pickerIn 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+    inset 0 1px 0 rgba(255, 230, 180, 0.18), inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 2px 0 #4a2f12, 0 4px 0 #3a2410, 0 6px 0 #2a1a0b,
+    0 30px 60px rgba(0, 0, 0, 0.75), 0 0 60px rgba(212, 150, 60, 0.18);
+  transform-origin: 50% 100%;
+  animation: pickerIn 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.15);
   user-select: none;
 }
-
 @keyframes pickerIn {
-  from { transform: translateY(48px) scale(0.92); opacity: 0; }
-  to   { transform: translateY(0)    scale(1);    opacity: 1; }
+  from { transform: rotateX(-38deg) translateY(60px) scale(0.9); opacity: 0; }
+  to   { transform: none; opacity: 1; }
 }
 
 /* ══════════════════════════════════════════════════════════════
-   HEADER — big time display + AM/PM
+   HEADER — flip-clock tiles + AM/PM keys
 ══════════════════════════════════════════════════════════════ */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.timeDisplay {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
+.header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.timeDisplay { display: flex; align-items: center; gap: 6px; perspective: 400px; }
 
 .timeUnit {
-  background: #3a1800;
-  border: 2px solid #5a2800;
-  border-radius: 14px;
-  color: #ffd080;
-  font-size: 2.6rem;
-  font-weight: 700;
-  font-family: var(--font-display, Georgia, serif);
-  padding: 6px 14px;
-  min-width: 76px;
-  text-align: center;
-  cursor: pointer;
-  line-height: 1.1;
-  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
+  position: relative; min-width: 82px; padding: 6px 10px; border-radius: 14px; cursor: pointer; overflow: hidden;
+  border: 1px solid #120a04; color: #f5d98a; line-height: 1.1;
+  font-size: 2.7rem; font-weight: 800; font-family: var(--font-display, Georgia, serif); font-variant-numeric: tabular-nums;
+  /* split-flap card: lighter top half, darker bottom half */
+  background: linear-gradient(180deg, #3d2a17 0%, #2c1d0f 49.5%, #1d1209 50.5%, #24170b 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.15), 0 2px 0 #0d0703, 0 4px 0 #0a0502, 0 8px 14px rgba(0, 0, 0, 0.55);
+  transition: transform 0.15s, box-shadow 0.15s, color 0.15s;
 }
-
-.timeUnit:hover {
-  background: #5a2800;
-  border-color: #c25000;
-  transform: scale(1.04);
+.timeUnit::after { /* the hinge line across the middle */
+  content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px;
+  background: rgba(0, 0, 0, 0.65); box-shadow: 0 1px 0 rgba(255, 220, 160, 0.08);
 }
-
+.timeUnit:hover { transform: translateY(-2px); }
 .unitActive {
-  background: linear-gradient(135deg, #c25000, #8b3a00) !important;
-  border-color: #e07000 !important;
-  color: #fff !important;
-  box-shadow: 0 4px 20px rgba(194, 80, 0, 0.55);
+  color: #fff6dc;
+  background: linear-gradient(180deg, #e07a1a 0%, #c25000 49.5%, #a14200 50.5%, #b04800 100%);
+  border-color: #6a2a00;
+  box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.45), 0 2px 0 #5a2200, 0 4px 0 #3e1700,
+    0 10px 18px rgba(0, 0, 0, 0.5), 0 0 22px rgba(224, 112, 0, 0.45);
 }
+.flip { display: inline-block; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45); transform-origin: 50% 50%; animation: flip 0.32s cubic-bezier(.2, .8, .3, 1); }
+@keyframes flip { from { transform: rotateX(-90deg); opacity: 0.3; } }
 
-.colon {
-  color: #ffd080;
-  font-size: 2.4rem;
-  font-weight: 700;
-  line-height: 1;
-  padding: 0 2px 8px;
-  opacity: 0.7;
-}
+.colon { display: grid; gap: 10px; padding: 0 1px; }
+.colon i { width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1c9, #b8862f 70%); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); }
 
-/* AM/PM */
+/* AM/PM: two keys in a recessed slot; the chosen key is pressed in and lit */
 .ampmGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid; gap: 4px; padding: 4px; border-radius: 14px;
+  background: #120a04; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 220, 160, 0.08);
 }
-
 .ampmBtn {
-  background: #2a1200;
-  border: 1.5px solid #5a3010;
-  border-radius: 10px;
-  color: #aa6030;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 7px 14px;
-  cursor: pointer;
-  letter-spacing: 1px;
-  transition: all 0.18s;
+  padding: 8px 14px; border: none; border-radius: 10px; cursor: pointer; letter-spacing: 1px;
+  font-size: 0.82rem; font-weight: 800; color: #c9a75e;
+  background: linear-gradient(180deg, #3d2a17, #261809);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.14), 0 3px 0 #0d0703;
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s, color 0.12s;
 }
-
-.ampmBtn:hover {
-  border-color: #c25000;
-  color: #ffd080;
-  background: #3a1a00;
-}
-
+.ampmBtn:hover { color: #f5d98a; }
 .ampmActive {
-  background: linear-gradient(135deg, #c25000, #7a2e00) !important;
-  border-color: #e07000 !important;
-  color: #fff !important;
-  box-shadow: 0 2px 10px rgba(194, 80, 0, 0.5);
+  color: #2a1606; transform: translateY(2px);
+  background: linear-gradient(180deg, #f8e2a6, #d4a640);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 1px 0 #6a4a16, 0 0 14px rgba(245, 217, 138, 0.35);
 }
 
 /* ══════════════════════════════════════════════════════════════
    STEP INDICATOR  (तास → मिनिटे)
 ══════════════════════════════════════════════════════════════ */
-.stepLabel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.stepDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #4a2800;
-  border: 1.5px solid #7a4000;
-  transition: background 0.2s, border-color 0.2s;
-  flex-shrink: 0;
-}
-
-.stepDotActive {
-  background: #c25000 !important;
-  border-color: #e07000 !important;
-  box-shadow: 0 0 8px rgba(194, 80, 0, 0.7);
-}
-
-.stepText {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #7a5030;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.stepTextActive {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #ffa040;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.stepArrow {
-  color: #5a3010;
-  font-size: 0.7rem;
-}
+.stepLabel { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 6px; }
+.stepDot { width: 8px; height: 8px; border-radius: 50%; background: #3a2410; border: 1.5px solid #6a4a20; flex-shrink: 0; transition: background 0.2s, box-shadow 0.2s; }
+.stepDotActive { background: #f5a020 !important; border-color: #ffd080 !important; box-shadow: 0 0 8px rgba(245, 160, 32, 0.8); }
+.stepText { font-size: 0.78rem; font-weight: 700; color: #8a7050; }
+.stepTextActive { font-size: 0.78rem; font-weight: 800; color: #f5c060; }
+.stepArrow { color: #6a4a20; font-size: 0.75rem; }
 
 /* ══════════════════════════════════════════════════════════════
-   SVG DIAL
+   3D WATCH
 ══════════════════════════════════════════════════════════════ */
-.dial {
-  display: block;
-  width: 100%;
-  max-width: 272px;
-  margin: 0 auto 4px;
-  cursor: crosshair;
-  touch-action: none; /* prevent page scroll while dragging */
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+.watch {
+  position: relative; margin: 2px auto 0; width: 100%; max-width: 290px;
+  /* a soft pool of shadow under the watch */
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.65)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
 }
+.dial { display: block; width: 100%; cursor: crosshair; touch-action: none; overflow: visible; }
 
-/* ── SVG elements (applied via className prop on SVG elements) ── */
-
-.faceRing {
-  fill: none;
-  stroke: rgba(180, 80, 0, 0.18);
-  stroke-width: 8;
-}
-
-.face {
-  fill: #1e0c00;
-  stroke: #5a2800;
-  stroke-width: 1.5;
-}
-
-.tickMin {
-  stroke: #3a2010;
-  stroke-width: 1;
-  stroke-linecap: round;
-}
-
-.tickMaj {
-  stroke: #6a3818;
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.handTrack {
-  stroke: rgba(194, 80, 0, 0.12);
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.hand {
-  stroke: #c25000;
-  stroke-width: 3;
-  stroke-linecap: round;
-  transition: none; /* instant feedback during drag */
-}
-
-.handTip {
-  fill: #c25000;
-}
-
-.pivot {
-  fill: #e07000;
-}
-
-.selGlow {
-  fill: rgba(194, 80, 0, 0.2);
-}
-
-.selBg {
-  fill: #c25000;
-}
+.face { stroke: #000; stroke-opacity: 0.5; stroke-width: 1; }
+.tickMin { stroke: rgba(240, 213, 144, 0.35); stroke-width: 1; stroke-linecap: round; }
+.tickMaj { stroke: #e2bf72; stroke-width: 2.4; stroke-linecap: round; }
 
 .num {
-  fill: #cc8040;
-  font-size: 16px;
+  fill: #f0d590; font-size: 17px; font-weight: 700; pointer-events: none;
   font-family: var(--font-display, Georgia, serif);
-  font-weight: 600;
-  pointer-events: none;
-  transition: fill 0.15s, font-size 0.15s;
+  paint-order: stroke; stroke: rgba(0, 0, 0, 0.55); stroke-width: 2.5px;   /* raised: dark rim */
+  transition: fill 0.15s;
 }
+.numSel { fill: #ffffff !important; font-weight: 800 !important; stroke: rgba(90, 30, 0, 0.6); }
+.selBall { stroke: rgba(255, 220, 160, 0.55); stroke-width: 1; }
+.handPath { stroke: rgba(0, 0, 0, 0.35); stroke-width: 0.6; }
 
-.numSel {
-  fill: #ffffff !important;
-  font-size: 17px !important;
-  font-weight: 800 !important;
-}
-
-/* Ripple on drag */
-.ripple {
-  fill: rgba(255, 130, 30, 0.22);
-  animation: rippleOut 0.35s ease-out;
-}
-
-@keyframes rippleOut {
-  from { r: 14; opacity: 0.5; }
-  to   { r: 26; opacity: 0;   }
-}
+.ripple { fill: rgba(255, 170, 60, 0.25); animation: rippleOut 0.4s ease-out; }
+@keyframes rippleOut { from { r: 16; opacity: 0.6; } to { r: 30; opacity: 0; } }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER
+   FOOTER — raised keys
 ══════════════════════════════════════════════════════════════ */
 .footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid #3a1800;
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(212, 175, 101, 0.2);
 }
-
 .cancelBtn {
-  background: transparent;
-  border: 1.5px solid #4a2800;
-  border-radius: 12px;
-  color: #aa6030;
-  font-family: var(--font-body, sans-serif);
-  font-size: 0.88rem;
-  font-weight: 600;
-  padding: 10px 22px;
-  cursor: pointer;
-  transition: all 0.18s;
+  padding: 10px 20px; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 700;
+  font-family: var(--font-body, sans-serif); color: #c9a75e;
+  border: 1px solid rgba(212, 175, 101, 0.3); background: linear-gradient(180deg, #33220f, #22150a);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 180, 0.1), 0 3px 0 #0d0703;
+  transition: transform 0.12s, box-shadow 0.12s, color 0.12s;
 }
-
-.cancelBtn:hover {
-  border-color: #c25000;
-  color: #ffd080;
-  background: #3a1800;
-}
-
+.cancelBtn:hover { color: #f5d98a; }
+.cancelBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 #0d0703; }
 .okBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #c25000 0%, #8b3a00 100%);
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  font-family: var(--font-body, sans-serif);
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 11px 26px;
-  cursor: pointer;
-  letter-spacing: 0.4px;
-  box-shadow: 0 4px 18px rgba(194, 80, 0, 0.5);
-  transition: all 0.18s;
+  display: flex; align-items: center; gap: 6px; padding: 11px 24px; border: none; border-radius: 12px; cursor: pointer;
+  font-size: 0.95rem; font-weight: 800; font-family: var(--font-body, sans-serif); color: #fff; letter-spacing: 0.3px;
+  background: linear-gradient(180deg, #e98a2a 0%, #c25000 55%, #9a3d00 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.5), 0 3px 0 #5a2200, 0 8px 18px rgba(194, 80, 0, 0.45);
+  transition: transform 0.12s, box-shadow 0.12s, filter 0.12s;
 }
-
-.okBtn:hover {
-  background: linear-gradient(135deg, #d46000, #a04800);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(194, 80, 0, 0.65);
-}
-
-.okBtn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(194, 80, 0, 0.4);
-}
+.okBtn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.okBtn:active { transform: translateY(2px); box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.4), 0 1px 0 #5a2200; }
 
 /* ══════════════════════════════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE / MOTION
 ══════════════════════════════════════════════════════════════ */
 @media (max-width: 360px) {
-  .picker    { padding: 20px 16px 16px; }
-  .timeUnit  { font-size: 2.1rem; min-width: 62px; padding: 6px 10px; }
-  .colon     { font-size: 2rem; }
+  .picker   { padding: 18px 14px 14px; }
+  .timeUnit { font-size: 2.2rem; min-width: 66px; padding: 5px 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .picker, .flip, .ripple, .overlay { animation: none; }
 }

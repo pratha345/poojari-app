@@ -1,4 +1,9 @@
-// components/common/ClockTimePicker.jsx — SVG clock-dial time picker
+// components/common/ClockTimePicker.jsx — 3D watch-face time picker
+//
+// A gold-bezelled watch under a glass dome: recessed dial, raised numerals, both hands
+// casting shadows (the one being set glows), a jewel pivot. Hours and minutes sit on
+// flip-clock tiles that flip when the value changes; AM/PM is a raised two-key switch.
+// The dial itself stays flat to the screen so a drag maps exactly to the time.
 import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from '../../styles/ClockTimePicker.module.css';
 
@@ -11,6 +16,8 @@ const NUM_R     = 86;
 const TICK_OUT  = 112;
 const TICK_MIN  = 106;
 const TICK_MAJ  = 98;
+const PAD       = 14;         // room for the bezel around the 280-unit dial
+const VB        = SIZE + PAD * 2;
 
 function polarXY(angleDeg, r) {
   const rad = (angleDeg - 90) * Math.PI / 180;
@@ -20,8 +27,8 @@ function polarXY(angleDeg, r) {
 function angleOf(svgEl, e) {
   const rect  = svgEl.getBoundingClientRect();
   const touch = e.touches?.[0] ?? e;
-  const x     = (touch.clientX - rect.left)  * (SIZE / rect.width)  - CX;
-  const y     = (touch.clientY - rect.top)   * (SIZE / rect.height) - CY;
+  const x     = (touch.clientX - rect.left)  * (VB / rect.width)  - PAD - CX;
+  const y     = (touch.clientY - rect.top)   * (VB / rect.height) - PAD - CY;
   let a = Math.atan2(y, x) * 180 / Math.PI + 90;
   if (a < 0) a += 360;
   return a;
@@ -41,6 +48,14 @@ function build24(h12, m, ampm) {
 // ── Label arrays ──────────────────────────────────────────────
 const HOUR_NUMS = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const MIN_NUMS  = ['00','05','10','15','20','25','30','35','40','45','50','55'];
+
+// a hand as a tapered blade from the centre to (r, angle)
+function blade(angle, r, w) {
+  const tip = polarXY(angle, r), tail = polarXY(angle + 180, 14);
+  const l = polarXY(angle - 90, w), rr = polarXY(angle + 90, w);
+  const dx = l.x - CX, dy = l.y - CY, ex = rr.x - CX, ey = rr.y - CY;
+  return `M${tail.x + dx * 0.6},${tail.y + dy * 0.6} L${CX + dx},${CY + dy} L${tip.x},${tip.y} L${CX + ex},${CY + ey} L${tail.x + ex * 0.6},${tail.y + ey * 0.6} Z`;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT
@@ -97,6 +112,13 @@ export default function ClockTimePicker({ value, onChange, onClose }) {
     };
   }, [dragging, applyAngle]);
 
+  // Esc closes, Enter confirms
+  useEffect(() => {
+    const key = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', key);
+    return () => document.removeEventListener('keydown', key);
+  }, [onClose]);
+
   // ── Confirm ───────────────────────────────────────────────
   const handleOk = () => {
     onChange(build24(hour, minute, ampm));
@@ -104,11 +126,11 @@ export default function ClockTimePicker({ value, onChange, onClose }) {
   };
 
   // ── Clock geometry ────────────────────────────────────────
-  const hourAngle   = ((hour % 12) / 12) * 360;
+  const hourAngle   = ((hour % 12) / 12) * 360 + (minute / 60) * 30;   // the hour hand creeps with the minutes
   const minuteAngle = (minute / 60) * 360;
-  const handAngle   = mode === 'hour' ? hourAngle : minuteAngle;
-  const handEnd     = polarXY(handAngle, NUM_R);
-  const selPos      = polarXY(handAngle, NUM_R);
+  const selAngle    = mode === 'hour' ? ((hour % 12) / 12) * 360 : minuteAngle;
+  const selPos      = polarXY(selAngle, NUM_R);
+  const hh = String(hour).padStart(2, '0'), mm = String(minute).padStart(2, '0');
 
   // ── Render ────────────────────────────────────────────────
   return (
@@ -117,34 +139,34 @@ export default function ClockTimePicker({ value, onChange, onClose }) {
       onMouseDown={e => e.target === e.currentTarget && onClose()}
       onTouchStart={e => e.target === e.currentTarget && onClose()}
     >
-      <div className={styles.picker}>
+      <div className={styles.picker} role="dialog" aria-label="वेळ निवडा">
 
-        {/* ── Header ── */}
+        {/* ── Header: flip-clock tiles + AM/PM switch ── */}
         <div className={styles.header}>
           <div className={styles.timeDisplay}>
             <button
               className={`${styles.timeUnit} ${mode === 'hour' ? styles.unitActive : ''}`}
               onClick={() => setMode('hour')}
-              title="तास बदला"
+              title="तास बदला" aria-label={`तास ${hh}`}
             >
-              {String(hour).padStart(2, '0')}
+              <span key={hh} className={styles.flip}>{hh}</span>
             </button>
-            <span className={styles.colon}>:</span>
+            <span className={styles.colon}><i /><i /></span>
             <button
               className={`${styles.timeUnit} ${mode === 'minute' ? styles.unitActive : ''}`}
               onClick={() => setMode('minute')}
-              title="मिनिटे बदला"
+              title="मिनिटे बदला" aria-label={`मिनिटे ${mm}`}
             >
-              {String(minute).padStart(2, '0')}
+              <span key={mm} className={styles.flip}>{mm}</span>
             </button>
           </div>
 
-          <div className={styles.ampmGroup}>
-            <button
+          <div className={styles.ampmGroup} role="radiogroup" aria-label="AM / PM">
+            <button role="radio" aria-checked={ampm === 'AM'}
               className={`${styles.ampmBtn} ${ampm === 'AM' ? styles.ampmActive : ''}`}
               onClick={() => setAmpm('AM')}
             >AM</button>
-            <button
+            <button role="radio" aria-checked={ampm === 'PM'}
               className={`${styles.ampmBtn} ${ampm === 'PM' ? styles.ampmActive : ''}`}
               onClick={() => setAmpm('PM')}
             >PM</button>
@@ -160,96 +182,97 @@ export default function ClockTimePicker({ value, onChange, onClose }) {
           <span className={mode === 'minute' ? styles.stepTextActive : styles.stepText}>मिनिटे</span>
         </div>
 
-        {/* ── SVG Dial ── */}
-        <svg
-          ref={svgRef}
-          className={styles.dial}
-          viewBox={`0 0 ${SIZE} ${SIZE}`}
-          onMouseDown={onPointerDown}
-          onTouchStart={onPointerDown}
-        >
-          {/* Outer shadow ring */}
-          <circle cx={CX} cy={CY} r={FACE_R + 4} className={styles.faceRing} />
+        {/* ── 3D watch dial ── */}
+        <div className={styles.watch}>
+          <svg
+            ref={svgRef}
+            className={styles.dial}
+            viewBox={`${-PAD} ${-PAD} ${VB} ${VB}`}
+            onMouseDown={onPointerDown}
+            onTouchStart={onPointerDown}
+          >
+            <defs>
+              <linearGradient id="ctp-bezel" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#fff1c9" /><stop offset="22%" stopColor="#e2bf72" />
+                <stop offset="48%" stopColor="#8a6424" /><stop offset="72%" stopColor="#f2d58e" />
+                <stop offset="100%" stopColor="#6f4b16" />
+              </linearGradient>
+              <linearGradient id="ctp-bezel-in" x1="1" y1="1" x2="0" y2="0">
+                <stop offset="0%" stopColor="#fff1c9" /><stop offset="50%" stopColor="#a8843e" /><stop offset="100%" stopColor="#5a3a10" />
+              </linearGradient>
+              <radialGradient id="ctp-face" cx="42%" cy="36%" r="70%">
+                <stop offset="0%" stopColor="#4a2a12" /><stop offset="60%" stopColor="#2a1607" /><stop offset="100%" stopColor="#140a03" />
+              </radialGradient>
+              <radialGradient id="ctp-glass" cx="35%" cy="25%" r="65%">
+                <stop offset="0%" stopColor="#fff" stopOpacity="0.22" /><stop offset="45%" stopColor="#fff" stopOpacity="0.04" />
+                <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+              </radialGradient>
+              <radialGradient id="ctp-ball" cx="35%" cy="30%" r="70%">
+                <stop offset="0%" stopColor="#ffd9a0" /><stop offset="45%" stopColor="#e07000" /><stop offset="100%" stopColor="#7a2e00" />
+              </radialGradient>
+              <radialGradient id="ctp-jewel" cx="35%" cy="30%" r="70%">
+                <stop offset="0%" stopColor="#ffd0d0" /><stop offset="50%" stopColor="#c0392b" /><stop offset="100%" stopColor="#5a0e08" />
+              </radialGradient>
+              <linearGradient id="ctp-hand-on" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#b84a00" /><stop offset="50%" stopColor="#ffb347" /><stop offset="100%" stopColor="#b84a00" />
+              </linearGradient>
+              <linearGradient id="ctp-hand-off" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#a8936a" /><stop offset="50%" stopColor="#f3e6c8" /><stop offset="100%" stopColor="#a8936a" />
+              </linearGradient>
+              <filter id="ctp-shadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2" /></filter>
+              <filter id="ctp-inset" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="5" /></filter>
+              <clipPath id="ctp-clip"><circle cx={CX} cy={CY} r={FACE_R + 1} /></clipPath>
+            </defs>
 
-          {/* Clock face */}
-          <circle cx={CX} cy={CY} r={FACE_R} className={styles.face} />
+            {/* bezel: polished outer ring, cut inner step */}
+            <circle cx={CX} cy={CY} r={FACE_R + 13} fill="url(#ctp-bezel)" />
+            <circle cx={CX} cy={CY} r={FACE_R + 6} fill="url(#ctp-bezel-in)" />
+            {/* recessed dial with an inner shadow along the top edge */}
+            <circle cx={CX} cy={CY} r={FACE_R + 1} className={styles.face} fill="url(#ctp-face)" />
+            <circle cx={CX} cy={CY + 3} r={FACE_R - 2} fill="none" stroke="#000" strokeOpacity="0.55" strokeWidth="8" filter="url(#ctp-inset)" clipPath="url(#ctp-clip)" />
 
-          {/* Tick marks */}
-          {Array.from({ length: 60 }, (_, i) => {
-            const a    = i * 6;
-            const isMa = i % 5 === 0;
-            const p1   = polarXY(a, TICK_OUT);
-            const p2   = polarXY(a, isMa ? TICK_MAJ : TICK_MIN);
-            return (
-              <line
-                key={i}
-                x1={p1.x} y1={p1.y}
-                x2={p2.x} y2={p2.y}
-                className={isMa ? styles.tickMaj : styles.tickMin}
-              />
-            );
-          })}
+            {/* Tick marks */}
+            {Array.from({ length: 60 }, (_, i) => {
+              const a    = i * 6;
+              const isMa = i % 5 === 0;
+              const p1   = polarXY(a, TICK_OUT);
+              const p2   = polarXY(a, isMa ? TICK_MAJ : TICK_MIN);
+              return <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} className={isMa ? styles.tickMaj : styles.tickMin} />;
+            })}
 
-          {/* Hand track line (dim, full length) */}
-          <line
-            x1={CX} y1={CY}
-            x2={polarXY(handAngle, FACE_R - 8).x}
-            y2={polarXY(handAngle, FACE_R - 8).y}
-            className={styles.handTrack}
-          />
+            {/* selected numeral: a raised orange ball */}
+            <circle cx={selPos.x + 2} cy={selPos.y + 4} r={18} fill="#000" opacity="0.45" filter="url(#ctp-shadow)" />
+            <circle cx={selPos.x} cy={selPos.y} r={18} fill="url(#ctp-ball)" className={styles.selBall} />
 
-          {/* Active hand */}
-          <line
-            x1={CX} y1={CY}
-            x2={handEnd.x} y2={handEnd.y}
-            className={styles.hand}
-          />
+            {/* numerals (embossed) */}
+            {(mode === 'hour' ? HOUR_NUMS : MIN_NUMS).map((label, i) => {
+              const pos = polarXY(i * 30, NUM_R);
+              const sel = mode === 'hour' ? label === hour : (minute >= i * 5 && minute < i * 5 + 5);
+              return (
+                <text key={label} x={pos.x} y={pos.y} dominantBaseline="central" textAnchor="middle"
+                  className={`${styles.num} ${sel ? styles.numSel : ''}`}>{label}</text>
+              );
+            })}
 
-          {/* Selected number background glow */}
-          <circle cx={selPos.x} cy={selPos.y} r={22} className={styles.selGlow} />
-          <circle cx={selPos.x} cy={selPos.y} r={17} className={styles.selBg} />
+            {/* hands: shadows first, then the blades; the one being set is lit */}
+            <path d={blade(hourAngle, 58, 5)} transform="translate(3 5)" fill="#000" opacity="0.5" filter="url(#ctp-shadow)" />
+            <path d={blade(minuteAngle, 92, 3.6)} transform="translate(4 6)" fill="#000" opacity="0.5" filter="url(#ctp-shadow)" />
+            <path d={blade(hourAngle, 58, 5)} fill={mode === 'hour' ? 'url(#ctp-hand-on)' : 'url(#ctp-hand-off)'} className={styles.handPath} />
+            <path d={blade(minuteAngle, 92, 3.6)} fill={mode === 'minute' ? 'url(#ctp-hand-on)' : 'url(#ctp-hand-off)'} className={styles.handPath} />
 
-          {/* Hand tip */}
-          <circle cx={handEnd.x} cy={handEnd.y} r={13} className={styles.handTip} />
+            {/* jewel pivot */}
+            <circle cx={CX} cy={CY} r={8} fill="url(#ctp-bezel)" />
+            <circle cx={CX} cy={CY} r={4.5} fill="url(#ctp-jewel)" />
 
-          {/* Center pivot */}
-          <circle cx={CX} cy={CY} r={5} className={styles.pivot} />
+            {/* Dragging ripple on the selected ball */}
+            {dragging && <circle cx={selPos.x} cy={selPos.y} r={22} className={styles.ripple} />}
 
-          {/* Hour numbers */}
-          {mode === 'hour' && HOUR_NUMS.map((h, i) => {
-            const pos = polarXY(i * 30, NUM_R);
-            return (
-              <text
-                key={h}
-                x={pos.x} y={pos.y}
-                className={`${styles.num} ${h === hour ? styles.numSel : ''}`}
-                dominantBaseline="central"
-                textAnchor="middle"
-              >{h}</text>
-            );
-          })}
-
-          {/* Minute numbers */}
-          {mode === 'minute' && MIN_NUMS.map((label, i) => {
-            const pos   = polarXY(i * 30, NUM_R);
-            const mVal  = i * 5;
-            const isSel = minute >= mVal && minute < mVal + 5;
-            return (
-              <text
-                key={label}
-                x={pos.x} y={pos.y}
-                className={`${styles.num} ${isSel ? styles.numSel : ''}`}
-                dominantBaseline="central"
-                textAnchor="middle"
-              >{label}</text>
-            );
-          })}
-
-          {/* Dragging ripple on hand tip */}
-          {dragging && (
-            <circle cx={handEnd.x} cy={handEnd.y} r={22} className={styles.ripple} />
-          )}
-        </svg>
+            {/* glass dome: soft highlight and a curved reflection */}
+            <circle cx={CX} cy={CY} r={FACE_R + 1} fill="url(#ctp-glass)" pointerEvents="none" />
+            <path d={`M ${CX - 82} ${CY - 54} A ${FACE_R - 14} ${FACE_R - 14} 0 0 1 ${CX + 30} ${CY - 100}`}
+              fill="none" stroke="#fff" strokeOpacity="0.16" strokeWidth="6" strokeLinecap="round" pointerEvents="none" />
+          </svg>
+        </div>
 
         {/* ── Footer ── */}
         <div className={styles.footer}>
