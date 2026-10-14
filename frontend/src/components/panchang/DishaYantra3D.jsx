@@ -108,7 +108,6 @@ const Rose = memo(function Rose() {
 export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
   const [mode, setMode]       = useState('idle');   // idle | sensor | manual
   const [shown, setShown]     = useState(0);        // heading shown in text (updated ~5×/s)
-  const [msg, setMsg]         = useState('');
   const [now, setNow]         = useState(() => new Date());
   const target = useRef(0), current = useRef(0), gotAbsolute = useRef(false);
   const wheelRef = useRef(null), stageRef = useRef(null);
@@ -139,43 +138,35 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
     if (typeof e.webkitCompassHeading === 'number') h = e.webkitCompassHeading;          // iPhone
     else if ((e.absolute || e.type === 'deviceorientationabsolute') && e.alpha != null) h = 360 - e.alpha; // Android
     if (h == null) return;
-    gotAbsolute.current = true;
+    if (!gotAbsolute.current) { gotAbsolute.current = true; setMode('sensor'); }   // sensor answered
     const screenAngle = (window.screen?.orientation?.angle ?? window.orientation ?? 0) || 0;
     target.current = norm(h + screenAngle);
   }, []);
 
+  // Always on: listen from the start and switch to the live heading as soon as the sensor
+  // answers. Without a compass (desktop) the dial simply stays hand-turnable — no prompts.
   const startCompass = async () => {
-    setMsg('');
     try {
       if (typeof window.DeviceOrientationEvent?.requestPermission === 'function') {
         const res = await window.DeviceOrientationEvent.requestPermission();   // iPhone asks here
-        if (res !== 'granted') { setMode('manual'); setMsg('Compass ची परवानगी मिळाली नाही — दिशा हाताने फिरवा.'); return; }
+        if (res !== 'granted') { setMode('manual'); return; }
       }
     } catch { /* fall through to listening */ }
     // iPhone reports webkitCompassHeading on the plain event; Android needs the absolute one
     const ios = typeof window.DeviceOrientationEvent?.requestPermission === 'function';
     const evt = !ios && 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
     window.addEventListener(evt, onOrient, true);
-    gotAbsolute.current = false;
-    setMode('sensor');
-    setTimeout(() => {
-      if (!gotAbsolute.current) {
-        window.removeEventListener(evt, onOrient, true);
-        setMode('manual');
-        setMsg('या उपकरणावर compass sensor नाही — मोबाईलवर उघडल्यास दिशा आपोआप दिसेल. इथे दिशा हाताने फिरवा आणि ☀ खूण प्रत्यक्ष सूर्याकडे जुळवा.');
-      }
-    }, 1500);
+    setTimeout(() => { if (!gotAbsolute.current) setMode('manual'); }, 1500);
   };
   useEffect(() => () => {
     window.removeEventListener('deviceorientationabsolute', onOrient, true);
     window.removeEventListener('deviceorientation', onOrient, true);
   }, [onOrient]);
 
-  // Compass on by default. Android/others start right away; iPhone only allows it from a
+  // Compass on by default. Android/others start right away; iPhone (Safari rule) only allows it from a
   // tap, so it starts on the first tap anywhere on the page.
   useEffect(() => {
     if (typeof window.DeviceOrientationEvent?.requestPermission === 'function') {
-      setMsg('Compass सुरू होण्यासाठी स्क्रीनवर कुठेही एकदा tap करा.');
       const once = () => { cleanup(); startCompass(); };
       const cleanup = () => { window.removeEventListener('touchend', once); window.removeEventListener('click', once); };
       window.addEventListener('touchend', once, { once: true });
@@ -251,17 +242,14 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
       </div>
 
       <div className={s.controls}>
-        {mode !== 'sensor'
-          ? <button type="button" className={s.start} onClick={startCompass}>🧭 Compass सुरू करा</button>
-          : <span className={s.live}>● Compass चालू — फोन सपाट धरा</span>}
+        {mode === 'sensor' && <span className={s.live}>● Compass चालू — फोन सपाट धरा</span>}
         <button type="button" className={s.reset} onClick={() => { target.current = 0; wheelRef.current?.style.setProperty('--tilt', '18deg'); }}
           title="उत्तर वर">उत्तर ↑</button>
       </div>
-      {msg && <p className={s.msg}>{msg}</p>}
 
       <dl className={s.facts}>
         <dt>आत्ता तोंड</dt>
-        <dd>{facing.mr} ({shown}°) · दिक्पाल {facing.dik}{mode === 'manual' ? ' · (हाताने ठरवलेली दिशा)' : mode === 'idle' ? ' · (compass सुरू केलेला नाही)' : ''}</dd>
+        <dd>{facing.mr} ({shown}°) · दिक्पाल {facing.dik}{mode === 'manual' ? ' · (हाताने ठरवलेली दिशा)' : ''}</dd>
         <dt>आजची दिशाशूल</dt>
         <dd className={s.shoolRow}>{DAYS[wd]}: {dirOf(shoolAz).mr} — या दिशेला प्रवासाची सुरुवात टाळावी.</dd>
         <dt>पूजेसाठी</dt>

@@ -75,17 +75,11 @@
 .hub span    { width: 5%; aspect-ratio: 1; background: radial-gradient(circle at 35% 30%, #fff3d2, #b8862f 60%, #5c3d10); z-index: 1; }
 
 .controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
-.start {
-  border: none; border-radius: 24px; padding: 11px 22px; cursor: pointer;
-  background: linear-gradient(180deg, #f6d58a, #c9962e); color: #3b2410; font-weight: 800; font-size: 1rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.45);
-}
 .live { color: #a5d6a7; font-weight: 700; }
 .reset {
   border: 1px solid rgba(232,196,122,0.35); background: rgba(255,220,150,0.06);
   color: var(--gold); border-radius: 22px; padding: 9px 16px; font-weight: 700; cursor: pointer;
 }
-.msg { text-align: center; color: #ffcc80; font-size: 0.86rem; margin: 10px 4px 0; }
 
 .facts { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 16px 6px 0; font-size: 0.92rem; line-height: 1.5; }
 .facts dt { color: var(--gold); font-weight: 700; white-space: nowrap; }
