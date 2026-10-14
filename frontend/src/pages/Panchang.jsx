@@ -300,6 +300,33 @@ function KundaliChart({ suryaRashi, chandraRashi, lagna, grahas = [], dark }) {
   );
 }
 
+// ── small pieces of the control panel ──
+const CAL_MON = ['जाने', 'फेब्रु', 'मार्च', 'एप्रि', 'मे', 'जून', 'जुलै', 'ऑग', 'सप्टें', 'ऑक्टो', 'नोव्हें', 'डिसें'];
+const CAL_DAY = ['रविवार', 'सोमवार', 'मंगळवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+// a tiny analogue clock whose hands show the chosen time
+function MiniClock({ time }) {
+  const [h, m] = (time || '00:00').split(':').map(Number);
+  const ha = ((h % 12) + m / 60) * 30, ma = m * 6;
+  return (
+    <svg viewBox="0 0 40 40" className={styles.miniClock} aria-hidden="true">
+      <circle cx="20" cy="20" r="18" className={styles.mcFace} />
+      {[0, 90, 180, 270].map(a => <line key={a} x1="20" y1="4.5" x2="20" y2="7.5" className={styles.mcTick} transform={`rotate(${a} 20 20)`} />)}
+      <line x1="20" y1="20" x2="20" y2="11" className={styles.mcHour} transform={`rotate(${ha} 20 20)`} />
+      <line x1="20" y1="20" x2="20" y2="7" className={styles.mcMin} transform={`rotate(${ma} 20 20)`} />
+      <circle cx="20" cy="20" r="2" className={styles.mcHub} />
+    </svg>
+  );
+}
+// the tab dock: icon, full name (wide screens) and a short name (phones)
+const PAGE_TABS = [
+  ['panchang', '📅', 'पंचांग', 'पंचांग'],
+  ['chakra', '🪐', 'राशि चक्र', 'चक्र'],
+  ['yantra', '🔆', 'पंचांग यंत्र', 'यंत्र'],
+  ['sankalp', '🙏', 'संकल्प मंत्र', 'संकल्प'],
+  ['vel', '🕰', 'वेळ · मासिक', 'वेळ'],
+  ['disha', '🧭', 'दिशा यंत्र', 'दिशा'],
+];
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -364,6 +391,15 @@ export default function Panchang() {
   }, [pageTab, live, date, time, setParams]);
   useEffect(() => { store.set(PLACE_KEY, { name: cityName, lat, lon }); }, [cityName, lat, lon]);
   useEffect(() => { store.set(DARK_KEY, dark); }, [dark]);
+  // the tab dock sticks just under the site header, whatever its height on this screen
+  useEffect(() => {
+    const fit = () => {
+      const h = document.querySelector('header')?.getBoundingClientRect().height;
+      if (h) document.documentElement.style.setProperty('--dock-top', `${Math.round(h) + 6}px`);
+    };
+    fit(); window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, []);
 
   // Rating state
   const [panRating,  setPanRating]  = useState({ helpful: 0, not_helpful: 0, user_vote: null });
@@ -575,56 +611,48 @@ export default function Panchang() {
 
       <div className="container">
 
-        {/* ═══ CONTROLS ════════════════════════════════════ */}
-        <div className={styles.controls}>
+        {/* ═══ CONTROLS: calendar page · time · place ═════════ */}
+        <div className={styles.ctl}>
+          {(() => {
+            const [cy, cm, cd] = date.split('-').map(Number);
+            const wd = new Date(Date.UTC(cy, cm - 1, cd)).getUTCDay();
+            return (
+              <label className={styles.calPage} title="तारीख निवडा">
+                <span className={styles.calRing} aria-hidden="true"><i /><i /></span>
+                <span className={styles.calMonth}>{CAL_MON[cm - 1]} {cy}</span>
+                <span key={date} className={styles.calDay}>{cd}</span>
+                <span className={styles.calWeek}>{CAL_DAY[wd]}</span>
+                <input type="date" className={styles.calInput} value={date} min="1900-01-01" max="2099-12-31"
+                  aria-label={`तारीख निवडा — ${formatMR(date)}`}
+                  onChange={e => { if (e.target.value) { setLive(false); setDate(e.target.value); } }} />
+              </label>
+            );
+          })()}
 
-          <div className={styles.controlRow}>
-            {/* Date */}
-            <div className={styles.controlGroup}>
-              <label className={styles.ctrlLabel}>📅 तारीख निवडा</label>
-              <input
-                type="date"
-                className={styles.dateInput}
-                value={date}
-                min="1900-01-01"
-                max="2099-12-31"
-                onChange={e => { setLive(false); setDate(e.target.value); }}
-              />
-              {date && (
-                <span className={styles.dateMR}>{formatMR(date)}</span>
-              )}
-            </div>
-
-            {/* Clock time picker */}
-            <div className={styles.controlGroup}>
-              <label className={styles.ctrlLabel}>⏰ वेळ निवडा</label>
-              <button
-                type="button"
-                className={styles.timePickerBtn}
-                onClick={() => setShowClock(true)}
-                title="घड्याळ उघडा"
-              >
-                <span className={styles.timePickerIcon}>🕐</span>
-                <span className={styles.timePickerVal}>{formatTime12h(time)}</span>
-                <span className={styles.timePickerChevron}>▼</span>
-              </button>
-              <span className={styles.timeSub}>
-                {live
-                  ? <span className={styles.timeNote}>🟢 आत्ताची वेळ · आपोआप पुढे सरकते</span>
-                  : <>
-                      {time}<span className={styles.timeNote}> · निवडलेली वेळ</span>{' '}
-                      <button type="button" className={styles.liveBtn}
-                        onClick={() => { setDate(todayIST()); setTime(nowISTTime()); setLive(true); }}>
-                        ⟳ आत्ताची वेळ
-                      </button>
-                    </>}
+          <div className={styles.ctlSide}>
+            <button type="button" className={styles.timeChip} onClick={() => setShowClock(true)} title="वेळ निवडा">
+              <MiniClock time={time} />
+              <span className={styles.timeChipText}>
+                <small>वेळ</small>
+                <b>{formatTime12h(time)}</b>
               </span>
-            </div>
+              <span className={styles.timeChipChev} aria-hidden="true">▾</span>
+            </button>
+            {live ? (
+              <span className={styles.livePill} title={lastRefresh ? `शेवटचे अपडेट: ${formatTime12h(lastRefresh)}` : undefined}>
+                <i className={loading ? styles.liveDotBusy : styles.liveDot} />
+                {loading ? 'अपडेट होत आहे…' : 'आत्ताची वेळ · आपोआप'}
+              </span>
+            ) : (
+              <button type="button" className={styles.backLive}
+                onClick={() => { setDate(todayIST()); setTime(nowISTTime()); setLive(true); }}>
+                ⟳ आत्ताच्या वेळेवर या
+              </button>
+            )}
+          </div>
 
-            {/* District searchable dropdown */}
-            <div className={styles.controlGroup}>
-              <label className={styles.ctrlLabel}>📍 जिल्हा निवडा</label>
-              <div className={styles.districtPickerRow}>
+          <div className={styles.ctlPlace}>
+            <span className={styles.ctlLabel}>📍 जिल्हा</span>
                 <div className={styles.searchDrop} ref={dropRef}>
                   <div className={styles.searchInputWrap}>
                     <span className={styles.searchInputIcon}>🔍</span>
@@ -640,9 +668,13 @@ export default function Panchang() {
                       autoComplete="off"
                     />
                     {query && (
-                      <button className={styles.clearBtn}
+                      <button className={styles.clearBtn} aria-label="जिल्हा पुसा"
                         onClick={() => { setQuery(''); setOpen(true); inputRef.current?.focus(); }}>✕</button>
                     )}
+                    <button type="button" className={styles.gpsInline}
+                      onClick={detectLocation} disabled={locLoading} title="GPS वरून शोधा" aria-label="GPS वरून जिल्हा शोधा">
+                      {locLoading ? '⏳' : '🎯'}
+                    </button>
                   </div>
                   {open && filteredDistricts.length > 0 && (
                     <ul className={styles.dropList}>
@@ -662,22 +694,6 @@ export default function Panchang() {
                     <div className={styles.dropEmpty}>"{query}" सापडला नाही</div>
                   )}
                 </div>
-                <button type="button" className={styles.gpsBtn}
-                  onClick={detectLocation} disabled={locLoading} title="GPS वरून शोधा">
-                  {locLoading ? '⏳' : '🎯'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Auto-refresh indicator */}
-          <div className={styles.autoRefreshInfo}>
-            <span className={`${styles.autoRefreshDot} ${loading ? styles.autoRefreshDotLoading : ''}`} />
-            {loading
-              ? 'अपडेट होत आहे...'
-              : lastRefresh
-                ? `शेवटचे अपडेट: ${formatTime12h(lastRefresh)}`
-                : 'आपोआप अपडेट होते'}
           </div>
         </div>
 
@@ -687,21 +703,18 @@ export default function Panchang() {
         {/* Skeleton */}
         {loading && !data && <Skeleton />}
 
-        {/* ═══ पंचांग | राशि चक्र ══════════════════════════════ */}
-        <div className={styles.pageTabs} role="tablist">
-          <button role="tab" aria-selected={pageTab === 'panchang'} onClick={() => setPageTab('panchang')}
-            className={`${styles.pageTab} ${pageTab === 'panchang' ? styles.pageTabOn : ''}`}>📅 पंचांग</button>
-          <button role="tab" aria-selected={pageTab === 'chakra'} onClick={() => setPageTab('chakra')}
-            className={`${styles.pageTab} ${pageTab === 'chakra' ? styles.pageTabOn : ''}`}>🪐 राशि चक्र</button>
-          <button role="tab" aria-selected={pageTab === 'yantra'} onClick={() => setPageTab('yantra')}
-            className={`${styles.pageTab} ${pageTab === 'yantra' ? styles.pageTabOn : ''}`}>🔆 पंचांग यंत्र</button>
-          <button role="tab" aria-selected={pageTab === 'sankalp'} onClick={() => setPageTab('sankalp')}
-            className={`${styles.pageTab} ${pageTab === 'sankalp' ? styles.pageTabOn : ''}`}>🙏 संकल्प मंत्र</button>
-          <button role="tab" aria-selected={pageTab === 'vel'} onClick={() => setPageTab('vel')}
-            className={`${styles.pageTab} ${pageTab === 'vel' ? styles.pageTabOn : ''}`}>🕰 वेळ · मासिक</button>
-          <button role="tab" aria-selected={pageTab === 'disha'} onClick={() => setPageTab('disha')}
-            className={`${styles.pageTab} ${pageTab === 'disha' ? styles.pageTabOn : ''}`}>🧭 दिशा यंत्र</button>
-        </div>
+        {/* ═══ tab dock (sticks under the header) ══════════════ */}
+        <nav className={styles.dock} role="tablist" aria-label="पंचांग विभाग">
+          {PAGE_TABS.map(([k, icon, full, short]) => (
+            <button key={k} type="button" role="tab" aria-selected={pageTab === k} title={full}
+              className={`${styles.dockBtn} ${pageTab === k ? styles.dockOn : ''}`}
+              onClick={() => setPageTab(k)}>
+              <span className={styles.dockIcon} aria-hidden="true">{icon}</span>
+              <span className={styles.dockFull}>{full}</span>
+              <span className={styles.dockShort} aria-hidden="true">{short}</span>
+            </button>
+          ))}
+        </nav>
 
         {pageTab === 'sankalp' && <SankalpMantra data={data} place={cityName} />}
         {pageTab === 'vel' && (
