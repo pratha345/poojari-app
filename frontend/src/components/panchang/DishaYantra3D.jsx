@@ -152,7 +152,9 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
         if (res !== 'granted') { setMode('manual'); setMsg('Compass ची परवानगी मिळाली नाही — दिशा हाताने फिरवा.'); return; }
       }
     } catch { /* fall through to listening */ }
-    const evt = 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
+    // iPhone reports webkitCompassHeading on the plain event; Android needs the absolute one
+    const ios = typeof window.DeviceOrientationEvent?.requestPermission === 'function';
+    const evt = !ios && 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
     window.addEventListener(evt, onOrient, true);
     gotAbsolute.current = false;
     setMode('sensor');
@@ -160,7 +162,7 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
       if (!gotAbsolute.current) {
         window.removeEventListener(evt, onOrient, true);
         setMode('manual');
-        setMsg('या उपकरणावर compass sensor मिळाला नाही. दिशा हाताने फिरवा आणि ☀ खूण प्रत्यक्ष सूर्याकडे जुळवा.');
+        setMsg('या उपकरणावर compass sensor नाही — मोबाईलवर उघडल्यास दिशा आपोआप दिसेल. इथे दिशा हाताने फिरवा आणि ☀ खूण प्रत्यक्ष सूर्याकडे जुळवा.');
       }
     }, 1500);
   };
@@ -168,6 +170,20 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
     window.removeEventListener('deviceorientationabsolute', onOrient, true);
     window.removeEventListener('deviceorientation', onOrient, true);
   }, [onOrient]);
+
+  // Compass on by default. Android/others start right away; iPhone only allows it from a
+  // tap, so it starts on the first tap anywhere on the page.
+  useEffect(() => {
+    if (typeof window.DeviceOrientationEvent?.requestPermission === 'function') {
+      setMsg('Compass सुरू होण्यासाठी स्क्रीनवर कुठेही एकदा tap करा.');
+      const once = () => { cleanup(); startCompass(); };
+      const cleanup = () => { window.removeEventListener('touchend', once); window.removeEventListener('click', once); };
+      window.addEventListener('touchend', once, { once: true });
+      window.addEventListener('click', once, { once: true });
+      return cleanup;
+    }
+    startCompass();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // drag: sideways turns the dial (only without a compass); up/down tilts the view
   useEffect(() => {
