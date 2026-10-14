@@ -1,0 +1,90 @@
+/* Tamrapatra — engraved copper plate with thickness, ring + seal, moving light */
+.scene {
+  --rx: 7deg; --ry: -5deg; --lx: 50%; --ly: 30%;
+  position: relative; perspective: 1300px; perspective-origin: 50% 30%;
+  padding: 46px 6px 26px; margin: 4px auto 0; max-width: 640px;
+  touch-action: pan-y;
+}
+.plate {
+  position: relative; transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  will-change: transform;
+}
+/* edge thickness: darker copper sheets stacked behind the face */
+.edge {
+  position: absolute; inset: 0; border-radius: 14px 14px 18px 18px;
+  background: linear-gradient(180deg, #6b3415, #4a2109);
+  box-shadow: 0 0 0 1px rgba(30, 10, 0, 0.5);
+}
+.face {
+  position: relative; border-radius: 14px 14px 18px 18px; overflow: hidden;
+  padding: 92px 40px 28px;
+  /* copper: warm base, brushed lines, hammered patina at the corners */
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 220, 190, 0.05) 0 1px, transparent 1px 4px),
+    radial-gradient(120% 60% at 10% 100%, rgba(40, 90, 70, 0.22), transparent 55%),
+    radial-gradient(90% 50% at 100% 0%, rgba(40, 90, 70, 0.16), transparent 55%),
+    linear-gradient(160deg, #d9905a 0%, #b8693a 30%, #9c522a 55%, #c27a46 78%, #8f4a24 100%);
+  box-shadow: inset 0 2px 0 rgba(255, 220, 190, 0.45), inset 0 -3px 6px rgba(60, 20, 0, 0.45),
+              inset 0 0 40px rgba(70, 25, 5, 0.35);
+}
+.border {
+  position: absolute; inset: 12px; border-radius: 10px 10px 14px 14px; pointer-events: none;
+  border: 2px solid rgba(70, 28, 8, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 215, 180, 0.35), 0 1px 0 rgba(255, 215, 180, 0.3);
+}
+.border::after {
+  content: ''; position: absolute; inset: 6px; border-radius: 6px 6px 10px 10px;
+  border: 1px dashed rgba(70, 28, 8, 0.35);
+}
+.hole {
+  position: absolute; left: 50%; top: 22px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 60%, #1a0b03 0 55%, #3a1a08 75%, #7a3a16 100%);
+  box-shadow: inset 0 3px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 210, 170, 0.4);
+}
+
+/* engraved writing: dark cut with a lit lower lip */
+.head, .title, .text, .foot, .end {
+  position: relative; color: #3a1807;
+  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.55), 0 -1px 0 rgba(30, 8, 0, 0.35);
+  font-family: var(--font-display, inherit);
+}
+.head { margin: 0; text-align: center; font-size: 1rem; letter-spacing: 2px; opacity: 0.85; }
+.title { margin: 2px 0 12px; text-align: center; font-size: 1.45rem; font-weight: 800; letter-spacing: 1px; }
+.text { margin: 0; white-space: pre-line; font-size: 1.2rem; line-height: 1.95; word-break: break-word; }
+/* changing values: gold inlay standing proud of the copper */
+.inlay {
+  color: #ffe08a; font-weight: 700;
+  text-shadow: 0 1px 0 #6a3410, 0 2px 2px rgba(40, 12, 0, 0.55), 0 0 8px rgba(255, 210, 110, 0.35);
+}
+.ph { color: #ffe08a; opacity: 0.75; font-style: italic; text-shadow: 0 1px 0 #6a3410; }
+.foot { margin: 14px 0 0; text-align: center; font-size: 0.85rem; opacity: 0.85; }
+.end { margin: 10px 0 0; text-align: center; font-size: 1.05rem; letter-spacing: 2px; }
+
+/* light reflection that slides as the plate leans */
+.sheen {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background: radial-gradient(70% 45% at var(--lx) var(--ly), rgba(255, 240, 220, 0.75), transparent 70%),
+              linear-gradient(115deg, transparent 35%, rgba(255, 235, 210, 0.22) 48%, transparent 60%);
+}
+
+.ring {
+  position: absolute; left: 50%; top: -48px; width: 96px; height: 96px; margin-left: -48px;
+  transform: translateZ(10px); pointer-events: none;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.45));
+}
+.om { fill: #4a1f08; font-size: 22px; font-weight: 800; }
+
+.shadow {
+  position: absolute; left: 8%; right: 8%; bottom: 4px; height: 26px; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), transparent); filter: blur(6px);
+}
+
+@media (max-width: 480px) {
+  .scene { padding: 40px 0 20px; }
+  .face { padding: 84px 28px 22px; }
+  .text { font-size: 1.08rem; line-height: 1.85; }
+  .title { font-size: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) { .plate { will-change: auto; } }
+@supports not (transform-style: preserve-3d) { .edge { display: none; } .plate { transform: none; } }

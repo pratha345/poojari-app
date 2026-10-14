@@ -7,6 +7,7 @@
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import s from './SankalpMantra.module.css';
+import Tamrapatra from './Tamrapatra';
 
 const MAAS = ['चैत्र', 'वैशाख', 'ज्येष्ठ', 'आषाढ', 'श्रावण', 'भाद्रपद', 'आश्विन', 'कार्तिक', 'मार्गशीर्ष', 'पौष', 'माघ', 'फाल्गुन'];
 const RITU = ['वसन्त', 'ग्रीष्म', 'वर्षा', 'शरद्', 'हेमन्त', 'शिशिर'];
@@ -33,7 +34,7 @@ const DEV = (n) => String(n).replace(/\d/g, d => '०१२३४५६७८९
 const GRAHA = [  // locative forms — only चंद्र, सूर्य and गुरु are named in the sankalp
   ['Moon', 'चन्द्रे'], ['Sun', 'श्रीसूर्ये'], ['Jupiter', 'देवगुरौ बृहस्पतौ']];
 
-const FIELDS_KEY = 'sankalp_fields', VIEW_KEY = 'sankalp_view';
+const FIELDS_KEY = 'sankalp_fields', VIEW_KEY = 'sankalp_view', STYLE_KEY = 'sankalp_style';
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } };
 
@@ -96,6 +97,8 @@ export default function SankalpMantra({ data, place }) {
   const [f, setF] = useState(() => ({ name: '', gotra: '', puja: '', place: '', gender: 'm', ...load(FIELDS_KEY, {}) }));
   const setField = (k, v) => setF(x => { const n = { ...x, [k]: v }; save(FIELDS_KEY, n); return n; });
   const pick = (v) => { setView(v); save(VIEW_KEY, v); };
+  const [style, setStyle] = useState(() => load(STYLE_KEY, 'plate'));     // plate | text
+  const pickStyle = (v) => { setStyle(v); save(STYLE_KEY, v); };
 
   const e = useMemo(() => (data ? elements(data, place) : null), [data, place]);
   if (!e) return <div className={s.root}><p className={s.wait}>पंचांग माहिती येत आहे…</p></div>;
@@ -157,11 +160,22 @@ export default function SankalpMantra({ data, place }) {
               ))}
             </div>
           </div>
-          <p className={s.mantra} lang="sa">
-            {parts.map((p, i) => (typeof p === 'string'
-              ? <span key={i}>{p}</span>
-              : <span key={i} className={p.empty ? s.ph : s.val}>{p.v}</span>))}
-          </p>
+          <div className={s.styleRow} role="radiogroup" aria-label="दाखवण्याची पद्धत">
+            {[['plate', '📜 ताम्रपत्र'], ['text', '📝 मजकूर']].map(([k, label]) => (
+              <button key={k} type="button" role="radio" aria-checked={style === k}
+                className={`${s.chip} ${style === k ? s.chipOn : ''}`} onClick={() => pickStyle(k)}>{label}</button>
+            ))}
+          </div>
+          {style === 'plate' ? (
+            <Tamrapatra parts={parts} title={view === 'full' ? 'विस्तृत संकल्पः' : 'संकल्पः'}
+              footer={`${Number(d)}-${Number(m)}-${y} · ${data.selectedTime} · ${f.place || place}`} />
+          ) : (
+            <p className={s.mantra} lang="sa">
+              {parts.map((p, i) => (typeof p === 'string'
+                ? <span key={i}>{p}</span>
+                : <span key={i} className={p.empty ? s.ph : s.val}>{p.v}</span>))}
+            </p>
+          )}
           <div className={s.actions}>
             <button type="button" className={s.copy} onClick={copy}>📋 संकल्प कॉपी करा</button>
           </div>

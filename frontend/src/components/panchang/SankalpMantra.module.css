@@ -45,6 +45,7 @@
 }
 .val { color: #7ee07e; }
 .ph { color: #7ee07e; opacity: 0.8; }
+.styleRow { display: flex; justify-content: center; gap: 8px; margin: 0 0 6px; }
 .actions { display: flex; justify-content: center; margin-top: 18px; }
 .copy {
   padding: 11px 22px; border-radius: 22px; border: 1px solid #d4af65; cursor: pointer; font-weight: 800;
