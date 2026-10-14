@@ -1217,4 +1217,4 @@
   transition: background 0.15s, color 0.15s;
 }
 .pageTab:hover { background: var(--kd-cell); }
-.pageTabOn { background: linear-gradient(180deg, #6b4a17, #4c330f); color: #f6d58a; border-color: #b8862f; }
+.pageTabOn, .pageTabOn:hover { background: linear-gradient(180deg, #6b4a17, #4c330f); color: #f6d58a; border-color: #b8862f; }
