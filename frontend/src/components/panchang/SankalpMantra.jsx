@@ -30,9 +30,8 @@ const SK = {
 };
 const sk = (w) => SK[w] || w;
 const DEV = (n) => String(n).replace(/\d/g, d => '०१२३४५६७८९'[d]);
-const GRAHA = [  // locative forms, in the order pothis list them
-  ['Moon', 'चन्द्रे'], ['Sun', 'श्रीसूर्ये'], ['Jupiter', 'देवगुरौ बृहस्पतौ'], ['Mars', 'भौमे'], ['Mercury', 'बुधे'],
-  ['Venus', 'शुक्रे'], ['Saturn', 'शनैश्चरे'], ['Rahu', 'राहौ'], ['Ketu', 'केतौ']];
+const GRAHA = [  // locative forms — only चंद्र, सूर्य and गुरु are named in the sankalp
+  ['Moon', 'चन्द्रे'], ['Sun', 'श्रीसूर्ये'], ['Jupiter', 'देवगुरौ बृहस्पतौ']];
 
 const FIELDS_KEY = 'sankalp_fields', VIEW_KEY = 'sankalp_view';
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
