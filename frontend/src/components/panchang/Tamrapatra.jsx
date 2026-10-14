@@ -11,7 +11,7 @@ const REST_X = 7, REST_Y = -5;              // resting lean (deg)
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 const EDGES = [1, 2, 3, 4, 5, 6, 7];
 
-export default function Tamrapatra({ parts, title, footer }) {
+export default function Tamrapatra({ parts, title, footer, children }) {
   const sceneRef = useRef(null), plateRef = useRef(null);
 
   useEffect(() => {
@@ -85,11 +85,13 @@ export default function Tamrapatra({ parts, title, footer }) {
           <div className={s.hole} aria-hidden="true" />
           <p className={s.head} aria-hidden="true">॥ श्री ॥</p>
           <h3 className={s.title}>{title}</h3>
-          <p className={s.text} lang="sa">
-            {parts.map((p, i) => (typeof p === 'string'
-              ? <span key={i}>{p}</span>
-              : <span key={i} className={p.empty ? s.ph : s.inlay}>{p.v}</span>))}
-          </p>
+          {children || (
+            <p className={s.text} lang="sa">
+              {parts.map((p, i) => (typeof p === 'string'
+                ? <span key={i}>{p}</span>
+                : <span key={i} className={p.empty ? s.ph : s.inlay}>{p.v}</span>))}
+            </p>
+          )}
           {footer && <p className={s.foot}>{footer}</p>}
           <p className={s.end} aria-hidden="true">॥ शुभं भवतु ॥</p>
           <div className={s.sheen} aria-hidden="true" />

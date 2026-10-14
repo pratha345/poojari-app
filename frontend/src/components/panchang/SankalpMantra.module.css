@@ -16,14 +16,6 @@
 .tab:hover { background: rgba(255, 220, 150, 0.06); }
 .tabOn { background: rgba(212, 175, 101, 0.22); color: #f5c518; border-color: rgba(212, 175, 101, 0.35); }
 
-/* माहिती */
-.list { list-style: none; margin: 0 auto; padding: 0 6px; max-width: 520px; display: grid; gap: 8px; }
-.list li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px dashed rgba(212, 175, 101, 0.15); padding-bottom: 6px; }
-.list b { color: #7ee07e; font-size: 1.22rem; font-weight: 600; font-family: var(--font-display, inherit); }
-.list span { color: #bfae8a; font-size: 0.85rem; text-align: right; }
-.grahaList { margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(212, 175, 101, 0.3); }
-.grahaList li { border-bottom: none; padding-bottom: 0; }
-.grahaList b { font-size: 1.08rem; }
 .note { margin: 18px 4px 0; font-size: 0.8rem; color: #a99773; line-height: 1.6; }
 
 /* लघु / विस्तृत */
@@ -59,5 +51,4 @@
   .tab { min-width: 0; padding: 9px 16px; font-size: 1rem; }
   .form { grid-template-columns: 1fr; }
   .mantra { font-size: 1.15rem; }
-  .list b { font-size: 1.1rem; }
 }

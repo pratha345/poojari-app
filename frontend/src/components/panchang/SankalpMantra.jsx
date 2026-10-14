@@ -8,7 +8,7 @@ import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import s from './SankalpMantra.module.css';
 import Tamrapatra from './Tamrapatra';
-import KaalKram from './KaalKram';
+import tp from './Tamrapatra.module.css';
 
 const MAAS = ['चैत्र', 'वैशाख', 'ज्येष्ठ', 'आषाढ', 'श्रावण', 'भाद्रपद', 'आश्विन', 'कार्तिक', 'मार्गशीर्ष', 'पौष', 'माघ', 'फाल्गुन'];
 const RITU = ['वसन्त', 'ग्रीष्म', 'वर्षा', 'शरद्', 'हेमन्त', 'शिशिर'];
@@ -40,7 +40,7 @@ const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; 
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } };
 
 /** The Sanskrit pieces for the panchang shown on the page. */
-export function elements(data, place) {
+function elements(data, place) {
   const adhik = /अधिक/.test(data.maas || '');
   const maasName = (data.maas || '').replace('अधिक', '').trim();
   const mi = MAAS.indexOf(maasName);
@@ -52,18 +52,6 @@ export function elements(data, place) {
   const n = data.tithi?.num;
   const tithi = n === 15 ? 'पौर्णिमा' : n === 30 ? 'अमावास्या' : TITHI[(n - 1) % 15] || data.tithi?.name;
   const shukla = /शुक्ल/.test(data.paksha);
-  // how far through each unit the chosen moment is (0…1), for the कालक्रम steps
-  const el = (((Number(data._moon_sun_diff) % 360) + 360) % 360) || 0;
-  const at = Date.parse(`${data.date}T${data.selectedTime}:00+05:30`);
-  const rise = Date.parse(data.sunriseAt), next = Date.parse(data.nextSunriseAt);
-  const clamp01 = (x) => (Number.isFinite(x) ? Math.min(1, Math.max(0, x)) : null);
-  const frac = {
-    year: mi >= 0 ? clamp01((mi + el / 360) / 12) : null,
-    ayana: uttar == null ? null : clamp01((((sunSid - (uttar ? 270 : 90)) % 360) + 360) % 360 / 180),
-    ritu: mi >= 0 ? clamp01(((mi % 2) + el / 360) / 2) : null,
-    maas: clamp01(el / 360), paksha: clamp01((el % 180) / 180), tithi: clamp01((el % 12) / 12),
-    vaar: clamp01((at - rise) / (next - rise)),
-  };
   const rashiOf = Object.fromEntries((data.grahas || []).map(g => [g.key, g.rashi]));
   rashiOf.Sun = data.suryaRashi; rashiOf.Moon = data.chandraRashi;
   return {
@@ -73,7 +61,7 @@ export function elements(data, place) {
     maas: `${adhik ? 'अधिक ' : ''}${maasName}`, paksha: shukla ? 'शुक्ल' : 'कृष्ण',
     tithi, vaar: VAAR[data.var] || data.var, nakshatra: sk(data.nakshatra), yoga: sk(data.yoga), karana: sk(data.karana),
     grahas: GRAHA.filter(([k]) => rashiOf[k]).map(([k, loc]) => [sk(rashiOf[k]), loc]),
-    place, frac,
+    place,
   };
 }
 
@@ -139,7 +127,28 @@ export default function SankalpMantra({ data, place }) {
 
       {view === 'info' ? (
         <>
-          <KaalKram e={e} data={data} />
+          <Tamrapatra title="संकल्पातील पंचांग"
+            footer={`${Number(d)}-${Number(m)}-${y} · ${data.selectedTime} · ${place}`}>
+            <ul className={tp.rows}>
+              {[
+                [`शालिवाहन शके ${DEV(e.shaka)}`, `${e.samvatsar} नाम संवत्सरे`],
+                e.ayana && [e.ayana, e.ayanaMr],
+                e.ritu && [`${e.ritu} ऋतौ`, `${e.rituMr} ऋतू`],
+                [`${e.maas} मासे`, `${data.maas} महिना (अमांत)`],
+                [`${e.paksha} पक्षे`, data.paksha],
+                [`${e.tithi} तिथौ`, data.tithi?.name],
+                [`${e.vaar} शुभवासरे`, data.var],
+                [`${e.nakshatra} नक्षत्रे`, data.nakshatra],
+                [`${e.yoga} योगे`, data.yoga],
+                [`${e.karana} करणे`, data.karana],
+              ].filter(Boolean).map(([sa, mr]) => (
+                <li key={sa}><b className={tp.inlay} lang="sa">{sa}</b><span>{mr}</span></li>
+              ))}
+              {e.grahas.map(([r, loc], i) => (
+                <li key={loc} className={i === 0 ? tp.rowsGap : ''}><b className={tp.inlay} lang="sa">{r} राशिस्थिते {loc}</b></li>
+              ))}
+            </ul>
+          </Tamrapatra>
           <p className={s.note}>
             संकल्प ज्या क्षणी करता त्या क्षणाची तिथी, नक्षत्र, योग व करण घ्यावे — वर तारीख, वेळ व जिल्हा बदलल्यास हा
             संकल्प त्याप्रमाणे बदलतो. ऋतू चांद्रमासानुसार, अयन निरयन. स्थानिक आचारानुसार शब्दरचनेत थोडा फरक असू शकतो.

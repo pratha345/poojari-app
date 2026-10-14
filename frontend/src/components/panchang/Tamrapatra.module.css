@@ -58,6 +58,19 @@
   text-shadow: 0 1px 0 #6a3410, 0 2px 2px rgba(40, 12, 0, 0.55), 0 0 8px rgba(255, 210, 110, 0.35);
 }
 .ph { color: #ffe08a; opacity: 0.75; font-style: italic; text-shadow: 0 1px 0 #6a3410; }
+/* माहिती: one engraved row per element — Sanskrit inlaid in gold, Marathi cut beside it */
+.rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rows li {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 14px; padding: 7px 2px;
+  border-bottom: 1px solid rgba(70, 28, 8, 0.35); box-shadow: 0 1px 0 rgba(255, 214, 178, 0.25);
+}
+.rows li:last-child { border-bottom: none; box-shadow: none; }
+.rows b { font-size: 1.2rem; font-family: var(--font-display, inherit); }
+.rows span {
+  color: #3a1807; font-size: 0.9rem; text-align: right;
+  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.55), 0 -1px 0 rgba(30, 8, 0, 0.35);
+}
+.rowsGap { margin-top: 14px; padding-top: 10px !important; border-top: 2px solid rgba(70, 28, 8, 0.45); }
 .foot { margin: 14px 0 0; text-align: center; font-size: 0.85rem; opacity: 0.85; }
 .end { margin: 10px 0 0; text-align: center; font-size: 1.05rem; letter-spacing: 2px; }
 
@@ -85,6 +98,8 @@
   .face { padding: 84px 28px 22px; }
   .text { font-size: 1.08rem; line-height: 1.85; }
   .title { font-size: 1.25rem; }
+  .rows b { font-size: 1.06rem; }
+  .rows span { font-size: 0.8rem; }
 }
 @media (prefers-reduced-motion: reduce) { .plate { will-change: auto; } }
 @supports not (transform-style: preserve-3d) { .edge { display: none; } .plate { transform: none; } }
