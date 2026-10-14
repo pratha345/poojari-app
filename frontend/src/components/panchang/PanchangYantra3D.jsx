@@ -5,9 +5,11 @@
 // shows the Moon's actual phase, and the bars below give each limb's progress and end time.
 // Positions: /api/panchang/chakra (sidereal, Lahiri — same engine as the panchang).
 // Maas comes from the panchang API, so adhik months are named correctly.
-import { useEffect, useMemo, useRef, useState, memo } from 'react';
+import { useEffect, useMemo, useState, memo } from 'react';
 import { panchangAPI } from '../../api/index.js';
 import { RASHIS } from '../../data/rashifalData';
+import { useView3D } from './view3d';
+import ViewToolbar from './ViewToolbar';
 import { useGrahaTimeline, useTimeControls, nextBoundary, norm, istParts, ymd, hhmm, fmtOffset, IST } from './yantraTime';
 import c from './RashiChakra3D.module.css';            // shared stage / controls styling
 import s from './PanchangYantra3D.module.css';
@@ -55,7 +57,7 @@ const ZodiacRing = memo(function ZodiacRing() {
     <svg viewBox="0 0 600 600" className={c.layer} aria-hidden="true">
       <defs>
         <linearGradient id="py-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f6d58a" /><stop offset="45%" stopColor="#b8862f" /><stop offset="100%" stopColor="#6f4b16" />
+          <stop offset="0%" stopColor="#f5d98a" /><stop offset="45%" stopColor="#b8862f" /><stop offset="100%" stopColor="#6f4b16" />
         </linearGradient>
         <radialGradient id="py-face" cx="50%" cy="45%" r="60%">
           <stop offset="0%" stopColor="#33220f" /><stop offset="75%" stopColor="#1c1209" /><stop offset="100%" stopColor="#120b05" />
@@ -88,8 +90,7 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
   const { t } = tc;
   const { samples, pos, error } = useGrahaTimeline(t, lat, lon);
   const [day, setDay] = useState(null);
-  const stageRef = useRef(null), wheelRef = useRef(null);
-  const view = useRef({ rot: 0, tilt: 24 });
+  const cam = useView3D({ defaultTilt: 24 });
 
   // maas (incl. adhik) and vaar from the panchang for the shown minute
   const minute = Math.floor(t / 60000);
@@ -99,40 +100,6 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
     }, 600);
     return () => clearTimeout(id);
   }, [minute, lat, lon]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // drag to rotate / tilt (view only)
-  useEffect(() => {
-    const stage = stageRef.current; if (!stage) return;
-    let drag = null;
-    const apply = () => {
-      wheelRef.current?.style.setProperty('--rot', `${view.current.rot}deg`);
-      wheelRef.current?.style.setProperty('--tilt', `${view.current.tilt}deg`);
-    };
-    apply();
-    const down = (e) => { drag = { x: e.clientX, y: e.clientY }; stage.classList.add(c.dragging); };
-    const move = (e) => {
-      if (!drag) return;
-      view.current.rot += (e.clientX - drag.x) * 0.45;
-      view.current.tilt = Math.max(0, Math.min(55, view.current.tilt + (e.clientY - drag.y) * 0.25));
-      drag = { x: e.clientX, y: e.clientY }; apply();
-    };
-    const up = () => { drag = null; stage.classList.remove(c.dragging); };
-    stage.addEventListener('pointerdown', down);
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-    window.addEventListener('pointercancel', up);
-    return () => {
-      stage.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-      window.removeEventListener('pointercancel', up);
-    };
-  }, []);
-  const resetView = () => {
-    view.current = { rot: 0, tilt: 24 };
-    wheelRef.current?.style.setProperty('--rot', '0deg');
-    wheelRef.current?.style.setProperty('--tilt', '24deg');
-  };
 
   // ── the five limbs, their progress and end times ──
   const limbs = useMemo(() => {
@@ -195,11 +162,14 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
       </p>
       {error && <p className={c.error}>{error}</p>}
 
-      <div className={c.stage} ref={stageRef} title="फिरवण्यासाठी ओढा · झुकवण्यासाठी वर-खाली ओढा">
+      <div ref={cam.viewerRef} className={`${c.viewer} ${cam.full && !document.fullscreenElement ? c.viewerFull : ''}`}>
+      <div className={c.stage} ref={cam.stageRef} tabIndex={0} role="group"
+        aria-label="पंचांग यंत्र — ओढून फिरवा; बाण कळा: सरकवा, + / −: झूम, 0: मूळ दृश्य">
         <div className={c.shadow} />
         {!pos && !error && <div className={c.loading}>गणित होत आहे…</div>}
-        <div className={c.wheel} ref={wheelRef}>
+        <div className={c.wheel}>
           <div className={`${c.plate} ${c.z0}`}><ZodiacRing /></div>
+          <div className={c.sheen} />
           {limbs && (
             <svg viewBox="0 0 600 600" className={`${c.layer} ${c.z1}`} aria-label="तिथी चक्र">
               {/* शुक्ल / कृष्ण halves */}
@@ -251,7 +221,8 @@ export default function PanchangYantra3D({ lat, lon, place, syncMs }) {
             </svg>
           )}
         </div>
-        <button type="button" className={c.reset} onClick={resetView} title="मूळ दृश्य">⟲</button>
+      </div>
+      <ViewToolbar cam={cam} />
       </div>
 
       {limbs && (

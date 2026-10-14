@@ -1,0 +1,57 @@
+/* ViewToolbar — translucent espresso surface, thin antique-gold edges (palette: --gold / --gold-hi / --ink) */
+.bar {
+  margin: 10px auto 0; width: fit-content; max-width: 100%;
+  padding: 8px 10px 6px; border-radius: 18px;
+  background: linear-gradient(180deg, rgba(48, 32, 20, 0.88), rgba(27, 16, 9, 0.92));
+  border: 1px solid rgba(212, 175, 101, 0.35);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(245, 217, 138, 0.08);
+  backdrop-filter: blur(6px);
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+.top { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.modes { display: inline-flex; padding: 3px; border-radius: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(212, 175, 101, 0.2); }
+.mode {
+  min-width: 56px; min-height: 36px; padding: 0 12px; border: none; border-radius: 9px;
+  background: none; color: #d8c6a0; font-weight: 700; font-size: 0.92rem; cursor: pointer;
+  font-family: var(--font-display, inherit); transition: background 0.15s, color 0.15s;
+}
+.mode:hover { color: var(--gold-hi, #f5d98a); }
+.modeOn { background: linear-gradient(180deg, #d4af65, #a8843e); color: #1b1009; }
+.modeOn:hover { color: #1b1009; }
+.hud { font-size: 0.8rem; color: #bfae8a; font-variant-numeric: tabular-nums; min-width: 84px; text-align: center; }
+.toggle { background: none; border: none; color: var(--gold, #d4af65); font-size: 0.82rem; font-weight: 700; cursor: pointer; padding: 6px 4px; min-height: 36px; }
+
+.pad { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px; }
+.btn {
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border-radius: 12px; border: 1px solid rgba(212, 175, 101, 0.35);
+  background: linear-gradient(180deg, rgba(64, 43, 24, 0.9), rgba(36, 22, 11, 0.95));
+  color: var(--gold-hi, #f5d98a); font-size: 1.05rem; line-height: 1; cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(245, 217, 138, 0.1);
+  touch-action: manipulation; transition: background 0.12s, transform 0.08s, border-color 0.12s;
+}
+.btn:hover { border-color: rgba(245, 217, 138, 0.7); background: linear-gradient(180deg, rgba(84, 58, 30, 0.95), rgba(46, 29, 14, 0.95)); }
+.btn:active { transform: translateY(1px) scale(0.96); background: rgba(212, 175, 101, 0.25); }
+.btn:focus-visible, .mode:focus-visible, .toggle:focus-visible { outline: 2px solid var(--gold-hi, #f5d98a); outline-offset: 2px; }
+
+/* cross-shaped direction pad with "home" in the middle */
+.dpad { display: grid; grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px); gap: 3px; }
+.up { grid-area: 1 / 2; } .left { grid-area: 2 / 1; } .home { grid-area: 2 / 2; } .right { grid-area: 2 / 3; } .down { grid-area: 3 / 2; }
+.home { font-size: 1.3rem; color: #1b1009; background: linear-gradient(180deg, #e6c47c, #b08a40); border-color: #f5d98a; }
+.home:hover { background: linear-gradient(180deg, #f5d98a, #c49b4a); }
+.grid { display: grid; grid-template-columns: repeat(2, 44px); gap: 6px; }
+.grid .btn { font-size: 1.25rem; }
+.full { align-self: center; font-size: 1.2rem; }
+
+.hint { margin: 6px 0 0; text-align: center; font-size: 0.72rem; color: #a99773; line-height: 1.4; }
+
+@media (max-width: 480px) {
+  .bar { padding: 7px 8px 5px; }
+  .top { gap: 6px; }
+  .mode { min-width: 44px; padding: 0 9px; font-size: 0.86rem; }
+  .hud { min-width: 0; font-size: 0.74rem; }
+  .toggle { font-size: 0.76rem; }
+  .pad { gap: 10px; }
+}
+@media (max-width: 360px) { .hud { display: none; } }
+@media (prefers-reduced-motion: reduce) { .btn, .mode { transition: none; } }

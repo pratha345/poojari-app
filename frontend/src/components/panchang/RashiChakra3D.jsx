@@ -11,6 +11,8 @@ import { panchangAPI } from '../../api/index.js';
 import { RASHIS } from '../../data/rashifalData';
 import s from './RashiChakra3D.module.css';
 import { useTimeControls, fmtOffset } from './yantraTime';
+import { useView3D } from './view3d';
+import ViewToolbar from './ViewToolbar';
 
 const RASHI = RASHIS.map(r => r.name);
 const NAKSHATRA = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशीर्ष', 'आर्द्रा', 'पुनर्वसू', 'पुष्य', 'आश्लेषा',
@@ -87,7 +89,7 @@ const Rings = memo(function Rings() {
           <stop offset="0%" stopColor="#3a2614" /><stop offset="70%" stopColor="#1f140b" /><stop offset="100%" stopColor="#140d07" />
         </radialGradient>
         <linearGradient id="rc-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f6d58a" /><stop offset="45%" stopColor="#b8862f" /><stop offset="100%" stopColor="#6f4b16" />
+          <stop offset="0%" stopColor="#f5d98a" /><stop offset="45%" stopColor="#b8862f" /><stop offset="100%" stopColor="#6f4b16" />
         </linearGradient>
       </defs>
       {/* bevelled outer rim */}
@@ -137,12 +139,8 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
   const [exact, setExact]     = useState(null);          // exact positions once the time settles
   const [sel, setSel]         = useState(null);          // selected graha (info card)
 
-  const stageRef = useRef(null), wheelRef = useRef(null);
-  const view3d = useRef({ rot: 0, tilt: DEFAULT_TILT, vRot: 0 });
-  const movedRef = useRef(0);                    // last time a drag moved (tap vs drag)
   const fetching = useRef(false);
   const tRef = useRef(t); tRef.current = t;
-  const reduceMotion = useMemo(() => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches, []);
 
 
   // ── data: keep a 10-day window of samples around t ──
@@ -181,78 +179,16 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
     return () => clearTimeout(id);
   }, [minuteKey, lat, lon]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── wheel rotation (view only) — written straight to CSS variables, no re-render ──
+  // ── camera (view only): rotate / tilt / pan / zoom live in CSS variables — see view3d.js ──
   const lagnaOffset = view === 'lagna' && pos ? pos.lagna - 90 : 0;   // lagna at the left (east)
-  const [restRot, setRestRot] = useState(0);     // user rotation once a drag/spin has settled
+  const [restRot, setRestRot] = useState(0);     // user rotation once a gesture has settled
   const offsetRef = useRef(0);
-  const applyView = useCallback(() => {          // stable: reads refs, so listeners stay bound
-    const el = wheelRef.current; if (!el) return;
-    const v = view3d.current;
-    el.style.setProperty('--rot', `${v.rot + offsetRef.current}deg`);
-    el.style.setProperty('--tilt', `${v.tilt}deg`);
-  }, []);
+  const cam = useView3D({ defaultTilt: DEFAULT_TILT, rotOffsetRef: offsetRef, onRest: setRestRot });
+  const movedRef = cam.movedAt;                  // tap vs drag on the graha markers
+  const { apply: applyView, setRot } = cam;
   useEffect(() => { offsetRef.current = lagnaOffset; applyView(); }, [lagnaOffset, applyView, view]);
   // a new view starts from the default orientation (lagna then sits exactly at the left)
-  useEffect(() => { view3d.current.rot = 0; view3d.current.vRot = 0; setRestRot(0); applyView(); }, [view, applyView]);
-
-  useEffect(() => {
-    const stage = stageRef.current; if (!stage) return;
-    let drag = null, raf = 0;
-    const down = (e) => {
-      if (e.button !== undefined && e.button !== 0) return;
-      cancelAnimationFrame(raf);
-      drag = { x: e.clientX, y: e.clientY, lx: e.clientX, lt: performance.now(), moved: 0 };
-      stage.classList.add(s.dragging);
-    };
-    const move = (e) => {
-      if (!drag) return;
-      const v = view3d.current, now = performance.now();
-      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-      drag.moved += Math.abs(dx) + Math.abs(dy);
-      if (drag.moved > 6) movedRef.current = performance.now();
-      v.rot += dx * 0.45;
-      v.tilt = Math.min(55, Math.max(0, v.tilt + dy * 0.25));
-      // flick speed in degrees per frame, capped so one fast swipe can't spin the wheel wildly
-      v.vRot = Math.max(-12, Math.min(12, ((e.clientX - drag.lx) * 0.45) / Math.max(8, now - drag.lt) * 16));
-      drag.x = e.clientX; drag.y = e.clientY; drag.lx = e.clientX; drag.lt = now;
-      applyView();
-    };
-    const up = () => {
-      if (!drag) return;
-      drag = null; stage.classList.remove(s.dragging);
-      if (reduceMotion) { setRestRot(view3d.current.rot); return; }
-      const spin = () => {                       // gentle inertia
-        const v = view3d.current;
-        v.vRot *= 0.92;
-        if (Math.abs(v.vRot) < 0.05) { setRestRot(v.rot); return; }
-        v.rot += v.vRot; applyView(); raf = requestAnimationFrame(spin);
-      };
-      raf = requestAnimationFrame(spin);
-    };
-    stage.addEventListener('pointerdown', down);
-    window.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', up);
-    window.addEventListener('pointercancel', up);
-    return () => {
-      cancelAnimationFrame(raf);
-      stage.removeEventListener('pointerdown', down);
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
-      window.removeEventListener('pointercancel', up);
-    };
-  }, [applyView, reduceMotion]);
-
-  const resetView = () => {
-    const v = view3d.current; const from = { ...v }; const t0 = performance.now();
-    setRestRot(0);
-    if (reduceMotion) { v.rot = 0; v.tilt = DEFAULT_TILT; v.vRot = 0; applyView(); return; }
-    const step = (now) => {
-      const k = Math.min(1, (now - t0) / 450), e = 1 - (1 - k) ** 3;
-      v.rot = from.rot * (1 - e); v.tilt = from.tilt + (DEFAULT_TILT - from.tilt) * e; v.vRot = 0;
-      applyView(); if (k < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  };
+  useEffect(() => { setRot(0); }, [view, setRot]);
 
 
   // ── what the bottom line says ──
@@ -293,7 +229,7 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
   // exact values at rest; interpolated while the time is moving
   const val = (k) => (exact && Math.abs(exact.t - t) < 1000 ? exact.row[k] : pos?.[k]);
   const rows = pos && [...GRAHA.map(g => ({ ...g, lon: val(g.key), retro: pos[g.key + '_retro'], speed: pos[g.key + '_speed'] })),
-    { key: 'lagna', mr: 'लग्न', c: '#f6d58a', lon: val('lagna'), retro: false, speed: null }];
+    { key: 'lagna', mr: 'लग्न', c: '#f5d98a', lon: val('lagna'), retro: false, speed: null }];
   const nakOf = (lon) => `${NAKSHATRA[Math.floor(lon / (360 / 27))]} (${Math.floor((lon % (360 / 27)) / (360 / 108)) + 1})`;
   const selRow = sel && rows?.find(r => r.key === sel);
   // whole-sign houses for the lagna view: house 1 = the lagna's rashi
@@ -317,11 +253,14 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
       {error && <p className={s.error}>{error}</p>}
 
       {view !== 'info' ? (
-        <div className={s.stage} ref={stageRef} title="फिरवण्यासाठी ओढा · झुकवण्यासाठी वर-खाली ओढा">
+        <div ref={cam.viewerRef} className={`${s.viewer} ${cam.full && !document.fullscreenElement ? s.viewerFull : ''}`}>
+        <div className={s.stage} ref={cam.stageRef} tabIndex={0} role="group"
+          aria-label="राशि चक्र — ओढून फिरवा; बाण कळा: सरकवा, + / −: झूम, 0: मूळ दृश्य">
           <div className={s.shadow} />
           {!pos && !error && <div className={s.loading}>ग्रहस्थितीचे गणित होत आहे…</div>}
-          <div className={s.wheel} ref={wheelRef}>
+          <div className={s.wheel}>
             <div className={`${s.plate} ${s.z0}`}><Rings /></div>
+            <div className={s.sheen} />
             <svg viewBox="0 0 600 600" className={`${s.layer} ${s.z1}`} aria-label="ग्रहस्थिती">
               {pos && (
                 <g>
@@ -365,7 +304,6 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
             </svg>
             <div className={`${s.hub} ${s.z3}`}><span /></div>
           </div>
-          <button type="button" className={s.reset} onClick={resetView} title="मूळ दृश्य">⟲</button>
           {selRow && (
             <div className={s.card} role="dialog" aria-label={`${selRow.mr} तपशील`}>
               <button type="button" className={s.cardX} onClick={() => setSel(null)} aria-label="बंद करा">×</button>
@@ -378,6 +316,8 @@ export default function RashiChakra3D({ lat, lon, place, syncMs, onShowKundli })
               </dl>
             </div>
           )}
+        </div>
+        <ViewToolbar cam={cam} />
         </div>
       ) : (
         <div className={s.infoWrap}>
