@@ -20,7 +20,7 @@
 .stage {
   position: relative; width: min(100%, 520px); aspect-ratio: 1; margin: 0 auto;
   perspective: 1400px; perspective-origin: 50% 30%;
-  touch-action: none; cursor: grab; user-select: none;
+  touch-action: pan-y; cursor: grab; user-select: none;   /* vertical swipes scroll the page */
 }
 .dragging { cursor: grabbing; }
 /* a fixed index mark at 12 o'clock */

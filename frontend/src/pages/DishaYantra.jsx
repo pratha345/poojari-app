@@ -27,7 +27,7 @@ export default function DishaYantra() {
       <div className={styles.hero}>
         <div className="container">
           <h1 className={styles.title}>🧭 दिशा यंत्र</h1>
-          <p className={styles.sub}>फोनच्या compass वरून अचूक दिशा · आजची दिशाशूल · पूजेसाठी योग्य दिशा</p>
+          <p className={styles.sub}>आजची दिशाशूल · पूजेसाठी योग्य दिशा · दिक्पाल</p>
         </div>
       </div>
       <div className="container" style={{ padding: '24px 16px 48px' }}>

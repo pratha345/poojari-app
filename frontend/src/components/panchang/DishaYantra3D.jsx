@@ -105,6 +105,16 @@ const Rose = memo(function Rose() {
   );
 });
 
+// heading the back of the phone faces, from alpha/beta/gamma (W3C DeviceOrientation spec example)
+function cameraHeading(alpha, beta, gamma) {
+  const r = Math.PI / 180, x = beta * r, y = gamma * r, z = alpha * r;
+  const cX = Math.cos(x), cY = Math.cos(y), cZ = Math.cos(z), sX = Math.sin(x), sY = Math.sin(y), sZ = Math.sin(z);
+  const vx = -cZ * sY - sZ * sX * cY, vy = -sZ * sY + cZ * sX * cY;
+  let h = Math.atan(vx / vy);
+  if (vy < 0) h += Math.PI; else if (vx < 0) h += 2 * Math.PI;
+  return (h * 180) / Math.PI;
+}
+
 export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
   const [mode, setMode]       = useState('idle');   // idle | sensor | manual
   const [shown, setShown]     = useState(0);        // heading shown in text (updated ~5×/s)
@@ -132,61 +142,68 @@ export default function DishaYantra3D({ lat = 18.5204, lon = 73.8567, place }) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // compass events
+  // compass events — any browser that gives an Earth-referenced reading is used:
+  // iPhone: webkitCompassHeading; Android Chrome: deviceorientationabsolute; Firefox &
+  // others: deviceorientation with absolute = true. Relative-only readings are ignored.
   const onOrient = useCallback((e) => {
     let h = null;
-    if (typeof e.webkitCompassHeading === 'number') h = e.webkitCompassHeading;          // iPhone
-    else if ((e.absolute || e.type === 'deviceorientationabsolute') && e.alpha != null) h = 360 - e.alpha; // Android
-    if (h == null) return;
-    if (!gotAbsolute.current) { gotAbsolute.current = true; setMode('sensor'); }   // sensor answered
     const screenAngle = (window.screen?.orientation?.angle ?? window.orientation ?? 0) || 0;
-    target.current = norm(h + screenAngle);
+    if (typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
+      h = e.webkitCompassHeading + screenAngle;                                   // iPhone
+    } else if ((e.absolute || e.type === 'deviceorientationabsolute') && e.alpha != null) {
+      h = Math.abs(e.beta ?? 0) < 50
+        ? 360 - e.alpha + screenAngle                                             // lying flat: where the top points
+        : cameraHeading(e.alpha, e.beta, e.gamma ?? 0);                           // held upright: where the back faces
+    }
+    if (h == null || !Number.isFinite(h)) return;
+    if (!gotAbsolute.current) { gotAbsolute.current = true; setMode('sensor'); }   // sensor answered
+    target.current = norm(h);
   }, []);
 
   // Always on: listen from the start and switch to the live heading as soon as the sensor
   // answers. Without a compass (desktop) the dial simply stays hand-turnable — no prompts.
-  const startCompass = async () => {
-    try {
-      if (typeof window.DeviceOrientationEvent?.requestPermission === 'function') {
-        const res = await window.DeviceOrientationEvent.requestPermission();   // iPhone asks here
-        if (res !== 'granted') { setMode('manual'); return; }
-      }
-    } catch { /* fall through to listening */ }
-    // iPhone reports webkitCompassHeading on the plain event; Android needs the absolute one
-    const ios = typeof window.DeviceOrientationEvent?.requestPermission === 'function';
-    const evt = !ios && 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
-    window.addEventListener(evt, onOrient, true);
-    setTimeout(() => { if (!gotAbsolute.current) setMode('manual'); }, 1500);
+  const listen = useCallback(() => {
+    window.addEventListener('deviceorientationabsolute', onOrient, true);
+    window.addEventListener('deviceorientation', onOrient, true);
+  }, [onOrient]);
+  const askPermission = async () => {
+    try { await window.DeviceOrientationEvent.requestPermission(); } catch { /* not allowed here */ }
   };
   useEffect(() => () => {
     window.removeEventListener('deviceorientationabsolute', onOrient, true);
     window.removeEventListener('deviceorientation', onOrient, true);
   }, [onOrient]);
 
-  // Compass on by default. Android/others start right away; iPhone (Safari rule) only allows it from a
-  // tap, so it starts on the first tap anywhere on the page.
+  // Compass on by default: listen straight away (Android needs no prompt). Where the browser
+  // asks for permission (iPhone Safari), the prompt can only come from a tap, so the first tap
+  // anywhere asks. Without a sensor (laptop) the dial stays hand-turnable.
   useEffect(() => {
+    listen();
+    const noSensor = setTimeout(() => { if (!gotAbsolute.current) setMode('manual'); }, 2500);
+    let cleanup = () => {};
     if (typeof window.DeviceOrientationEvent?.requestPermission === 'function') {
-      const once = () => { cleanup(); startCompass(); };
-      const cleanup = () => { window.removeEventListener('touchend', once); window.removeEventListener('click', once); };
+      const once = () => { cleanup(); askPermission(); };
+      cleanup = () => { window.removeEventListener('touchend', once); window.removeEventListener('click', once); };
       window.addEventListener('touchend', once, { once: true });
       window.addEventListener('click', once, { once: true });
-      return cleanup;
     }
-    startCompass();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => { clearTimeout(noSensor); cleanup(); };
+  }, [listen]);
 
-  // drag: sideways turns the dial (only without a compass); up/down tilts the view
+  // drag: sideways turns the dial (only without a compass); with a mouse, up/down tilts the view.
+  // On touch the browser keeps vertical swipes (touch-action: pan-y) so the page scrolls.
   useEffect(() => {
     const stage = stageRef.current; if (!stage) return;
     let drag = null, tilt = 18;
-    const down = (e) => { drag = { x: e.clientX, y: e.clientY }; stage.classList.add(s.dragging); };
+    const down = (e) => { drag = { x: e.clientX, y: e.clientY, mouse: e.pointerType === 'mouse' }; stage.classList.add(s.dragging); };
     const move = (e) => {
       if (!drag) return;
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-      drag = { x: e.clientX, y: e.clientY };
-      tilt = Math.max(0, Math.min(45, tilt + dy * 0.25));
-      wheelRef.current?.style.setProperty('--tilt', `${tilt}deg`);
+      drag = { ...drag, x: e.clientX, y: e.clientY };
+      if (drag.mouse) {
+        tilt = Math.max(0, Math.min(45, tilt + dy * 0.25));
+        wheelRef.current?.style.setProperty('--tilt', `${tilt}deg`);
+      }
       if (mode !== 'sensor') target.current = norm(target.current - dx * 0.5);
     };
     const up = () => { drag = null; stage.classList.remove(s.dragging); };
