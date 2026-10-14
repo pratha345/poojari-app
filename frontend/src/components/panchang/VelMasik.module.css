@@ -1,0 +1,124 @@
+/* हिंदू वेळ · मासिक — espresso & antique gold, matching the other yantras */
+.root {
+  max-width: 760px; margin: 0 auto; padding: 18px 16px 22px; border-radius: 20px; color: #fff4de;
+  background: radial-gradient(120% 90% at 50% 20%, #3a2716 0%, #302014 35%, #1b1009 100%);
+  box-shadow: inset 0 0 0 1px rgba(212, 175, 101, 0.28), 0 18px 50px rgba(30, 15, 0, 0.35);
+}
+.tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 14px; }
+.tab {
+  padding: 9px 20px; border-radius: 14px; border: 1px solid transparent; cursor: pointer; background: none;
+  color: #e9dcc0; font-size: 1.05rem; font-weight: 700; font-family: var(--font-display, inherit);
+}
+.tab:hover { background: rgba(255, 220, 150, 0.06); }
+.tabOn { background: rgba(212, 175, 101, 0.22); color: #f5c518; border-color: rgba(212, 175, 101, 0.35); }
+.wait, .err { text-align: center; color: #bfae8a; padding: 30px 0; }
+.err { color: #ffab91; }
+
+/* ── clock ── */
+.clockWrap { display: grid; justify-items: center; }
+.scene { --rx: 14deg; --ry: 0deg; width: min(100%, 540px); perspective: 1300px; perspective-origin: 50% 35%; }
+.clock {
+  position: relative; aspect-ratio: 1; transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform 0.25s ease-out;
+}
+.layer, .hands { position: absolute; inset: 0; }
+.hands { transform: translateZ(26px); }
+.dialSvg { width: 100%; height: 100%; display: block; overflow: visible; }
+.layer { filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.5)); }
+.dayFill { fill: rgba(245, 217, 138, 0.10); }
+.nightFill { fill: rgba(8, 10, 26, 0.45); }
+.thin { stroke: rgba(212, 175, 101, 0.4); stroke-width: 1; }
+.tick { stroke: rgba(240, 213, 144, 0.55); stroke-width: 1.2; }
+.tickBig { stroke: #f0d590; stroke-width: 2.4; }
+.ghatiNum { fill: #d8c08a; font-size: 17px; text-anchor: middle; dominant-baseline: middle; font-variant-numeric: tabular-nums; }
+.hour { fill: #f0d590; font-size: 15px; font-weight: 600; text-anchor: middle; dominant-baseline: middle; opacity: 0.85; }
+.prahar { fill: #f5c518; font-size: 17px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; font-family: var(--font-display, inherit); }
+.half { fill: rgba(240, 213, 144, 0.75); font-size: 18px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; letter-spacing: 1px; }
+.sunMark { fill: #ffc22e; font-size: 22px; text-anchor: middle; }
+.setMark { stroke: #ff9f43; stroke-width: 3; }
+.handGhati { stroke: #f5c518; stroke-width: 13; stroke-linecap: round; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.55)); }
+.handPal { stroke: #ece6da; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5)); }
+.handVip { stroke: #ff8a65; stroke-width: 1.6; stroke-linecap: round; }
+.hub { fill: #f5c518; stroke: #7a5420; stroke-width: 3; }
+.digits { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; margin-top: 14px; }
+.digits div { display: grid; justify-items: start; }
+.digits span { font-size: 0.82rem; color: #bfae8a; }
+.dGhati { font-size: 2.6rem; color: #f5c518; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+.dClock { font-size: 2.1rem; color: #ece6da; font-weight: 400; font-variant-numeric: tabular-nums; margin-top: 6px; }
+.meta { margin: 10px 0 0; text-align: center; color: #f0d590; font-weight: 700; }
+.note { margin: 4px 0 0; text-align: center; color: #a99773; font-size: 0.78rem; }
+
+/* ── calendar ── */
+.masik { position: relative; }
+.monthBar { display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; gap: 10px; }
+.monthName {
+  margin: 0; text-align: center; padding: 10px 0; border-radius: 999px; font-size: 1.5rem; color: #f5c518;
+  background: rgba(212, 175, 101, 0.16); font-family: var(--font-display, inherit);
+}
+.navBtn { height: 48px; border: none; background: none; color: #f5c518; font-size: 2.2rem; cursor: pointer; line-height: 1; }
+.todayBtn { display: block; margin: 8px auto 0; padding: 5px 16px; border-radius: 999px; border: 1px solid #d4af65; background: none; color: #f5d98a; font-weight: 700; cursor: pointer; }
+.selCard {
+  display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; margin-top: 14px;
+  padding: 14px 16px; border-radius: 16px; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(212, 175, 101, 0.2);
+}
+.bigMoon { animation: float 6s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-4px) rotate(-2deg); } }
+.selText { display: grid; gap: 3px; }
+.selText b { font-size: 1.2rem; color: #fff4de; }
+.selText span { color: #e8d9b8; }
+.small { font-size: 0.82rem; color: #bfae8a !important; }
+.fest { font-size: 0.88rem; color: #f5d98a !important; }
+.openBtn { justify-self: start; margin-top: 4px; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(212, 175, 101, 0.5); background: none; color: #f5d98a; font-weight: 700; cursor: pointer; }
+.hint { margin: 10px 0 8px; text-align: center; font-size: 0.82rem; color: #d4af65; }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); background: rgba(255, 244, 222, 0.12); border-radius: 8px 8px 0 0; }
+.week span { text-align: center; padding: 8px 0; color: #f5c518; font-weight: 700; font-size: 0.95rem; }
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 5px; }
+.cell {
+  position: relative; aspect-ratio: 0.95; border-radius: 10px; border: 1px solid transparent; cursor: pointer;
+  background: #2b2b2e; color: #fff; padding: 0; font: inherit; overflow: visible;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.cell:hover { transform: translateY(-2px); border-color: rgba(245, 217, 138, 0.6); }
+.cell:focus-visible { outline: 2px solid #f5d98a; outline-offset: 2px; }
+.ghost { background: rgba(255, 255, 255, 0.04); animation: shimmer 1.2s ease-in-out infinite; }
+@keyframes shimmer { 50% { opacity: 0.5; } }
+.out { opacity: 0.45; }
+.today { background: #e3b505; color: #1b1009; }
+.sel { border-color: #f5d98a; box-shadow: 0 0 0 2px rgba(245, 217, 138, 0.35), 0 6px 14px rgba(0, 0, 0, 0.45); }
+.purnima { background: #8f8c6a; }
+.amavasya { background: #050505; }
+.ekadashi { background: #4a4e68; }
+.moonBox { position: absolute; left: -4px; top: -6px; width: 62%; aspect-ratio: 1; display: grid; place-items: center; }
+.moonBox svg { width: 100%; height: 100%; }
+.tNum {
+  position: absolute; inset: 0; display: grid; place-items: center; font-style: normal; font-weight: 800;
+  font-size: clamp(0.72rem, 2.6vw, 1.05rem); color: #f5c518; paint-order: stroke;
+  text-shadow: 0 0 3px #000, 0 0 2px #000, 0 0 1px #000;
+}
+.icon { position: absolute; left: 6px; bottom: 4px; font-size: clamp(0.7rem, 2.4vw, 1rem); }
+.date { position: absolute; right: 7px; bottom: 4px; font-size: clamp(0.9rem, 3vw, 1.35rem); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; margin-top: 12px; font-size: 0.76rem; color: #bfae8a; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.lgToday { background: #e3b505; } .lgPurn { background: #8f8c6a; } .lgAmav { background: #050505; border: 1px solid #555; } .lgEk { background: #4a4e68; }
+.festList { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 4px; }
+.festList button {
+  width: 100%; display: grid; grid-template-columns: 70px 1fr; gap: 10px; text-align: left; padding: 7px 10px;
+  border: none; border-radius: 8px; background: rgba(0, 0, 0, 0.18); color: #e8d9b8; cursor: pointer; font: inherit;
+}
+.festList button:hover { background: rgba(212, 175, 101, 0.14); }
+.festList b { color: #f5c518; }
+
+@media (max-width: 480px) {
+  .root { padding: 14px 8px 18px; border-radius: 14px; }
+  .dGhati { font-size: 2rem; } .dClock { font-size: 1.6rem; }
+  .digits { gap: 20px; }
+  .grid { gap: 3px; }
+  .cell { border-radius: 7px; }
+  .selCard { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .selText { justify-items: center; }
+  .openBtn { justify-self: center; }
+  .monthName { font-size: 1.2rem; }
+}
+@media (prefers-reduced-motion: reduce) { .bigMoon, .ghost { animation: none; } .clock { transition: none; } }
+@supports not (transform-style: preserve-3d) { .clock, .hands { transform: none; } }

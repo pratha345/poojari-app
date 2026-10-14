@@ -85,6 +85,39 @@ router.get('/chakra', (req, res) => {
   res.json({ success: true, data: { step, samples } });
 });
 
+// GET /api/panchang/days?start=YYYY-MM-DD&days=42&lat=&lon=
+// The sunrise panchang of consecutive days (मासिक calendar): tithi at sunrise, Moon–Sun
+// elongation for the phase picture, maas, nakshatra and festivals. One call per month grid.
+router.get('/days', async (req, res) => {
+  try {
+    const start = String(req.query.start || '');
+    const days  = Math.min(45, Math.max(1, parseInt(req.query.days) || 42));
+    const lat   = parseFloat(req.query.lat ?? 18.5204);
+    const lon   = parseFloat(req.query.lon ?? 73.8567);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(start) || Number.isNaN(Date.parse(start)))
+      return res.status(400).json({ success: false, message: 'अवैध तारीख स्वरूप. YYYY-MM-DD वापरा.' });
+    if (!(lat >= -66 && lat <= 66) || !(lon >= -180 && lon <= 180))
+      return res.status(400).json({ success: false, message: 'अवैध स्थान.' });
+    const [y, m, d] = start.split('-').map(Number);
+    const out = [];
+    for (let i = 0; i < days; i++) {
+      const date = new Date(Date.UTC(y, m - 1, d + i)).toISOString().slice(0, 10);
+      const p = await getPanchang(date, lat, lon, 330, null);       // at sunrise
+      out.push({
+        date, var: p.var, sunrise: p.sunrise, sunset: p.sunset,
+        tithi: p.tithi, paksha: p.paksha, maas: p.maas, nakshatra: p.nakshatra, yoga: p.yoga,
+        chandraRashi: p.chandraRashi, el: Number(p._moon_sun_diff),
+        festivals: (p.festivals || []).map(f => ({ name: f.name, icon: f.icon, type: f.type })),
+      });
+    }
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.json({ success: true, data: out });
+  } catch (err) {
+    console.error('❌ Panchang days error:', err);
+    res.status(500).json({ success: false, message: 'पंचांग माहिती मिळवण्यात त्रुटी झाली.' });
+  }
+});
+
 // GET /api/panchang/YYYY-MM-DD (tests use this) — only matches a date, so /rating etc. reach their own routes
 router.get('/:date(\\d{4}-\\d{2}-\\d{2})', (req, res) => {
   req.query.date = req.params.date;
