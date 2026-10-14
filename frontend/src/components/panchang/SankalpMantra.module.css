@@ -16,7 +16,6 @@
 .tab:hover { background: rgba(255, 220, 150, 0.06); }
 .tabOn { background: rgba(212, 175, 101, 0.22); color: #f5c518; border-color: rgba(212, 175, 101, 0.35); }
 
-.note { margin: 18px 4px 0; font-size: 0.8rem; color: #a99773; line-height: 1.6; }
 
 /* लघु / विस्तृत */
 .form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; margin-bottom: 16px; }
