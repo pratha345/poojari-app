@@ -1310,13 +1310,17 @@
   box-shadow: inset 0 1px 0 rgba(245, 217, 138, 0.15), 0 10px 26px rgba(40, 20, 5, 0.35);
 }
 .dockBtn {
-  position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 56px;
+  position: relative; display: grid; justify-items: center; align-content: center; gap: 3px; min-height: 74px;
   padding: 6px 4px; border: none; border-radius: 13px; cursor: pointer; background: none; color: #e9dcc0;
   font-family: var(--font-display, inherit); transition: transform 0.18s, background 0.18s, color 0.18s, box-shadow 0.18s;
 }
 .dockBtn:hover { background: rgba(255, 220, 150, 0.08); color: #f5d98a; }
 .dockBtn:focus-visible { outline: 2px solid #f5d98a; outline-offset: 1px; }
-.dockIcon { font-size: 1.35rem; line-height: 1; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4)); transition: transform 0.18s; }
+.dockIcon {
+  display: block; width: 52px; height: 52px; object-fit: contain; pointer-events: none; user-select: none;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.45)); transition: transform 0.2s cubic-bezier(.3, 1.4, .6, 1);
+}
+.dockBtn:hover .dockIcon { transform: translateY(-2px) scale(1.06); }
 .dockFull { font-size: 0.86rem; font-weight: 700; white-space: nowrap; }
 .dockShort { display: none; font-size: 0.72rem; font-weight: 700; }
 /* the chosen tab stands up out of the dock */
@@ -1326,7 +1330,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 3px 0 #7a5420, 0 8px 14px rgba(0, 0, 0, 0.45);
 }
 .dockOn:hover { color: #2a1606; background: linear-gradient(180deg, #fbe9b8 0%, #e6c06a 55%, #c08f36 100%); }
-.dockOn .dockIcon { transform: scale(1.12); }
+.dockOn .dockIcon { transform: translateY(-3px) scale(1.14); filter: drop-shadow(0 4px 4px rgba(60, 30, 0, 0.5)); }
 .dockOn::after {
   content: ''; position: absolute; bottom: -9px; left: 50%; width: 6px; height: 6px; margin-left: -3px;
   border-radius: 50%; background: #f5d98a; box-shadow: 0 0 8px #f5d98a;
@@ -1342,10 +1346,10 @@
   .calDay { font-size: 2rem; }
   .timeChipText b { font-size: 1.15rem; }
   .dock { gap: 2px; padding: 5px; border-radius: 16px; margin-bottom: 14px; }
-  .dockBtn { min-height: 52px; padding: 5px 2px; border-radius: 11px; }
+  .dockBtn { min-height: 60px; padding: 4px 1px 5px; border-radius: 11px; gap: 1px; }
   .dockFull { display: none; }
   .dockShort { display: block; }
-  .dockIcon { font-size: 1.25rem; }
+  .dockIcon { width: 36px; height: 36px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .calDay { animation: none; }

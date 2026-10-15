@@ -317,14 +317,14 @@ function MiniClock({ time }) {
     </svg>
   );
 }
-// the tab dock: icon, full name (wide screens) and a short name (phones)
+// the tab dock: 3D icon (/public/icons/tabs, 96 & 192 px WebP), full name and a short name for phones
 const PAGE_TABS = [
-  ['panchang', '📅', 'पंचांग', 'पंचांग'],
-  ['chakra', '🪐', 'राशि चक्र', 'चक्र'],
-  ['yantra', '🔆', 'पंचांग यंत्र', 'यंत्र'],
-  ['sankalp', '🙏', 'संकल्प मंत्र', 'संकल्प'],
-  ['vel', '🕰', 'वेळ · मासिक', 'वेळ'],
-  ['disha', '🧭', 'दिशा यंत्र', 'दिशा'],
+  ['panchang', 'पंचांग', 'पंचांग'],
+  ['chakra', 'राशि चक्र', 'चक्र'],
+  ['yantra', 'पंचांग यंत्र', 'यंत्र'],
+  ['sankalp', 'संकल्प मंत्र', 'संकल्प'],
+  ['vel', 'वेळ · मासिक', 'वेळ'],
+  ['disha', 'दिशा यंत्र', 'दिशा'],
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -700,11 +700,14 @@ export default function Panchang() {
 
         {/* ═══ tab dock (sticks under the header) ══════════════ */}
         <nav className={styles.dock} role="tablist" aria-label="पंचांग विभाग">
-          {PAGE_TABS.map(([k, icon, full, short]) => (
+          {PAGE_TABS.map(([k, full, short]) => (
             <button key={k} type="button" role="tab" aria-selected={pageTab === k} title={full}
               className={`${styles.dockBtn} ${pageTab === k ? styles.dockOn : ''}`}
               onClick={() => setPageTab(k)}>
-              <span className={styles.dockIcon} aria-hidden="true">{icon}</span>
+              <img className={styles.dockIcon} alt="" aria-hidden="true" width="52" height="52" decoding="async"
+                src={`/icons/tabs/${k}-96.webp`}
+                srcSet={`/icons/tabs/${k}-96.webp 96w, /icons/tabs/${k}-192.webp 192w`}
+                sizes="(max-width: 600px) 36px, 52px" />
               <span className={styles.dockFull}>{full}</span>
               <span className={styles.dockShort} aria-hidden="true">{short}</span>
             </button>
