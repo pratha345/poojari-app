@@ -249,29 +249,32 @@ function makeRange(riseDate, setDate, seg, tzOffset) {
 //     after that new Rashi.
 //  5. If it didn't change → no Sankranti this month = Adhika Maas.
 //
+// Amanta month: named after the rashi the Sun ENTERS during the lunar month (Sun enters मेष → चैत्र).
+// A lunar month with no Sun ingress is अधिक and takes the name of the month that follows it.
+// New moons are found exactly (Newton on the Moon–Sun elongation): a mean-motion estimate is off
+// by up to a day, which mislabels months that start or end near a संक्रांती.
+function exactNewMoon(JDguess) {
+  let jd = JDguess;
+  for (let i = 0; i < 8; i++) {
+    const e = ((norm360(moonLongitude(jd) - sunLongitude(jd)) + 180) % 360) - 180;   // −180…180
+    jd -= e / 12.19;                                                                     // ~12.19°/day
+    if (Math.abs(e) < 1e-5) break;
+  }
+  return jd;
+}
+
 function getAmantaMaas(moonSunDiff, JD) {
   const SYNODIC = 29.5306;
+  const JD_prevNM = exactNewMoon(JD - moonSunDiff / 12.19);
+  const JD_nextNM = exactNewMoon(JD_prevNM + SYNODIC);
 
-  // Previous new moon
-  const daysSinceNM = moonSunDiff * (SYNODIC / 360);
-  const JD_prevNM   = JD - daysSinceNM;
-
-  // Next new moon
-  const JD_nextNM   = JD_prevNM + SYNODIC;
-
-  // Sidereal Sun at both new moons
   const sidStart = norm360(sunLongitude(JD_prevNM) - getLahiriAyanamsha(JD_prevNM));
   const sidEnd   = norm360(sunLongitude(JD_nextNM) - getLahiriAyanamsha(JD_nextNM));
-
   const rashiStart = Math.floor(sidStart / 30) % 12;
   const rashiEnd   = Math.floor(sidEnd   / 30) % 12;
 
-  if (rashiEnd !== rashiStart) {
-    // Sankranti fell within this month → named after the rashi entered
-    return MAAS[rashiEnd];
-  }
-  // No Sankranti → Adhika (intercalary) month; carry forward same name
-  return 'अधिक ' + MAAS[rashiStart];
+  if (rashiEnd !== rashiStart) return MAAS[rashiEnd];          // a संक्रांती fell in this month
+  return 'अधिक ' + MAAS[(rashiStart + 1) % 12];                 // none → अधिक, named after the next month
 }
 
 // ── Festival / Special-day detection ────────────────────────────
@@ -281,152 +284,155 @@ function getAmantaMaas(moonSunDiff, JD) {
 // paksha     — 'शुक्ल पक्ष' | 'कृष्ण पक्ष'
 // weekDay    — 0 Sun … 6 Sat
 // date       — JS Date (civil Gregorian)
-// siderealSunDeg — Sun sidereal longitude (for Sankranti detection)
+// sankranti  — rashi index (0 मेष … 11 मीन) the Sun enters between today's and tomorrow's sunrise, else null
+// at(kaal, T)— true when tithi T (1–30) is in force at that काळ today and was not at the same काळ
+//              yesterday — the day a timed festival is kept (प्रदोष, मध्यान्ह, अपराह्ण, निशीथ …).
 //
-function getSpecialDays(maasName, tithiNum, paksha, weekDay, date, siderealSunDeg) {
+// maasName / tithiNum / paksha are taken at SUNRISE, so the list belongs to the day and does not
+// change with the minute the visitor picks. Months are अमांत (Maharashtra): कृष्ण पक्ष of a month
+// comes before its अमावस्या — धनत्रयोदशी, नरक चतुर्दशी, लक्ष्मीपूजन are आश्विन कृष्ण.
+// कृष्ण पक्ष tithis are numbered 16–30 (कृष्ण चतुर्थी = 19, कृष्ण एकादशी = 26, अमावस्या = 30).
+//
+function getSpecialDays(maasName, tithiNum, paksha, weekDay, date, sankranti = null, at = () => false, kshaya = null) {
   const events = [];
   const isShukla  = paksha === 'शुक्ल पक्ष';
   const isKrishna = !isShukla;
 
   // ── Helper ──────────────────────────────────────────────────
   const add = (name, icon, type = 'festival') => events.push({ name, icon, type });
+  // kshaya = { tithi, maas }: a tithi that begins after this sunrise and ends before the next one.
+  // It never meets a sunrise, so its festivals are kept today, the day it begins.
+  let M = null;                                                     // the month block being read
+  const inMaas = (name) => { M = name; return maasName === name || kshaya?.maas === name; };
+  const on = (T) => (tithiNum === T && maasName === M) || (kshaya?.tithi === T && kshaya.maas === M);
 
   // ── Universal tithi events (every month) ───────────────────
   if (tithiNum === 15)  add('पौर्णिमा',          '🌕', 'special');
   if (tithiNum === 30)  add('अमावस्या',           '🌑', 'special');
-  if (tithiNum === 11 && isShukla)  add('एकादशी (शुक्ल)', '🙏', 'vrat');
-  if (tithiNum === 11 && isKrishna) add('एकादशी (कृष्ण)', '🙏', 'vrat');
-  if (tithiNum ===  4 && isShukla)  add('विनायकी चतुर्थी', '🐘', 'vrat');
-  if (tithiNum ===  4 && isKrishna) add('संकष्टी चतुर्थी',  '🐘', 'vrat');
+  if (tithiNum === 11 || kshaya?.tithi === 11) add('एकादशी (शुक्ल)', '🙏', 'vrat');
+  if (tithiNum === 26 || kshaya?.tithi === 26) add('एकादशी (कृष्ण)', '🙏', 'vrat');
+  if (at('madhyahna', 4)) add('विनायकी चतुर्थी', '🐘', 'vrat');
+  if (at('chandrodaya', 19)) add('संकष्टी चतुर्थी', '🐘', 'vrat');        // चतुर्थी at moonrise
   if (tithiNum ===  8)  add('अष्टमी',             '🌙', 'special');
-  if (tithiNum === 13)  add('प्रदोष व्रत',         '🕉️', 'vrat');
-  if (tithiNum === 28)  add('प्रदोष व्रत (कृष्ण)', '🕉️', 'vrat');
-  if (tithiNum === 14 && isKrishna) add('शिवरात्री / मासिक शिवरात्री', '🕉️', 'vrat');
+  if (at('pradosh', 13)) add('प्रदोष व्रत',         '🕉️', 'vrat');
+  if (at('pradosh', 28)) add('प्रदोष व्रत (कृष्ण)', '🕉️', 'vrat');
+  if (at('nishita', 29) && maasName !== 'माघ') add('मासिक शिवरात्री', '🕉️', 'vrat');
 
   // ── Major Hindu festivals (Maas + Tithi + Paksha) ──────────
 
   // चैत्र
-  if (maasName === 'चैत्र') {
-    if (tithiNum ===  1 && isShukla) add('गुढी पाडवा (हिंदू नूतन वर्ष)', '🎋', 'festival');
-    if (tithiNum ===  3 && isShukla) add('गौरी तृतीया',                   '🌸', 'festival');
-    if (tithiNum ===  6 && isShukla) add('यमुना षष्ठी',                   '🌊', 'special');
-    if (tithiNum ===  9 && isShukla) add('रामनवमी',                        '🏹', 'festival');
-    if (tithiNum === 15)             add('हनुमान जयंती / चैत्र पौर्णिमा',  '🚩', 'festival');
+  if (inMaas('चैत्र')) {
+    if (on(1))                       add('गुढी पाडवा (हिंदू नूतन वर्ष)', '🎋', 'festival');
+    if (on(3))                       add('गौरी तृतीया',                   '🌸', 'festival');
+    if (on(6))                       add('यमुना षष्ठी',                   '🌊', 'special');
+    if (at('madhyahna', 9))          add('रामनवमी',                        '🏹', 'festival');
+    if (on(15))                      add('हनुमान जयंती / चैत्र पौर्णिमा',  '🚩', 'festival');
   }
 
   // वैशाख
-  if (maasName === 'वैशाख') {
-    if (tithiNum ===  3 && isShukla) add('अक्षय तृतीया (आखाजी)',           '✨', 'festival');
-    if (tithiNum ===  6 && isShukla) add('परशुराम षष्ठी',                   '⚔️', 'festival');
-    if (tithiNum === 14 && isShukla) add('नृसिंह चतुर्दशी',                 '🦁', 'festival');
-    if (tithiNum === 15)             add('वैशाख पौर्णिमा / बुद्ध पौर्णिमा', '☸️', 'festival');
+  if (inMaas('वैशाख')) {
+    if (on(3))                       add('अक्षय तृतीया (आखाजी) · परशुराम जयंती', '✨', 'festival');
+    if (on(14))                      add('नृसिंह चतुर्दशी',                 '🦁', 'festival');
+    if (on(15))                      add('वैशाख पौर्णिमा / बुद्ध पौर्णिमा', '☸️', 'festival');
   }
 
   // ज्येष्ठ
-  if (maasName === 'ज्येष्ठ') {
-    if (tithiNum ===  5 && isShukla) add('वट पौर्णिमा / वट सावित्री व्रत (पूर्वार्ध)', '🌳', 'vrat');
-    if (tithiNum === 13 && isShukla) add('प्रदोष व्रत',                      '🕉️', 'vrat');
-    if (tithiNum === 15)             add('ज्येष्ठ पौर्णिमा / वट सावित्री',   '🌳', 'festival');
+  if (inMaas('ज्येष्ठ')) {
+    if (on(15))                      add('ज्येष्ठ पौर्णिमा / वट सावित्री',   '🌳', 'festival');
   }
 
   // आषाढ
-  if (maasName === 'आषाढ') {
-    if (tithiNum ===  2 && isShukla) add('आषाढी एकादशी (देवशयनी)',           '🙏', 'festival');
-    if (tithiNum === 11 && isShukla) add('आषाढी एकादशी',                     '🙏', 'festival');
-    if (tithiNum === 15)             add('आषाढ पौर्णिमा / गुरु पौर्णिमा',    '🪷', 'festival');
+  if (inMaas('आषाढ')) {
+    if (on(2))                       add('जगन्नाथ रथयात्रा',                 '🛕', 'festival');
+    if (on(11))                      add('आषाढी एकादशी (देवशयनी)',           '🙏', 'festival');
+    if (on(15))                      add('आषाढ पौर्णिमा / गुरु पौर्णिमा',    '🪷', 'festival');
   }
 
   // श्रावण
-  if (maasName === 'श्रावण') {
-    if (tithiNum ===  5 && isShukla) add('नागपंचमी',                         '🐍', 'festival');
-    if (tithiNum ===  6 && isShukla) add('सूर्य षष्ठी (हलषष्ठी)',            '☀️', 'special');
-    if (tithiNum === 15)             add('रक्षाबंधन / नारळी पौर्णिमा',       '🤝', 'festival');
+  if (inMaas('श्रावण')) {
+    if (on(5))                       add('नागपंचमी',                         '🐍', 'festival');
+    if (on(15))                      add('रक्षाबंधन / नारळी पौर्णिमा',       '🤝', 'festival');
     // Shravan Somvar (Monday in Shravan)
-    if (weekDay === 1)               add('श्रावण सोमवार',                     '🕉️', 'vrat');
-    if (tithiNum ===  8 && isKrishna) add('कृष्ण जन्माष्टमी',                '🎉', 'festival');
+    if (maasName === M && weekDay === 1) add('श्रावण सोमवार',                     '🕉️', 'vrat');
+    if (on(21))                      add('हलषष्ठी (बलराम जयंती)',            '🌾', 'special');
+    if (at('nishita', 23))           add('कृष्ण जन्माष्टमी (गोकुळाष्टमी)',   '🎉', 'festival');   // अष्टमी at midnight
+    if (on(24))                      add('गोपाळकाला (दहीहंडी)',               '🏺', 'festival');
   }
 
   // भाद्रपद
-  if (maasName === 'भाद्रपद') {
-    if (tithiNum ===  3 && isShukla) add('हरितालिका तीज',                    '🌿', 'festival');
-    if (tithiNum ===  4 && isShukla) add('गणेश चतुर्थी',                     '🐘', 'festival');
-    if (tithiNum ===  5 && isShukla) add('ऋषी पंचमी',                        '🌺', 'vrat');
-    if (tithiNum ===  6 && isShukla) add('ललिता षष्ठी',                      '🌸', 'special');
-    if (tithiNum === 14 && isShukla) add('अनंत चतुर्दशी (गणेश विसर्जन)',      '🐘', 'festival');
-    if (tithiNum ===  8 && isKrishna) add('कृष्ण अष्टमी',                    '🎉', 'special');
-    if (tithiNum === 15)             add('भाद्रपद पौर्णिमा',                  '🌕', 'special');
+  if (inMaas('भाद्रपद')) {
+    if (on(3))                       add('हरितालिका तीज',                    '🌿', 'festival');
+    if (at('madhyahna', 4))          add('गणेश चतुर्थी',                     '🐘', 'festival');   // चतुर्थी at मध्यान्ह
+    if (on(5))                       add('ऋषी पंचमी',                        '🌺', 'vrat');
+    if (on(6))                       add('ललिता षष्ठी',                      '🌸', 'special');
+    if (on(14))                      add('अनंत चतुर्दशी (गणेश विसर्जन)',      '🐘', 'festival');
+    if (on(15))                      add('भाद्रपद पौर्णिमा',                  '🌕', 'special');
+    if (maasName === M && tithiNum >= 16 && tithiNum <= 29) add('पितृपक्ष (महालय)',             '🕯️', 'special');
+    if (on(30))                      add('सर्वपित्री अमावस्या',                '🕯️', 'festival');
   }
 
   // आश्विन
-  if (maasName === 'आश्विन') {
-    if (tithiNum ===  1 && isShukla) add('शारदीय नवरात्री प्रारंभ',           '🔱', 'festival');
-    if (tithiNum ===  2 && isShukla) add('नवरात्री द्वितीया',                 '🔱', 'festival');
-    if (tithiNum ===  3 && isShukla) add('नवरात्री तृतीया',                   '🔱', 'festival');
-    if (tithiNum ===  4 && isShukla) add('नवरात्री चतुर्थी',                  '🔱', 'festival');
-    if (tithiNum ===  5 && isShukla) add('नवरात्री पंचमी',                    '🔱', 'festival');
-    if (tithiNum ===  6 && isShukla) add('नवरात्री षष्ठी (सरस्वती पूजन)',     '📚', 'festival');
-    if (tithiNum ===  7 && isShukla) add('नवरात्री सप्तमी',                   '🔱', 'festival');
-    if (tithiNum ===  8 && isShukla) add('नवरात्री अष्टमी (दुर्गाष्टमी)',     '⚔️', 'festival');
-    if (tithiNum ===  9 && isShukla) add('नवरात्री नवमी (महानवमी)',            '🔱', 'festival');
-    if (tithiNum === 10 && isShukla) add('दसरा (विजयादशमी)',                   '⚔️', 'festival');
-    if (tithiNum === 15)             add('कोजागिरी पौर्णिमा',                  '🌕', 'festival');
+  if (inMaas('आश्विन')) {
+    if (on(1))                       add('शारदीय नवरात्री प्रारंभ',           '🔱', 'festival');
+    if (on(2))                       add('नवरात्री द्वितीया',                 '🔱', 'festival');
+    if (on(3))                       add('नवरात्री तृतीया',                   '🔱', 'festival');
+    if (on(4))                       add('नवरात्री चतुर्थी',                  '🔱', 'festival');
+    if (on(5))                       add('नवरात्री पंचमी',                    '🔱', 'festival');
+    if (on(6))                       add('नवरात्री षष्ठी (सरस्वती पूजन)',     '📚', 'festival');
+    if (on(7))                       add('नवरात्री सप्तमी',                   '🔱', 'festival');
+    if (on(8))                       add('नवरात्री अष्टमी (दुर्गाष्टमी)',     '⚔️', 'festival');
+    if (on(9))                       add('नवरात्री नवमी (महानवमी)',            '🔱', 'festival');
+    if (at('aparahna', 10))          add('दसरा (विजयादशमी)',                   '⚔️', 'festival');   // दशमी at अपराह्ण
+    if (at('nishita', 15))           add('कोजागिरी पौर्णिमा',                  '🌕', 'festival');   // पौर्णिमा at midnight
+    if (at('pradosh', 27))           add('वसुबारस (गोवत्स द्वादशी)',           '🐄', 'festival');
+    if (at('pradosh', 28))           add('धनत्रयोदशी (धनतेरस)',                '🪔', 'festival');
+    if (at('arunodaya', 29))         add('नरक चतुर्दशी (अभ्यंगस्नान)',         '🪔', 'festival');   // चतुर्दशी before sunrise
+    if (at('pradosh', 30))           add('दिवाळी · लक्ष्मीपूजन',                '🪔', 'festival');   // अमावस्या at प्रदोष
   }
 
   // कार्तिक
-  if (maasName === 'कार्तिक') {
-    if (tithiNum === 11 && isShukla) add('देवउठनी एकादशी (तुलसी विवाह)',      '🌿', 'festival');
-    if (tithiNum === 13 && isKrishna) add('धनत्रयोदशी (धनतेरस)',              '🪔', 'festival');
-    if (tithiNum === 14 && isKrishna) add('नरक चतुर्दशी (छोटी दिवाळी)',       '🪔', 'festival');
-    if (tithiNum === 30)             add('दिवाळी / लक्ष्मीपूजन (अमावस्या)',    '🪔', 'festival');
-    if (tithiNum ===  1 && isShukla) add('बलिप्रतिपदा (दिवाळी पाडवा)',         '🎊', 'festival');
-    if (tithiNum ===  2 && isShukla) add('भाऊबीज (यम द्वितीया)',               '🤝', 'festival');
-    if (tithiNum === 15)             add('कार्तिक पौर्णिमा / त्रिपुरी पौर्णिमा', '🌕', 'festival');
+  if (inMaas('कार्तिक')) {
+    if (on(11))                      add('देवउठनी एकादशी (तुलसी विवाह)',      '🌿', 'festival');
+    if (on(1))                       add('बलिप्रतिपदा (दिवाळी पाडवा)',         '🎊', 'festival');
+    if (on(2))                       add('भाऊबीज (यम द्वितीया)',               '🤝', 'festival');
+    if (on(15))                      add('कार्तिक पौर्णिमा / त्रिपुरी पौर्णिमा', '🌕', 'festival');
   }
 
   // मार्गशीर्ष
-  if (maasName === 'मार्गशीर्ष') {
-    if (weekDay === 4)               add('मार्गशीर्ष गुरुवार',                 '🪷', 'vrat');
-    if (tithiNum === 15)             add('मार्गशीर्ष पौर्णिमा',                '🌕', 'special');
+  if (inMaas('मार्गशीर्ष')) {
+    if (maasName === M && weekDay === 4) add('मार्गशीर्ष गुरुवार',                 '🪷', 'vrat');
+    if (on(15))                      add('मार्गशीर्ष पौर्णिमा',                '🌕', 'special');
   }
 
   // पौष
-  if (maasName === 'पौष') {
-    if (tithiNum === 15)             add('पौष पौर्णिमा',                       '🌕', 'special');
+  if (inMaas('पौष')) {
+    if (on(15))                      add('पौष पौर्णिमा',                       '🌕', 'special');
   }
 
   // माघ
-  if (maasName === 'माघ') {
-    if (tithiNum ===  5 && isShukla) add('वसंत पंचमी (सरस्वती पूजन)',          '📚', 'festival');
-    if (tithiNum === 14 && isKrishna) add('महाशिवरात्री',                      '🕉️', 'festival');
-    if (tithiNum === 15)             add('माघ पौर्णिमा',                        '🌕', 'special');
+  if (inMaas('माघ')) {
+    if (on(5))                       add('वसंत पंचमी (सरस्वती पूजन)',          '📚', 'festival');
+    if (at('nishita', 29))           add('महाशिवरात्री',                      '🕉️', 'festival');   // चतुर्दशी at midnight
+    if (on(15))                      add('माघ पौर्णिमा',                        '🌕', 'special');
   }
 
   // फाल्गुन
-  if (maasName === 'फाल्गुन') {
-    if (tithiNum === 15)             add('होळी पौर्णिमा (होलिका दहन)',          '🔥', 'festival');
-    if (tithiNum === 30)             add('रंगपंचमी / धुळवड',                    '🎨', 'festival');
-    // The day after Holi purnima — dhulvad falls on first after purnima
+  if (inMaas('फाल्गुन')) {
+    if (at('pradosh', 15))           add('होळी पौर्णिमा (होलिका दहन)',          '🔥', 'festival');   // पौर्णिमा at प्रदोष
+    if (on(16))                      add('धुळवड (धूलिवंदन)',                    '🎨', 'festival');
+    if (on(20))                      add('रंगपंचमी',                            '🎨', 'festival');
   }
 
-  // ── Sankranti detection from Sun sidereal position ──────────
-  // Each rashi entry = Sankranti; Sun crosses a 30° boundary today
-  // Check: is Sun within 0.5° of a rashi boundary (0°,30°,60°…)?
-  if (siderealSunDeg !== undefined) {
-    const degInRashi = siderealSunDeg % 30;
-    if (degInRashi < 0.85) {
-      const rashiIdx = Math.floor(siderealSunDeg / 30) % 12;
-      const SANKRANTI_NAMES = [
-        'मेष संक्रांती',    'वृषभ संक्रांती',  'मिथुन संक्रांती',
-        'कर्क संक्रांती',  'सिंह संक्रांती',  'कन्या संक्रांती',
-        'तुला संक्रांती',  'वृश्चिक संक्रांती','धनु संक्रांती',
-        'मकर संक्रांती',   'कुंभ संक्रांती',  'मीन संक्रांती',
-      ];
-      const SANKRANTI_ICONS = [
-        '🐏','🐂','👫','🦀','🦁','👩‍🌾',
-        '⚖️','🦂','🏹','🐊','🏺','🐟',
-      ];
-      add(SANKRANTI_NAMES[rashiIdx], SANKRANTI_ICONS[rashiIdx], 'festival');
-    }
+  // ── संक्रांती: the Sun enters a new (sidereal) rashi before tomorrow's sunrise ──
+  if (sankranti !== null) {
+    const SANKRANTI_NAMES = [
+      'मेष संक्रांती',    'वृषभ संक्रांती',  'मिथुन संक्रांती',
+      'कर्क संक्रांती',  'सिंह संक्रांती',  'कन्या संक्रांती',
+      'तुला संक्रांती',  'वृश्चिक संक्रांती','धनु संक्रांती',
+      'मकर संक्रांती',   'कुंभ संक्रांती',  'मीन संक्रांती',
+    ];
+    const SANKRANTI_ICONS = ['🐏','🐂','👫','🦀','🦁','👩‍🌾','⚖️','🦂','🏹','🪁','🏺','🐟'];
+    add(SANKRANTI_NAMES[sankranti], SANKRANTI_ICONS[sankranti], 'festival');
   }
 
   // ── Weekday-based devotional reminders ──────────────────────
@@ -440,7 +446,6 @@ function getSpecialDays(maasName, tithiNum, paksha, weekDay, date, siderealSunDe
   const m = date.getMonth() + 1, day = date.getDate();
   const gFests = {
     '1-1':   { name: 'नवीन वर्ष (ग्रेगोरियन)',           icon: '🎉' },
-    '1-14':  { name: 'मकर संक्रांती',                    icon: '🪁' },
     '1-26':  { name: 'प्रजासत्ताक दिन',                  icon: '🇮🇳' },
     '2-19':  { name: 'छत्रपती शिवाजी महाराज जयंती',      icon: '⚔️' },
     '4-14':  { name: 'डॉ. बाबासाहेब आंबेडकर जयंती',      icon: '📚' },
@@ -569,8 +574,60 @@ async function getPanchang(dateStr, lat, lon, tzOffset, timeStr) {
   const lagna         = RASHIS[Math.floor(lagnaLong / 30) % 12];
   const lagnaDegs     = (lagnaLong % 30).toFixed(2); // degrees within rashi
 
-  // ── Special days ─────────────────────────────────────────────
-  const festivals = getSpecialDays(maas, tithiNum, paksha, weekDay, new Date(y, mo - 1, d), siderealSun);
+  // ── Special days — they belong to the day, not to the chosen minute ──────────
+  // Ordinary days follow the tithi at sunrise; timed festivals follow the tithi in force at
+  // their काळ (मध्यान्ह, अपराह्ण, प्रदोष, निशीथ, अरुणोदय, चंद्रोदय) on the first such day.
+  let festivals = [];
+  if (riseDate && setDate && nextRiseDate && !isNaN(riseDate) && !isNaN(setDate) && !isNaN(nextRiseDate)) {
+    const tithiAt = (when) => {
+      const j = toJD(when);
+      return Math.floor(norm360(moonLongitude(j) - sunLongitude(j)) / 12) + 1;
+    };
+    const kaalOf = (rise, set, next) => {
+      const day = set - rise;
+      return {
+        arunodaya:   new Date(+rise - 96 * 60000),          // 4 घटी before sunrise
+        madhyahna:   new Date(+rise + day * 0.5),           // middle of the day's 3rd fifth
+        aparahna:    new Date(+rise + day * 0.7),           // middle of the 4th fifth
+        pradosh:     new Date(+set + 60 * 60000),           // within the 2-hour प्रदोष after sunset
+        chandrodaya: new Date(+set + 3 * 3600000),          // कृष्ण चतुर्थी moonrise, ~3 h after sunset
+        nishita:     new Date(+set + (next - set) / 2),     // middle of the night
+      };
+    };
+    const prev = new Date(Date.UTC(y, mo - 1, d - 1));
+    const prevSun = getSunTimes(prev.getUTCFullYear(), prev.getUTCMonth() + 1, prev.getUTCDate(), lat, lon);
+    const kToday = kaalOf(riseDate, setDate, nextRiseDate);
+    const kYest  = prevSun.sunrise && prevSun.sunset && !isNaN(prevSun.sunrise) ? kaalOf(prevSun.sunrise, prevSun.sunset, riseDate) : null;
+    const seen = {};
+    const tAt = (k, yest) => {
+      const key = (yest ? 'y' : 't') + k;
+      if (!(key in seen)) seen[key] = yest ? (kYest ? tithiAt(kYest[k]) : null) : tithiAt(kToday[k]);
+      return seen[key];
+    };
+
+    const riseJD    = toJD(riseDate);
+    const riseDiff  = norm360(moonLongitude(riseJD) - sunLongitude(riseJD));
+    const riseTithi = Math.floor(riseDiff / 12) + 1;
+    const riseMaas  = getAmantaMaas(riseDiff, riseJD);
+    const sidSun    = (when) => { const j = toJD(when); return norm360(sunLongitude(j) - getLahiriAyanamsha(j)); };
+    const r0 = Math.floor(sidSun(riseDate) / 30) % 12, r1 = Math.floor(sidSun(nextRiseDate) / 30) % 12;
+    const nextJD    = toJD(nextRiseDate);
+    const nextDiff  = norm360(moonLongitude(nextJD) - sunLongitude(nextJD));
+    const nextTithi = Math.floor(nextDiff / 12) + 1;
+    const skipped   = (riseTithi % 30) + 1;                       // the tithi after today's
+    const kshaya    = nextTithi !== skipped && nextTithi === (skipped % 30) + 1
+      ? { tithi: skipped, maas: skipped === 1 ? getAmantaMaas(nextDiff, nextJD) : riseMaas }
+      : null;
+    // a timed festival: the first day whose काळ sees tithi T; if T is at that काळ on neither day
+    // (a short tithi), the day T is in force at sunrise — or begins, when it is क्षय
+    const at = (k, T) => {
+      const now = tAt(k, false) === T, before = tAt(k, true) === T;
+      if (now) return !before;
+      return !before && (riseTithi === T || kshaya?.tithi === T);
+    };
+    festivals = getSpecialDays(riseMaas, riseTithi, PAKSHA[riseTithi <= 15 ? 0 : 1], weekDay,
+      new Date(y, mo - 1, d), r0 !== r1 ? r1 : null, at, kshaya);
+  }
 
   // ── Shubh Muhurat recommendation ─────────────────────────────
   const inauspiciousYogaIdx = [8, 9, 16, 18, 26]; // Shula, Ganda, Vyatipata, Parigha, Vaidhriti
