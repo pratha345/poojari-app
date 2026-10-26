@@ -118,12 +118,12 @@ h1, h2, h3, h4, h5 {
 .btn-primary {
   background:  var(--primary);
   color:       var(--white);
-  box-shadow:  0 4px 15px rgba(224, 123, 42, 0.35);
+  box-shadow:  0 4px 15px color-mix(in srgb, var(--primary) 35%, transparent);
 }
 .btn-primary:hover {
   background:  var(--primary-dark);
   transform:   translateY(-2px);
-  box-shadow:  0 8px 25px rgba(224, 123, 42, 0.45);
+  box-shadow:  0 8px 25px color-mix(in srgb, var(--primary) 45%, transparent);
 }
 
 .btn-secondary {

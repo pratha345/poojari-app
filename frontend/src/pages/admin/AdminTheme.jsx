@@ -6,7 +6,7 @@ import { themeAPI } from '../../api/index.js';
 import AdminLayout from './AdminLayout';
 import { useTheme } from '../../context/ThemeContext';
 import {
-  PRESET_THEMES, THEME_MODE_OPTIONS, ALL_THEMES, getThemeById,
+  PRESET_THEMES, PREMIUM_THEMES, THEME_MODE_OPTIONS, ALL_THEMES, getThemeById,
 } from '../../themes/themes';
 import adminStyles from './Admin.module.css';
 import s from '../../styles/AdminTheme.module.css';
@@ -179,6 +179,64 @@ export default function AdminTheme() {
                 {festival_name && <div className={s.previewFestival}>🎉 सक्रिय सण: {festival_name}</div>}
               </div>
             </div>
+
+            {/* ── Premium themes: palette, miniature dashboard, apply ── */}
+            <section className={s.section} aria-labelledby="premium-title">
+              <div className={s.sectionTitle} id="premium-title">✨ प्रीमियम थीम</div>
+              <div className={s.premiumGrid} role="radiogroup" aria-label="प्रीमियम थीम">
+                {PREMIUM_THEMES.map(t => {
+                  const isActive = settings.active_theme === t.id;
+                  const v = t.preview;
+                  return (
+                    <article key={t.id} className={`${s.premiumCard} ${isActive ? s.premiumCardActive : ''}`}>
+                      <header className={s.premiumHead}>
+                        <span role="radio" aria-checked={isActive} aria-label={t.name}
+                          className={`${s.radio} ${isActive ? s.radioOn : ''}`} />
+                        <div>
+                          <h3 className={s.premiumName}>{t.name}</h3>
+                          <span className={s.premiumTag}>{t.tagline}</span>
+                        </div>
+                      </header>
+
+                      {/* miniature dashboard in the theme's own colours */}
+                      <div className={s.mini} aria-hidden="true" style={{ background: v.bg, borderColor: v.border }}>
+                        <div className={s.miniSide} style={{ background: v.sidebar, borderColor: v.border }}>
+                          <i style={{ background: v.button }} />
+                          <b style={{ background: v.nav }} />
+                          <b /><b />
+                        </div>
+                        <div className={s.miniMain}>
+                          <div className={s.miniHeader} style={{ background: v.header }}>
+                            <span style={{ background: v.headerText }} />
+                          </div>
+                          <div className={s.miniCard} style={{ background: v.card, borderColor: v.border }}>
+                            <span style={{ background: v.text }} />
+                            <span style={{ background: v.muted }} />
+                            <em style={{ background: v.accent }} />
+                            <span className={s.miniBtn} style={{ background: v.button, color: v.buttonText }}>Apply</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={s.premiumSwatches}>
+                        {t.swatches.map(([label, hex]) => (
+                          <div key={hex} className={s.bigSwatch}>
+                            <span style={{ background: hex }} />
+                            <small>{label}<br /><code>{hex}</code></small>
+                          </div>
+                        ))}
+                      </div>
+                      <p className={s.premiumDesc}>{t.desc}</p>
+
+                      <button type="button" className={`btn ${isActive ? 'btn-secondary' : 'btn-primary'} btn-sm ${s.applyBtn}`}
+                        onClick={() => handleThemeSelect(t.id)} disabled={isActive} aria-pressed={isActive}>
+                        {isActive ? '✓ सक्रिय थीम' : 'Apply Theme · लागू करा'}
+                      </button>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
 
             {/* ── SECTION 1: Theme Mode ── */}
             <section className={s.section}>
@@ -417,7 +475,7 @@ export default function AdminTheme() {
                   })}
                 </optgroup>
                 <optgroup label="🎨 Preset थीम">
-                  {PRESET_THEMES.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.nameMarathi}</option>)}
+                  {[...PREMIUM_THEMES, ...PRESET_THEMES].map(t => <option key={t.id} value={t.id}>{t.emoji} {t.nameMarathi}</option>)}
                 </optgroup>
               </select>
             </div>

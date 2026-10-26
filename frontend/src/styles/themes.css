@@ -184,6 +184,85 @@ html {
 }
 
 /* ════════════════════════════════════════════════════════════
+   PREMIUM THEMES — same semantic variables as the presets.
+   --primary = main action colour (buttons, links, active marks)
+   --secondary = navigation / headings · --gold = highlight
+   --cream-dark = sidebar · --nav-active = selected menu item
+════════════════════════════════════════════════════════════ */
+
+/* Premium 1 — Mocha Elegance: mocha navigation, champagne highlights, burnt-amber actions */
+:root[data-theme="mocha-elegance"] {
+  --primary:       #C8792C;
+  --primary-dark:  #A3601F;
+  --primary-light: #DE9A55;
+  --secondary:     #5B4632;
+  --gold:          #D9B46A;
+  --gold-light:    #F4D9A0;
+  --cream:         #FAF6EF;
+  --cream-dark:    #F3E8D8;
+  --brown:         #463526;
+  --text:          #30251D;
+  --text-muted:    #796958;
+  --white:         #FFFFFF;
+  --border:        #E4D2B8;
+  --shadow:        rgba(91, 70, 50, 0.12);
+  --shadow-gold:   rgba(244, 217, 160, 0.45);
+  --success:       #287D55;
+  --danger:        #C7473A;
+  --nav-active:    #EBD2AE;
+  --accent:        #C8792C;
+}
+
+/* Premium 2 — Creative Lemon: charcoal controls, lemon highlights, lavender accents (sparingly) */
+:root[data-theme="creative-lemon"] {
+  --primary:       #171717;
+  --primary-dark:  #303030;
+  --primary-light: #7A45F5;
+  --secondary:     #171717;
+  --gold:          #FFF21A;
+  --gold-light:    #FFF7A3;
+  --cream:         #F8F8F4;
+  --cream-dark:    #F1F0E9;
+  --brown:         #171717;
+  --text:          #171717;
+  --text-muted:    #626262;
+  --white:         #FFFFFF;
+  --border:        #DEDDD3;
+  --shadow:        rgba(23, 23, 23, 0.10);
+  --shadow-gold:   rgba(255, 242, 26, 0.45);
+  --success:       #218653;
+  --danger:        #C62828;
+  --nav-active:    #FFF7A3;
+  --accent:        #7A45F5;
+}
+
+/* Premium 3 — Forest Crimson: deep-forest navigation, crimson calls to action */
+:root[data-theme="forest-crimson"] {
+  --primary:       #A31C1B;
+  --primary-dark:  #7E1514;
+  --primary-light: #C9504F;
+  --secondary:     #06110C;
+  --gold:          #C9504F;
+  --gold-light:    #F0C2C1;
+  --cream:         #F5F7F5;
+  --cream-dark:    #EAF0EB;
+  --brown:         #10251B;
+  --text:          #17241D;
+  --text-muted:    #64736A;
+  --white:         #FFFFFF;
+  --border:        #D4DFD7;
+  --shadow:        rgba(6, 17, 12, 0.12);
+  --shadow-gold:   rgba(163, 28, 27, 0.22);
+  --success:       #26734D;
+  --danger:        #B42323;
+  --nav-active:    #DCE9DF;
+  --accent:        #A31C1B;
+}
+/* lemon is a highlight, not a text colour: keep text that uses --gold readable on light surfaces */
+:root[data-theme="creative-lemon"] .btn-primary { color: #FFF21A; }
+:root[data-theme="creative-lemon"] .btn-primary:hover { background: #303030; }
+
+/* ════════════════════════════════════════════════════════════
    FESTIVAL THEME 1 — Ganesh Chaturthi 🐘
 ════════════════════════════════════════════════════════════ */
 :root[data-theme="ganpati"] {
