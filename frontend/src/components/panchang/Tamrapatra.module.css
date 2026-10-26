@@ -78,6 +78,39 @@
 .foot { margin: 14px 0 0; text-align: center; font-size: 0.85rem; opacity: 0.85; }
 .end { margin: 10px 0 0; text-align: center; font-size: 1.05rem; letter-spacing: 2px; }
 
+/* पंचांग तत्त्वे: raised copper tiles set into the plate */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
+.tile {
+  position: relative; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto 1fr;
+  column-gap: 8px; padding: 12px 12px 11px; min-height: 92px; border-radius: 12px;
+  background: linear-gradient(160deg, #c27c48 0%, #a95f30 55%, #8f4b24 100%);
+  border: 1px solid rgba(60, 22, 4, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 190, 0.55), inset 0 -2px 3px rgba(60, 20, 0, 0.35),
+    0 1px 0 #6a3415, 0 2px 0 #5c2c11, 0 3px 0 #4e250e, 0 8px 12px rgba(40, 12, 0, 0.35);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.tile:hover { transform: translateY(-2px); box-shadow:
+    inset 0 1px 0 rgba(255, 220, 190, 0.6), inset 0 -2px 3px rgba(60, 20, 0, 0.35),
+    0 1px 0 #6a3415, 0 2px 0 #5c2c11, 0 3px 0 #4e250e, 0 4px 0 #43200c, 0 12px 16px rgba(40, 12, 0, 0.4); }
+.tileKey { background: linear-gradient(160deg, #d08a52 0%, #b56a36 55%, #9a5228 100%); border-color: rgba(255, 210, 150, 0.45); }
+.tileArt { grid-column: 2; grid-row: 1 / span 2; align-self: start; width: 38px; height: 38px; display: grid; place-items: center; }
+.tileArt img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(255, 214, 160, 0.55), 0 3px 6px rgba(40, 12, 0, 0.45); background: #f3e2c4; }
+.tileGlyph {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 1.1rem; color: #ffe38f;
+  background: radial-gradient(circle at 35% 30%, #a35a2c, #6e3416);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 180, 0.4), 0 2px 4px rgba(40, 12, 0, 0.45);
+  text-shadow: 0 1px 0 #3a1505;
+}
+.tileLabel {
+  grid-column: 1; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.4px; color: #2e1205;
+  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.45);
+}
+.tileValue { grid-column: 1; font-size: 1.32rem; line-height: 1.25; margin-top: 2px; font-family: var(--font-display, inherit); word-break: break-word; }
+.tileSub { grid-column: 1 / -1; align-self: end; margin-top: 4px; font-size: 0.74rem; font-weight: 700; color: #3a1807;
+  text-shadow: 0 1px 0 rgba(255, 214, 178, 0.4); }
+
 /* light reflection that slides as the plate leans */
 .sheen {
   position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
@@ -99,6 +132,14 @@
 
 /* phones: the whole plate fits one screen — smaller ring, tighter rows, same readable text */
 @media (max-width: 480px) {
+  .tiles { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tile { min-height: 78px; padding: 9px 9px 8px; border-radius: 10px; }
+  .tile:last-child { grid-column: 1 / -1; }
+  .tileArt, .tileArt img { width: 30px; height: 30px; }
+  .tileGlyph { width: 28px; height: 28px; font-size: 0.95rem; }
+  .tileLabel { font-size: 0.72rem; }
+  .tileValue { font-size: 1.08rem; }
+  .tileSub { font-size: 0.68rem; }
   .scene { padding: 30px 0 12px; }
   .face { padding: 50px 20px 14px; }
   .border { inset: 8px; }
@@ -123,3 +164,5 @@
   .shadow { height: 16px; }
 }
 @supports not (transform-style: preserve-3d) { .edge { display: none; } .plate { transform: none; } }
+
+@media (prefers-reduced-motion: reduce) { .tile { transition: none; } .tile:hover { transform: none; } }

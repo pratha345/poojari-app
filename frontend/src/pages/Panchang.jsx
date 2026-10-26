@@ -15,6 +15,9 @@ import DishaYantra3D from '../components/panchang/DishaYantra3D';
 import PanchangYantra3D from '../components/panchang/PanchangYantra3D';
 import SankalpMantra from '../components/panchang/SankalpMantra';
 import VelMasik from '../components/panchang/VelMasik';
+import Tamrapatra from '../components/panchang/Tamrapatra';
+import tp from '../components/panchang/Tamrapatra.module.css';
+import Moon3D, { MoonDefs } from '../components/panchang/Moon3D';
 
 const RASHI_IMG = Object.fromEntries(RASHIS.map(r => [r.name, r.img]));
 
@@ -164,19 +167,6 @@ function formatTime12h(t) {
 // ═══════════════════════════════════════════════════════════════
 
 /* ── Panchang detail card ── */
-function PCard({ icon, label, value, sub, accent }) {
-  return (
-    <div className={`${styles.pCard} ${accent ? styles.pCardAccent : ''}`}>
-      <div className={styles.pCardTop}>
-        <span className={styles.pCardIcon}>{icon}</span>
-        <span className={styles.pCardLabel}>{label}</span>
-      </div>
-      <span className={styles.pCardValue}>{value || '—'}</span>
-      {sub && <span className={styles.pCardSub}>{sub}</span>}
-    </div>
-  );
-}
-
 /* ── Muhurta time block ── */
 // tone: 'good' = शुभ (green), 'bad' = टाळावे (red), 'warn' = वर्ज्य / सावधानी (amber)
 function MuhurtaBlock({ icon, label, range, tone = 'good' }) {
@@ -777,29 +767,37 @@ export default function Panchang() {
               </div>
             )}
 
-            {/* ── Panchang cards ── */}
-            <section className={styles.section}>
-              <h2 className={styles.sectionHeading}>
-                <span className={styles.sectionIcon}>📿</span>
-                पंचांग तत्त्वे
-              </h2>
-              <div className={styles.panchangGrid}>
-                <PCard icon="🌓" label="तिथी"        value={data.tithi?.name}  sub={`${data.tithi?.num} / ३०`} accent />
-                <PCard icon="⭐" label="नक्षत्र"      value={data.nakshatra} />
-                <PCard icon="🔮" label="योग"          value={data.yoga} />
-                <PCard icon="✋" label="करण"          value={data.karana} />
-                <PCard icon="🌗" label="पक्ष"         value={data.paksha} />
-                <PCard icon="📅" label="मास"          value={`${data.maas} मास`} />
-                <PCard icon="☀️" label="सूर्य राशी"    value={data.suryaRashi} />
-                <PCard icon="🌙" label="चंद्र राशी"    value={data.chandraRashi} />
-                <PCard
-                  icon="🔯"
-                  label="लग्न (Lagna)"
-                  value={data.lagna}
-                  sub={data.lagnaDegs ? `${data.lagnaDegs}°` : undefined}
-                  accent
-                />
-              </div>
+            {/* ── पंचांग तत्त्वे on a copper plate: raised tiles with gold-inlaid values ── */}
+            <section className={styles.section} aria-label="पंचांग तत्त्वे">
+              <MoonDefs />
+              <Tamrapatra title="पंचांग तत्त्वे"
+                footer={`${formatMR(data.date)} · ${formatTime12h(data.selectedTime || time)} · ${cityName}`}>
+                <div className={tp.tiles}>
+                  {[
+                    { k: 'tithi', label: 'तिथी', value: data.tithi?.name, sub: `${data.paksha} · ${data.tithi?.num} / ३०`,
+                      art: Number.isFinite(Number(data._moon_sun_diff)) && <Moon3D el={Number(data._moon_sun_diff)} size={38} /> },
+                    { k: 'nak', label: 'नक्षत्र', value: data.nakshatra, art: <span className={tp.tileGlyph}>✶</span> },
+                    { k: 'yoga', label: 'योग', value: data.yoga, art: <span className={tp.tileGlyph}>☯</span> },
+                    { k: 'karana', label: 'करण', value: data.karana, art: <span className={tp.tileGlyph}>◐</span> },
+                    { k: 'paksha', label: 'पक्ष', value: data.paksha, art: <span className={tp.tileGlyph}>{/शुक्ल/.test(data.paksha || '') ? '☽' : '☾'}</span> },
+                    { k: 'maas', label: 'मास', value: `${data.maas} मास`, art: <span className={tp.tileGlyph}>◷</span> },
+                    { k: 'surya', label: 'सूर्य राशी', value: data.suryaRashi, rashi: data.suryaRashi },
+                    { k: 'chandra', label: 'चंद्र राशी', value: data.chandraRashi, rashi: data.chandraRashi },
+                    { k: 'lagna', label: 'लग्न', value: data.lagna, sub: data.lagnaDegs ? `${data.lagnaDegs}°` : undefined, rashi: data.lagna },
+                  ].map(t => (
+                    <div key={t.k} className={`${tp.tile} ${t.k === 'tithi' || t.k === 'lagna' ? tp.tileKey : ''}`}>
+                      <span className={tp.tileArt} aria-hidden="true">
+                        {t.rashi && RASHI_IMG[t.rashi]
+                          ? <img src={RASHI_IMG[t.rashi]} alt="" width="36" height="36" loading="lazy" decoding="async" />
+                          : t.art}
+                      </span>
+                      <span className={tp.tileLabel}>{t.label}</span>
+                      <b className={`${tp.inlay} ${tp.tileValue}`}>{t.value || '—'}</b>
+                      {t.sub && <span className={tp.tileSub}>{t.sub}</span>}
+                    </div>
+                  ))}
+                </div>
+              </Tamrapatra>
             </section>
 
             {/* ── Sun row ── */}
