@@ -234,6 +234,14 @@
   box-shadow: 0 8px 22px rgba(0,0,0,0.22);
 }
 
+/* 3D illustrated icons: no coloured tile, the image carries its own depth */
+.megaIcon3d,
+.megaItem:hover .megaIcon3d { background: none; box-shadow: none; border-radius: 0; }
+.megaIcon3d img { filter: drop-shadow(0 4px 6px rgba(42,22,6,0.22)); }
+.megaItem:hover .megaIcon3d { transform: scale(1.12) translateY(-2px); }
+.mobileSubIcon3d { background: none !important; box-shadow: none !important; width: 34px; height: 34px; }
+.navIcon3d { margin: -4px 5px -4px 0; vertical-align: middle; filter: drop-shadow(0 1px 2px rgba(42,22,6,0.25)); }
+
 .mobileSubIcon {
   display:         inline-flex;
   align-items:     center;

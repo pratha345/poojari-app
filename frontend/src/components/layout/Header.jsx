@@ -1,5 +1,6 @@
 // src/components/layout/Header.jsx — Single-row clean navbar
 import { useState, useEffect, useRef } from 'react';
+import Icon3D from '../common/Icon3D';
 import { FaHandsPraying, FaFire, FaLaptop, FaBuilding, FaOm, FaWandMagicSparkles, FaCalendarDays, FaBook, FaLocationDot, FaMagnifyingGlass, FaBell, FaCompass } from 'react-icons/fa6';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -18,26 +19,26 @@ function buildNav(t) {
     {
       label: t.nav.poojaService,
       children: [
-        { to: '/pooja',            icon: FaHandsPraying, iconBg: 'linear-gradient(135deg,#FF8C00,#E07B2A)', label: t.nav.allPooja,    desc: t.nav.home === 'Home' ? 'Book all types of puja' : 'सर्व प्रकारच्या पूजा बुक करा' },
-        { to: '/pooja/havan-jaap', icon: FaFire,         iconBg: 'linear-gradient(135deg,#ef4444,#b91c1c)', label: t.nav.havan,       desc: t.nav.home === 'Home' ? 'Navgraha, Maha Mrityunjay Havan' : 'नवग्रह, महा मृत्युंजय हवन' },
-        { to: '/online-puja',      icon: FaLaptop,       iconBg: 'linear-gradient(135deg,#3b82f6,#1e40af)', label: t.nav.onlinePuja,  desc: t.nav.home === 'Home' ? 'Puja via video call from anywhere' : 'व्हिडिओ कॉलद्वारे घरबसल्या' },
-        { to: '/hall-booking',     icon: FaBuilding,     iconBg: 'linear-gradient(135deg,#10b981,#047857)', label: t.nav.hallBooking, desc: t.nav.home === 'Home' ? 'Halls for weddings & events' : 'लग्न व कार्यक्रमांसाठी हॉल' },
+        { img: '3d/nav-puja-all', to: '/pooja',            icon: FaHandsPraying, iconBg: 'linear-gradient(135deg,#FF8C00,#E07B2A)', label: t.nav.allPooja,    desc: t.nav.home === 'Home' ? 'Book all types of puja' : 'सर्व प्रकारच्या पूजा बुक करा' },
+        { img: '3d/nav-havan', to: '/pooja/havan-jaap', icon: FaFire,         iconBg: 'linear-gradient(135deg,#ef4444,#b91c1c)', label: t.nav.havan,       desc: t.nav.home === 'Home' ? 'Navgraha, Maha Mrityunjay Havan' : 'नवग्रह, महा मृत्युंजय हवन' },
+        { img: '3d/nav-online-puja', to: '/online-puja',      icon: FaLaptop,       iconBg: 'linear-gradient(135deg,#3b82f6,#1e40af)', label: t.nav.onlinePuja,  desc: t.nav.home === 'Home' ? 'Puja via video call from anywhere' : 'व्हिडिओ कॉलद्वारे घरबसल्या' },
+        { img: '3d/nav-hall-booking', to: '/hall-booking',     icon: FaBuilding,     iconBg: 'linear-gradient(135deg,#10b981,#047857)', label: t.nav.hallBooking, desc: t.nav.home === 'Home' ? 'Halls for weddings & events' : 'लग्न व कार्यक्रमांसाठी हॉल' },
       ],
     },
     {
       label: t.nav.jyotish,
       children: [
-        { to: '/panchang', icon: FaOm,                iconBg: 'linear-gradient(135deg,#8b5cf6,#6d28d9)', label: t.nav.panchang, desc: t.nav.home === 'Home' ? "Today's Tithi, Nakshatra, Yoga" : 'आजचे तिथी, नक्षत्र, योग' },
-        { to: '/rashifal', icon: FaWandMagicSparkles, iconBg: 'linear-gradient(135deg,#ec4899,#be185d)', label: t.nav.rashifal,  desc: t.nav.home === 'Home' ? 'Daily horoscope for all signs' : 'मेष ते मीन आजचे भविष्य' },
-        { to: '/muhurat',  icon: FaCalendarDays,      iconBg: 'linear-gradient(135deg,#D4AF37,#a07810)', label: t.nav.muhurat,   desc: t.nav.home === 'Home' ? 'Auspicious time & Muhurat calendar' : 'शुभ वेळ व मुहूर्त कॅलेंडर' },
-        { to: '/disha-yantra', icon: FaCompass,       iconBg: 'linear-gradient(135deg,#8a5f1d,#5c3d10)', label: t.nav.disha,     desc: t.nav.home === 'Home' ? 'Compass, today\'s Dishashool, puja direction' : 'कंपास, आजची दिशाशूल, पूजेची दिशा' },
+        { img: 'tabs/panchang', to: '/panchang', icon: FaOm,                iconBg: 'linear-gradient(135deg,#8b5cf6,#6d28d9)', label: t.nav.panchang, desc: t.nav.home === 'Home' ? "Today's Tithi, Nakshatra, Yoga" : 'आजचे तिथी, नक्षत्र, योग' },
+        { img: '3d/nav-rashifal', to: '/rashifal', icon: FaWandMagicSparkles, iconBg: 'linear-gradient(135deg,#ec4899,#be185d)', label: t.nav.rashifal,  desc: t.nav.home === 'Home' ? 'Daily horoscope for all signs' : 'मेष ते मीन आजचे भविष्य' },
+        { img: '3d/nav-muhurat', to: '/muhurat',  icon: FaCalendarDays,      iconBg: 'linear-gradient(135deg,#D4AF37,#a07810)', label: t.nav.muhurat,   desc: t.nav.home === 'Home' ? 'Auspicious time & Muhurat calendar' : 'शुभ वेळ व मुहूर्त कॅलेंडर' },
+        { img: 'tabs/disha', to: '/disha-yantra', icon: FaCompass,       iconBg: 'linear-gradient(135deg,#8a5f1d,#5c3d10)', label: t.nav.disha,     desc: t.nav.home === 'Home' ? 'Compass, today\'s Dishashool, puja direction' : 'कंपास, आजची दिशाशूल, पूजेची दिशा' },
       ],
     },
-    { to: '/blog',          icon: FaBook,        iconColor: '#8b5cf6', label: t.nav.blog   },
-    { to: '/aarti',         icon: FaBell,        iconColor: '#E07B2A', label: t.nav.aarti  },
+    { img: '3d/nav-blog', to: '/blog',          icon: FaBook,        iconColor: '#8b5cf6', label: t.nav.blog   },
+    { img: '3d/nav-aarti', to: '/aarti',         icon: FaBell,        iconColor: '#E07B2A', label: t.nav.aarti  },
     { to: '/book-pujari',   label: t.nav.bookPujari || 'पुजारी बुक करा', highlight: true },
     { to: '/pujari-nondni', label: t.nav.becomePujari          },
-    { to: '/cities',        icon: FaLocationDot, iconColor: '#ef4444', label: t.nav.cities },
+    { img: '3d/nav-cities', to: '/cities',        icon: FaLocationDot, iconColor: '#ef4444', label: t.nav.cities },
     { to: '/contact',       label: t.nav.contact               },
   ];
 }
@@ -95,12 +96,18 @@ function NavDropdown({ item, pathname, closeAll }) {
               className={`${styles.megaItem} ${pathname.startsWith(child.to) ? styles.megaItemActive : ''}`}
               onClick={() => { setOpen(false); closeAll(); }}
             >
-              <span
-                className={styles.megaIcon}
-                style={child.iconBg ? { background: child.iconBg } : { background: 'rgba(224,123,42,0.12)', color: 'var(--primary)' }}
-              >
-                {child.icon && <child.icon />}
-              </span>
+              {child.img ? (
+                <span className={`${styles.megaIcon} ${styles.megaIcon3d}`}>
+                  <Icon3D name={child.img} size={46} />
+                </span>
+              ) : (
+                <span
+                  className={styles.megaIcon}
+                  style={child.iconBg ? { background: child.iconBg } : { background: 'rgba(224,123,42,0.12)', color: 'var(--primary)' }}
+                >
+                  {child.icon && <child.icon />}
+                </span>
+              )}
               <span>
                 <span className={styles.megaLabel}>{child.label}</span>
                 {child.desc && <span className={styles.megaDesc}>{child.desc}</span>}
@@ -135,7 +142,11 @@ function MobileNavGroup({ item, pathname, closeAll }) {
               className={`${styles.mobileSubLink} ${pathname.startsWith(child.to) ? styles.active : ''}`}
               onClick={() => { setOpen(false); closeAll(); }}
             >
-              {child.icon && (
+              {child.img ? (
+                <span className={`${styles.mobileSubIcon} ${styles.mobileSubIcon3d}`}>
+                  <Icon3D name={child.img} size={34} />
+                </span>
+              ) : child.icon && (
                 <span
                   className={styles.mobileSubIcon}
                   style={child.iconBg ? { background: child.iconBg, color: '#fff' } : { background: 'rgba(224,123,42,0.12)', color: 'var(--primary)' }}
@@ -242,7 +253,7 @@ export default function Header() {
                   className={`${styles.navLink} ${pathname === item.to ? styles.active : ''} ${item.highlight ? styles.navLinkHighlight : ''}`}
                   onClick={closeAll}
                 >
-                  {item.icon && <item.icon style={{marginRight:5,verticalAlign:'middle',fontSize:'13px',color:item.iconColor||'currentColor'}}/>}{item.label}
+                  {item.img ? <Icon3D name={item.img} size={22} className={styles.navIcon3d} /> : item.icon && <item.icon style={{marginRight:5,verticalAlign:'middle',fontSize:'13px',color:item.iconColor||'currentColor'}}/>}{item.label}
                 </Link>
               )
             )}

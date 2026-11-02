@@ -1419,3 +1419,13 @@
 
   .pSliderCat { font-size: 10px; margin-bottom: 8px; }
 }
+
+/* ── 3D illustrated icons (public/icons/3d) ─────────────────── */
+.pSliderDecorImg { width: clamp(96px, 14vw, 150px); height: auto; filter: drop-shadow(0 8px 22px rgba(42,22,6,0.35)); }
+.catImg { filter: drop-shadow(0 6px 10px rgba(42,22,6,0.18)); }
+.stepIconBox img, .statIcon img { filter: drop-shadow(0 4px 8px rgba(42,22,6,0.22)); }
+.statIcon { display: flex; justify-content: center; }
+@media (max-width: 640px) {
+  .catImg { width: 52px; height: 52px; }
+  .statIcon img { width: 42px; height: 42px; }
+}

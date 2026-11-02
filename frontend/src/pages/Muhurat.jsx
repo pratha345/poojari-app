@@ -1,4 +1,5 @@
 // src/pages/Muhurat.jsx — शुभ मुहूर्त & चौघडिया (redesigned)
+import Icon3D from '../components/common/Icon3D';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
@@ -38,12 +39,12 @@ const CHOG_META = {
 };
 
 const OCCASIONS = [
-  { icon: '💍', label: 'विवाह',        good: ['अमृत','शुभ','लाभ'] },
-  { icon: '🏠', label: 'गृहप्रवेश',    good: ['अमृत','शुभ','लाभ'] },
+  { img: '3d/occ-vivah', icon: '💍', label: 'विवाह',        good: ['अमृत','शुभ','लाभ'] },
+  { img: '3d/occ-grihapravesh', icon: '🏠', label: 'गृहप्रवेश',    good: ['अमृत','शुभ','लाभ'] },
   { icon: '🚗', label: 'वाहन खरेदी',  good: ['अमृत','शुभ','लाभ','चर'] },
   { icon: '💼', label: 'व्यापार सुरू', good: ['अमृत','लाभ','शुभ'] },
-  { icon: '👶', label: 'नामकरण',       good: ['अमृत','शुभ'],       dayOnly: true },
-  { icon: '✂️', label: 'मुंडन',        good: ['अमृत','शुभ','लाभ'], dayOnly: true },
+  { img: '3d/occ-namkaran', icon: '👶', label: 'नामकरण',       good: ['अमृत','शुभ'],       dayOnly: true },
+  { img: '3d/occ-mundan', icon: '✂️', label: 'मुंडन',        good: ['अमृत','शुभ','लाभ'], dayOnly: true },
   { icon: '🍚', label: 'अन्नप्राशन',   good: ['अमृत','शुभ'],       dayOnly: true },
   { icon: '🏗️', label: 'भूमिपूजन',    good: ['अमृत','शुभ','लाभ'], dayOnly: true },
 ];
@@ -568,7 +569,7 @@ export default function Muhurat() {
                 return (
                   <div key={occ.label} className={styles.occasionCard}>
                     <div className={styles.occasionHeader}>
-                      <span className={styles.occasionIcon}>{occ.icon}</span>
+                      <span className={styles.occasionIcon}>{occ.img ? <Icon3D name={occ.img} size={40} /> : occ.icon}</span>
                       <h3 className={styles.occasionTitle}>{occ.label}</h3>
                     </div>
                     <div className={styles.occasionSlots}>

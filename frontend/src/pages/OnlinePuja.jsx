@@ -1,4 +1,5 @@
 // src/pages/OnlinePuja.jsx — ऑनलाइन पूजा (Virtual Puja) landing page
+import Icon3D from '../components/common/Icon3D';
 import { useSearchParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
@@ -7,28 +8,28 @@ import SEOHead from '../components/SEOHead';
 import styles from './OnlinePuja.module.css';
 
 const ONLINE_SERVICES = [
-  { icon: '🏠',  name: 'गृहप्रवेश पूजा',       desc: 'नवीन घरात प्रवेशापूर्वी विधिपूर्वक पूजा',  slug: 'gruh-pravesh' },
-  { icon: '🙏',  name: 'सत्यनारायण पूजा',      desc: 'घरी किंवा व्हिडिओ कॉलद्वारे संपूर्ण पूजा',  slug: 'satyanarayan' },
-  { icon: '🔥',  name: 'हवन / जाप',            desc: 'ऑनलाइन हवन सेवा अनुभवी पुजारींसोबत',         slug: 'havan-jaap'   },
-  { icon: '⭐',  name: 'नवरात्री पूजा',         desc: 'माँ दुर्गेची नवरात्री पूजा व्हिडिओवर',       slug: 'utsav-pooja'  },
-  { icon: '🌙',  name: 'वास्तुशांती पूजा',      desc: 'वास्तूदोष निवारणासाठी ऑनलाइन पूजा',          slug: 'vastu-pooja'  },
-  { icon: '🪔',  name: 'पितृश्राद्ध / तर्पण',  desc: 'पूर्वजांसाठी ऑनलाइन श्राद्ध विधी',           slug: 'pitru-shraddha'},
+  { img: '3d/occ-grihapravesh', icon: '🏠',  name: 'गृहप्रवेश पूजा',       desc: 'नवीन घरात प्रवेशापूर्वी विधिपूर्वक पूजा',  slug: 'gruh-pravesh' },
+  { img: '3d/occ-satyanarayan', icon: '🙏',  name: 'सत्यनारायण पूजा',      desc: 'घरी किंवा व्हिडिओ कॉलद्वारे संपूर्ण पूजा',  slug: 'satyanarayan' },
+  { img: '3d/nav-havan', icon: '🔥',  name: 'हवन / जाप',            desc: 'ऑनलाइन हवन सेवा अनुभवी पुजारींसोबत',         slug: 'havan-jaap'   },
+  { img: '3d/cat-utsav-pooja', icon: '⭐',  name: 'नवरात्री पूजा',         desc: 'माँ दुर्गेची नवरात्री पूजा व्हिडिओवर',       slug: 'utsav-pooja'  },
+  { img: '3d/cat-vastu-pooja', icon: '🌙',  name: 'वास्तुशांती पूजा',      desc: 'वास्तूदोष निवारणासाठी ऑनलाइन पूजा',          slug: 'vastu-pooja'  },
+  { img: '3d/cat-pitru-shraddha', icon: '🪔',  name: 'पितृश्राद्ध / तर्पण',  desc: 'पूर्वजांसाठी ऑनलाइन श्राद्ध विधी',           slug: 'pitru-shraddha'},
 ];
 
 const HOW_IT_WORKS = [
-  { step: '1', icon: '📱', title: 'पूजा बुक करा',       desc: 'आपल्या पसंतीची पूजा निवडा आणि तारीख व वेळ सेट करा.' },
-  { step: '2', icon: '🧑‍💼', title: 'पुजारी नियुक्त होतो', desc: 'आम्ही सत्यापित व अनुभवी पुजारी तुमच्यासाठी नियुक्त करतो.' },
-  { step: '3', icon: '💻', title: 'व्हिडिओ कॉल सुरू',  desc: 'ठरलेल्या वेळी WhatsApp / Zoom वर पुजारी जोडतात.' },
-  { step: '4', icon: '🪔', title: 'पूजा संपन्न होते',   desc: 'घरी बसून पारंपरिक विधी पूर्ण होतो, आशीर्वाद मिळतो.' },
+  { step: '1', img: '3d/step-choose-puja', icon: '📱', title: 'पूजा बुक करा',       desc: 'आपल्या पसंतीची पूजा निवडा आणि तारीख व वेळ सेट करा.' },
+  { step: '2', img: '3d/step-pujari-assigned', icon: '🧑‍💼', title: 'पुजारी नियुक्त होतो', desc: 'आम्ही सत्यापित व अनुभवी पुजारी तुमच्यासाठी नियुक्त करतो.' },
+  { step: '3', img: '3d/step-video-call', icon: '💻', title: 'व्हिडिओ कॉल सुरू',  desc: 'ठरलेल्या वेळी WhatsApp / Zoom वर पुजारी जोडतात.' },
+  { step: '4', img: '3d/step-puja-complete', icon: '🪔', title: 'पूजा संपन्न होते',   desc: 'घरी बसून पारंपरिक विधी पूर्ण होतो, आशीर्वाद मिळतो.' },
 ];
 
 const BENEFITS = [
-  { icon: '🌍', title: 'कुठूनही करा',        desc: 'USA, UK, UAE, Canada — जगात कुठेही असलात तरी पूजा करा.' },
-  { icon: '⏰', title: 'वेळेची बचत',          desc: 'प्रवास नाही, तयारी कमी — फक्त भक्तिभावाने बसा.' },
-  { icon: '✅', title: 'सत्यापित पुजारी',    desc: 'सर्व पुजारी प्रशिक्षित, अनुभवी आणि पोलीस सत्यापित.' },
-  { icon: '💰', title: 'परवडणाऱ्या किंमती', desc: 'प्रत्यक्ष पूजेपेक्षा कमी खर्चात संपूर्ण विधी.' },
-  { icon: '📿', title: 'पारंपरिक विधी',      desc: 'वैदिक पद्धतीने संपूर्ण मंत्रोच्चार व विधी.' },
-  { icon: '📞', title: '२४x७ सहाय्य',        desc: 'बुकिंगपासून पूजेपर्यंत आमची टीम सदैव उपलब्ध.' },
+  { img: '3d/feat-worldwide', icon: '🌍', title: 'कुठूनही करा',        desc: 'USA, UK, UAE, Canada — जगात कुठेही असलात तरी पूजा करा.' },
+  { img: '3d/feat-time-saving', icon: '⏰', title: 'वेळेची बचत',          desc: 'प्रवास नाही, तयारी कमी — फक्त भक्तिभावाने बसा.' },
+  { img: '3d/feat-verified', icon: '✅', title: 'सत्यापित पुजारी',    desc: 'सर्व पुजारी प्रशिक्षित, अनुभवी आणि पोलीस सत्यापित.' },
+  { img: '3d/feat-affordable', icon: '💰', title: 'परवडणाऱ्या किंमती', desc: 'प्रत्यक्ष पूजेपेक्षा कमी खर्चात संपूर्ण विधी.' },
+  { img: '3d/feat-vedic-vidhi', icon: '📿', title: 'पारंपरिक विधी',      desc: 'वैदिक पद्धतीने संपूर्ण मंत्रोच्चार व विधी.' },
+  { img: '3d/feat-support', icon: '📞', title: '२४x७ सहाय्य',        desc: 'बुकिंगपासून पूजेपर्यंत आमची टीम सदैव उपलब्ध.' },
 ];
 
 const FAQS = [
@@ -201,7 +202,7 @@ export default function OnlinePuja() {
             {HOW_IT_WORKS.map((item, i) => (
               <div key={i} className={styles.howCard}>
                 <div className={styles.howStep}>{item.step}</div>
-                <div className={styles.howIcon}>{item.icon}</div>
+                <div className={styles.howIcon}>{item.img ? <Icon3D name={item.img} size={56} /> : item.icon}</div>
                 <h3 className={styles.howTitle}>{item.title}</h3>
                 <p className={styles.howDesc}>{item.desc}</p>
                 {i < HOW_IT_WORKS.length - 1 && <div className={styles.howArrow}>→</div>}
@@ -219,7 +220,7 @@ export default function OnlinePuja() {
           <div className={styles.servicesGrid}>
             {ONLINE_SERVICES.map((s, i) => (
               <Link to={`/pooja/${s.slug}`} key={i} className={styles.serviceCard}>
-                <div className={styles.serviceIcon}>{s.icon}</div>
+                <div className={styles.serviceIcon}>{s.img ? <Icon3D name={s.img} size={56} /> : s.icon}</div>
                 <h3 className={styles.serviceName}>{s.name}</h3>
                 <p className={styles.serviceDesc}>{s.desc}</p>
                 <span className={styles.serviceLink}>बुक करा →</span>
@@ -241,7 +242,7 @@ export default function OnlinePuja() {
           <div className={styles.benefitsGrid}>
             {BENEFITS.map((b, i) => (
               <div key={i} className={styles.benefitCard}>
-                <div className={styles.benefitIcon}>{b.icon}</div>
+                <div className={styles.benefitIcon}>{b.img ? <Icon3D name={b.img} size={52} /> : b.icon}</div>
                 <h3 className={styles.benefitTitle}>{b.title}</h3>
                 <p className={styles.benefitDesc}>{b.desc}</p>
               </div>

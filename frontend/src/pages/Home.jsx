@@ -1,4 +1,5 @@
 // src/pages/Home.jsx — पूजारी • Dynamic Premium Homepage
+import Icon3D from '../components/common/Icon3D';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header    from '../components/layout/Header';
@@ -18,6 +19,14 @@ const CAT_ICON = {
   'उत्सव पूजा':      '🎉', 'कथा / नित्य':    '📿',
   'कथा / नित्य पूजा':'📿', 'ऑनलाइन पूजा':   '💻',
   'आध्यात्मिक सेवा': '🧘', 'हॉल बुकिंग':     '🏛️',
+};
+
+// Category → 3D icon (public/icons/3d); falls back to CAT_ICON emoji
+const CAT_IMG = {
+  'गृह पूजा': 'cat-gruh-pooja', 'वास्तू पूजा': 'cat-vastu-pooja', 'हवन / जाप': 'nav-havan',
+  'पित्रुश्राद्ध': 'cat-pitru-shraddha', 'उत्सव पूजा': 'cat-utsav-pooja', 'कथा / नित्य': 'cat-katha-nitya',
+  'कथा / नित्य पूजा': 'cat-katha-nitya', 'ऑनलाइन पूजा': 'nav-online-puja', 'आध्यात्मिक सेवा': 'cat-adhyatmik-seva',
+  'हॉल बुकिंग': 'nav-hall-booking',
 };
 
 // ── Featured Puja Full-Width Slider ──────────────────────────
@@ -87,7 +96,7 @@ function FeaturedPoojaSlider({ poojas }) {
           <div className={s.pSliderRing3} />
           {/* Large category icon */}
           <span className={s.pSliderDecorIcon}>
-            {CAT_ICON[pooja.category_name] || '🪔'}
+            {CAT_IMG[pooja.category_name] ? <Icon3D name={`3d/${CAT_IMG[pooja.category_name]}`} size={150} className={s.pSliderDecorImg} /> : (CAT_ICON[pooja.category_name] || '🪔')}
           </span>
           {/* OM watermark */}
           <span className={s.pSliderOm}>ॐ</span>
@@ -334,16 +343,16 @@ const SEARCH_CATEGORIES = [
 
 // Quick-occasion chips — shown below the search bar on the homepage
 const OCCASIONS = [
-  { icon: '🏠', label: 'गृहप्रवेश',       href: '/pooja/vastu-pooja'                    },
-  { icon: '🪔', label: 'सत्यनारायण',      href: '/pooja?search=सत्यनारायण'              },
-  { icon: '💍', label: 'लग्न',            href: '/pooja?search=लग्न'                    },
-  { icon: '👶', label: 'नामकरण',          href: '/pooja?search=नामकरण'                  },
-  { icon: '🔥', label: 'हवन',             href: '/pooja/havan-jaap'                     },
-  { icon: '🕯️', label: 'दशक्रिया',        href: '/pooja/pitru-shraddha'                 },
-  { icon: '🐘', label: 'गणपती पूजा',      href: '/pooja?search=गणपती'                   },
-  { icon: '🌟', label: 'नवग्रह शांती',     href: '/pooja?search=नवग्रह'                  },
-  { icon: '🎓', label: 'मुंज',            href: '/pooja?search=मुंज'                    },
-  { icon: '💡', label: 'दिवाळी पूजा',     href: '/pooja?search=दिवाळी'                  },
+  { img: '3d/occ-grihapravesh', icon: '🏠', label: 'गृहप्रवेश',       href: '/pooja/vastu-pooja'                    },
+  { img: '3d/occ-satyanarayan', icon: '🪔', label: 'सत्यनारायण',      href: '/pooja?search=सत्यनारायण'              },
+  { img: '3d/occ-vivah', icon: '💍', label: 'लग्न',            href: '/pooja?search=लग्न'                    },
+  { img: '3d/occ-namkaran', icon: '👶', label: 'नामकरण',          href: '/pooja?search=नामकरण'                  },
+  { img: '3d/nav-havan', icon: '🔥', label: 'हवन',             href: '/pooja/havan-jaap'                     },
+  { img: '3d/cat-pitru-shraddha', icon: '🕯️', label: 'दशक्रिया',        href: '/pooja/pitru-shraddha'                 },
+  { img: '3d/occ-ganpati', icon: '🐘', label: 'गणपती पूजा',      href: '/pooja?search=गणपती'                   },
+  { img: '3d/occ-navgraha', icon: '🌟', label: 'नवग्रह शांती',     href: '/pooja?search=नवग्रह'                  },
+  { img: '3d/occ-munj', icon: '🎓', label: 'मुंज',            href: '/pooja?search=मुंज'                    },
+  { img: '3d/occ-diwali', icon: '💡', label: 'दिवाळी पूजा',     href: '/pooja?search=दिवाळी'                  },
 ];
 
 // City cards now link to dedicated SEO city pages
@@ -367,40 +376,40 @@ const MH_CITIES = [
 ];
 
 const QUICK_ACTIONS = [
-  { icon: '📿', label: 'आजची पूजा बुक करा', sub: 'घरात किंवा मंदिरात', to: '/pooja',    accent: '#FF7A00' },
-  { icon: '📅', label: 'पंचांग पहा',         sub: 'आजचे तिथी-नक्षत्र', to: '/panchang', accent: '#C62828' },
-  { icon: '🔮', label: 'राशिभविष्य',         sub: 'आजचे भविष्य जाणा',   to: '/rashifal', accent: '#7B1FA2' },
+  { img: '3d/nav-puja-all', icon: '📿', label: 'आजची पूजा बुक करा', sub: 'घरात किंवा मंदिरात', to: '/pooja',    accent: '#FF7A00' },
+  { img: 'tabs/panchang', icon: '📅', label: 'पंचांग पहा',         sub: 'आजचे तिथी-नक्षत्र', to: '/panchang', accent: '#C62828' },
+  { img: '3d/nav-rashifal', icon: '🔮', label: 'राशिभविष्य',         sub: 'आजचे भविष्य जाणा',   to: '/rashifal', accent: '#7B1FA2' },
 ];
 
 const SERVICES = [
-  { icon: '🙏', accent: '#D4AF37', title: 'पुजारी सेवा',          desc: 'वेदशास्त्रसंपन्न पुजारी घरी येऊन संपूर्ण विधी भक्तीभावाने करतात.', to: '/pooja',        badge: null },
-  { icon: '💻', accent: '#FF7A00', title: 'ऑनलाइन पूजा — NRI',   desc: 'USA · UK · UAE · Canada — WhatsApp/Zoom वर पारंपरिक मराठी पूजा.', to: '/online-puja',  badge: '🌍 NRI' },
-  { icon: '🏛️', accent: '#2E7D32', title: 'हॉल बुकिंग',          desc: 'लग्न · साखरपुडा · समारंभ. पूजारी + हॉल एकत्र बुक करा — फक्त पूजारीवर!', to: '/hall-booking', badge: '✨ युनिक' },
+  { img: '3d/stat-pujaris', icon: '🙏', accent: '#D4AF37', title: 'पुजारी सेवा',          desc: 'वेदशास्त्रसंपन्न पुजारी घरी येऊन संपूर्ण विधी भक्तीभावाने करतात.', to: '/pooja',        badge: null },
+  { img: '3d/nav-online-puja', icon: '💻', accent: '#FF7A00', title: 'ऑनलाइन पूजा — NRI',   desc: 'USA · UK · UAE · Canada — WhatsApp/Zoom वर पारंपरिक मराठी पूजा.', to: '/online-puja',  badge: '🌍 NRI' },
+  { img: '3d/nav-hall-booking', icon: '🏛️', accent: '#2E7D32', title: 'हॉल बुकिंग',          desc: 'लग्न · साखरपुडा · समारंभ. पूजारी + हॉल एकत्र बुक करा — फक्त पूजारीवर!', to: '/hall-booking', badge: '✨ युनिक' },
 ];
 
 const STEPS = [
-  { icon: '💻', num: '१', title: 'पूजा निवडा',     desc: 'इच्छित पूजेची श्रेणी निवडा आणि बुकिंग फॉर्म भरा.' },
-  { icon: '📲', num: '२', title: 'पुजारी नियुक्त', desc: 'आम्ही आपल्यासाठी विश्वासू व अनुभवी पुजारी निवडतो.' },
-  { icon: '💳', num: '३', title: 'पेमेंट करा',     desc: 'सुरक्षित ऑनलाइन पेमेंट — Razorpay द्वारे.' },
-  { icon: '🪔', num: '४', title: 'पूजा संपन्न',    desc: 'पुजारी घरी येऊन पूर्ण विधीसह पूजा करतात.' },
+  { img: '3d/step-choose-puja', icon: '💻', num: '१', title: 'पूजा निवडा',     desc: 'इच्छित पूजेची श्रेणी निवडा आणि बुकिंग फॉर्म भरा.' },
+  { img: '3d/step-pujari-assigned', icon: '📲', num: '२', title: 'पुजारी नियुक्त', desc: 'आम्ही आपल्यासाठी विश्वासू व अनुभवी पुजारी निवडतो.' },
+  { img: '3d/step-payment', icon: '💳', num: '३', title: 'पेमेंट करा',     desc: 'सुरक्षित ऑनलाइन पेमेंट — Razorpay द्वारे.' },
+  { img: '3d/step-puja-complete', icon: '🪔', num: '४', title: 'पूजा संपन्न',    desc: 'पुजारी घरी येऊन पूर्ण विधीसह पूजा करतात.' },
 ];
 
 const CATEGORIES = [
-  { slug: 'gruh-pooja',     icon: '🏠', label: 'गृह पूजा',         desc: 'सत्यनारायण, साखरपुडा' },
-  { slug: 'havan-jaap',     icon: '🔥', label: 'हवन / जाप',        desc: 'नवग्रह, महा मृत्युंजय' },
-  { slug: 'katha-nitya',    icon: '📿', label: 'कथा / नित्य पूजा', desc: 'रुद्राभिषेक, मंगळागौरी' },
-  { slug: 'pitru-shraddha', icon: '🕯️', label: 'पित्रुश्राद्ध',   desc: 'दशक्रिया, बारावे विधी' },
-  { slug: 'utsav-pooja',    icon: '🎉', label: 'उत्सव पूजा',       desc: 'गणपती, नवरात्री, दिवाळी' },
-  { slug: 'vastu-pooja',    icon: '🏗️', label: 'वास्तू पूजा',     desc: 'गृहप्रवेश, भूमिपूजन' },
-  { slug: 'adhyatmik-seva', icon: '🧘', label: 'आध्यात्मिक सेवा',  desc: 'पाठ, अनुष्ठान, कीर्तन' },
-  { slug: 'lagn-hall',      icon: '🏛️', label: 'हॉल बुकिंग',      desc: 'लग्नसमारंभ व कार्यक्रम', href: '/hall-booking' },
+  { slug: 'gruh-pooja', img: '3d/cat-gruh-pooja',     icon: '🏠', label: 'गृह पूजा',         desc: 'सत्यनारायण, साखरपुडा' },
+  { slug: 'havan-jaap', img: '3d/nav-havan',     icon: '🔥', label: 'हवन / जाप',        desc: 'नवग्रह, महा मृत्युंजय' },
+  { slug: 'katha-nitya', img: '3d/cat-katha-nitya',    icon: '📿', label: 'कथा / नित्य पूजा', desc: 'रुद्राभिषेक, मंगळागौरी' },
+  { slug: 'pitru-shraddha', img: '3d/cat-pitru-shraddha', icon: '🕯️', label: 'पित्रुश्राद्ध',   desc: 'दशक्रिया, बारावे विधी' },
+  { slug: 'utsav-pooja', img: '3d/cat-utsav-pooja',    icon: '🎉', label: 'उत्सव पूजा',       desc: 'गणपती, नवरात्री, दिवाळी' },
+  { slug: 'vastu-pooja', img: '3d/cat-vastu-pooja',    icon: '🏗️', label: 'वास्तू पूजा',     desc: 'गृहप्रवेश, भूमिपूजन' },
+  { slug: 'adhyatmik-seva', img: '3d/cat-adhyatmik-seva', icon: '🧘', label: 'आध्यात्मिक सेवा',  desc: 'पाठ, अनुष्ठान, कीर्तन' },
+  { slug: 'lagn-hall', img: '3d/nav-hall-booking',      icon: '🏛️', label: 'हॉल बुकिंग',      desc: 'लग्नसमारंभ व कार्यक्रम', href: '/hall-booking' },
 ];
 
 const TRUST = [
-  { icon: '🔐', color: '#FF7A00', title: 'सत्यापित पुजारी',   desc: 'सर्व पुजारी ओळख-सत्यापित, अनुभवी आणि पारंपरिक ज्ञानसंपन्न.' },
-  { icon: '⚡', color: '#C62828', title: 'सहज बुकिंग',        desc: 'काही मिनिटांत बुकिंग पूर्ण करा. कोणतीही गुंतागुंत नाही.' },
-  { icon: '💸', color: '#D4AF37', title: 'परवडणाऱ्या किंमती', desc: 'कोणत्याही बजेटमध्ये उत्तम सेवा — कोणतेही छुपे शुल्क नाही.' },
-  { icon: '🏠', color: '#2E7D32', title: 'घरपोच सेवा',        desc: 'पुजारी सामग्रीसह घरी येतो — आपण पूर्णतः निश्चिंत राहा.' },
+  { img: '3d/feat-verified', icon: '🔐', color: '#FF7A00', title: 'सत्यापित पुजारी',   desc: 'सर्व पुजारी ओळख-सत्यापित, अनुभवी आणि पारंपरिक ज्ञानसंपन्न.' },
+  { img: '3d/feat-easy-booking', icon: '⚡', color: '#C62828', title: 'सहज बुकिंग',        desc: 'काही मिनिटांत बुकिंग पूर्ण करा. कोणतीही गुंतागुंत नाही.' },
+  { img: '3d/feat-affordable', icon: '💸', color: '#D4AF37', title: 'परवडणाऱ्या किंमती', desc: 'कोणत्याही बजेटमध्ये उत्तम सेवा — कोणतेही छुपे शुल्क नाही.' },
+  { img: '3d/feat-home-service', icon: '🏠', color: '#2E7D32', title: 'घरपोच सेवा',        desc: 'पुजारी सामग्रीसह घरी येतो — आपण पूर्णतः निश्चिंत राहा.' },
 ];
 
 const TESTIMONIALS = [
@@ -899,7 +908,7 @@ export default function Home() {
                   <div className={s.occasionChips}>
                     {OCCASIONS.map(o => (
                       <Link key={o.label} to={o.href} className={s.occasionChip}>
-                        <span>{o.icon}</span>{o.label}
+                        {o.img ? <Icon3D name={o.img} size={24} /> : <span>{o.icon}</span>}{o.label}
                       </Link>
                     ))}
                   </div>
@@ -1004,13 +1013,13 @@ export default function Home() {
           <div className="container">
             <div className={s.statsGrid}>
               {[
-                { value: content.stat_bookings, label: 'यशस्वी बुकिंग',   icon: '📅' },
-                { value: content.stat_pujaris,  label: 'अनुभवी पुजारी',   icon: '🙏' },
-                { value: content.stat_cities,   label: 'शहरांमध्ये सेवा', icon: '📍' },
-                { value: content.stat_years,    label: 'वर्षांचा अनुभव',  icon: '⭐' },
+                { value: content.stat_bookings, label: 'यशस्वी बुकिंग', img: '3d/stat-bookings',   icon: '📅' },
+                { value: content.stat_pujaris,  label: 'अनुभवी पुजारी', img: '3d/stat-pujaris',   icon: '🙏' },
+                { value: content.stat_cities,   label: 'शहरांमध्ये सेवा', img: '3d/nav-cities', icon: '📍' },
+                { value: content.stat_years,    label: 'वर्षांचा अनुभव', img: '3d/stat-experience',  icon: '⭐' },
               ].map((stat, i) => (
                 <div key={i} className={s.statCard}>
-                  <span className={s.statIcon}>{stat.icon}</span>
+                  <span className={s.statIcon}>{stat.img ? <Icon3D name={stat.img} size={52} /> : stat.icon}</span>
                   <span className={s.statValue}>{stat.value}</span>
                   <span className={s.statLabel}>{stat.label}</span>
                 </div>
@@ -1048,7 +1057,7 @@ export default function Home() {
                   style={{ '--qAccent': a.accent }}>
                   <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl text-2xl"
                     style={{ background: `linear-gradient(135deg,${a.accent}25,${a.accent}10)`, border: `1.5px solid ${a.accent}30` }}>
-                    {a.icon}
+                    {a.img ? <Icon3D name={a.img} size={50} /> : a.icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-display text-base font-bold text-maroon-700">{a.label}</p>
@@ -1104,7 +1113,7 @@ export default function Home() {
                   )}
                   <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
                     style={{ background: `linear-gradient(135deg,${svc.accent}20,${svc.accent}0e)`, border: `1.5px solid ${svc.accent}28` }}>
-                    {svc.icon}
+                    {svc.img ? <Icon3D name={svc.img} size={58} /> : svc.icon}
                   </div>
                   <h3 className="mb-3 font-display text-xl font-bold text-maroon-700">{svc.title}</h3>
                   <p className="mb-6 font-devanagari text-sm leading-relaxed text-maroon-700/60">{svc.desc}</p>
@@ -1150,7 +1159,7 @@ export default function Home() {
                   className={`${s.trustCard} group rounded-2xl border border-saffron-500/10 bg-theme-cream p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-[0_12px_40px_rgba(224,123,42,0.14)]`}>
                   <div className={`${s.trustIcon} mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl text-3xl`}
                     style={{ background: `linear-gradient(135deg,${w.color}1e,${w.color}0c)`, border: `1.5px solid ${w.color}25` }}>
-                    {w.icon}
+                    {w.img ? <Icon3D name={w.img} size={58} /> : w.icon}
                   </div>
                   <h3 className="mb-3 font-display text-base font-bold text-maroon-700">{w.title}</h3>
                   <p className="font-devanagari text-sm leading-relaxed text-maroon-700/60">{w.desc}</p>
@@ -1202,7 +1211,7 @@ export default function Home() {
                     {/* big number badge */}
                     <div className={s.stepNum}>{st.num}</div>
                     {/* icon circle */}
-                    <div className={s.stepIconBox}>{st.icon}</div>
+                    <div className={s.stepIconBox}>{st.img ? <Icon3D name={st.img} size={64} /> : st.icon}</div>
                     <h3 className={s.stepTitle}>{st.title}</h3>
                     <p className={s.stepDesc}>{st.desc}</p>
                   </div>
@@ -1224,7 +1233,7 @@ export default function Home() {
               {CATEGORIES.map(cat => (
                 <Link key={cat.slug} to={cat.href || `/pooja?category=${cat.slug}`}
                   className="group rounded-2xl border border-saffron-500/10 bg-theme-cream p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:bg-saffron-500 hover:shadow-saffron-xl">
-                  <span className="block text-3xl transition-transform duration-200 group-hover:scale-110">{cat.icon}</span>
+                  <span className="flex justify-center text-3xl transition-transform duration-200 group-hover:scale-110">{cat.img ? <Icon3D name={cat.img} size={64} className={s.catImg} /> : cat.icon}</span>
                   <h3 className="mt-3 font-display text-sm font-bold text-maroon-700 transition-colors group-hover:text-white">{cat.label}</h3>
                   <p className="mt-1 font-devanagari text-xs text-maroon-700/50 transition-colors group-hover:text-white/80">{cat.desc}</p>
                 </Link>
