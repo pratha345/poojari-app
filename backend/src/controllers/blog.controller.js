@@ -79,7 +79,7 @@ exports.list = async (req, res) => {
       `SELECT id, title, slug, excerpt, image_url, author_name, category, tags, read_time, views, avg_rating, rating_count, created_at,
               ${so.label} AS season_label
        FROM blog_posts WHERE ${whereClause}
-       ORDER BY ${so.score} DESC, views DESC, created_at DESC LIMIT ? OFFSET ?`,
+       ORDER BY ${so.score} DESC, (created_at >= NOW() - INTERVAL 30 DAY) DESC, views DESC, created_at DESC LIMIT ? OFFSET ?`,
       [...so.labelParams, ...params, ...so.params, parseInt(limit), offset]
     );
     const [[{ total }]] = await pool.query(
