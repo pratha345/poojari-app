@@ -7,7 +7,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '../../.env') }
 const pool = require('./db');
 
 const AUTHOR = 'पूजारी टीम';
-const BLOGS = ['A', 'B', 'C']
+const BLOGS = ['A', 'B', 'C', 'D', 'E', 'F']
   .flatMap(p => require(`./blogs_nirnayasindhu_part${p}`));
 const DRY = process.argv.includes('--dry');
 
